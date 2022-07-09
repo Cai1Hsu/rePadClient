@@ -25,9 +25,10 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     
-    - name: Download a Build Artifact
-      uses: actions/download-artifact@v3.0.0
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: app-release.apk
-        path: /home/runner/work/rePadClient/rePadClient/app/build/output/apk/release/app-release.apk
+        path: app/build/output/apk/release/app-release.apk
+    
     
