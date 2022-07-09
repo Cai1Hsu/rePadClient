@@ -42,7 +42,7 @@ rule CXX_SHARED_LIBRARY_LINKER__native-lib
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /home/caiyi/android-sdk/cmake/3.10.2.4988404/bin/cmake -H/home/caiyi/workspace/PadClient/app/src/main/cpp -B/home/caiyi/workspace/PadClient/app/.cxx/cmake/release/armeabi-v7a
+  command = /home/caiyi/android-sdk/cmake/3.10.2.4988404/bin/cmake -H/home/caiyi/workspace/rePadClient/app/src/main/cpp -B/home/caiyi/workspace/rePadClient/app/.cxx/cmake/release/armeabi-v7a
   description = Re-running CMake...
   generator = 1
 
