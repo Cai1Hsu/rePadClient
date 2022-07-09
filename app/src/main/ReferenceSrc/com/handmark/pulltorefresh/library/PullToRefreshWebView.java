@@ -10,22 +10,46 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshWebView.class */
 public class PullToRefreshWebView extends PullToRefreshBase<WebView> {
     private static final PullToRefreshBase.OnRefreshListener<WebView> defaultOnRefreshListener = new PullToRefreshBase.OnRefreshListener<WebView>() { // from class: com.handmark.pulltorefresh.library.PullToRefreshWebView.1
         @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener
-        public void onRefresh(PullToRefreshBase<WebView> refreshView) {
-            refreshView.getRefreshableView().reload();
+        public void onRefresh(PullToRefreshBase<WebView> pullToRefreshBase) {
+            pullToRefreshBase.getRefreshableView().reload();
         }
     };
     private final WebChromeClient defaultWebChromeClient = new WebChromeClient() { // from class: com.handmark.pulltorefresh.library.PullToRefreshWebView.2
         @Override // android.webkit.WebChromeClient
-        public void onProgressChanged(WebView view, int newProgress) {
-            if (newProgress == 100) {
+        public void onProgressChanged(WebView webView, int i) {
+            if (i == 100) {
                 PullToRefreshWebView.this.onRefreshComplete();
             }
         }
     };
+
+    @TargetApi(9)
+    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshWebView$InternalWebViewSDK9.class */
+    final class InternalWebViewSDK9 extends WebView {
+        static final int OVERSCROLL_FUZZY_THRESHOLD = 2;
+        static final float OVERSCROLL_SCALE_FACTOR = 1.5f;
+
+        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+        public InternalWebViewSDK9(Context context, AttributeSet attributeSet) {
+            super(context, attributeSet);
+            PullToRefreshWebView.this = r5;
+        }
+
+        private int getScrollRange() {
+            return (int) Math.max(0.0f, FloatMath.floor(((WebView) PullToRefreshWebView.this.mRefreshableView).getScale() * ((WebView) PullToRefreshWebView.this.mRefreshableView).getContentHeight()) - ((getHeight() - getPaddingBottom()) - getPaddingTop()));
+        }
+
+        @Override // android.view.View
+        protected boolean overScrollBy(int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, boolean z) {
+            boolean overScrollBy = super.overScrollBy(i, i2, i3, i4, i5, i6, i7, i8, z);
+            OverscrollHelper.overScrollBy(PullToRefreshWebView.this, i, i3, i2, i4, getScrollRange(), 2, OVERSCROLL_SCALE_FACTOR, z);
+            return overScrollBy;
+        }
+    }
 
     public PullToRefreshWebView(Context context) {
         super(context);
@@ -33,8 +57,8 @@ public class PullToRefreshWebView extends PullToRefreshBase<WebView> {
         ((WebView) this.mRefreshableView).setWebChromeClient(this.defaultWebChromeClient);
     }
 
-    public PullToRefreshWebView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public PullToRefreshWebView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
         setOnRefreshListener(defaultOnRefreshListener);
         ((WebView) this.mRefreshableView).setWebChromeClient(this.defaultWebChromeClient);
     }
@@ -45,10 +69,17 @@ public class PullToRefreshWebView extends PullToRefreshBase<WebView> {
         ((WebView) this.mRefreshableView).setWebChromeClient(this.defaultWebChromeClient);
     }
 
-    public PullToRefreshWebView(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.AnimationStyle style) {
-        super(context, mode, style);
+    public PullToRefreshWebView(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.AnimationStyle animationStyle) {
+        super(context, mode, animationStyle);
         setOnRefreshListener(defaultOnRefreshListener);
         ((WebView) this.mRefreshableView).setWebChromeClient(this.defaultWebChromeClient);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
+    public WebView createRefreshableView(Context context, AttributeSet attributeSet) {
+        InternalWebViewSDK9 internalWebViewSDK9 = Build.VERSION.SDK_INT >= 9 ? new InternalWebViewSDK9(context, attributeSet) : new WebView(context, attributeSet);
+        internalWebViewSDK9.setId(R.id.webview);
+        return internalWebViewSDK9;
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
@@ -57,15 +88,8 @@ public class PullToRefreshWebView extends PullToRefreshBase<WebView> {
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    public WebView createRefreshableView(Context context, AttributeSet attrs) {
-        WebView webView;
-        if (Build.VERSION.SDK_INT >= 9) {
-            webView = new InternalWebViewSDK9(context, attrs);
-        } else {
-            webView = new WebView(context, attrs);
-        }
-        webView.setId(R.id.webview);
-        return webView;
+    protected boolean isReadyForPullEnd() {
+        return ((float) ((WebView) this.mRefreshableView).getScrollY()) >= FloatMath.floor(((WebView) this.mRefreshableView).getScale() * ((float) ((WebView) this.mRefreshableView).getContentHeight())) - ((float) ((WebView) this.mRefreshableView).getHeight());
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
@@ -74,44 +98,14 @@ public class PullToRefreshWebView extends PullToRefreshBase<WebView> {
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected boolean isReadyForPullEnd() {
-        float exactContentHeight = FloatMath.floor(((WebView) this.mRefreshableView).getScale() * ((WebView) this.mRefreshableView).getContentHeight());
-        return ((float) ((WebView) this.mRefreshableView).getScrollY()) >= exactContentHeight - ((float) ((WebView) this.mRefreshableView).getHeight());
+    protected void onPtrRestoreInstanceState(Bundle bundle) {
+        super.onPtrRestoreInstanceState(bundle);
+        ((WebView) this.mRefreshableView).restoreState(bundle);
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected void onPtrRestoreInstanceState(Bundle savedInstanceState) {
-        super.onPtrRestoreInstanceState(savedInstanceState);
-        ((WebView) this.mRefreshableView).restoreState(savedInstanceState);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected void onPtrSaveInstanceState(Bundle saveState) {
-        super.onPtrSaveInstanceState(saveState);
-        ((WebView) this.mRefreshableView).saveState(saveState);
-    }
-
-    @TargetApi(9)
-    /* loaded from: classes.dex */
-    final class InternalWebViewSDK9 extends WebView {
-        static final int OVERSCROLL_FUZZY_THRESHOLD = 2;
-        static final float OVERSCROLL_SCALE_FACTOR = 1.5f;
-
-        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
-        public InternalWebViewSDK9(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            PullToRefreshWebView.this = r1;
-        }
-
-        @Override // android.view.View
-        protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
-            boolean returnValue = super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
-            OverscrollHelper.overScrollBy(PullToRefreshWebView.this, deltaX, scrollX, deltaY, scrollY, getScrollRange(), 2, OVERSCROLL_SCALE_FACTOR, isTouchEvent);
-            return returnValue;
-        }
-
-        private int getScrollRange() {
-            return (int) Math.max(0.0f, FloatMath.floor(((WebView) PullToRefreshWebView.this.mRefreshableView).getScale() * ((WebView) PullToRefreshWebView.this.mRefreshableView).getContentHeight()) - ((getHeight() - getPaddingBottom()) - getPaddingTop()));
-        }
+    protected void onPtrSaveInstanceState(Bundle bundle) {
+        super.onPtrSaveInstanceState(bundle);
+        ((WebView) this.mRefreshableView).saveState(bundle);
     }
 }

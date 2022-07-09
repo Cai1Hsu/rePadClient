@@ -1,77 +1,80 @@
 package com.google.zxing.oned;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/CodaBarWriter.class */
 public class CodaBarWriter extends OneDimensionalCodeWriter {
     public CodaBarWriter() {
         super(20);
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public byte[] encode(String contents) {
-        if (!CodaBarReader.arrayContains(new char[]{'A', 'B', 'C', 'D'}, Character.toUpperCase(contents.charAt(0)))) {
+    public byte[] encode(String str) {
+        int i;
+        if (!CodaBarReader.arrayContains(new char[]{'A', 'B', 'C', 'D'}, Character.toUpperCase(str.charAt(0)))) {
             throw new IllegalArgumentException("Codabar should start with one of the following: 'A', 'B', 'C' or 'D'");
         }
-        if (!CodaBarReader.arrayContains(new char[]{'T', 'N', '*', 'E'}, Character.toUpperCase(contents.charAt(contents.length() - 1)))) {
+        if (!CodaBarReader.arrayContains(new char[]{'T', 'N', '*', 'E'}, Character.toUpperCase(str.charAt(str.length() - 1)))) {
             throw new IllegalArgumentException("Codabar should end with one of the following: 'T', 'N', '*' or 'E'");
         }
-        int resultLength = 20;
-        char[] charsWhichAreTenLengthEachAfterDecoded = {IOUtils.DIR_SEPARATOR_UNIX, ':', '+', FilenameUtils.EXTENSION_SEPARATOR};
-        for (int i = 1; i < contents.length() - 1; i++) {
-            if (Character.isDigit(contents.charAt(i)) || contents.charAt(i) == '-' || contents.charAt(i) == '$') {
-                resultLength += 9;
-            } else if (CodaBarReader.arrayContains(charsWhichAreTenLengthEachAfterDecoded, contents.charAt(i))) {
-                resultLength += 10;
+        int i2 = 20;
+        for (int i3 = 1; i3 < str.length() - 1; i3++) {
+            if (Character.isDigit(str.charAt(i3)) || str.charAt(i3) == '-' || str.charAt(i3) == '$') {
+                i2 += 9;
+            } else if (!CodaBarReader.arrayContains(new char[]{'/', ':', '+', '.'}, str.charAt(i3))) {
+                throw new IllegalArgumentException("Cannot encode : '" + str.charAt(i3) + '\'');
             } else {
-                throw new IllegalArgumentException("Cannot encode : '" + contents.charAt(i) + '\'');
+                i2 += 10;
             }
         }
-        byte[] result = new byte[resultLength + (contents.length() - 1)];
-        int position = 0;
-        for (int index = 0; index < contents.length(); index++) {
-            char c = Character.toUpperCase(contents.charAt(index));
-            if (index == contents.length() - 1) {
-                if (c == '*') {
+        byte[] bArr = new byte[i2 + (str.length() - 1)];
+        int i4 = 0;
+        int i5 = 0;
+        while (i5 < str.length()) {
+            char upperCase = Character.toUpperCase(str.charAt(i5));
+            char c = upperCase;
+            if (i5 == str.length() - 1) {
+                if (upperCase == '*') {
                     c = 'C';
-                } else if (c == 'E') {
-                    c = 'D';
-                }
-            }
-            int code = 0;
-            int i2 = 0;
-            while (true) {
-                if (i2 < CodaBarReader.ALPHABET.length) {
-                    if (c != CodaBarReader.ALPHABET[i2]) {
-                        i2++;
-                    } else {
-                        code = CodaBarReader.CHARACTER_ENCODINGS[i2];
-                        break;
+                } else {
+                    c = upperCase;
+                    if (upperCase == 'E') {
+                        c = 'D';
                     }
-                } else {
+                }
+            }
+            int i6 = 0;
+            while (true) {
+                i = 0;
+                if (i6 >= CodaBarReader.ALPHABET.length) {
                     break;
-                }
-            }
-            byte color = 1;
-            int counter = 0;
-            int bit = 0;
-            while (bit < 7) {
-                result[position] = color;
-                position++;
-                if (((code >> (6 - bit)) & 1) == 0 || counter == 1) {
-                    color = (byte) (color ^ 1);
-                    bit++;
-                    counter = 0;
+                } else if (c == CodaBarReader.ALPHABET[i6]) {
+                    i = CodaBarReader.CHARACTER_ENCODINGS[i6];
+                    break;
                 } else {
-                    counter++;
+                    i6++;
                 }
             }
-            if (index < contents.length() - 1) {
-                result[position] = 0;
-                position++;
+            byte b = 1;
+            int i7 = 0;
+            int i8 = 0;
+            while (i8 < 7) {
+                bArr[i4] = b;
+                i4++;
+                if (((i >> (6 - i8)) & 1) == 0 || i7 == 1) {
+                    b = (byte) (b ^ 1);
+                    i8++;
+                    i7 = 0;
+                } else {
+                    i7++;
+                }
             }
+            int i9 = i4;
+            if (i5 < str.length() - 1) {
+                bArr[i4] = (byte) 0;
+                i9 = i4 + 1;
+            }
+            i5++;
+            i4 = i9;
         }
-        return result;
+        return bArr;
     }
 }

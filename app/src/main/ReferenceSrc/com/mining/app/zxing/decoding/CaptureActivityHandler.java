@@ -15,7 +15,7 @@ import com.mining.app.zxing.camera.CameraManager;
 import com.mining.app.zxing.view.ViewfinderResultPointCallback;
 import java.util.Collection;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mining/app/zxing/decoding/CaptureActivityHandler.class */
 public final class CaptureActivityHandler extends Handler {
     private static final String TAG = CaptureActivityHandler.class.getSimpleName();
     private final MipcaActivityCapture activity;
@@ -23,30 +23,39 @@ public final class CaptureActivityHandler extends Handler {
     private final DecodeThread decodeThread;
     private State state = State.SUCCESS;
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/mining/app/zxing/decoding/CaptureActivityHandler$State.class */
     private enum State {
         PREVIEW,
         SUCCESS,
         DONE
     }
 
-    public CaptureActivityHandler(MipcaActivityCapture activity, Collection<BarcodeFormat> decodeFormats, String characterSet, CameraManager cameraManager) {
-        this.activity = activity;
-        this.decodeThread = new DecodeThread(activity, decodeFormats, characterSet, new ViewfinderResultPointCallback(activity.getViewfinderView()));
+    public CaptureActivityHandler(MipcaActivityCapture mipcaActivityCapture, Collection<BarcodeFormat> collection, String str, CameraManager cameraManager) {
+        this.activity = mipcaActivityCapture;
+        this.decodeThread = new DecodeThread(mipcaActivityCapture, collection, str, new ViewfinderResultPointCallback(mipcaActivityCapture.getViewfinderView()));
         this.decodeThread.start();
         this.cameraManager = cameraManager;
         cameraManager.startPreview();
         restartPreviewAndDecode();
     }
 
+    private void restartPreviewAndDecode() {
+        if (this.state == State.SUCCESS) {
+            this.state = State.PREVIEW;
+            this.cameraManager.requestPreviewFrame(this.decodeThread.getHandler(), R.id.decode);
+            this.cameraManager.requestAutoFocus(this, R.id.auto_focus);
+            this.activity.drawViewfinder();
+        }
+    }
+
     @Override // android.os.Handler
     public void handleMessage(Message message) {
         switch (message.what) {
             case R.id.auto_focus /* 2131361795 */:
-                if (this.state == State.PREVIEW) {
-                    this.cameraManager.requestAutoFocus(this, R.id.auto_focus);
+                if (this.state != State.PREVIEW) {
                     return;
                 }
+                this.cameraManager.requestAutoFocus(this, R.id.auto_focus);
                 return;
             case R.id.decode /* 2131361796 */:
             case R.id.encode_failed /* 2131361799 */:
@@ -61,14 +70,12 @@ public final class CaptureActivityHandler extends Handler {
             case R.id.decode_succeeded /* 2131361798 */:
                 Log.d(TAG, "Got decode succeeded message");
                 this.state = State.SUCCESS;
-                Bundle bundle = message.getData();
-                Bitmap barcode = bundle == null ? null : (Bitmap) bundle.getParcelable(DecodeThread.BARCODE_BITMAP);
-                this.activity.handleDecode((Result) message.obj, barcode);
+                Bundle data = message.getData();
+                this.activity.handleDecode((Result) message.obj, data == null ? null : (Bitmap) data.getParcelable(DecodeThread.BARCODE_BITMAP));
                 return;
             case R.id.launch_product_query /* 2131361801 */:
                 Log.d(TAG, "Got product query message");
-                String url = (String) message.obj;
-                Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+                Intent intent = new Intent("android.intent.action.VIEW", Uri.parse((String) message.obj));
                 intent.addFlags(524288);
                 this.activity.startActivity(intent);
                 return;
@@ -87,22 +94,12 @@ public final class CaptureActivityHandler extends Handler {
     public void quitSynchronously() {
         this.state = State.DONE;
         this.cameraManager.stopPreview();
-        Message quit = Message.obtain(this.decodeThread.getHandler(), (int) R.id.quit);
-        quit.sendToTarget();
+        Message.obtain(this.decodeThread.getHandler(), (int) R.id.quit).sendToTarget();
         try {
             this.decodeThread.join(500L);
         } catch (InterruptedException e) {
         }
         removeMessages(R.id.decode_succeeded);
         removeMessages(R.id.decode_failed);
-    }
-
-    private void restartPreviewAndDecode() {
-        if (this.state == State.SUCCESS) {
-            this.state = State.PREVIEW;
-            this.cameraManager.requestPreviewFrame(this.decodeThread.getHandler(), R.id.decode);
-            this.cameraManager.requestAutoFocus(this, R.id.auto_focus);
-            this.activity.drawViewfinder();
-        }
     }
 }

@@ -5,17 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/SampleAdmin.class */
 public class SampleAdmin extends DeviceAdminReceiver {
-    void showToast(Context context, CharSequence msg) {
-        Toast.makeText(context, msg, 0).show();
-    }
-
-    @Override // android.app.admin.DeviceAdminReceiver
-    public void onEnabled(Context context, Intent intent) {
-        showToast(context, "Sample Device Admin: enabled");
-    }
-
     @Override // android.app.admin.DeviceAdminReceiver
     public CharSequence onDisableRequested(Context context, Intent intent) {
         return "This is an optional message to warn the user about disabling.";
@@ -24,6 +15,11 @@ public class SampleAdmin extends DeviceAdminReceiver {
     @Override // android.app.admin.DeviceAdminReceiver
     public void onDisabled(Context context, Intent intent) {
         showToast(context, "Sample Device Admin: disabled");
+    }
+
+    @Override // android.app.admin.DeviceAdminReceiver
+    public void onEnabled(Context context, Intent intent) {
+        showToast(context, "Sample Device Admin: enabled");
     }
 
     @Override // android.app.admin.DeviceAdminReceiver
@@ -39,5 +35,9 @@ public class SampleAdmin extends DeviceAdminReceiver {
     @Override // android.app.admin.DeviceAdminReceiver
     public void onPasswordSucceeded(Context context, Intent intent) {
         showToast(context, "Sample Device Admin: pw succeeded");
+    }
+
+    void showToast(Context context, CharSequence charSequence) {
+        Toast.makeText(context, charSequence, 0).show();
     }
 }

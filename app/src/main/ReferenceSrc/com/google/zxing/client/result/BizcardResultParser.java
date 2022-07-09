@@ -2,54 +2,44 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 import java.util.ArrayList;
-import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/BizcardResultParser.class */
 public final class BizcardResultParser extends AbstractDoCoMoResultParser {
+    private static String buildName(String str, String str2) {
+        if (str == null) {
+            str = str2;
+        } else if (str2 != null) {
+            str = str + ' ' + str2;
+        }
+        return str;
+    }
+
+    private static String[] buildPhoneNumbers(String str, String str2, String str3) {
+        ArrayList arrayList = new ArrayList(3);
+        if (str != null) {
+            arrayList.add(str);
+        }
+        if (str2 != null) {
+            arrayList.add(str2);
+        }
+        if (str3 != null) {
+            arrayList.add(str3);
+        }
+        int size = arrayList.size();
+        return size == 0 ? null : (String[]) arrayList.toArray(new String[size]);
+    }
+
     @Override // com.google.zxing.client.result.ResultParser
     public AddressBookParsedResult parse(Result result) {
-        String rawText = result.getText();
-        if (!rawText.startsWith("BIZCARD:")) {
-            return null;
+        AddressBookParsedResult addressBookParsedResult;
+        String text = result.getText();
+        if (!text.startsWith("BIZCARD:")) {
+            addressBookParsedResult = null;
+        } else {
+            String buildName = buildName(matchSingleDoCoMoPrefixedField("N:", text, true), matchSingleDoCoMoPrefixedField("X:", text, true));
+            String matchSingleDoCoMoPrefixedField = matchSingleDoCoMoPrefixedField("T:", text, true);
+            addressBookParsedResult = new AddressBookParsedResult(maybeWrap(buildName), null, buildPhoneNumbers(matchSingleDoCoMoPrefixedField("B:", text, true), matchSingleDoCoMoPrefixedField("M:", text, true), matchSingleDoCoMoPrefixedField("F:", text, true)), null, maybeWrap(matchSingleDoCoMoPrefixedField("E:", text, true)), null, null, null, matchDoCoMoPrefixedField("A:", text, true), null, matchSingleDoCoMoPrefixedField("C:", text, true), null, matchSingleDoCoMoPrefixedField, null);
         }
-        String firstName = matchSingleDoCoMoPrefixedField("N:", rawText, true);
-        String lastName = matchSingleDoCoMoPrefixedField("X:", rawText, true);
-        String fullName = buildName(firstName, lastName);
-        String title = matchSingleDoCoMoPrefixedField("T:", rawText, true);
-        String org2 = matchSingleDoCoMoPrefixedField("C:", rawText, true);
-        String[] addresses = matchDoCoMoPrefixedField("A:", rawText, true);
-        String phoneNumber1 = matchSingleDoCoMoPrefixedField("B:", rawText, true);
-        String phoneNumber2 = matchSingleDoCoMoPrefixedField("M:", rawText, true);
-        String phoneNumber3 = matchSingleDoCoMoPrefixedField("F:", rawText, true);
-        String email = matchSingleDoCoMoPrefixedField("E:", rawText, true);
-        return new AddressBookParsedResult(maybeWrap(fullName), null, buildPhoneNumbers(phoneNumber1, phoneNumber2, phoneNumber3), null, maybeWrap(email), null, null, null, addresses, null, org2, null, title, null);
-    }
-
-    private static String[] buildPhoneNumbers(String number1, String number2, String number3) {
-        List<String> numbers = new ArrayList<>(3);
-        if (number1 != null) {
-            numbers.add(number1);
-        }
-        if (number2 != null) {
-            numbers.add(number2);
-        }
-        if (number3 != null) {
-            numbers.add(number3);
-        }
-        int size = numbers.size();
-        if (size == 0) {
-            return null;
-        }
-        return (String[]) numbers.toArray(new String[size]);
-    }
-
-    private static String buildName(String firstName, String lastName) {
-        if (firstName == null) {
-            return lastName;
-        }
-        if (lastName != null) {
-            firstName = firstName + ' ' + lastName;
-        }
-        return firstName;
+        return addressBookParsedResult;
     }
 }

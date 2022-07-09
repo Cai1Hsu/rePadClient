@@ -1,13 +1,13 @@
 package com.google.zxing.qrcode.encoder;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/qrcode/encoder/BlockPair.class */
 final class BlockPair {
     private final byte[] dataBytes;
     private final byte[] errorCorrectionBytes;
 
-    BlockPair(byte[] data, byte[] errorCorrection) {
-        this.dataBytes = data;
-        this.errorCorrectionBytes = errorCorrection;
+    BlockPair(byte[] bArr, byte[] bArr2) {
+        this.dataBytes = bArr;
+        this.errorCorrectionBytes = bArr2;
     }
 
     public byte[] getDataBytes() {

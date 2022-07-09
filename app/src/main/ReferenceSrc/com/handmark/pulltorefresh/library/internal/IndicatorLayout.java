@@ -6,7 +6,6 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
@@ -15,9 +14,9 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.R;
 
 @SuppressLint({"ViewConstructor"})
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/internal/IndicatorLayout.class */
 public class IndicatorLayout extends FrameLayout implements Animation.AnimationListener {
-    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode = null;
+    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode;
     static final int DEFAULT_ROTATION_ANIMATION_DURATION = 150;
     private ImageView mArrowImageView;
     private Animation mInAnim;
@@ -56,57 +55,60 @@ public class IndicatorLayout extends FrameLayout implements Animation.AnimationL
 
     public IndicatorLayout(Context context, PullToRefreshBase.Mode mode) {
         super(context);
-        int inAnimResId;
-        int outAnimResId;
+        int i;
+        int i2;
         this.mArrowImageView = new ImageView(context);
-        Drawable arrowD = getResources().getDrawable(R.drawable.indicator_arrow);
-        this.mArrowImageView.setImageDrawable(arrowD);
-        int padding = getResources().getDimensionPixelSize(R.dimen.indicator_internal_padding);
-        this.mArrowImageView.setPadding(padding, padding, padding, padding);
+        Drawable drawable = getResources().getDrawable(R.drawable.indicator_arrow);
+        this.mArrowImageView.setImageDrawable(drawable);
+        int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.indicator_internal_padding);
+        this.mArrowImageView.setPadding(dimensionPixelSize, dimensionPixelSize, dimensionPixelSize, dimensionPixelSize);
         addView(this.mArrowImageView);
         switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[mode.ordinal()]) {
             case 3:
-                inAnimResId = R.anim.slide_in_from_bottom;
-                outAnimResId = R.anim.slide_out_to_bottom;
+                i = R.anim.slide_in_from_bottom;
+                i2 = R.anim.slide_out_to_bottom;
                 setBackgroundResource(R.drawable.indicator_bg_bottom);
                 this.mArrowImageView.setScaleType(ImageView.ScaleType.MATRIX);
                 Matrix matrix = new Matrix();
-                matrix.setRotate(180.0f, arrowD.getIntrinsicWidth() / 2.0f, arrowD.getIntrinsicHeight() / 2.0f);
+                matrix.setRotate(180.0f, drawable.getIntrinsicWidth() / 2.0f, drawable.getIntrinsicHeight() / 2.0f);
                 this.mArrowImageView.setImageMatrix(matrix);
                 break;
             default:
-                inAnimResId = R.anim.slide_in_from_top;
-                outAnimResId = R.anim.slide_out_to_top;
+                i = R.anim.slide_in_from_top;
+                i2 = R.anim.slide_out_to_top;
                 setBackgroundResource(R.drawable.indicator_bg_top);
                 break;
         }
-        this.mInAnim = AnimationUtils.loadAnimation(context, inAnimResId);
+        this.mInAnim = AnimationUtils.loadAnimation(context, i);
         this.mInAnim.setAnimationListener(this);
-        this.mOutAnim = AnimationUtils.loadAnimation(context, outAnimResId);
+        this.mOutAnim = AnimationUtils.loadAnimation(context, i2);
         this.mOutAnim.setAnimationListener(this);
-        Interpolator interpolator = new LinearInterpolator();
+        LinearInterpolator linearInterpolator = new LinearInterpolator();
         this.mRotateAnimation = new RotateAnimation(0.0f, -180.0f, 1, 0.5f, 1, 0.5f);
-        this.mRotateAnimation.setInterpolator(interpolator);
+        this.mRotateAnimation.setInterpolator(linearInterpolator);
         this.mRotateAnimation.setDuration(150L);
         this.mRotateAnimation.setFillAfter(true);
         this.mResetRotateAnimation = new RotateAnimation(-180.0f, 0.0f, 1, 0.5f, 1, 0.5f);
-        this.mResetRotateAnimation.setInterpolator(interpolator);
+        this.mResetRotateAnimation.setInterpolator(linearInterpolator);
         this.mResetRotateAnimation.setDuration(150L);
         this.mResetRotateAnimation.setFillAfter(true);
-    }
-
-    public final boolean isVisible() {
-        Animation currentAnim = getAnimation();
-        return currentAnim != null ? this.mInAnim == currentAnim : getVisibility() == 0;
     }
 
     public void hide() {
         startAnimation(this.mOutAnim);
     }
 
-    public void show() {
-        this.mArrowImageView.clearAnimation();
-        startAnimation(this.mInAnim);
+    public final boolean isVisible() {
+        boolean z = true;
+        Animation animation = getAnimation();
+        if (animation != null) {
+            if (this.mInAnim != animation) {
+                z = false;
+            }
+        } else if (getVisibility() != 0) {
+            z = false;
+        }
+        return z;
     }
 
     @Override // android.view.animation.Animation.AnimationListener
@@ -129,11 +131,16 @@ public class IndicatorLayout extends FrameLayout implements Animation.AnimationL
         setVisibility(0);
     }
 
+    public void pullToRefresh() {
+        this.mArrowImageView.startAnimation(this.mResetRotateAnimation);
+    }
+
     public void releaseToRefresh() {
         this.mArrowImageView.startAnimation(this.mRotateAnimation);
     }
 
-    public void pullToRefresh() {
-        this.mArrowImageView.startAnimation(this.mResetRotateAnimation);
+    public void show() {
+        this.mArrowImageView.clearAnimation();
+        startAnimation(this.mInAnim);
     }
 }

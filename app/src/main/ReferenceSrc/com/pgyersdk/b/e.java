@@ -28,7 +28,7 @@ import org.jivesoftware.smackx.packet.JingleContent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/b/e.class */
 public final class e extends AsyncTask {
     private Context a;
     private Handler b;
@@ -53,11 +53,11 @@ public final class e extends AsyncTask {
     }
 
     private String a(HttpClient httpClient) {
+        String str;
         HttpPut httpPut;
         HttpResponse execute;
         String readLine;
         HttpPost httpPost = null;
-        String str = "";
         try {
             ArrayList arrayList = new ArrayList();
             arrayList.add(new BasicNameValuePair("agKey", com.pgyersdk.a.a.k));
@@ -80,38 +80,47 @@ public final class e extends AsyncTask {
                 httpPost.setEntity(urlEncodedFormEntity);
                 execute = httpClient.execute(httpPost);
             }
-            if (execute == null || execute.getStatusLine().getStatusCode() != 200) {
-                return str;
-            }
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(execute.getEntity().getContent(), "UTF-8"), 8);
-            StringBuilder sb = new StringBuilder();
-            while (true) {
-                if (bufferedReader.readLine() == null) {
+            str = "";
+            if (execute != null) {
+                str = "";
+                if (execute.getStatusLine().getStatusCode() == 200) {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(execute.getEntity().getContent(), "UTF-8"), 8);
+                    StringBuilder sb = new StringBuilder();
+                    while (true) {
+                        if (bufferedReader.readLine() == null) {
+                            break;
+                        }
+                        sb.append(String.valueOf(readLine) + "\n");
+                    }
                     str = sb.toString();
-                    return str;
                 }
-                sb.append(String.valueOf(readLine) + "\n");
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return str;
+            str = "";
         } catch (ClientProtocolException e2) {
             e2.printStackTrace();
-            return str;
+            str = "";
         } catch (IOException e3) {
             e3.printStackTrace();
-            return str;
+            str = "";
         }
+        return str;
     }
 
-    /* JADX DEBUG: Another duplicated slice has different insns count: {[IF]}, finally: {[IF, INVOKE, MOVE_EXCEPTION, INVOKE, INVOKE, MOVE_EXCEPTION] complete} */
+    /* JADX DEBUG: Another duplicated slice has different insns count: {[MOVE]}, finally: {[MOVE, MOVE, INVOKE, INVOKE, INVOKE, MOVE_EXCEPTION, MOVE, INVOKE, INVOKE, INVOKE, MOVE_EXCEPTION, IF] complete} */
     private String b(HttpClient httpClient) {
+        String str;
         HttpPost httpPost;
         HttpPut httpPut;
         HttpResponse execute;
-        String str;
+        String str2;
+        InputStream inputStream;
         String readLine;
-        InputStream inputStream = null;
+        InputStream inputStream2 = null;
+        InputStream inputStream3 = null;
+        InputStream inputStream4 = null;
+        InputStream inputStream5 = null;
         try {
             try {
                 ArrayList<NameValuePair> arrayList = new ArrayList();
@@ -126,8 +135,8 @@ public final class e extends AsyncTask {
                 }
                 int i = 0;
                 while (i < this.e.size()) {
-                    String str2 = (String) this.e.get(i);
-                    lVar.a("image[]", str2.substring(str2.lastIndexOf("/") + 1), new FileInputStream(str2), i == this.e.size() + (-1));
+                    String str3 = (String) this.e.get(i);
+                    lVar.a("image[]", str3.substring(str3.lastIndexOf("/") + 1), new FileInputStream(str3), i == this.e.size() - 1);
                     i++;
                 }
                 lVar.c();
@@ -149,10 +158,11 @@ public final class e extends AsyncTask {
                     execute = httpClient.execute(httpPost);
                 }
                 if (execute == null || execute.getStatusLine().getStatusCode() != 200) {
-                    str = "";
+                    str2 = "";
+                    inputStream = null;
                 } else {
-                    inputStream = execute.getEntity().getContent();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
+                    InputStream content = execute.getEntity().getContent();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(content, "UTF-8"), 8);
                     StringBuilder sb = new StringBuilder();
                     while (true) {
                         if (bufferedReader.readLine() == null) {
@@ -160,22 +170,27 @@ public final class e extends AsyncTask {
                         }
                         sb.append(String.valueOf(readLine) + "\n");
                     }
-                    str = sb.toString();
+                    inputStream2 = content;
+                    inputStream3 = content;
+                    inputStream4 = content;
+                    inputStream5 = content;
+                    str2 = sb.toString();
+                    inputStream = content;
                 }
-                if (inputStream == null) {
-                    return str;
-                }
-                try {
-                    inputStream.close();
-                    return str;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return str;
-                }
-            } catch (Throwable th) {
+                str = str2;
                 if (inputStream != null) {
                     try {
                         inputStream.close();
+                        str = str2;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        str = str2;
+                    }
+                }
+            } catch (Throwable th) {
+                if (inputStream5 != null) {
+                    try {
+                        inputStream5.close();
                     } catch (IOException e2) {
                         e2.printStackTrace();
                     }
@@ -184,41 +199,42 @@ public final class e extends AsyncTask {
             }
         } catch (UnsupportedEncodingException e3) {
             e3.printStackTrace();
-            if (inputStream != null) {
+            if (inputStream2 != null) {
                 try {
-                    inputStream.close();
-                    return "";
+                    inputStream2.close();
+                    str = "";
                 } catch (IOException e4) {
                     e4.printStackTrace();
-                    return "";
+                    str = "";
                 }
             }
-            return "";
+            str = "";
         } catch (ClientProtocolException e5) {
             e5.printStackTrace();
-            if (inputStream != null) {
+            if (inputStream3 != null) {
                 try {
-                    inputStream.close();
-                    return "";
+                    inputStream3.close();
+                    str = "";
                 } catch (IOException e6) {
                     e6.printStackTrace();
-                    return "";
+                    str = "";
                 }
             }
-            return "";
+            str = "";
         } catch (IOException e7) {
             e7.printStackTrace();
-            if (inputStream != null) {
+            if (inputStream4 != null) {
                 try {
-                    inputStream.close();
-                    return "";
+                    inputStream4.close();
+                    str = "";
                 } catch (IOException e8) {
                     e8.printStackTrace();
-                    return "";
+                    str = "";
                 }
             }
-            return "";
+            str = "";
         }
+        return str;
     }
 
     public final void a() {
@@ -231,6 +247,7 @@ public final class e extends AsyncTask {
         return this.e.isEmpty() ? a(b) : b(b);
     }
 
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:15:0x0047 -> B:20:0x0013). Please submit an issue!!! */
     @Override // android.os.AsyncTask
     protected final /* synthetic */ void onPostExecute(Object obj) {
         String str = (String) obj;

@@ -65,7 +65,7 @@
         <activity android:configChanges="keyboardHidden|layoutDirection|orientation|screenSize" android:excludeFromRecents="true" android:label="@string/app_name" android:launchMode="singleInstance" android:name="com.edutech.mobilestudyclient.activity.CloudClientActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"> 
             <intent-filter> 
                 <action android:name="android.intent.action.MAIN"/>  
-                <category android:name="android.intent.category.LAUNCHER"/>  
+                <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.HOME"/>  
                 <category android:name="android.intent.category.DEFAULT"/> 
             </intent-filter>  

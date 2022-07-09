@@ -2,7 +2,7 @@ package com.pgyersdk.b;
 
 import android.content.DialogInterface;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/b/c.class */
 final class c implements DialogInterface.OnClickListener {
     final /* synthetic */ b a;
 

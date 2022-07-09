@@ -1,36 +1,33 @@
 package com.google.zxing;
 
-import org.apache.commons.io.FilenameUtils;
-import org.bson.BSON;
-
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/LuminanceSource.class */
 public abstract class LuminanceSource {
     private final int height;
     private final int width;
 
-    public abstract byte[] getMatrix();
-
-    public abstract byte[] getRow(int i, byte[] bArr);
-
-    protected LuminanceSource(int width, int height) {
-        this.width = width;
-        this.height = height;
+    protected LuminanceSource(int i, int i2) {
+        this.width = i;
+        this.height = i2;
     }
 
-    public final int getWidth() {
-        return this.width;
+    public LuminanceSource crop(int i, int i2, int i3, int i4) {
+        throw new UnsupportedOperationException("This luminance source does not support cropping.");
     }
 
     public final int getHeight() {
         return this.height;
     }
 
-    public boolean isCropSupported() {
-        return false;
+    public abstract byte[] getMatrix();
+
+    public abstract byte[] getRow(int i, byte[] bArr);
+
+    public final int getWidth() {
+        return this.width;
     }
 
-    public LuminanceSource crop(int left, int top, int width, int height) {
-        throw new UnsupportedOperationException("This luminance source does not support cropping.");
+    public boolean isCropSupported() {
+        return false;
     }
 
     public boolean isRotateSupported() {
@@ -42,26 +39,16 @@ public abstract class LuminanceSource {
     }
 
     public String toString() {
-        char c;
-        byte[] row = new byte[this.width];
-        StringBuilder result = new StringBuilder(this.height * (this.width + 1));
-        for (int y = 0; y < this.height; y++) {
-            row = getRow(y, row);
-            for (int x = 0; x < this.width; x++) {
-                int luminance = row[x] & BSON.MINKEY;
-                if (luminance < 64) {
-                    c = '#';
-                } else if (luminance < 128) {
-                    c = '+';
-                } else if (luminance < 192) {
-                    c = FilenameUtils.EXTENSION_SEPARATOR;
-                } else {
-                    c = ' ';
-                }
-                result.append(c);
+        byte[] bArr = new byte[this.width];
+        StringBuilder sb = new StringBuilder(this.height * (this.width + 1));
+        for (int i = 0; i < this.height; i++) {
+            bArr = getRow(i, bArr);
+            for (int i2 = 0; i2 < this.width; i2++) {
+                int i3 = bArr[i2] & 255;
+                sb.append(i3 < 64 ? '#' : i3 < 128 ? '+' : i3 < 192 ? '.' : ' ');
             }
-            result.append('\n');
+            sb.append('\n');
         }
-        return result.toString();
+        return sb.toString();
     }
 }

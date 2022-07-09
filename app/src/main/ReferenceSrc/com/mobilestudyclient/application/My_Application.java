@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mobilestudyclient/application/My_Application.class */
 public class My_Application extends Application {
     private static final String AUTH_ON = "on";
     public static int Class_Type = 0;
-    public static String LoginName = null;
+    public static String LoginName;
     private static final String POLICY_ALWAYS_NEW_CLIENT = "always new client";
     private static final String POLICY_SINGLE_SESSION_PER_ACCOUNT = "single session per account";
     private static Context mContext;

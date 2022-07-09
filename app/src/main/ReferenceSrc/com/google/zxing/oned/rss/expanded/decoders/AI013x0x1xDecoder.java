@@ -3,7 +3,7 @@ package com.google.zxing.oned.rss.expanded.decoders;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI013x0x1xDecoder.class */
 final class AI013x0x1xDecoder extends AI01weightDecoder {
     private static final int DATE_SIZE = 16;
     private static final int HEADER_SIZE = 8;
@@ -11,10 +11,49 @@ final class AI013x0x1xDecoder extends AI01weightDecoder {
     private final String dateCode;
     private final String firstAIdigits;
 
-    AI013x0x1xDecoder(BitArray information, String firstAIdigits, String dateCode) {
-        super(information);
-        this.dateCode = dateCode;
-        this.firstAIdigits = firstAIdigits;
+    AI013x0x1xDecoder(BitArray bitArray, String str, String str2) {
+        super(bitArray);
+        this.dateCode = str2;
+        this.firstAIdigits = str;
+    }
+
+    private void encodeCompressedDate(StringBuilder sb, int i) {
+        int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray(i, 16);
+        if (extractNumericValueFromBitArray == 38400) {
+            return;
+        }
+        sb.append('(');
+        sb.append(this.dateCode);
+        sb.append(')');
+        int i2 = extractNumericValueFromBitArray % 32;
+        int i3 = extractNumericValueFromBitArray / 32;
+        int i4 = (i3 % 12) + 1;
+        int i5 = i3 / 12;
+        if (i5 / 10 == 0) {
+            sb.append('0');
+        }
+        sb.append(i5);
+        if (i4 / 10 == 0) {
+            sb.append('0');
+        }
+        sb.append(i4);
+        if (i2 / 10 == 0) {
+            sb.append('0');
+        }
+        sb.append(i2);
+    }
+
+    @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
+    protected void addWeightCode(StringBuilder sb, int i) {
+        sb.append('(');
+        sb.append(this.firstAIdigits);
+        sb.append(i / 100000);
+        sb.append(')');
+    }
+
+    @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
+    protected int checkWeight(int i) {
+        return i % 100000;
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
@@ -22,49 +61,10 @@ final class AI013x0x1xDecoder extends AI01weightDecoder {
         if (getInformation().getSize() != 84) {
             throw NotFoundException.getNotFoundInstance();
         }
-        StringBuilder buf = new StringBuilder();
-        encodeCompressedGtin(buf, 8);
-        encodeCompressedWeight(buf, 48, 20);
-        encodeCompressedDate(buf, 68);
-        return buf.toString();
-    }
-
-    private void encodeCompressedDate(StringBuilder buf, int currentPos) {
-        int numericDate = getGeneralDecoder().extractNumericValueFromBitArray(currentPos, 16);
-        if (numericDate != 38400) {
-            buf.append('(');
-            buf.append(this.dateCode);
-            buf.append(')');
-            int day = numericDate % 32;
-            int numericDate2 = numericDate / 32;
-            int month = (numericDate2 % 12) + 1;
-            int numericDate3 = numericDate2 / 12;
-            if (numericDate3 / 10 == 0) {
-                buf.append('0');
-            }
-            buf.append(numericDate3);
-            if (month / 10 == 0) {
-                buf.append('0');
-            }
-            buf.append(month);
-            if (day / 10 == 0) {
-                buf.append('0');
-            }
-            buf.append(day);
-        }
-    }
-
-    @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
-    protected void addWeightCode(StringBuilder buf, int weight) {
-        int lastAI = weight / 100000;
-        buf.append('(');
-        buf.append(this.firstAIdigits);
-        buf.append(lastAI);
-        buf.append(')');
-    }
-
-    @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
-    protected int checkWeight(int weight) {
-        return weight % 100000;
+        StringBuilder sb = new StringBuilder();
+        encodeCompressedGtin(sb, 8);
+        encodeCompressedWeight(sb, 48, 20);
+        encodeCompressedDate(sb, 68);
+        return sb.toString();
     }
 }

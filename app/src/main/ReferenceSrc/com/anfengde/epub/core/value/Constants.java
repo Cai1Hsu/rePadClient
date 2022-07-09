@@ -1,6 +1,6 @@
 package com.anfengde.epub.core.value;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/anfengde/epub/core/value/Constants.class */
 public class Constants {
     public static final String CACHE_PAHT = "/sdcard/epub";
     public static final String COVERIMG_PATH = "../image/afd_coverimg.png";

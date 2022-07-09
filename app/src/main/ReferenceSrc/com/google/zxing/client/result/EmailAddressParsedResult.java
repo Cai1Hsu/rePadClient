@@ -1,42 +1,42 @@
 package com.google.zxing.client.result;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/EmailAddressParsedResult.class */
 public final class EmailAddressParsedResult extends ParsedResult {
     private final String body;
     private final String emailAddress;
     private final String mailtoURI;
     private final String subject;
 
-    EmailAddressParsedResult(String emailAddress, String subject, String body, String mailtoURI) {
+    EmailAddressParsedResult(String str, String str2, String str3, String str4) {
         super(ParsedResultType.EMAIL_ADDRESS);
-        this.emailAddress = emailAddress;
-        this.subject = subject;
-        this.body = body;
-        this.mailtoURI = mailtoURI;
-    }
-
-    public String getEmailAddress() {
-        return this.emailAddress;
-    }
-
-    public String getSubject() {
-        return this.subject;
+        this.emailAddress = str;
+        this.subject = str2;
+        this.body = str3;
+        this.mailtoURI = str4;
     }
 
     public String getBody() {
         return this.body;
     }
 
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
+        StringBuilder sb = new StringBuilder(30);
+        maybeAppend(this.emailAddress, sb);
+        maybeAppend(this.subject, sb);
+        maybeAppend(this.body, sb);
+        return sb.toString();
+    }
+
+    public String getEmailAddress() {
+        return this.emailAddress;
+    }
+
     public String getMailtoURI() {
         return this.mailtoURI;
     }
 
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(30);
-        maybeAppend(this.emailAddress, result);
-        maybeAppend(this.subject, result);
-        maybeAppend(this.body, result);
-        return result.toString();
+    public String getSubject() {
+        return this.subject;
     }
 }

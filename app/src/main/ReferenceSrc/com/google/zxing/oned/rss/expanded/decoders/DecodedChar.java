@@ -1,13 +1,13 @@
 package com.google.zxing.oned.rss.expanded.decoders;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/DecodedChar.class */
 final class DecodedChar extends DecodedObject {
     static final char FNC1 = '$';
     private final char value;
 
-    DecodedChar(int newPosition, char value) {
-        super(newPosition);
-        this.value = value;
+    DecodedChar(int i, char c) {
+        super(i);
+        this.value = c;
     }
 
     char getValue() {

@@ -2,7 +2,7 @@ package com.pgyersdk.feedback;
 
 import android.content.Context;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/j.class */
 final class j implements m {
     final /* synthetic */ PgyFeedbackShakeManager a;
     private final /* synthetic */ Context b;

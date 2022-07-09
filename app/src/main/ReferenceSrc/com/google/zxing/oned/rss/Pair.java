@@ -1,21 +1,21 @@
 package com.google.zxing.oned.rss;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/Pair.class */
 final class Pair extends DataCharacter {
     private int count;
     private final FinderPattern finderPattern;
 
-    Pair(int value, int checksumPortion, FinderPattern finderPattern) {
-        super(value, checksumPortion);
+    Pair(int i, int i2, FinderPattern finderPattern) {
+        super(i, i2);
         this.finderPattern = finderPattern;
-    }
-
-    FinderPattern getFinderPattern() {
-        return this.finderPattern;
     }
 
     int getCount() {
         return this.count;
+    }
+
+    FinderPattern getFinderPattern() {
+        return this.finderPattern;
     }
 
     void incrementCount() {

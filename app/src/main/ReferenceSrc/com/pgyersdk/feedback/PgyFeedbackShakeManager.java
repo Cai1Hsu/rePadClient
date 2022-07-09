@@ -3,7 +3,7 @@ package com.pgyersdk.feedback;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/PgyFeedbackShakeManager.class */
 public class PgyFeedbackShakeManager {
     private static String a = "PgyFeedbackShake";
     private static PgyFeedbackShakeManager b = null;
@@ -18,9 +18,9 @@ public class PgyFeedbackShakeManager {
         return b;
     }
 
-    public static void register(Context context, String appId) {
+    public static void register(Context context, String str) {
         try {
-            com.pgyersdk.a.a.k = appId;
+            com.pgyersdk.a.a.k = str;
             PgyFeedbackShakeManager a2 = a();
             a2.c = new l(context);
             a2.c.a(new j(a2, context));
@@ -29,8 +29,8 @@ public class PgyFeedbackShakeManager {
         }
     }
 
-    public static PgyFeedbackShakeManager setGLSurface(boolean glSurface) {
-        a().e = Boolean.valueOf(glSurface);
+    public static PgyFeedbackShakeManager setGLSurface(boolean z) {
+        a().e = Boolean.valueOf(z);
         return b;
     }
 

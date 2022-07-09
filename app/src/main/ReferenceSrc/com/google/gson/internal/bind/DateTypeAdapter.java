@@ -17,15 +17,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/internal/bind/DateTypeAdapter.class */
 public final class DateTypeAdapter extends TypeAdapter<Date> {
     public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.DateTypeAdapter.1
         @Override // com.google.gson.TypeAdapterFactory
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            if (typeToken.getRawType() == Date.class) {
-                return new DateTypeAdapter();
-            }
-            return null;
+            return typeToken.getRawType() == Date.class ? new DateTypeAdapter() : null;
         }
     };
     private final DateFormat enUsFormat = DateFormat.getDateTimeInstance(2, 2, Locale.US);
@@ -33,44 +30,50 @@ public final class DateTypeAdapter extends TypeAdapter<Date> {
     private final DateFormat iso8601Format = buildIso8601Format();
 
     private static DateFormat buildIso8601Format() {
-        DateFormat iso8601Format = new SimpleDateFormat(JSONCallback._secDateFormat, Locale.US);
-        iso8601Format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return iso8601Format;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(JSONCallback._secDateFormat, Locale.US);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return simpleDateFormat;
     }
 
-    @Override // com.google.gson.TypeAdapter
-    public Date read(JsonReader in) throws IOException {
-        if (in.peek() == JsonToken.NULL) {
-            in.nextNull();
-            return null;
-        }
-        return deserializeToDate(in.nextString());
-    }
-
-    private synchronized Date deserializeToDate(String json) {
+    private Date deserializeToDate(String str) {
         Date parse;
-        try {
-            parse = this.localFormat.parse(json);
-        } catch (ParseException e) {
+        synchronized (this) {
             try {
-                parse = this.enUsFormat.parse(json);
-            } catch (ParseException e2) {
+                parse = this.localFormat.parse(str);
+            } catch (ParseException e) {
                 try {
-                    parse = this.iso8601Format.parse(json);
-                } catch (ParseException e3) {
-                    throw new JsonSyntaxException(json, e3);
+                    parse = this.enUsFormat.parse(str);
+                } catch (ParseException e2) {
+                    try {
+                        parse = this.iso8601Format.parse(str);
+                    } catch (ParseException e3) {
+                        throw new JsonSyntaxException(str, e3);
+                    }
                 }
             }
         }
         return parse;
     }
 
-    public synchronized void write(JsonWriter out, Date value) throws IOException {
-        if (value == null) {
-            out.nullValue();
+    @Override // com.google.gson.TypeAdapter
+    public Date read(JsonReader jsonReader) throws IOException {
+        Date deserializeToDate;
+        if (jsonReader.peek() == JsonToken.NULL) {
+            jsonReader.nextNull();
+            deserializeToDate = null;
         } else {
-            String dateFormatAsString = this.enUsFormat.format(value);
-            out.value(dateFormatAsString);
+            deserializeToDate = deserializeToDate(jsonReader.nextString());
+        }
+        return deserializeToDate;
+    }
+
+    public void write(JsonWriter jsonWriter, Date date) throws IOException {
+        synchronized (this) {
+            if (date == null) {
+                jsonWriter.nullValue();
+            } else {
+                jsonWriter.value(this.enUsFormat.format(date));
+            }
         }
     }
 }

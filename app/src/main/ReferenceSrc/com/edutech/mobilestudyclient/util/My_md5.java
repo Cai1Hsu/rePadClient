@@ -3,41 +3,43 @@ package com.edutech.mobilestudyclient.util;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/util/My_md5.class */
 public class My_md5 {
-    public static String Md5(String plainText) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(plainText.getBytes());
-            byte[] b = md.digest();
-            StringBuffer buf = new StringBuffer("");
-            for (int offset = 0; offset < b.length; offset++) {
-                int i = b[offset];
-                if (i < 0) {
-                    i += 256;
-                }
-                if (i < 16) {
-                    buf.append("0");
-                }
-                buf.append(Integer.toHexString(i));
-            }
-            String md5_32 = buf.toString();
-            buf.toString().substring(8, 24);
-            System.out.println("result: " + buf.toString());
-            System.out.println("result: " + buf.toString().substring(8, 24));
-            return md5_32;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+    public static String MD5_string(String str) {
+        char[] charArray = str.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            charArray[i] = (char) (charArray[i] ^ 't');
         }
+        return new String(charArray);
     }
 
-    public static String MD5_string(String inStr) {
-        char[] a = inStr.toCharArray();
-        for (int i = 0; i < a.length; i++) {
-            a[i] = (char) (a[i] ^ 't');
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r0v35, types: [int] */
+    public static String Md5(String str) {
+        String str2;
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(str.getBytes());
+            byte[] digest = messageDigest.digest();
+            StringBuffer stringBuffer = new StringBuffer("");
+            for (byte b : digest) {
+                byte b2 = b;
+                if (b < 0) {
+                    b2 = b + 256;
+                }
+                if (b2 < 16) {
+                    stringBuffer.append("0");
+                }
+                stringBuffer.append(Integer.toHexString(b2));
+            }
+            str2 = stringBuffer.toString();
+            stringBuffer.toString().substring(8, 24);
+            System.out.println("result: " + stringBuffer.toString());
+            System.out.println("result: " + stringBuffer.toString().substring(8, 24));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            str2 = null;
         }
-        String s = new String(a);
-        return s;
+        return str2;
     }
 }

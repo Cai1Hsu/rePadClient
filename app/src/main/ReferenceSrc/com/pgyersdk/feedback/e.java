@@ -3,7 +3,7 @@ package com.pgyersdk.feedback;
 import android.content.Context;
 import android.content.DialogInterface;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/e.class */
 final class e implements DialogInterface.OnClickListener {
     final /* synthetic */ c a;
     private final /* synthetic */ Context b;

@@ -7,7 +7,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/d.class */
 final class d implements DialogInterface.OnClickListener {
     final /* synthetic */ c a;
     private final /* synthetic */ Context b;

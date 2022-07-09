@@ -3,14 +3,14 @@ package com.google.zxing.oned.rss.expanded.decoders;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI01393xDecoder.class */
 final class AI01393xDecoder extends AI01decoder {
     private static final int FIRST_THREE_DIGITS_SIZE = 10;
     private static final int HEADER_SIZE = 8;
     private static final int LAST_DIGIT_SIZE = 2;
 
-    AI01393xDecoder(BitArray information) {
-        super(information);
+    AI01393xDecoder(BitArray bitArray) {
+        super(bitArray);
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
@@ -18,22 +18,21 @@ final class AI01393xDecoder extends AI01decoder {
         if (getInformation().getSize() < 48) {
             throw NotFoundException.getNotFoundInstance();
         }
-        StringBuilder buf = new StringBuilder();
-        encodeCompressedGtin(buf, 8);
-        int lastAIdigit = getGeneralDecoder().extractNumericValueFromBitArray(48, 2);
-        buf.append("(393");
-        buf.append(lastAIdigit);
-        buf.append(')');
-        int firstThreeDigits = getGeneralDecoder().extractNumericValueFromBitArray(50, 10);
-        if (firstThreeDigits / 100 == 0) {
-            buf.append('0');
+        StringBuilder sb = new StringBuilder();
+        encodeCompressedGtin(sb, 8);
+        int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray(48, 2);
+        sb.append("(393");
+        sb.append(extractNumericValueFromBitArray);
+        sb.append(')');
+        int extractNumericValueFromBitArray2 = getGeneralDecoder().extractNumericValueFromBitArray(50, 10);
+        if (extractNumericValueFromBitArray2 / 100 == 0) {
+            sb.append('0');
         }
-        if (firstThreeDigits / 10 == 0) {
-            buf.append('0');
+        if (extractNumericValueFromBitArray2 / 10 == 0) {
+            sb.append('0');
         }
-        buf.append(firstThreeDigits);
-        DecodedInformation generalInformation = getGeneralDecoder().decodeGeneralPurposeField(60, null);
-        buf.append(generalInformation.getNewString());
-        return buf.toString();
+        sb.append(extractNumericValueFromBitArray2);
+        sb.append(getGeneralDecoder().decodeGeneralPurposeField(60, null).getNewString());
+        return sb.toString();
     }
 }

@@ -6,65 +6,37 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/JsonArray.class */
 public final class JsonArray extends JsonElement implements Iterable<JsonElement> {
     private final List<JsonElement> elements = new ArrayList();
 
+    public void add(JsonElement jsonElement) {
+        JsonNull jsonNull = jsonElement;
+        if (jsonElement == null) {
+            jsonNull = JsonNull.INSTANCE;
+        }
+        this.elements.add(jsonNull);
+    }
+
+    public void addAll(JsonArray jsonArray) {
+        this.elements.addAll(jsonArray.elements);
+    }
+
     @Override // com.google.gson.JsonElement
     public JsonArray deepCopy() {
-        JsonArray result = new JsonArray();
-        for (JsonElement element : this.elements) {
-            result.add(element.deepCopy());
+        JsonArray jsonArray = new JsonArray();
+        for (JsonElement jsonElement : this.elements) {
+            jsonArray.add(jsonElement.deepCopy());
         }
-        return result;
+        return jsonArray;
     }
 
-    public void add(JsonElement element) {
-        if (element == null) {
-            element = JsonNull.INSTANCE;
-        }
-        this.elements.add(element);
-    }
-
-    public void addAll(JsonArray array) {
-        this.elements.addAll(array.elements);
-    }
-
-    public int size() {
-        return this.elements.size();
-    }
-
-    @Override // java.lang.Iterable
-    public Iterator<JsonElement> iterator() {
-        return this.elements.iterator();
+    public boolean equals(Object obj) {
+        return obj == this || ((obj instanceof JsonArray) && ((JsonArray) obj).elements.equals(this.elements));
     }
 
     public JsonElement get(int i) {
         return this.elements.get(i);
-    }
-
-    @Override // com.google.gson.JsonElement
-    public Number getAsNumber() {
-        if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsNumber();
-        }
-        throw new IllegalStateException();
-    }
-
-    @Override // com.google.gson.JsonElement
-    public String getAsString() {
-        if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsString();
-        }
-        throw new IllegalStateException();
-    }
-
-    @Override // com.google.gson.JsonElement
-    public double getAsDouble() {
-        if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsDouble();
-        }
-        throw new IllegalStateException();
     }
 
     @Override // com.google.gson.JsonElement
@@ -84,25 +56,9 @@ public final class JsonArray extends JsonElement implements Iterable<JsonElement
     }
 
     @Override // com.google.gson.JsonElement
-    public float getAsFloat() {
+    public boolean getAsBoolean() {
         if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsFloat();
-        }
-        throw new IllegalStateException();
-    }
-
-    @Override // com.google.gson.JsonElement
-    public long getAsLong() {
-        if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsLong();
-        }
-        throw new IllegalStateException();
-    }
-
-    @Override // com.google.gson.JsonElement
-    public int getAsInt() {
-        if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsInt();
+            return this.elements.get(0).getAsBoolean();
         }
         throw new IllegalStateException();
     }
@@ -124,6 +80,46 @@ public final class JsonArray extends JsonElement implements Iterable<JsonElement
     }
 
     @Override // com.google.gson.JsonElement
+    public double getAsDouble() {
+        if (this.elements.size() == 1) {
+            return this.elements.get(0).getAsDouble();
+        }
+        throw new IllegalStateException();
+    }
+
+    @Override // com.google.gson.JsonElement
+    public float getAsFloat() {
+        if (this.elements.size() == 1) {
+            return this.elements.get(0).getAsFloat();
+        }
+        throw new IllegalStateException();
+    }
+
+    @Override // com.google.gson.JsonElement
+    public int getAsInt() {
+        if (this.elements.size() == 1) {
+            return this.elements.get(0).getAsInt();
+        }
+        throw new IllegalStateException();
+    }
+
+    @Override // com.google.gson.JsonElement
+    public long getAsLong() {
+        if (this.elements.size() == 1) {
+            return this.elements.get(0).getAsLong();
+        }
+        throw new IllegalStateException();
+    }
+
+    @Override // com.google.gson.JsonElement
+    public Number getAsNumber() {
+        if (this.elements.size() == 1) {
+            return this.elements.get(0).getAsNumber();
+        }
+        throw new IllegalStateException();
+    }
+
+    @Override // com.google.gson.JsonElement
     public short getAsShort() {
         if (this.elements.size() == 1) {
             return this.elements.get(0).getAsShort();
@@ -132,18 +128,23 @@ public final class JsonArray extends JsonElement implements Iterable<JsonElement
     }
 
     @Override // com.google.gson.JsonElement
-    public boolean getAsBoolean() {
+    public String getAsString() {
         if (this.elements.size() == 1) {
-            return this.elements.get(0).getAsBoolean();
+            return this.elements.get(0).getAsString();
         }
         throw new IllegalStateException();
     }
 
-    public boolean equals(Object o) {
-        return o == this || ((o instanceof JsonArray) && ((JsonArray) o).elements.equals(this.elements));
-    }
-
     public int hashCode() {
         return this.elements.hashCode();
+    }
+
+    @Override // java.lang.Iterable
+    public Iterator<JsonElement> iterator() {
+        return this.elements.iterator();
+    }
+
+    public int size() {
+        return this.elements.size();
     }
 }

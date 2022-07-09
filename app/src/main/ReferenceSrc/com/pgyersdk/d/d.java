@@ -3,7 +3,7 @@ package com.pgyersdk.d;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/d/d.class */
 final class d implements CompoundButton.OnCheckedChangeListener {
     final /* synthetic */ a a;
 
@@ -12,10 +12,10 @@ final class d implements CompoundButton.OnCheckedChangeListener {
     }
 
     @Override // android.widget.CompoundButton.OnCheckedChangeListener
-    public final void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+    public final void onCheckedChanged(CompoundButton compoundButton, boolean z) {
         ImageView imageView;
         ImageView imageView2;
-        if (isChecked) {
+        if (z) {
             imageView2 = this.a.f;
             imageView2.setVisibility(0);
             return;

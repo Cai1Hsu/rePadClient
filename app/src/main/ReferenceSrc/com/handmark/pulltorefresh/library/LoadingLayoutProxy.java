@@ -6,25 +6,24 @@ import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 import java.util.HashSet;
 import java.util.Iterator;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/LoadingLayoutProxy.class */
 public class LoadingLayoutProxy implements ILoadingLayout {
     private final HashSet<LoadingLayout> mLoadingLayouts = new HashSet<>();
 
     LoadingLayoutProxy() {
     }
 
-    public void addLayout(LoadingLayout layout) {
-        if (layout != null) {
-            this.mLoadingLayouts.add(layout);
+    public void addLayout(LoadingLayout loadingLayout) {
+        if (loadingLayout != null) {
+            this.mLoadingLayouts.add(loadingLayout);
         }
     }
 
     @Override // com.handmark.pulltorefresh.library.ILoadingLayout
-    public void setLastUpdatedLabel(CharSequence label) {
+    public void setLastUpdatedLabel(CharSequence charSequence) {
         Iterator<LoadingLayout> it = this.mLoadingLayouts.iterator();
         while (it.hasNext()) {
-            LoadingLayout layout = it.next();
-            layout.setLastUpdatedLabel(label);
+            it.next().setLastUpdatedLabel(charSequence);
         }
     }
 
@@ -32,44 +31,39 @@ public class LoadingLayoutProxy implements ILoadingLayout {
     public void setLoadingDrawable(Drawable drawable) {
         Iterator<LoadingLayout> it = this.mLoadingLayouts.iterator();
         while (it.hasNext()) {
-            LoadingLayout layout = it.next();
-            layout.setLoadingDrawable(drawable);
+            it.next().setLoadingDrawable(drawable);
         }
     }
 
     @Override // com.handmark.pulltorefresh.library.ILoadingLayout
-    public void setRefreshingLabel(CharSequence refreshingLabel) {
+    public void setPullLabel(CharSequence charSequence) {
         Iterator<LoadingLayout> it = this.mLoadingLayouts.iterator();
         while (it.hasNext()) {
-            LoadingLayout layout = it.next();
-            layout.setRefreshingLabel(refreshingLabel);
+            it.next().setPullLabel(charSequence);
         }
     }
 
     @Override // com.handmark.pulltorefresh.library.ILoadingLayout
-    public void setPullLabel(CharSequence label) {
+    public void setRefreshingLabel(CharSequence charSequence) {
         Iterator<LoadingLayout> it = this.mLoadingLayouts.iterator();
         while (it.hasNext()) {
-            LoadingLayout layout = it.next();
-            layout.setPullLabel(label);
+            it.next().setRefreshingLabel(charSequence);
         }
     }
 
     @Override // com.handmark.pulltorefresh.library.ILoadingLayout
-    public void setReleaseLabel(CharSequence label) {
+    public void setReleaseLabel(CharSequence charSequence) {
         Iterator<LoadingLayout> it = this.mLoadingLayouts.iterator();
         while (it.hasNext()) {
-            LoadingLayout layout = it.next();
-            layout.setReleaseLabel(label);
+            it.next().setReleaseLabel(charSequence);
         }
     }
 
     @Override // com.handmark.pulltorefresh.library.ILoadingLayout
-    public void setTextTypeface(Typeface tf) {
+    public void setTextTypeface(Typeface typeface) {
         Iterator<LoadingLayout> it = this.mLoadingLayouts.iterator();
         while (it.hasNext()) {
-            LoadingLayout layout = it.next();
-            layout.setTextTypeface(tf);
+            it.next().setTextTypeface(typeface);
         }
     }
 }

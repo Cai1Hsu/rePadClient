@@ -7,13 +7,33 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/FieldAttributes.class */
 public final class FieldAttributes {
     private final Field field;
 
-    public FieldAttributes(Field f) {
-        C$Gson$Preconditions.checkNotNull(f);
-        this.field = f;
+    public FieldAttributes(Field field) {
+        C$Gson$Preconditions.checkNotNull(field);
+        this.field = field;
+    }
+
+    Object get(Object obj) throws IllegalAccessException {
+        return this.field.get(obj);
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> cls) {
+        return (T) this.field.getAnnotation(cls);
+    }
+
+    public Collection<Annotation> getAnnotations() {
+        return Arrays.asList(this.field.getAnnotations());
+    }
+
+    public Class<?> getDeclaredClass() {
+        return this.field.getType();
+    }
+
+    public Type getDeclaredType() {
+        return this.field.getGenericType();
     }
 
     public Class<?> getDeclaringClass() {
@@ -24,28 +44,8 @@ public final class FieldAttributes {
         return this.field.getName();
     }
 
-    public Type getDeclaredType() {
-        return this.field.getGenericType();
-    }
-
-    public Class<?> getDeclaredClass() {
-        return this.field.getType();
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotation) {
-        return (T) this.field.getAnnotation(annotation);
-    }
-
-    public Collection<Annotation> getAnnotations() {
-        return Arrays.asList(this.field.getAnnotations());
-    }
-
-    public boolean hasModifier(int modifier) {
-        return (this.field.getModifiers() & modifier) != 0;
-    }
-
-    Object get(Object instance) throws IllegalAccessException {
-        return this.field.get(instance);
+    public boolean hasModifier(int i) {
+        return (this.field.getModifiers() & i) != 0;
     }
 
     boolean isSynthetic() {

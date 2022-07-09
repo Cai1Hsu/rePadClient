@@ -2,34 +2,34 @@ package com.edutech.publicedu.log;
 
 import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/publicedu/log/LogInfo.class */
 public class LogInfo {
     private String MachineID;
     private String UserID;
     private List<LogDataItem> data;
 
-    public String getUserID() {
-        return this.UserID;
-    }
-
-    public void setUserID(String userID) {
-        this.UserID = userID;
+    public List<LogDataItem> getData() {
+        return this.data;
     }
 
     public String getMachineID() {
         return this.MachineID;
     }
 
-    public void setMachineID(String machineID) {
-        this.MachineID = machineID;
+    public String getUserID() {
+        return this.UserID;
     }
 
-    public List<LogDataItem> getData() {
-        return this.data;
+    public void setData(List<LogDataItem> list) {
+        this.data = list;
     }
 
-    public void setData(List<LogDataItem> data) {
-        this.data = data;
+    public void setMachineID(String str) {
+        this.MachineID = str;
+    }
+
+    public void setUserID(String str) {
+        this.UserID = str;
     }
 
     public String toString() {

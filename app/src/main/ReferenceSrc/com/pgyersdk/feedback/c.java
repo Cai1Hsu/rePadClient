@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 import java.lang.reflect.Field;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/c.class */
 public final class c {
     private static c a = null;
     private static b i;
@@ -69,43 +69,46 @@ public final class c {
     }
 
     public final com.pgyersdk.d.a a(Context context) {
+        com.pgyersdk.d.a aVar;
         this.g = context;
         this.f = new i(this);
         if (this.b != null) {
-            return this.b;
-        }
-        if (this.d != null) {
-            this.d.a();
-        }
-        if (Build.VERSION.SDK_INT >= 11) {
-            if (this.c == 0) {
-                this.c = 3;
-            }
-            this.b = new com.pgyersdk.d.a(context, this.c);
+            aVar = this.b;
         } else {
-            this.b = new com.pgyersdk.d.a(context);
-        }
-        if (context instanceof Activity) {
-            if (!this.e) {
-                this.h = com.pgyersdk.c.e.a().a(context);
-                String str = this.h;
-                View decorView = ((Activity) context).getWindow().getDecorView();
-                decorView.setDrawingCacheEnabled(true);
-                Bitmap drawingCache = decorView.getDrawingCache();
-                Log.d("takeScreenshot filepath", str);
-                com.pgyersdk.c.a.a(new h(this, drawingCache, str));
-            } else {
-                com.pgyersdk.c.f.a().a(context);
-                com.pgyersdk.c.f.a().c();
+            if (this.d != null) {
+                this.d.a();
             }
+            if (Build.VERSION.SDK_INT >= 11) {
+                if (this.c == 0) {
+                    this.c = 3;
+                }
+                this.b = new com.pgyersdk.d.a(context, this.c);
+            } else {
+                this.b = new com.pgyersdk.d.a(context);
+            }
+            if (context instanceof Activity) {
+                if (!this.e) {
+                    this.h = com.pgyersdk.c.e.a().a(context);
+                    String str = this.h;
+                    View decorView = ((Activity) context).getWindow().getDecorView();
+                    decorView.setDrawingCacheEnabled(true);
+                    Bitmap drawingCache = decorView.getDrawingCache();
+                    Log.d("takeScreenshot filepath", str);
+                    com.pgyersdk.c.a.a(new h(this, drawingCache, str));
+                } else {
+                    com.pgyersdk.c.f.a().a(context);
+                    com.pgyersdk.c.f.a().c();
+                }
+            }
+            this.b.setPositiveButton("提交", new d(this, context));
+            this.b.setNegativeButton("取消", new e(this, context));
+            this.b.setOnCancelListener(new f(this));
+            AlertDialog create = this.b.create();
+            create.setOnDismissListener(new g(this));
+            create.show();
+            aVar = this.b;
         }
-        this.b.setPositiveButton("提交", new d(this, context));
-        this.b.setNegativeButton("取消", new e(this, context));
-        this.b.setOnCancelListener(new f(this));
-        AlertDialog create = this.b.create();
-        create.setOnDismissListener(new g(this));
-        create.show();
-        return this.b;
+        return aVar;
     }
 
     public final c a(a aVar) {

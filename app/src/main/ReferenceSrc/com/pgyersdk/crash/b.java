@@ -1,6 +1,6 @@
 package com.pgyersdk.crash;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/crash/b.class */
 final class b extends Thread {
     final /* synthetic */ a a;
     private final /* synthetic */ Throwable b;

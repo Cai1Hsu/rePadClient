@@ -1,13 +1,71 @@
 package com.google.zxing;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/ResultPoint.class */
 public class ResultPoint {
     private final float x;
     private final float y;
 
-    public ResultPoint(float x, float y) {
-        this.x = x;
-        this.y = y;
+    public ResultPoint(float f, float f2) {
+        this.x = f;
+        this.y = f2;
+    }
+
+    private static float crossProductZ(ResultPoint resultPoint, ResultPoint resultPoint2, ResultPoint resultPoint3) {
+        float f = resultPoint2.x;
+        float f2 = resultPoint2.y;
+        return ((resultPoint3.x - f) * (resultPoint.y - f2)) - ((resultPoint3.y - f2) * (resultPoint.x - f));
+    }
+
+    public static float distance(ResultPoint resultPoint, ResultPoint resultPoint2) {
+        float f = resultPoint.x - resultPoint2.x;
+        float f2 = resultPoint.y - resultPoint2.y;
+        return (float) Math.sqrt((f * f) + (f2 * f2));
+    }
+
+    public static void orderBestPatterns(ResultPoint[] resultPointArr) {
+        ResultPoint resultPoint;
+        ResultPoint resultPoint2;
+        ResultPoint resultPoint3;
+        float distance = distance(resultPointArr[0], resultPointArr[1]);
+        float distance2 = distance(resultPointArr[1], resultPointArr[2]);
+        float distance3 = distance(resultPointArr[0], resultPointArr[2]);
+        if (distance2 >= distance && distance2 >= distance3) {
+            resultPoint = resultPointArr[0];
+            resultPoint2 = resultPointArr[1];
+            resultPoint3 = resultPointArr[2];
+        } else if (distance3 < distance2 || distance3 < distance) {
+            resultPoint = resultPointArr[2];
+            resultPoint2 = resultPointArr[0];
+            resultPoint3 = resultPointArr[1];
+        } else {
+            resultPoint = resultPointArr[1];
+            resultPoint2 = resultPointArr[0];
+            resultPoint3 = resultPointArr[2];
+        }
+        ResultPoint resultPoint4 = resultPoint2;
+        ResultPoint resultPoint5 = resultPoint3;
+        if (crossProductZ(resultPoint2, resultPoint, resultPoint3) < 0.0f) {
+            resultPoint5 = resultPoint2;
+            resultPoint4 = resultPoint3;
+        }
+        resultPointArr[0] = resultPoint4;
+        resultPointArr[1] = resultPoint;
+        resultPointArr[2] = resultPoint5;
+    }
+
+    public boolean equals(Object obj) {
+        boolean z = false;
+        if (obj instanceof ResultPoint) {
+            ResultPoint resultPoint = (ResultPoint) obj;
+            z = false;
+            if (this.x == resultPoint.x) {
+                z = false;
+                if (this.y == resultPoint.y) {
+                    z = true;
+                }
+            }
+        }
+        return z;
     }
 
     public final float getX() {
@@ -18,67 +76,17 @@ public class ResultPoint {
         return this.y;
     }
 
-    public boolean equals(Object other) {
-        if (other instanceof ResultPoint) {
-            ResultPoint otherPoint = (ResultPoint) other;
-            return this.x == otherPoint.x && this.y == otherPoint.y;
-        }
-        return false;
-    }
-
     public int hashCode() {
         return (Float.floatToIntBits(this.x) * 31) + Float.floatToIntBits(this.y);
     }
 
     public String toString() {
-        StringBuilder result = new StringBuilder(25);
-        result.append('(');
-        result.append(this.x);
-        result.append(',');
-        result.append(this.y);
-        result.append(')');
-        return result.toString();
-    }
-
-    public static void orderBestPatterns(ResultPoint[] patterns) {
-        ResultPoint pointB;
-        ResultPoint pointA;
-        ResultPoint pointC;
-        float zeroOneDistance = distance(patterns[0], patterns[1]);
-        float oneTwoDistance = distance(patterns[1], patterns[2]);
-        float zeroTwoDistance = distance(patterns[0], patterns[2]);
-        if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance) {
-            pointB = patterns[0];
-            pointA = patterns[1];
-            pointC = patterns[2];
-        } else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance) {
-            pointB = patterns[1];
-            pointA = patterns[0];
-            pointC = patterns[2];
-        } else {
-            pointB = patterns[2];
-            pointA = patterns[0];
-            pointC = patterns[1];
-        }
-        if (crossProductZ(pointA, pointB, pointC) < 0.0f) {
-            ResultPoint temp = pointA;
-            pointA = pointC;
-            pointC = temp;
-        }
-        patterns[0] = pointA;
-        patterns[1] = pointB;
-        patterns[2] = pointC;
-    }
-
-    public static float distance(ResultPoint pattern1, ResultPoint pattern2) {
-        float xDiff = pattern1.x - pattern2.x;
-        float yDiff = pattern1.y - pattern2.y;
-        return (float) Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
-    }
-
-    private static float crossProductZ(ResultPoint pointA, ResultPoint pointB, ResultPoint pointC) {
-        float bX = pointB.x;
-        float bY = pointB.y;
-        return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
+        StringBuilder sb = new StringBuilder(25);
+        sb.append('(');
+        sb.append(this.x);
+        sb.append(',');
+        sb.append(this.y);
+        sb.append(')');
+        return sb.toString();
     }
 }

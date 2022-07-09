@@ -4,39 +4,27 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/daoxueben/until/NetWorkHelper.class */
 public class NetWorkHelper {
-    public static boolean isNetworkConnected(Context context) {
+    public static boolean isMobileConnected(Context context) {
+        boolean z = false;
         if (context != null) {
-            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
-            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
-            if (mNetworkInfo != null) {
-                return mNetworkInfo.isAvailable();
+            NetworkInfo networkInfo = ((ConnectivityManager) context.getSystemService("connectivity")).getNetworkInfo(0);
+            z = false;
+            if (networkInfo != null) {
+                z = networkInfo.isAvailable();
             }
         }
-        return false;
+        return z;
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        NetworkInfo activeNetworkInfo;
+        return (context == null || (activeNetworkInfo = ((ConnectivityManager) context.getSystemService("connectivity")).getActiveNetworkInfo()) == null) ? false : activeNetworkInfo.isAvailable();
     }
 
     public static boolean isWifiConnected(Context context) {
-        if (context != null) {
-            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
-            NetworkInfo mWiFiNetworkInfo = mConnectivityManager.getNetworkInfo(1);
-            if (mWiFiNetworkInfo != null) {
-                return mWiFiNetworkInfo.isAvailable();
-            }
-        }
-        return false;
-    }
-
-    public static boolean isMobileConnected(Context context) {
-        if (context != null) {
-            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
-            NetworkInfo mMobileNetworkInfo = mConnectivityManager.getNetworkInfo(0);
-            if (mMobileNetworkInfo == null) {
-                return false;
-            }
-            return mMobileNetworkInfo.isAvailable();
-        }
-        return false;
+        NetworkInfo networkInfo;
+        return (context == null || (networkInfo = ((ConnectivityManager) context.getSystemService("connectivity")).getNetworkInfo(1)) == null) ? false : networkInfo.isAvailable();
     }
 }

@@ -4,113 +4,115 @@ import com.edutech.idauthentication.JsonHelper;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/json/BookJsonHelper.class */
 public class BookJsonHelper {
-    public static void addBookToBooksJson(String book_id, String book_name, long book_downloadsize, long book_size, String booksJsonPath) {
-        if (!"".equals(book_id)) {
-            ArrayList<Books> books = new ArrayList<>();
-            Books newbook = new Books();
-            newbook.setbook_id(book_id);
-            newbook.setbook_name(book_name);
-            newbook.setBookdownloadsize(book_downloadsize);
-            newbook.setBooksize(book_size);
-            newbook.setProgress("0");
-            newbook.setbook_path("../offlinedownload/" + book_id + "/");
-            ArrayList<Books> books2 = JsonParse.parseBooksJson(books, booksJsonPath);
-            boolean isnewbook = true;
-            Iterator<Books> it = books2.iterator();
+    public static void addBookToBooksJson(String str, String str2, long j, long j2, String str3) {
+        if (!"".equals(str)) {
+            ArrayList arrayList = new ArrayList();
+            Books books = new Books();
+            books.setbook_id(str);
+            books.setbook_name(str2);
+            books.setBookdownloadsize(j);
+            books.setBooksize(j2);
+            books.setProgress("0");
+            books.setbook_path("../offlinedownload/" + str + "/");
+            ArrayList<Books> parseBooksJson = JsonParse.parseBooksJson(arrayList, str3);
+            boolean z = true;
+            Iterator<Books> it = parseBooksJson.iterator();
             while (it.hasNext()) {
-                Books entry = it.next();
-                if (newbook.getbook_id().equals(entry.getbook_id())) {
-                    isnewbook = false;
-                    entry.setbook_id(newbook.getbook_id());
-                    entry.setbook_name(newbook.getbook_name());
-                    entry.setBooksize(newbook.getBooksize());
-                    entry.setbook_path(newbook.getbook_path());
+                Books next = it.next();
+                if (books.getbook_id().equals(next.getbook_id())) {
+                    z = false;
+                    next.setbook_id(books.getbook_id());
+                    next.setbook_name(books.getbook_name());
+                    next.setBooksize(books.getBooksize());
+                    next.setbook_path(books.getbook_path());
                 }
             }
-            if (isnewbook) {
-                books2.add(newbook);
+            if (z) {
+                parseBooksJson.add(books);
             }
-            writeToLocal(books2, book_id, booksJsonPath);
+            writeToLocal(parseBooksJson, str, str3);
         }
     }
 
-    public static void getBooks(Books book, String booksJsonPath) {
-        ArrayList<Books> books = new ArrayList<>();
-        String bookid = book.getbook_id();
-        boolean isnewbook = true;
-        if (bookid != null && !"".equals(bookid)) {
-            books = JsonParse.parseBooksJson(books, booksJsonPath);
-            Iterator<Books> it = books.iterator();
-            while (it.hasNext()) {
-                Books entry = it.next();
-                if (bookid.equals(entry.getbook_id())) {
-                    isnewbook = false;
-                    entry.setbook_name(book.getbook_name());
-                    entry.setbook_path(book.getbook_path());
-                    entry.setBook_updatetime(book.getBook_updatetime());
-                    entry.setBook_total(book.getBook_total());
-                    entry.setBook_isnew(book.getBook_isnew());
-                    entry.setBookdownloadsize(book.getBookdownloadsize());
-                    entry.setBooksize(book.getBooksize());
-                    entry.setProgress(book.getProgress());
-                }
-            }
-        }
-        if (isnewbook) {
-            books.add(book);
-        }
-        writeToLocal(books, bookid, booksJsonPath);
-    }
-
-    public static void deleteBooksJsonInfo(String bookid, String booksJsonPath) {
-        boolean isexistbook = false;
-        ArrayList<Books> books = JsonParse.parseBooksJson(new ArrayList<>(), booksJsonPath);
-        Books newbook = new Books();
-        Iterator<Books> it = books.iterator();
+    public static void deleteBooksJsonInfo(String str, String str2) {
+        boolean z = false;
+        ArrayList<Books> parseBooksJson = JsonParse.parseBooksJson(new ArrayList(), str2);
+        Books books = new Books();
+        Iterator<Books> it = parseBooksJson.iterator();
         while (it.hasNext()) {
-            Books entry = it.next();
-            if (bookid.equals(entry.getbook_id())) {
-                isexistbook = true;
-                newbook = entry;
+            Books next = it.next();
+            if (str.equals(next.getbook_id())) {
+                z = true;
+                books = next;
             }
         }
-        if (isexistbook) {
-            books.remove(newbook);
+        if (z) {
+            parseBooksJson.remove(books);
         }
-        writeToLocal(books, bookid, booksJsonPath);
+        writeToLocal(parseBooksJson, str, str2);
     }
 
-    public static void updateIsNewToBooksJson(String book_id, String booksJsonPath) {
-        if (!"".equals(book_id)) {
-            ArrayList<Books> books = JsonParse.parseBooksJson(new ArrayList<>(), booksJsonPath);
-            Iterator<Books> it = books.iterator();
-            while (it.hasNext()) {
-                Books entry = it.next();
-                if (book_id.equals(entry.getbook_id())) {
-                    entry.setBook_isnew(1);
+    public static void getBooks(Books books, String str) {
+        ArrayList<Books> arrayList = new ArrayList<>();
+        String str2 = books.getbook_id();
+        ArrayList<Books> arrayList2 = arrayList;
+        boolean z = true;
+        if (str2 != null) {
+            arrayList2 = arrayList;
+            z = true;
+            if (!"".equals(str2)) {
+                arrayList2 = JsonParse.parseBooksJson(arrayList, str);
+                Iterator<Books> it = arrayList2.iterator();
+                z = true;
+                while (it.hasNext()) {
+                    Books next = it.next();
+                    if (str2.equals(next.getbook_id())) {
+                        z = false;
+                        next.setbook_name(books.getbook_name());
+                        next.setbook_path(books.getbook_path());
+                        next.setBook_updatetime(books.getBook_updatetime());
+                        next.setBook_total(books.getBook_total());
+                        next.setBook_isnew(books.getBook_isnew());
+                        next.setBookdownloadsize(books.getBookdownloadsize());
+                        next.setBooksize(books.getBooksize());
+                        next.setProgress(books.getProgress());
+                    }
                 }
             }
-            writeToLocal(books, book_id, booksJsonPath);
+        }
+        if (z) {
+            arrayList2.add(books);
+        }
+        writeToLocal(arrayList2, str2, str);
+    }
+
+    public static long getLongDefault(Object obj) {
+        return obj == null ? 0L : Long.valueOf(obj.toString()).longValue();
+    }
+
+    public static String getStringDefault(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
+
+    public static void updateIsNewToBooksJson(String str, String str2) {
+        if (!"".equals(str)) {
+            ArrayList<Books> parseBooksJson = JsonParse.parseBooksJson(new ArrayList(), str2);
+            Iterator<Books> it = parseBooksJson.iterator();
+            while (it.hasNext()) {
+                Books next = it.next();
+                if (str.equals(next.getbook_id())) {
+                    next.setBook_isnew(1);
+                }
+            }
+            writeToLocal(parseBooksJson, str, str2);
         }
     }
 
-    private static void writeToLocal(ArrayList<Books> books, String book_id, String booksJsonPath) {
-        String Newjson = JsonCreate.createBooksJson(books);
-        if (JsonHelper.CreateFile(Newjson, booksJsonPath)) {
-            "".equals(book_id);
+    private static void writeToLocal(ArrayList<Books> arrayList, String str, String str2) {
+        if (JsonHelper.CreateFile(JsonCreate.createBooksJson(arrayList), str2)) {
+            "".equals(str);
         }
-    }
-
-    public static String getStringDefault(Object object) {
-        return object == null ? "" : object.toString();
-    }
-
-    public static long getLongDefault(Object object) {
-        if (object == null) {
-            return 0L;
-        }
-        return Long.valueOf(object.toString()).longValue();
     }
 }

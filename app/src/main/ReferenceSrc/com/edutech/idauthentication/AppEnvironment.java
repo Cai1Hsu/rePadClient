@@ -3,7 +3,7 @@ package com.edutech.idauthentication;
 import android.os.Environment;
 import java.io.File;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/idauthentication/AppEnvironment.class */
 public class AppEnvironment {
     public static final String APP_NAME = "appname";
     public static final String APP_WEBPATH = "appwebpath";
@@ -41,19 +41,19 @@ public class AppEnvironment {
     public static final String URLFILEPATH = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/CloudClient/.System/setting.xml";
     public static String SETTING_PWD_SAVE_FILEPATH = String.valueOf(FOLDER_MAIN) + "setting_pwd.xml";
 
-    public static String LOGJSON_HTTPPOST_URL(String ip) {
-        return "http://" + ip + "/student/fetchdata/set-log-by-textbook";
+    public static String LOGJSON_HTTPPOST_URL(String str) {
+        return "http://" + str + "/student/fetchdata/set-log-by-textbook";
     }
 
-    public static String SETTING_PWD_UPDATE_HTTPPOST_URL(String ip, String username) {
-        return "http://" + ip + "/student/fetchdata/get-pad-pwd/usercode/" + username;
+    public static String SETTING_APK_UPDATE_HTTPPOST_URL(String str, String str2) {
+        return "http://" + str + "/student/fetchdata/get-apk-version/usercode/" + str2;
     }
 
-    public static String SETTING_APK_UPDATE_HTTPPOST_URL(String ip, String username) {
-        return "http://" + ip + "/student/fetchdata/get-apk-version/usercode/" + username;
+    public static String SETTING_PWD_UPDATE_HTTPPOST_URL(String str, String str2) {
+        return "http://" + str + "/student/fetchdata/get-pad-pwd/usercode/" + str2;
     }
 
-    public static String UPDATEJSON_HTTPPOST_URL(String ip, String stuid) {
-        return "http://" + ip + "/default/index/check-update/studentid/" + stuid;
+    public static String UPDATEJSON_HTTPPOST_URL(String str, String str2) {
+        return "http://" + str + "/default/index/check-update/studentid/" + str2;
     }
 }

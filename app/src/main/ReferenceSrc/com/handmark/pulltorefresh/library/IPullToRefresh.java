@@ -4,7 +4,7 @@ import android.view.View;
 import android.view.animation.Interpolator;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/IPullToRefresh.class */
 public interface IPullToRefresh<T extends View> {
     boolean demo();
 

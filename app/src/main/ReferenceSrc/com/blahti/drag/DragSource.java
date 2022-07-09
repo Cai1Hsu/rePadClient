@@ -2,7 +2,7 @@ package com.blahti.drag;
 
 import android.view.View;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/blahti/drag/DragSource.class */
 public interface DragSource {
     boolean allowDrag();
 

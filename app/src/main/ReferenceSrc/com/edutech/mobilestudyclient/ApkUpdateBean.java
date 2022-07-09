@@ -1,6 +1,6 @@
 package com.edutech.mobilestudyclient;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/ApkUpdateBean.class */
 public class ApkUpdateBean {
     private long apkDownloadSize;
     private String apkLocalPath;
@@ -12,76 +12,76 @@ public class ApkUpdateBean {
     private String versioncode;
     private String versionname;
 
-    public String getVersioncode() {
-        return this.versioncode;
-    }
-
-    public void setVersioncode(String versioncode) {
-        this.versioncode = versioncode;
-    }
-
-    public String getVersionname() {
-        return this.versionname;
-    }
-
-    public void setVersionname(String versionname) {
-        this.versionname = versionname;
-    }
-
-    public String getAppName() {
-        return this.appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public long getApkSize() {
-        return this.apkSize;
-    }
-
-    public void setApkSize(long apkSize) {
-        this.apkSize = apkSize;
-    }
-
     public long getApkDownloadSize() {
         return this.apkDownloadSize;
-    }
-
-    public void setApkDownloadSize(long apkDownloadSize) {
-        this.apkDownloadSize = apkDownloadSize;
-    }
-
-    public int getInstallState() {
-        return this.installState;
-    }
-
-    public void setInstallState(int installState) {
-        this.installState = installState;
-    }
-
-    public String getPackagename() {
-        return this.packagename;
-    }
-
-    public void setPackagename(String packagename) {
-        this.packagename = packagename;
-    }
-
-    public String getApkUrl() {
-        return this.apkUrl;
-    }
-
-    public void setApkUrl(String apkUrl) {
-        this.apkUrl = apkUrl;
     }
 
     public String getApkLocalPath() {
         return this.apkLocalPath;
     }
 
-    public void setApkLocalPath(String apkLocalPath) {
-        this.apkLocalPath = apkLocalPath;
+    public long getApkSize() {
+        return this.apkSize;
+    }
+
+    public String getApkUrl() {
+        return this.apkUrl;
+    }
+
+    public String getAppName() {
+        return this.appName;
+    }
+
+    public int getInstallState() {
+        return this.installState;
+    }
+
+    public String getPackagename() {
+        return this.packagename;
+    }
+
+    public String getVersioncode() {
+        return this.versioncode;
+    }
+
+    public String getVersionname() {
+        return this.versionname;
+    }
+
+    public void setApkDownloadSize(long j) {
+        this.apkDownloadSize = j;
+    }
+
+    public void setApkLocalPath(String str) {
+        this.apkLocalPath = str;
+    }
+
+    public void setApkSize(long j) {
+        this.apkSize = j;
+    }
+
+    public void setApkUrl(String str) {
+        this.apkUrl = str;
+    }
+
+    public void setAppName(String str) {
+        this.appName = str;
+    }
+
+    public void setInstallState(int i) {
+        this.installState = i;
+    }
+
+    public void setPackagename(String str) {
+        this.packagename = str;
+    }
+
+    public void setVersioncode(String str) {
+        this.versioncode = str;
+    }
+
+    public void setVersionname(String str) {
+        this.versionname = str;
     }
 
     public String toString() {

@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/i.class */
 final class i extends Handler {
     final /* synthetic */ c a;
 
@@ -15,10 +15,10 @@ final class i extends Handler {
 
     /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
     @Override // android.os.Handler
-    public final void handleMessage(Message msg) {
+    public final void handleMessage(Message message) {
         Context context;
         Context context2;
-        switch (msg.what) {
+        switch (message.what) {
             case 20001:
                 context2 = this.a.g;
                 Toast.makeText(context2, "谢谢你的反馈", 0).show();

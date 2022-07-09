@@ -3,7 +3,7 @@ package com.pgyersdk.c;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/c/n.class */
 public final class n {
     private static final Pattern a = Pattern.compile("[0-9a-f]+", 2);
 

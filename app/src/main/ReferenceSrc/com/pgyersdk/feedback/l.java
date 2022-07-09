@@ -5,7 +5,7 @@ import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/l.class */
 public final class l implements SensorListener {
     private static String a = "ShakeListener";
     private SensorManager g;
@@ -56,8 +56,8 @@ public final class l implements SensorListener {
     }
 
     @Override // android.hardware.SensorListener
-    public final void onSensorChanged(int sensor, float[] values) {
-        if (sensor != 2) {
+    public final void onSensorChanged(int i, float[] fArr) {
+        if (i != 2) {
             return;
         }
         long currentTimeMillis = System.currentTimeMillis();
@@ -67,10 +67,10 @@ public final class l implements SensorListener {
         if (currentTimeMillis - this.k <= this.c) {
             return;
         }
-        if ((Math.abs(((((values[0] + values[1]) + values[2]) - this.h) - this.i) - this.j) / ((float) (currentTimeMillis - this.k))) * 10000.0f > this.b) {
-            int i = this.n + 1;
-            this.n = i;
-            if (i >= this.f && currentTimeMillis - this.o > this.e) {
+        if ((Math.abs(((((fArr[0] + fArr[1]) + fArr[2]) - this.h) - this.i) - this.j) / ((float) (currentTimeMillis - this.k))) * 10000.0f > this.b) {
+            int i2 = this.n + 1;
+            this.n = i2;
+            if (i2 >= this.f && currentTimeMillis - this.o > this.e) {
                 this.o = currentTimeMillis;
                 this.n = 0;
                 if (this.l != null) {
@@ -80,8 +80,8 @@ public final class l implements SensorListener {
             this.p = currentTimeMillis;
         }
         this.k = currentTimeMillis;
-        this.h = values[0];
-        this.i = values[1];
-        this.j = values[2];
+        this.h = fArr[0];
+        this.i = fArr[1];
+        this.j = fArr[2];
     }
 }

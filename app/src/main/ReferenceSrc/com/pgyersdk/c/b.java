@@ -13,7 +13,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpProtocolParams;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/c/b.class */
 public final class b {
     private HttpClient a;
 

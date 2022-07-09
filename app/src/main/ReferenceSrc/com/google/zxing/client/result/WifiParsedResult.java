@@ -1,20 +1,25 @@
 package com.google.zxing.client.result;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/WifiParsedResult.class */
 public final class WifiParsedResult extends ParsedResult {
     private final String networkEncryption;
     private final String password;
     private final String ssid;
 
-    public WifiParsedResult(String networkEncryption, String ssid, String password) {
+    public WifiParsedResult(String str, String str2, String str3) {
         super(ParsedResultType.WIFI);
-        this.ssid = ssid;
-        this.networkEncryption = networkEncryption;
-        this.password = password;
+        this.ssid = str2;
+        this.networkEncryption = str;
+        this.password = str3;
     }
 
-    public String getSsid() {
-        return this.ssid;
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
+        StringBuilder sb = new StringBuilder(80);
+        maybeAppend(this.ssid, sb);
+        maybeAppend(this.networkEncryption, sb);
+        maybeAppend(this.password, sb);
+        return sb.toString();
     }
 
     public String getNetworkEncryption() {
@@ -25,12 +30,7 @@ public final class WifiParsedResult extends ParsedResult {
         return this.password;
     }
 
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(80);
-        maybeAppend(this.ssid, result);
-        maybeAppend(this.networkEncryption, result);
-        maybeAppend(this.password, result);
-        return result.toString();
+    public String getSsid() {
+        return this.ssid;
     }
 }

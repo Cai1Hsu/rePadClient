@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mining/app/zxing/decoding/DecodeFormatManager.class */
 final class DecodeFormatManager {
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
     static final Vector<BarcodeFormat> PRODUCT_FORMATS = new Vector<>(5);
@@ -36,48 +36,55 @@ final class DecodeFormatManager {
     }
 
     static Vector<BarcodeFormat> parseDecodeFormats(Intent intent) {
-        List<String> scanFormats = null;
-        String scanFormatsString = intent.getStringExtra(Intents.Scan.SCAN_FORMATS);
-        if (scanFormatsString != null) {
-            scanFormats = Arrays.asList(COMMA_PATTERN.split(scanFormatsString));
+        List list = null;
+        String stringExtra = intent.getStringExtra(Intents.Scan.SCAN_FORMATS);
+        if (stringExtra != null) {
+            list = Arrays.asList(COMMA_PATTERN.split(stringExtra));
         }
-        return parseDecodeFormats(scanFormats, intent.getStringExtra(Intents.Scan.MODE));
+        return parseDecodeFormats(list, intent.getStringExtra(Intents.Scan.MODE));
     }
 
-    static Vector<BarcodeFormat> parseDecodeFormats(Uri inputUri) {
-        List<String> formats = inputUri.getQueryParameters(Intents.Scan.SCAN_FORMATS);
-        if (formats != null && formats.size() == 1 && formats.get(0) != null) {
-            formats = Arrays.asList(COMMA_PATTERN.split(formats.get(0)));
-        }
-        return parseDecodeFormats(formats, inputUri.getQueryParameter(Intents.Scan.MODE));
-    }
-
-    private static Vector<BarcodeFormat> parseDecodeFormats(Iterable<String> scanFormats, String decodeMode) {
-        if (scanFormats != null) {
-            Vector<BarcodeFormat> formats = new Vector<>();
-            try {
-                for (String format : scanFormats) {
-                    formats.add(BarcodeFormat.valueOf(format));
+    static Vector<BarcodeFormat> parseDecodeFormats(Uri uri) {
+        List<String> queryParameters = uri.getQueryParameters(Intents.Scan.SCAN_FORMATS);
+        List<String> list = queryParameters;
+        if (queryParameters != null) {
+            list = queryParameters;
+            if (queryParameters.size() == 1) {
+                list = queryParameters;
+                if (queryParameters.get(0) != null) {
+                    list = Arrays.asList(COMMA_PATTERN.split(queryParameters.get(0)));
                 }
-                return formats;
+            }
+        }
+        return parseDecodeFormats(list, uri.getQueryParameter(Intents.Scan.MODE));
+    }
+
+    private static Vector<BarcodeFormat> parseDecodeFormats(Iterable<String> iterable, String str) {
+        Vector<BarcodeFormat> vector;
+        if (iterable != null) {
+            Vector<BarcodeFormat> vector2 = new Vector<>();
+            try {
+                for (String str2 : iterable) {
+                    vector2.add(BarcodeFormat.valueOf(str2));
+                }
+                vector = vector2;
             } catch (IllegalArgumentException e) {
             }
+            return vector;
         }
-        if (decodeMode != null) {
-            if (Intents.Scan.PRODUCT_MODE.equals(decodeMode)) {
-                Vector<BarcodeFormat> formats2 = PRODUCT_FORMATS;
-                return formats2;
-            } else if (Intents.Scan.QR_CODE_MODE.equals(decodeMode)) {
-                Vector<BarcodeFormat> formats3 = QR_CODE_FORMATS;
-                return formats3;
-            } else if (Intents.Scan.DATA_MATRIX_MODE.equals(decodeMode)) {
-                Vector<BarcodeFormat> formats4 = DATA_MATRIX_FORMATS;
-                return formats4;
-            } else if (Intents.Scan.ONE_D_MODE.equals(decodeMode)) {
-                Vector<BarcodeFormat> formats5 = ONE_D_FORMATS;
-                return formats5;
+        if (str != null) {
+            if (Intents.Scan.PRODUCT_MODE.equals(str)) {
+                vector = PRODUCT_FORMATS;
+            } else if (Intents.Scan.QR_CODE_MODE.equals(str)) {
+                vector = QR_CODE_FORMATS;
+            } else if (Intents.Scan.DATA_MATRIX_MODE.equals(str)) {
+                vector = DATA_MATRIX_FORMATS;
+            } else if (Intents.Scan.ONE_D_MODE.equals(str)) {
+                vector = ONE_D_FORMATS;
             }
+            return vector;
         }
-        return null;
+        vector = null;
+        return vector;
     }
 }

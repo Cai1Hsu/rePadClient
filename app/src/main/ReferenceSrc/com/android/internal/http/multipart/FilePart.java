@@ -5,50 +5,40 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/android/internal/http/multipart/FilePart.class */
 public class FilePart extends PartBase {
     public static final String DEFAULT_CHARSET = "ISO-8859-1";
     public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
     public static final String DEFAULT_TRANSFER_ENCODING = "binary";
     protected static final String FILE_NAME = "; filename=";
 
-    public FilePart(String name, PartSource partSource, String contentType, String charset) {
+    public FilePart(String str, PartSource partSource) {
         super(null, null, null, null);
         throw new RuntimeException("Stub!");
     }
 
-    public FilePart(String name, PartSource partSource) {
+    public FilePart(String str, PartSource partSource, String str2, String str3) {
         super(null, null, null, null);
         throw new RuntimeException("Stub!");
     }
 
-    public FilePart(String name, File file) throws FileNotFoundException {
+    public FilePart(String str, File file) throws FileNotFoundException {
         super(null, null, null, null);
         throw new RuntimeException("Stub!");
     }
 
-    public FilePart(String name, File file, String contentType, String charset) throws FileNotFoundException {
+    public FilePart(String str, File file, String str2, String str3) throws FileNotFoundException {
         super(null, null, null, null);
         throw new RuntimeException("Stub!");
     }
 
-    public FilePart(String name, String fileName, File file) throws FileNotFoundException {
+    public FilePart(String str, String str2, File file) throws FileNotFoundException {
         super(null, null, null, null);
         throw new RuntimeException("Stub!");
     }
 
-    public FilePart(String name, String fileName, File file, String contentType, String charset) throws FileNotFoundException {
+    public FilePart(String str, String str2, File file, String str3, String str4) throws FileNotFoundException {
         super(null, null, null, null);
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // com.android.internal.http.multipart.Part
-    protected void sendDispositionHeader(OutputStream out) throws IOException {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // com.android.internal.http.multipart.Part
-    protected void sendData(OutputStream out) throws IOException {
         throw new RuntimeException("Stub!");
     }
 
@@ -58,6 +48,16 @@ public class FilePart extends PartBase {
 
     @Override // com.android.internal.http.multipart.Part
     protected long lengthOfData() {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // com.android.internal.http.multipart.Part
+    protected void sendData(OutputStream outputStream) throws IOException {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // com.android.internal.http.multipart.Part
+    protected void sendDispositionHeader(OutputStream outputStream) throws IOException {
         throw new RuntimeException("Stub!");
     }
 }

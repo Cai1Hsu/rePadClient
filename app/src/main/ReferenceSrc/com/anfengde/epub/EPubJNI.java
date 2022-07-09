@@ -1,7 +1,11 @@
 package com.anfengde.epub;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/anfengde/epub/EPubJNI.class */
 public class EPubJNI {
+    static {
+        System.loadLibrary("epubjni");
+    }
+
     public final native int addEPubBookmark(EPubBookmark ePubBookmark, int i);
 
     public final native int cleanEPubBookCache(int i);
@@ -55,8 +59,4 @@ public class EPubJNI {
     public final native int updateEPubBookmark(EPubBookmark ePubBookmark, int i);
 
     public final native int updateEPubReadingStatus(EPubReadingStatus ePubReadingStatus, int i);
-
-    static {
-        System.loadLibrary("epubjni");
-    }
 }

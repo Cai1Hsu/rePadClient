@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/DefaultDateTypeAdapter.class */
 final class DefaultDateTypeAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
     private final DateFormat enUsFormat;
     private final DateFormat iso8601Format;
@@ -20,70 +20,69 @@ final class DefaultDateTypeAdapter implements JsonSerializer<Date>, JsonDeserial
         this(DateFormat.getDateTimeInstance(2, 2, Locale.US), DateFormat.getDateTimeInstance(2, 2));
     }
 
-    DefaultDateTypeAdapter(String datePattern) {
-        this(new SimpleDateFormat(datePattern, Locale.US), new SimpleDateFormat(datePattern));
+    DefaultDateTypeAdapter(int i) {
+        this(DateFormat.getDateInstance(i, Locale.US), DateFormat.getDateInstance(i));
     }
 
-    DefaultDateTypeAdapter(int style) {
-        this(DateFormat.getDateInstance(style, Locale.US), DateFormat.getDateInstance(style));
+    public DefaultDateTypeAdapter(int i, int i2) {
+        this(DateFormat.getDateTimeInstance(i, i2, Locale.US), DateFormat.getDateTimeInstance(i, i2));
     }
 
-    public DefaultDateTypeAdapter(int dateStyle, int timeStyle) {
-        this(DateFormat.getDateTimeInstance(dateStyle, timeStyle, Locale.US), DateFormat.getDateTimeInstance(dateStyle, timeStyle));
+    DefaultDateTypeAdapter(String str) {
+        this(new SimpleDateFormat(str, Locale.US), new SimpleDateFormat(str));
     }
 
-    DefaultDateTypeAdapter(DateFormat enUsFormat, DateFormat localFormat) {
-        this.enUsFormat = enUsFormat;
-        this.localFormat = localFormat;
+    DefaultDateTypeAdapter(DateFormat dateFormat, DateFormat dateFormat2) {
+        this.enUsFormat = dateFormat;
+        this.localFormat = dateFormat2;
         this.iso8601Format = new SimpleDateFormat(JSONCallback._secDateFormat, Locale.US);
         this.iso8601Format.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonPrimitive jsonPrimitive;
-        synchronized (this.localFormat) {
-            String dateFormatAsString = this.enUsFormat.format(src);
-            jsonPrimitive = new JsonPrimitive(dateFormatAsString);
-        }
-        return jsonPrimitive;
-    }
-
-    @Override // com.google.gson.JsonDeserializer
-    public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        if (!(json instanceof JsonPrimitive)) {
-            throw new JsonParseException("The date should be a string value");
-        }
-        Date date = deserializeToDate(json);
-        if (typeOfT != Date.class) {
-            if (typeOfT == Timestamp.class) {
-                return new Timestamp(date.getTime());
-            }
-            if (typeOfT == java.sql.Date.class) {
-                return new java.sql.Date(date.getTime());
-            }
-            throw new IllegalArgumentException(getClass() + " cannot deserialize to " + typeOfT);
-        }
-        return date;
-    }
-
-    private Date deserializeToDate(JsonElement json) {
+    private Date deserializeToDate(JsonElement jsonElement) {
         Date parse;
         synchronized (this.localFormat) {
             try {
-                parse = this.localFormat.parse(json.getAsString());
+                parse = this.localFormat.parse(jsonElement.getAsString());
             } catch (ParseException e) {
                 try {
-                    parse = this.enUsFormat.parse(json.getAsString());
+                    parse = this.enUsFormat.parse(jsonElement.getAsString());
                 } catch (ParseException e2) {
                     try {
-                        parse = this.iso8601Format.parse(json.getAsString());
+                        parse = this.iso8601Format.parse(jsonElement.getAsString());
                     } catch (ParseException e3) {
-                        throw new JsonSyntaxException(json.getAsString(), e3);
+                        throw new JsonSyntaxException(jsonElement.getAsString(), e3);
                     }
                 }
             }
         }
         return parse;
+    }
+
+    @Override // com.google.gson.JsonDeserializer
+    public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        if (!(jsonElement instanceof JsonPrimitive)) {
+            throw new JsonParseException("The date should be a string value");
+        }
+        Timestamp deserializeToDate = deserializeToDate(jsonElement);
+        if (type != Date.class) {
+            if (type == Timestamp.class) {
+                deserializeToDate = new Timestamp(deserializeToDate.getTime());
+            } else if (type != java.sql.Date.class) {
+                throw new IllegalArgumentException(getClass() + " cannot deserialize to " + type);
+            } else {
+                deserializeToDate = new java.sql.Date(deserializeToDate.getTime());
+            }
+        }
+        return deserializeToDate;
+    }
+
+    public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {
+        JsonPrimitive jsonPrimitive;
+        synchronized (this.localFormat) {
+            jsonPrimitive = new JsonPrimitive(this.enUsFormat.format(date));
+        }
+        return jsonPrimitive;
     }
 
     public String toString() {

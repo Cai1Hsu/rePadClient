@@ -1,6 +1,6 @@
 package com.google.zxing;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/ChecksumException.class */
 public final class ChecksumException extends ReaderException {
     private static final ChecksumException instance = new ChecksumException();
 

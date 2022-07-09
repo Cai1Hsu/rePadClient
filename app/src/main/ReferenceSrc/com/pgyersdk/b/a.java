@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import org.apache.http.message.BasicNameValuePair;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/b/a.class */
 public class a extends AsyncTask {
     protected String a;
     protected String b;
@@ -37,11 +37,13 @@ public class a extends AsyncTask {
     }
 
     private static String b(String str) {
+        String str2;
         try {
-            return URLEncoder.encode(str, "UTF-8");
+            str2 = URLEncoder.encode(str, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            return "";
+            str2 = "";
         }
+        return str2;
     }
 
     public void a() {

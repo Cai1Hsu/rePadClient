@@ -6,7 +6,7 @@ import com.pgyersdk.b.a;
 import com.pgyersdk.b.b;
 import com.pgyersdk.c.n;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/update/PgyUpdateManager.class */
 public class PgyUpdateManager {
     private static a a = null;
     private static UpdateManagerListener b = null;
@@ -27,12 +27,12 @@ public class PgyUpdateManager {
         }
     }
 
-    public static void register(Activity activity, String appId) {
-        a(activity, "http://www.pgyer.com/", appId, null);
+    public static void register(Activity activity, String str) {
+        a(activity, "http://www.pgyer.com/", str, null);
     }
 
-    public static void register(Activity activity, String appId, UpdateManagerListener listener) {
-        a(activity, "http://www.pgyer.com/", appId, listener);
+    public static void register(Activity activity, String str, UpdateManagerListener updateManagerListener) {
+        a(activity, "http://www.pgyer.com/", str, updateManagerListener);
     }
 
     public static void unregister() {

@@ -3,7 +3,7 @@ package com.pgyersdk.c;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/c/k.class */
 public final class k {
     private static SharedPreferences a = null;
 

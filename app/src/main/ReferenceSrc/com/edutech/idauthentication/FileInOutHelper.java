@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/idauthentication/FileInOutHelper.class */
 public final class FileInOutHelper {
     private static final int INDEX5 = 5;
     private static final int INDEX6 = 6;
@@ -26,335 +26,376 @@ public final class FileInOutHelper {
     private FileInOutHelper() {
     }
 
-    public static File setupOrOpenFile(String aPath) {
-        String name = aPath.substring(aPath.lastIndexOf("/") + 1);
-        String path = aPath.substring(0, aPath.lastIndexOf("/") + 1);
-        return setupOrOpenFile(path, name);
+    public static boolean addToFile(String str, String str2, byte[] bArr, int i) {
+        String str3 = str;
+        if (!str.endsWith("/")) {
+            str3 = String.valueOf(str) + "/";
+        }
+        return addToFile(String.valueOf(str3) + str2, bArr, i);
     }
 
-    public static File setupOrOpenFile(String aPath, String aFileName) {
-        File file = null;
-        if ("mounted".equals(Environment.getExternalStorageState())) {
-            File file2 = new File(aPath);
-            if (!file2.exists()) {
-                file2.mkdirs();
-            }
-            if (!aPath.endsWith("/")) {
-                aPath = String.valueOf(aPath) + "/";
-            }
-            file = new File(String.valueOf(aPath) + aFileName);
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return file;
-    }
-
-    public static boolean renameFile(String aPath, String aCurrentName, String aReName) {
-        if ("mounted".equals(Environment.getExternalStorageState())) {
-            if (!aPath.endsWith("/")) {
-                aPath = String.valueOf(aPath) + "/";
-            }
-            File currentFile = new File(String.valueOf(aPath) + aCurrentName);
-            File reFile = new File(String.valueOf(aPath) + aReName);
-            if (currentFile.exists()) {
-                currentFile.renameTo(reFile);
-                return false;
-            }
-            return false;
-        }
-        return false;
-    }
-
-    public static byte[] loadFdisk(String aPath, String aFileName) {
-        if (!aPath.endsWith("/")) {
-            aPath = String.valueOf(aPath) + "/";
-        }
-        return loadFdisk(aPath);
-    }
-
-    public static byte[] loadFdisk(String aPath) {
-        File file = new File(aPath);
-        if (!file.exists() && file.length() <= 0 && file.isDirectory()) {
-            return null;
-        }
-        byte[] temp = new byte[(int) file.length()];
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            fis.read(temp);
-            return temp;
-        } catch (Exception e) {
-            return temp;
-        }
-    }
-
-    public static boolean fileIsExists(String aPath, String aFileName) {
-        if (!aPath.endsWith("/")) {
-            aPath = String.valueOf(aPath) + "/";
-        }
-        return fileIsExists(String.valueOf(aPath) + aFileName);
-    }
-
-    public static boolean fileIsExists(String aPath) {
-        if ("mounted".equals(Environment.getExternalStorageState())) {
-            File file = new File(aPath);
-            if (file.exists()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean addToFile(String aPath, String aFileName, byte[] aData, int aLength) {
-        if (!aPath.endsWith("/")) {
-            aPath = String.valueOf(aPath) + "/";
-        }
-        return addToFile(String.valueOf(aPath) + aFileName, aData, aLength);
-    }
-
-    public static boolean addToFile(String aPath, byte[] aData, int aLength) {
+    /* JADX WARN: Code restructure failed: missing block: B:12:0x003d, code lost:
+        if (readSystemRemain() >= r7) goto L22;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    public static boolean addToFile(String str, byte[] bArr, int i) {
+        File file = new File(str);
         boolean z = false;
-        File file = new File(aPath);
         if (file.exists()) {
-            if (aPath.indexOf(Environment.getExternalStorageDirectory().getPath()) != -1) {
-                if (readSDCardRemain() < aLength) {
-                    return false;
-                }
-            } else if (readSystemRemain() < aLength) {
-                return false;
+            if (str.indexOf(Environment.getExternalStorageDirectory().getPath()) == -1) {
+                z = false;
+            } else if (readSDCardRemain() < i) {
+                z = false;
             }
             try {
-                DataOutputStream dos = new DataOutputStream(new FileOutputStream(aPath, false));
-                if (aLength == 0) {
-                    dos.write(aData);
+                DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(str, false));
+                if (i == 0) {
+                    dataOutputStream.write(bArr);
                 } else {
-                    dos.write(aData, 0, aLength);
+                    dataOutputStream.write(bArr, 0, i);
                 }
-                dos.flush();
+                dataOutputStream.flush();
                 file.setLastModified(System.currentTimeMillis());
-                dos.close();
+                dataOutputStream.close();
                 z = true;
-                return true;
             } catch (IOException e) {
                 e.printStackTrace();
-                return z;
+                z = false;
             }
         }
-        return false;
+        return z;
     }
 
-    public static int deleteFile(String aPath, String aFileName) {
-        if (!aPath.endsWith("/")) {
-            aPath = String.valueOf(aPath) + "/";
-        }
-        return deleteFile(String.valueOf(aPath) + aFileName);
-    }
-
-    public static int deleteFile(String aPath) {
-        File file = new File(aPath);
-        if (file.exists()) {
-            file.delete();
-            return 0;
-        }
-        return -1;
-    }
-
-    public static long readSDCardRemain() {
-        if ("mounted".equals(Environment.getExternalStorageState())) {
-            File sdcardDir = Environment.getExternalStorageDirectory();
-            StatFs sf = new StatFs(sdcardDir.getPath());
-            long blockSize = sf.getBlockSize();
-            long availCount = sf.getAvailableBlocks();
-            return availCount * blockSize;
-        }
-        return -1L;
-    }
-
-    public static long readSystemRemain() {
-        File root = Environment.getRootDirectory();
-        StatFs sf = new StatFs(root.getPath());
-        long blockSize = sf.getBlockSize();
-        long availCount = sf.getAvailableBlocks();
-        return availCount * blockSize;
-    }
-
-    public static void copy(File aDesFile, File aSrcFile) throws IOException {
-        FileInputStream input = new FileInputStream(aSrcFile);
-        BufferedInputStream inBuff = new BufferedInputStream(input);
-        FileOutputStream output = new FileOutputStream(aDesFile);
-        BufferedOutputStream outBuff = new BufferedOutputStream(output);
-        byte[] b = new byte[5120];
+    public static void copy(File file, File file2) throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(file2);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+        byte[] bArr = new byte[5120];
         while (true) {
-            int len = inBuff.read(b);
-            if (len != -1) {
-                outBuff.write(b, 0, len);
-            } else {
-                outBuff.flush();
-                inBuff.close();
-                outBuff.close();
-                output.close();
-                input.close();
+            int read = bufferedInputStream.read(bArr);
+            if (read == -1) {
+                bufferedOutputStream.flush();
+                bufferedInputStream.close();
+                bufferedOutputStream.close();
+                fileOutputStream.close();
+                fileInputStream.close();
                 return;
             }
+            bufferedOutputStream.write(bArr, 0, read);
         }
     }
 
-    public static synchronized File createWithoutOverwriteExistFile(String aPath) throws IOException {
-        File file;
-        synchronized (FileInOutHelper.class) {
-            String fileName = aPath.substring(aPath.lastIndexOf(File.separatorChar) + 1);
-            String dir = aPath.substring(0, aPath.lastIndexOf(File.separatorChar) + 1);
-            String suffix = fileName.substring(fileName.lastIndexOf("."));
-            String fileNameWithoutSuffix = fileName.substring(0, fileName.lastIndexOf("."));
-            int duplicateCount = 1;
-            file = new File(aPath);
-            while (file.exists()) {
-                String tmpString = String.valueOf(fileNameWithoutSuffix) + "_" + duplicateCount;
-                file = new File(String.valueOf(dir) + tmpString + suffix);
-                duplicateCount++;
-            }
-            File parentFile = file.getParentFile();
-            if (parentFile != null) {
+    public static boolean createNewFile(File file) {
+        boolean z;
+        File parentFile;
+        if (file == null) {
+            z = false;
+        } else {
+            if (!file.exists() && (parentFile = file.getParentFile()) != null) {
                 parentFile.mkdirs();
             }
-            file.createNewFile();
+            try {
+                z = file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                z = false;
+            }
+        }
+        return z;
+    }
+
+    public static File createWithOverwriteExistFile(String str) throws IOException {
+        File file;
+        synchronized (FileInOutHelper.class) {
+            try {
+                file = new File(str);
+                if (!file.exists()) {
+                    File parentFile = file.getParentFile();
+                    if (parentFile != null) {
+                        parentFile.mkdirs();
+                    }
+                } else {
+                    file.delete();
+                }
+                file.createNewFile();
+            } catch (Throwable th) {
+                throw th;
+            }
         }
         return file;
     }
 
-    public static synchronized File createWithOverwriteExistFile(String aPath) throws IOException {
+    public static File createWithoutOverwriteExistFile(String str) throws IOException {
         File file;
         synchronized (FileInOutHelper.class) {
-            file = new File(aPath);
-            if (!file.exists()) {
+            try {
+                String substring = str.substring(str.lastIndexOf(File.separatorChar) + 1);
+                String substring2 = str.substring(0, str.lastIndexOf(File.separatorChar) + 1);
+                String substring3 = substring.substring(substring.lastIndexOf("."));
+                String substring4 = substring.substring(0, substring.lastIndexOf("."));
+                int i = 1;
+                file = new File(str);
+                while (file.exists()) {
+                    file = new File(String.valueOf(substring2) + (String.valueOf(substring4) + "_" + i) + substring3);
+                    i++;
+                }
                 File parentFile = file.getParentFile();
                 if (parentFile != null) {
                     parentFile.mkdirs();
                 }
-            } else {
-                file.delete();
+                file.createNewFile();
+            } catch (Throwable th) {
+                throw th;
             }
-            file.createNewFile();
         }
         return file;
     }
 
-    public static boolean createNewFile(File aFile) {
-        boolean fileCreateSuccessful;
-        File parentFile;
-        if (aFile == null) {
-            return false;
+    public static void deleteDir(File file) throws IOException {
+        synchronized (FileInOutHelper.class) {
+            if (file != null) {
+                try {
+                    if (file.isDirectory()) {
+                        File[] listFiles = file.listFiles();
+                        int length = listFiles.length;
+                        for (int i = 0; i < length; i++) {
+                            if (listFiles[i].isDirectory()) {
+                                deleteDir(listFiles[i]);
+                            } else {
+                                listFiles[i].delete();
+                            }
+                        }
+                    }
+                } catch (Throwable th) {
+                    throw th;
+                }
+            }
+            file.delete();
         }
-        if (!aFile.exists() && (parentFile = aFile.getParentFile()) != null) {
-            parentFile.mkdirs();
-        }
-        try {
-            fileCreateSuccessful = aFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-            fileCreateSuccessful = false;
-        }
-        return fileCreateSuccessful;
     }
 
-    public static synchronized void deleteDir(File aDir) throws IOException {
-        synchronized (FileInOutHelper.class) {
-            if (aDir != null) {
-                if (aDir.isDirectory()) {
-                    File[] entries = aDir.listFiles();
-                    int sz = entries.length;
-                    for (int i = 0; i < sz; i++) {
-                        if (entries[i].isDirectory()) {
-                            deleteDir(entries[i]);
-                        } else {
-                            entries[i].delete();
+    public static int deleteFile(String str) {
+        int i;
+        File file = new File(str);
+        if (file.exists()) {
+            file.delete();
+            i = 0;
+        } else {
+            i = -1;
+        }
+        return i;
+    }
+
+    public static int deleteFile(String str, String str2) {
+        String str3 = str;
+        if (!str.endsWith("/")) {
+            str3 = String.valueOf(str) + "/";
+        }
+        return deleteFile(String.valueOf(str3) + str2);
+    }
+
+    public static boolean fileIsExists(String str) {
+        return "mounted".equals(Environment.getExternalStorageState()) && new File(str).exists();
+    }
+
+    public static boolean fileIsExists(String str, String str2) {
+        String str3 = str;
+        if (!str.endsWith("/")) {
+            str3 = String.valueOf(str) + "/";
+        }
+        return fileIsExists(String.valueOf(str3) + str2);
+    }
+
+    public static void installApk(Context context, String str) {
+        Intent intent = new Intent("android.intent.action.VIEW");
+        intent.addFlags(268435456);
+        intent.setDataAndType(Uri.fromFile(new File(str)), "application/vnd.android.package-archive");
+        context.startActivity(intent);
+    }
+
+    public static byte[] loadFdisk(String str) {
+        byte[] bArr;
+        File file = new File(str);
+        if (file.exists() || file.length() > 0 || !file.isDirectory()) {
+            bArr = new byte[(int) file.length()];
+            try {
+                new FileInputStream(file).read(bArr);
+            } catch (Exception e) {
+            }
+        } else {
+            bArr = null;
+        }
+        return bArr;
+    }
+
+    public static byte[] loadFdisk(String str, String str2) {
+        String str3 = str;
+        if (!str.endsWith("/")) {
+            str3 = String.valueOf(str) + "/";
+        }
+        return loadFdisk(str3);
+    }
+
+    public static long readSDCardRemain() {
+        long j;
+        if ("mounted".equals(Environment.getExternalStorageState())) {
+            StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
+            j = statFs.getAvailableBlocks() * statFs.getBlockSize();
+        } else {
+            j = -1;
+        }
+        return j;
+    }
+
+    public static long readSystemRemain() {
+        StatFs statFs = new StatFs(Environment.getRootDirectory().getPath());
+        return statFs.getAvailableBlocks() * statFs.getBlockSize();
+    }
+
+    public static boolean renameFile(String str, String str2, String str3) {
+        if ("mounted".equals(Environment.getExternalStorageState())) {
+            String str4 = str;
+            if (!str.endsWith("/")) {
+                str4 = String.valueOf(str) + "/";
+            }
+            File file = new File(String.valueOf(str4) + str2);
+            File file2 = new File(String.valueOf(str4) + str3);
+            if (!file.exists()) {
+                return false;
+            }
+            file.renameTo(file2);
+            return false;
+        }
+        return false;
+    }
+
+    public static File setupOrOpenFile(String str) {
+        return setupOrOpenFile(str.substring(0, str.lastIndexOf("/") + 1), str.substring(str.lastIndexOf("/") + 1));
+    }
+
+    public static File setupOrOpenFile(String str, String str2) {
+        File file = null;
+        if ("mounted".equals(Environment.getExternalStorageState())) {
+            File file2 = new File(str);
+            if (!file2.exists()) {
+                file2.mkdirs();
+            }
+            String str3 = str;
+            if (!str.endsWith("/")) {
+                str3 = String.valueOf(str) + "/";
+            }
+            File file3 = new File(String.valueOf(str3) + str2);
+            file = file3;
+            if (!file3.exists()) {
+                try {
+                    file3.createNewFile();
+                    file = file3;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    file = file3;
+                }
+            }
+        }
+        return file;
+    }
+
+    public static String toCaseSensitivePath(String str) {
+        String str2;
+        if (str == null) {
+            str2 = null;
+        } else {
+            new String();
+            File file = new File(str);
+            str2 = str;
+            if (file.exists()) {
+                File parentFile = file.getParentFile();
+                str2 = str;
+                if (parentFile != null) {
+                    String[] list = parentFile.list();
+                    str2 = str;
+                    if (list != null) {
+                        int i = 0;
+                        while (true) {
+                            str2 = str;
+                            if (i >= list.length) {
+                                break;
+                            } else if ((String.valueOf(file.getParent()) + "/" + list[i]).compareToIgnoreCase(str) == 0) {
+                                str2 = String.valueOf(toCaseSensitivePath(file.getParent())) + "/" + list[i];
+                                break;
+                            } else {
+                                i++;
+                            }
                         }
                     }
                 }
             }
-            aDir.delete();
         }
+        return str2;
     }
 
-    public static synchronized void unZip(InputStream aIs, String aOutPutDir, boolean aOverride) throws IOException {
-        String name;
+    public static void unZip(InputStream inputStream, String str, boolean z) throws IOException {
         synchronized (FileInOutHelper.class) {
-            ZipInputStream zipInputStream = new ZipInputStream(aIs);
-            new File(aOutPutDir).mkdirs();
-            for (ZipEntry zipEntry = zipInputStream.getNextEntry(); zipEntry != null; zipEntry = zipInputStream.getNextEntry()) {
-                if (zipEntry.isDirectory()) {
-                    String name2 = zipEntry.getName().substring(0, name.length() - 1);
-                    if (name2 != null && "" != name2) {
-                        new File(String.valueOf(aOutPutDir) + File.separator + name2).mkdir();
+            try {
+                ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+                new File(str).mkdirs();
+                for (ZipEntry nextEntry = zipInputStream.getNextEntry(); nextEntry != null; nextEntry = zipInputStream.getNextEntry()) {
+                    if (nextEntry.isDirectory()) {
+                        String name = nextEntry.getName();
+                        String substring = name.substring(0, name.length() - 1);
+                        if (substring != null && "" != substring) {
+                            new File(String.valueOf(str) + File.separator + substring).mkdir();
+                        }
+                    } else {
+                        String str2 = String.valueOf(str) + File.separatorChar + nextEntry.getName();
+                        File file = new File(str2);
+                        if (z) {
+                            writeFile(zipInputStream, createWithOverwriteExistFile(str2));
+                        } else if (!file.exists()) {
+                            file.createNewFile();
+                            writeFile(zipInputStream, file);
+                        }
                     }
-                } else {
-                    String filePath = String.valueOf(aOutPutDir) + File.separatorChar + zipEntry.getName();
-                    File file = new File(filePath);
-                    if (aOverride) {
-                        writeFile(zipInputStream, createWithOverwriteExistFile(filePath));
-                    } else if (!file.exists()) {
-                        file.createNewFile();
-                        writeFile(zipInputStream, file);
+                }
+                zipInputStream.close();
+            } catch (Throwable th) {
+                throw th;
+            }
+        }
+    }
+
+    public static void unZip(String str, String str2, boolean z) throws IOException {
+        synchronized (FileInOutHelper.class) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(new File(str));
+                unZip(fileInputStream, str2, z);
+                fileInputStream.close();
+            } catch (Throwable th) {
+                throw th;
+            }
+        }
+    }
+
+    public static void writeFile(InputStream inputStream, File file) throws IOException {
+        synchronized (FileInOutHelper.class) {
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                byte[] bArr = new byte[6144];
+                fileOutputStream.write(bArr, 0, inputStream.read(bArr));
+                while (true) {
+                    int read = inputStream.read(bArr);
+                    if (read <= 0) {
+                        fileOutputStream.close();
+                    } else {
+                        fileOutputStream.write(bArr, 0, read);
+                        fileOutputStream.flush();
                     }
                 }
-            }
-            zipInputStream.close();
-        }
-    }
-
-    public static synchronized void writeFile(InputStream aIs, File aDesFile) throws IOException {
-        synchronized (FileInOutHelper.class) {
-            FileOutputStream out = new FileOutputStream(aDesFile);
-            byte[] b = new byte[6144];
-            out.write(b, 0, aIs.read(b));
-            while (true) {
-                int len = aIs.read(b);
-                if (len > 0) {
-                    out.write(b, 0, len);
-                    out.flush();
-                } else {
-                    out.close();
-                }
+            } catch (Throwable th) {
+                throw th;
             }
         }
-    }
-
-    public static synchronized void unZip(String aZipFilePath, String aOutPutDir, boolean aOverride) throws IOException {
-        synchronized (FileInOutHelper.class) {
-            InputStream is = new FileInputStream(new File(aZipFilePath));
-            unZip(is, aOutPutDir, aOverride);
-            is.close();
-        }
-    }
-
-    public static void installApk(Context aContext, String aUri) {
-        Intent intent = new Intent("android.intent.action.VIEW");
-        intent.addFlags(268435456);
-        intent.setDataAndType(Uri.fromFile(new File(aUri)), "application/vnd.android.package-archive");
-        aContext.startActivity(intent);
-    }
-
-    public static String toCaseSensitivePath(String aInsensitvePath) {
-        File parentFile;
-        String[] subPaths;
-        if (aInsensitvePath == null) {
-            return null;
-        }
-        new String();
-        File file = new File(aInsensitvePath);
-        if (file.exists() && (parentFile = file.getParentFile()) != null && (subPaths = parentFile.list()) != null) {
-            for (int i = 0; i < subPaths.length; i++) {
-                String convertedPath = String.valueOf(file.getParent()) + "/" + subPaths[i];
-                if (convertedPath.compareToIgnoreCase(aInsensitvePath) == 0) {
-                    return String.valueOf(toCaseSensitivePath(file.getParent())) + "/" + subPaths[i];
-                }
-            }
-            return aInsensitvePath;
-        }
-        return aInsensitvePath;
     }
 }

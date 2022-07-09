@@ -35,451 +35,508 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/internal/bind/TypeAdapters.class */
 public final class TypeAdapters {
     public static final TypeAdapter<Class> CLASS = new TypeAdapter<Class>() { // from class: com.google.gson.internal.bind.TypeAdapters.1
-        public void write(JsonWriter out, Class value) throws IOException {
-            if (value == null) {
-                out.nullValue();
-                return;
-            }
-            throw new UnsupportedOperationException("Attempted to serialize java.lang.Class: " + value.getName() + ". Forgot to register a type adapter?");
-        }
-
         @Override // com.google.gson.TypeAdapter
-        public Class read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
+        public Class read(JsonReader jsonReader) throws IOException {
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
                 return null;
             }
             throw new UnsupportedOperationException("Attempted to deserialize a java.lang.Class. Forgot to register a type adapter?");
+        }
+
+        public void write(JsonWriter jsonWriter, Class cls) throws IOException {
+            if (cls == null) {
+                jsonWriter.nullValue();
+                return;
+            }
+            throw new UnsupportedOperationException("Attempted to serialize java.lang.Class: " + cls.getName() + ". Forgot to register a type adapter?");
         }
     };
     public static final TypeAdapterFactory CLASS_FACTORY = newFactory(Class.class, CLASS);
     public static final TypeAdapter<BitSet> BIT_SET = new TypeAdapter<BitSet>() { // from class: com.google.gson.internal.bind.TypeAdapters.2
         @Override // com.google.gson.TypeAdapter
-        public BitSet read(JsonReader in) throws IOException {
-            boolean set;
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-            BitSet bitset = new BitSet();
-            in.beginArray();
-            int i = 0;
-            JsonToken tokenType = in.peek();
-            while (tokenType != JsonToken.END_ARRAY) {
-                switch (AnonymousClass32.$SwitchMap$com$google$gson$stream$JsonToken[tokenType.ordinal()]) {
-                    case 1:
-                        if (in.nextInt() == 0) {
-                            set = false;
-                            break;
-                        } else {
-                            set = true;
-                            break;
-                        }
-                    case 2:
-                        set = in.nextBoolean();
-                        break;
-                    case 3:
-                        String stringValue = in.nextString();
-                        try {
-                            if (Integer.parseInt(stringValue) == 0) {
-                                set = false;
+        public BitSet read(JsonReader jsonReader) throws IOException {
+            BitSet bitSet;
+            boolean z;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                bitSet = null;
+            } else {
+                BitSet bitSet2 = new BitSet();
+                jsonReader.beginArray();
+                int i = 0;
+                JsonToken peek = jsonReader.peek();
+                while (true) {
+                    JsonToken jsonToken = peek;
+                    if (jsonToken != JsonToken.END_ARRAY) {
+                        switch (AnonymousClass32.$SwitchMap$com$google$gson$stream$JsonToken[jsonToken.ordinal()]) {
+                            case 1:
+                                if (jsonReader.nextInt() == 0) {
+                                    z = false;
+                                    break;
+                                } else {
+                                    z = true;
+                                    break;
+                                }
+                            case 2:
+                                z = jsonReader.nextBoolean();
                                 break;
-                            } else {
-                                set = true;
-                                break;
-                            }
-                        } catch (NumberFormatException e) {
-                            throw new JsonSyntaxException("Error: Expecting: bitset number value (1, 0), Found: " + stringValue);
+                            case 3:
+                                String nextString = jsonReader.nextString();
+                                try {
+                                    if (Integer.parseInt(nextString) == 0) {
+                                        z = false;
+                                        break;
+                                    } else {
+                                        z = true;
+                                        break;
+                                    }
+                                } catch (NumberFormatException e) {
+                                    throw new JsonSyntaxException("Error: Expecting: bitset number value (1, 0), Found: " + nextString);
+                                }
+                            default:
+                                throw new JsonSyntaxException("Invalid bitset value type: " + jsonToken);
                         }
-                    default:
-                        throw new JsonSyntaxException("Invalid bitset value type: " + tokenType);
+                        if (z) {
+                            bitSet2.set(i);
+                        }
+                        i++;
+                        peek = jsonReader.peek();
+                    } else {
+                        jsonReader.endArray();
+                        bitSet = bitSet2;
+                    }
                 }
-                if (set) {
-                    bitset.set(i);
-                }
-                i++;
-                tokenType = in.peek();
             }
-            in.endArray();
-            return bitset;
+            return bitSet;
         }
 
-        public void write(JsonWriter out, BitSet src) throws IOException {
-            if (src == null) {
-                out.nullValue();
+        public void write(JsonWriter jsonWriter, BitSet bitSet) throws IOException {
+            if (bitSet == null) {
+                jsonWriter.nullValue();
                 return;
             }
-            out.beginArray();
-            for (int i = 0; i < src.length(); i++) {
-                int value = src.get(i) ? 1 : 0;
-                out.value(value);
+            jsonWriter.beginArray();
+            for (int i = 0; i < bitSet.length(); i++) {
+                jsonWriter.value(bitSet.get(i) ? 1 : 0);
             }
-            out.endArray();
+            jsonWriter.endArray();
         }
     };
     public static final TypeAdapterFactory BIT_SET_FACTORY = newFactory(BitSet.class, BIT_SET);
     public static final TypeAdapter<Boolean> BOOLEAN = new TypeAdapter<Boolean>() { // from class: com.google.gson.internal.bind.TypeAdapters.3
         @Override // com.google.gson.TypeAdapter
-        public Boolean read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            } else if (in.peek() == JsonToken.STRING) {
-                return Boolean.valueOf(Boolean.parseBoolean(in.nextString()));
+        public Boolean read(JsonReader jsonReader) throws IOException {
+            Boolean valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
             } else {
-                return Boolean.valueOf(in.nextBoolean());
+                valueOf = jsonReader.peek() == JsonToken.STRING ? Boolean.valueOf(Boolean.parseBoolean(jsonReader.nextString())) : Boolean.valueOf(jsonReader.nextBoolean());
             }
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Boolean value) throws IOException {
-            if (value == null) {
-                out.nullValue();
+        public void write(JsonWriter jsonWriter, Boolean bool) throws IOException {
+            if (bool == null) {
+                jsonWriter.nullValue();
             } else {
-                out.value(value.booleanValue());
+                jsonWriter.value(bool.booleanValue());
             }
         }
     };
     public static final TypeAdapter<Boolean> BOOLEAN_AS_STRING = new TypeAdapter<Boolean>() { // from class: com.google.gson.internal.bind.TypeAdapters.4
         @Override // com.google.gson.TypeAdapter
-        public Boolean read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Boolean read(JsonReader jsonReader) throws IOException {
+            Boolean valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                valueOf = Boolean.valueOf(jsonReader.nextString());
             }
-            return Boolean.valueOf(in.nextString());
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Boolean value) throws IOException {
-            out.value(value == null ? "null" : value.toString());
+        public void write(JsonWriter jsonWriter, Boolean bool) throws IOException {
+            jsonWriter.value(bool == null ? "null" : bool.toString());
         }
     };
     public static final TypeAdapterFactory BOOLEAN_FACTORY = newFactory(Boolean.TYPE, Boolean.class, BOOLEAN);
     public static final TypeAdapter<Number> BYTE = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.5
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Number read(JsonReader jsonReader) throws IOException {
+            Byte valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                try {
+                    valueOf = Byte.valueOf((byte) jsonReader.nextInt());
+                } catch (NumberFormatException e) {
+                    throw new JsonSyntaxException(e);
+                }
             }
-            try {
-                int intValue = in.nextInt();
-                return Byte.valueOf((byte) intValue);
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapterFactory BYTE_FACTORY = newFactory(Byte.TYPE, Byte.class, BYTE);
     public static final TypeAdapter<Number> SHORT = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.6
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Number read(JsonReader jsonReader) throws IOException {
+            Short valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                try {
+                    valueOf = Short.valueOf((short) jsonReader.nextInt());
+                } catch (NumberFormatException e) {
+                    throw new JsonSyntaxException(e);
+                }
             }
-            try {
-                return Short.valueOf((short) in.nextInt());
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapterFactory SHORT_FACTORY = newFactory(Short.TYPE, Short.class, SHORT);
     public static final TypeAdapter<Number> INTEGER = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.7
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Number read(JsonReader jsonReader) throws IOException {
+            Integer valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                try {
+                    valueOf = Integer.valueOf(jsonReader.nextInt());
+                } catch (NumberFormatException e) {
+                    throw new JsonSyntaxException(e);
+                }
             }
-            try {
-                return Integer.valueOf(in.nextInt());
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapterFactory INTEGER_FACTORY = newFactory(Integer.TYPE, Integer.class, INTEGER);
     public static final TypeAdapter<Number> LONG = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.8
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Number read(JsonReader jsonReader) throws IOException {
+            Long valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                try {
+                    valueOf = Long.valueOf(jsonReader.nextLong());
+                } catch (NumberFormatException e) {
+                    throw new JsonSyntaxException(e);
+                }
             }
-            try {
-                return Long.valueOf(in.nextLong());
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapter<Number> FLOAT = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.9
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Number read(JsonReader jsonReader) throws IOException {
+            Float valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                valueOf = Float.valueOf((float) jsonReader.nextDouble());
             }
-            return Float.valueOf((float) in.nextDouble());
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapter<Number> DOUBLE = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.10
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Number read(JsonReader jsonReader) throws IOException {
+            Double valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                valueOf = Double.valueOf(jsonReader.nextDouble());
             }
-            return Double.valueOf(in.nextDouble());
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapter<Number> NUMBER = new TypeAdapter<Number>() { // from class: com.google.gson.internal.bind.TypeAdapters.11
         @Override // com.google.gson.TypeAdapter
-        public Number read(JsonReader in) throws IOException {
-            JsonToken jsonToken = in.peek();
-            switch (AnonymousClass32.$SwitchMap$com$google$gson$stream$JsonToken[jsonToken.ordinal()]) {
+        public Number read(JsonReader jsonReader) throws IOException {
+            LazilyParsedNumber lazilyParsedNumber;
+            JsonToken peek = jsonReader.peek();
+            switch (AnonymousClass32.$SwitchMap$com$google$gson$stream$JsonToken[peek.ordinal()]) {
                 case 1:
-                    return new LazilyParsedNumber(in.nextString());
+                    lazilyParsedNumber = new LazilyParsedNumber(jsonReader.nextString());
+                    break;
                 case 2:
                 case 3:
                 default:
-                    throw new JsonSyntaxException("Expecting number, got: " + jsonToken);
+                    throw new JsonSyntaxException("Expecting number, got: " + peek);
                 case 4:
-                    in.nextNull();
-                    return null;
+                    jsonReader.nextNull();
+                    lazilyParsedNumber = null;
+                    break;
             }
+            return lazilyParsedNumber;
         }
 
-        public void write(JsonWriter out, Number value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            jsonWriter.value(number);
         }
     };
     public static final TypeAdapterFactory NUMBER_FACTORY = newFactory(Number.class, NUMBER);
     public static final TypeAdapter<Character> CHARACTER = new TypeAdapter<Character>() { // from class: com.google.gson.internal.bind.TypeAdapters.12
         @Override // com.google.gson.TypeAdapter
-        public Character read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Character read(JsonReader jsonReader) throws IOException {
+            Character valueOf;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                valueOf = null;
+            } else {
+                String nextString = jsonReader.nextString();
+                if (nextString.length() != 1) {
+                    throw new JsonSyntaxException("Expecting character, got: " + nextString);
+                }
+                valueOf = Character.valueOf(nextString.charAt(0));
             }
-            String str = in.nextString();
-            if (str.length() != 1) {
-                throw new JsonSyntaxException("Expecting character, got: " + str);
-            }
-            return Character.valueOf(str.charAt(0));
+            return valueOf;
         }
 
-        public void write(JsonWriter out, Character value) throws IOException {
-            out.value(value == null ? null : String.valueOf(value));
+        public void write(JsonWriter jsonWriter, Character ch) throws IOException {
+            jsonWriter.value(ch == null ? null : String.valueOf(ch));
         }
     };
     public static final TypeAdapterFactory CHARACTER_FACTORY = newFactory(Character.TYPE, Character.class, CHARACTER);
     public static final TypeAdapter<String> STRING = new TypeAdapter<String>() { // from class: com.google.gson.internal.bind.TypeAdapters.13
         @Override // com.google.gson.TypeAdapter
-        public String read(JsonReader in) throws IOException {
-            JsonToken peek = in.peek();
+        public String read(JsonReader jsonReader) throws IOException {
+            String bool;
+            JsonToken peek = jsonReader.peek();
             if (peek == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            } else if (peek == JsonToken.BOOLEAN) {
-                return Boolean.toString(in.nextBoolean());
+                jsonReader.nextNull();
+                bool = null;
             } else {
-                return in.nextString();
+                bool = peek == JsonToken.BOOLEAN ? Boolean.toString(jsonReader.nextBoolean()) : jsonReader.nextString();
             }
+            return bool;
         }
 
-        public void write(JsonWriter out, String value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, String str) throws IOException {
+            jsonWriter.value(str);
         }
     };
     public static final TypeAdapter<BigDecimal> BIG_DECIMAL = new TypeAdapter<BigDecimal>() { // from class: com.google.gson.internal.bind.TypeAdapters.14
         @Override // com.google.gson.TypeAdapter
-        public BigDecimal read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public BigDecimal read(JsonReader jsonReader) throws IOException {
+            BigDecimal bigDecimal;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                bigDecimal = null;
+            } else {
+                try {
+                    bigDecimal = new BigDecimal(jsonReader.nextString());
+                } catch (NumberFormatException e) {
+                    throw new JsonSyntaxException(e);
+                }
             }
-            try {
-                return new BigDecimal(in.nextString());
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
+            return bigDecimal;
         }
 
-        public void write(JsonWriter out, BigDecimal value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, BigDecimal bigDecimal) throws IOException {
+            jsonWriter.value(bigDecimal);
         }
     };
     public static final TypeAdapter<BigInteger> BIG_INTEGER = new TypeAdapter<BigInteger>() { // from class: com.google.gson.internal.bind.TypeAdapters.15
         @Override // com.google.gson.TypeAdapter
-        public BigInteger read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public BigInteger read(JsonReader jsonReader) throws IOException {
+            BigInteger bigInteger;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                bigInteger = null;
+            } else {
+                try {
+                    bigInteger = new BigInteger(jsonReader.nextString());
+                } catch (NumberFormatException e) {
+                    throw new JsonSyntaxException(e);
+                }
             }
-            try {
-                return new BigInteger(in.nextString());
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
+            return bigInteger;
         }
 
-        public void write(JsonWriter out, BigInteger value) throws IOException {
-            out.value(value);
+        public void write(JsonWriter jsonWriter, BigInteger bigInteger) throws IOException {
+            jsonWriter.value(bigInteger);
         }
     };
     public static final TypeAdapterFactory STRING_FACTORY = newFactory(String.class, STRING);
     public static final TypeAdapter<StringBuilder> STRING_BUILDER = new TypeAdapter<StringBuilder>() { // from class: com.google.gson.internal.bind.TypeAdapters.16
         @Override // com.google.gson.TypeAdapter
-        public StringBuilder read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public StringBuilder read(JsonReader jsonReader) throws IOException {
+            StringBuilder sb;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                sb = null;
+            } else {
+                sb = new StringBuilder(jsonReader.nextString());
             }
-            return new StringBuilder(in.nextString());
+            return sb;
         }
 
-        public void write(JsonWriter out, StringBuilder value) throws IOException {
-            out.value(value == null ? null : value.toString());
+        public void write(JsonWriter jsonWriter, StringBuilder sb) throws IOException {
+            jsonWriter.value(sb == null ? null : sb.toString());
         }
     };
     public static final TypeAdapterFactory STRING_BUILDER_FACTORY = newFactory(StringBuilder.class, STRING_BUILDER);
     public static final TypeAdapter<StringBuffer> STRING_BUFFER = new TypeAdapter<StringBuffer>() { // from class: com.google.gson.internal.bind.TypeAdapters.17
         @Override // com.google.gson.TypeAdapter
-        public StringBuffer read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public StringBuffer read(JsonReader jsonReader) throws IOException {
+            StringBuffer stringBuffer;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                stringBuffer = null;
+            } else {
+                stringBuffer = new StringBuffer(jsonReader.nextString());
             }
-            return new StringBuffer(in.nextString());
+            return stringBuffer;
         }
 
-        public void write(JsonWriter out, StringBuffer value) throws IOException {
-            out.value(value == null ? null : value.toString());
+        public void write(JsonWriter jsonWriter, StringBuffer stringBuffer) throws IOException {
+            jsonWriter.value(stringBuffer == null ? null : stringBuffer.toString());
         }
     };
     public static final TypeAdapterFactory STRING_BUFFER_FACTORY = newFactory(StringBuffer.class, STRING_BUFFER);
     public static final TypeAdapter<URL> URL = new TypeAdapter<URL>() { // from class: com.google.gson.internal.bind.TypeAdapters.18
         @Override // com.google.gson.TypeAdapter
-        public URL read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public URL read(JsonReader jsonReader) throws IOException {
+            URL url;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                url = null;
+            } else {
+                String nextString = jsonReader.nextString();
+                url = null;
+                if (!"null".equals(nextString)) {
+                    url = new URL(nextString);
+                }
             }
-            String nextString = in.nextString();
-            if ("null".equals(nextString)) {
-                return null;
-            }
-            return new URL(nextString);
+            return url;
         }
 
-        public void write(JsonWriter out, URL value) throws IOException {
-            out.value(value == null ? null : value.toExternalForm());
+        public void write(JsonWriter jsonWriter, URL url) throws IOException {
+            jsonWriter.value(url == null ? null : url.toExternalForm());
         }
     };
     public static final TypeAdapterFactory URL_FACTORY = newFactory(URL.class, URL);
     public static final TypeAdapter<URI> URI = new TypeAdapter<URI>() { // from class: com.google.gson.internal.bind.TypeAdapters.19
         @Override // com.google.gson.TypeAdapter
-        public URI read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-            try {
-                String nextString = in.nextString();
-                if ("null".equals(nextString)) {
-                    return null;
+        public URI read(JsonReader jsonReader) throws IOException {
+            URI uri;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                uri = null;
+            } else {
+                try {
+                    String nextString = jsonReader.nextString();
+                    uri = null;
+                    if (!"null".equals(nextString)) {
+                        uri = new URI(nextString);
+                    }
+                } catch (URISyntaxException e) {
+                    throw new JsonIOException(e);
                 }
-                return new URI(nextString);
-            } catch (URISyntaxException e) {
-                throw new JsonIOException(e);
             }
+            return uri;
         }
 
-        public void write(JsonWriter out, URI value) throws IOException {
-            out.value(value == null ? null : value.toASCIIString());
+        public void write(JsonWriter jsonWriter, URI uri) throws IOException {
+            jsonWriter.value(uri == null ? null : uri.toASCIIString());
         }
     };
     public static final TypeAdapterFactory URI_FACTORY = newFactory(URI.class, URI);
     public static final TypeAdapter<InetAddress> INET_ADDRESS = new TypeAdapter<InetAddress>() { // from class: com.google.gson.internal.bind.TypeAdapters.20
         @Override // com.google.gson.TypeAdapter
-        public InetAddress read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public InetAddress read(JsonReader jsonReader) throws IOException {
+            InetAddress byName;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                byName = null;
+            } else {
+                byName = InetAddress.getByName(jsonReader.nextString());
             }
-            return InetAddress.getByName(in.nextString());
+            return byName;
         }
 
-        public void write(JsonWriter out, InetAddress value) throws IOException {
-            out.value(value == null ? null : value.getHostAddress());
+        public void write(JsonWriter jsonWriter, InetAddress inetAddress) throws IOException {
+            jsonWriter.value(inetAddress == null ? null : inetAddress.getHostAddress());
         }
     };
     public static final TypeAdapterFactory INET_ADDRESS_FACTORY = newTypeHierarchyFactory(InetAddress.class, INET_ADDRESS);
     public static final TypeAdapter<UUID> UUID = new TypeAdapter<UUID>() { // from class: com.google.gson.internal.bind.TypeAdapters.21
         @Override // com.google.gson.TypeAdapter
-        public UUID read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public UUID read(JsonReader jsonReader) throws IOException {
+            UUID fromString;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                fromString = null;
+            } else {
+                fromString = UUID.fromString(jsonReader.nextString());
             }
-            return UUID.fromString(in.nextString());
+            return fromString;
         }
 
-        public void write(JsonWriter out, UUID value) throws IOException {
-            out.value(value == null ? null : value.toString());
+        public void write(JsonWriter jsonWriter, UUID uuid) throws IOException {
+            jsonWriter.value(uuid == null ? null : uuid.toString());
         }
     };
     public static final TypeAdapterFactory UUID_FACTORY = newFactory(UUID.class, UUID);
     public static final TypeAdapterFactory TIMESTAMP_FACTORY = new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.22
         @Override // com.google.gson.TypeAdapterFactory
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+            TypeAdapter<Timestamp> typeAdapter;
             if (typeToken.getRawType() != Timestamp.class) {
-                return null;
-            }
-            final TypeAdapter<Date> dateTypeAdapter = gson.getAdapter(Date.class);
-            return (TypeAdapter<T>) new TypeAdapter<Timestamp>() { // from class: com.google.gson.internal.bind.TypeAdapters.22.1
-                @Override // com.google.gson.TypeAdapter
-                public Timestamp read(JsonReader in) throws IOException {
-                    Date date = (Date) dateTypeAdapter.read(in);
-                    if (date != null) {
-                        return new Timestamp(date.getTime());
+                typeAdapter = null;
+            } else {
+                final TypeAdapter<T> adapter = gson.getAdapter(Date.class);
+                typeAdapter = new TypeAdapter<Timestamp>() { // from class: com.google.gson.internal.bind.TypeAdapters.22.1
+                    @Override // com.google.gson.TypeAdapter
+                    public Timestamp read(JsonReader jsonReader) throws IOException {
+                        Date date = (Date) adapter.read(jsonReader);
+                        return date != null ? new Timestamp(date.getTime()) : null;
                     }
-                    return null;
-                }
 
-                public void write(JsonWriter out, Timestamp value) throws IOException {
-                    dateTypeAdapter.write(out, value);
-                }
-            };
+                    public void write(JsonWriter jsonWriter, Timestamp timestamp) throws IOException {
+                        adapter.write(jsonWriter, timestamp);
+                    }
+                };
+            }
+            return (TypeAdapter<T>) typeAdapter;
         }
     };
     public static final TypeAdapter<Calendar> CALENDAR = new TypeAdapter<Calendar>() { // from class: com.google.gson.internal.bind.TypeAdapters.23
@@ -491,173 +548,185 @@ public final class TypeAdapters {
         private static final String YEAR = "year";
 
         @Override // com.google.gson.TypeAdapter
-        public Calendar read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-            in.beginObject();
-            int year = 0;
-            int month = 0;
-            int dayOfMonth = 0;
-            int hourOfDay = 0;
-            int minute = 0;
-            int second = 0;
-            while (in.peek() != JsonToken.END_OBJECT) {
-                String name = in.nextName();
-                int value = in.nextInt();
-                if (YEAR.equals(name)) {
-                    year = value;
-                } else if (MONTH.equals(name)) {
-                    month = value;
-                } else if (DAY_OF_MONTH.equals(name)) {
-                    dayOfMonth = value;
-                } else if (HOUR_OF_DAY.equals(name)) {
-                    hourOfDay = value;
-                } else if ("minute".equals(name)) {
-                    minute = value;
-                } else if ("second".equals(name)) {
-                    second = value;
+        public Calendar read(JsonReader jsonReader) throws IOException {
+            GregorianCalendar gregorianCalendar;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                gregorianCalendar = null;
+            } else {
+                jsonReader.beginObject();
+                int i = 0;
+                int i2 = 0;
+                int i3 = 0;
+                int i4 = 0;
+                int i5 = 0;
+                int i6 = 0;
+                while (jsonReader.peek() != JsonToken.END_OBJECT) {
+                    String nextName = jsonReader.nextName();
+                    int nextInt = jsonReader.nextInt();
+                    if (YEAR.equals(nextName)) {
+                        i = nextInt;
+                    } else if (MONTH.equals(nextName)) {
+                        i2 = nextInt;
+                    } else if (DAY_OF_MONTH.equals(nextName)) {
+                        i3 = nextInt;
+                    } else if (HOUR_OF_DAY.equals(nextName)) {
+                        i4 = nextInt;
+                    } else if ("minute".equals(nextName)) {
+                        i5 = nextInt;
+                    } else if ("second".equals(nextName)) {
+                        i6 = nextInt;
+                    }
                 }
+                jsonReader.endObject();
+                gregorianCalendar = new GregorianCalendar(i, i2, i3, i4, i5, i6);
             }
-            in.endObject();
-            return new GregorianCalendar(year, month, dayOfMonth, hourOfDay, minute, second);
+            return gregorianCalendar;
         }
 
-        public void write(JsonWriter out, Calendar value) throws IOException {
-            if (value == null) {
-                out.nullValue();
+        public void write(JsonWriter jsonWriter, Calendar calendar) throws IOException {
+            if (calendar == null) {
+                jsonWriter.nullValue();
                 return;
             }
-            out.beginObject();
-            out.name(YEAR);
-            out.value(value.get(1));
-            out.name(MONTH);
-            out.value(value.get(2));
-            out.name(DAY_OF_MONTH);
-            out.value(value.get(5));
-            out.name(HOUR_OF_DAY);
-            out.value(value.get(11));
-            out.name("minute");
-            out.value(value.get(12));
-            out.name("second");
-            out.value(value.get(13));
-            out.endObject();
+            jsonWriter.beginObject();
+            jsonWriter.name(YEAR);
+            jsonWriter.value(calendar.get(1));
+            jsonWriter.name(MONTH);
+            jsonWriter.value(calendar.get(2));
+            jsonWriter.name(DAY_OF_MONTH);
+            jsonWriter.value(calendar.get(5));
+            jsonWriter.name(HOUR_OF_DAY);
+            jsonWriter.value(calendar.get(11));
+            jsonWriter.name("minute");
+            jsonWriter.value(calendar.get(12));
+            jsonWriter.name("second");
+            jsonWriter.value(calendar.get(13));
+            jsonWriter.endObject();
         }
     };
     public static final TypeAdapterFactory CALENDAR_FACTORY = newFactoryForMultipleTypes(Calendar.class, GregorianCalendar.class, CALENDAR);
     public static final TypeAdapter<Locale> LOCALE = new TypeAdapter<Locale>() { // from class: com.google.gson.internal.bind.TypeAdapters.24
         @Override // com.google.gson.TypeAdapter
-        public Locale read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public Locale read(JsonReader jsonReader) throws IOException {
+            Locale locale;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                locale = null;
+            } else {
+                StringTokenizer stringTokenizer = new StringTokenizer(jsonReader.nextString(), "_");
+                String str = null;
+                String str2 = null;
+                String str3 = null;
+                if (stringTokenizer.hasMoreElements()) {
+                    str = stringTokenizer.nextToken();
+                }
+                if (stringTokenizer.hasMoreElements()) {
+                    str2 = stringTokenizer.nextToken();
+                }
+                if (stringTokenizer.hasMoreElements()) {
+                    str3 = stringTokenizer.nextToken();
+                }
+                locale = (str2 == null && str3 == null) ? new Locale(str) : str3 == null ? new Locale(str, str2) : new Locale(str, str2, str3);
             }
-            String locale = in.nextString();
-            StringTokenizer tokenizer = new StringTokenizer(locale, "_");
-            String language = null;
-            String country = null;
-            String variant = null;
-            if (tokenizer.hasMoreElements()) {
-                language = tokenizer.nextToken();
-            }
-            if (tokenizer.hasMoreElements()) {
-                country = tokenizer.nextToken();
-            }
-            if (tokenizer.hasMoreElements()) {
-                variant = tokenizer.nextToken();
-            }
-            if (country == null && variant == null) {
-                return new Locale(language);
-            }
-            if (variant == null) {
-                return new Locale(language, country);
-            }
-            return new Locale(language, country, variant);
+            return locale;
         }
 
-        public void write(JsonWriter out, Locale value) throws IOException {
-            out.value(value == null ? null : value.toString());
+        public void write(JsonWriter jsonWriter, Locale locale) throws IOException {
+            jsonWriter.value(locale == null ? null : locale.toString());
         }
     };
     public static final TypeAdapterFactory LOCALE_FACTORY = newFactory(Locale.class, LOCALE);
     public static final TypeAdapter<JsonElement> JSON_ELEMENT = new TypeAdapter<JsonElement>() { // from class: com.google.gson.internal.bind.TypeAdapters.25
         @Override // com.google.gson.TypeAdapter
-        public JsonElement read(JsonReader in) throws IOException {
-            switch (AnonymousClass32.$SwitchMap$com$google$gson$stream$JsonToken[in.peek().ordinal()]) {
+        public JsonElement read(JsonReader jsonReader) throws IOException {
+            JsonArray jsonArray;
+            switch (AnonymousClass32.$SwitchMap$com$google$gson$stream$JsonToken[jsonReader.peek().ordinal()]) {
                 case 1:
-                    String number = in.nextString();
-                    return new JsonPrimitive((Number) new LazilyParsedNumber(number));
+                    jsonArray = new JsonPrimitive((Number) new LazilyParsedNumber(jsonReader.nextString()));
+                    break;
                 case 2:
-                    return new JsonPrimitive(Boolean.valueOf(in.nextBoolean()));
+                    jsonArray = new JsonPrimitive(Boolean.valueOf(jsonReader.nextBoolean()));
+                    break;
                 case 3:
-                    return new JsonPrimitive(in.nextString());
+                    jsonArray = new JsonPrimitive(jsonReader.nextString());
+                    break;
                 case 4:
-                    in.nextNull();
-                    return JsonNull.INSTANCE;
+                    jsonReader.nextNull();
+                    jsonArray = JsonNull.INSTANCE;
+                    break;
                 case 5:
-                    JsonArray array = new JsonArray();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        array.add(read(in));
+                    JsonArray jsonArray2 = new JsonArray();
+                    jsonReader.beginArray();
+                    while (jsonReader.hasNext()) {
+                        jsonArray2.add(read(jsonReader));
                     }
-                    in.endArray();
-                    return array;
+                    jsonReader.endArray();
+                    jsonArray = jsonArray2;
+                    break;
                 case 6:
-                    JsonObject object = new JsonObject();
-                    in.beginObject();
-                    while (in.hasNext()) {
-                        object.add(in.nextName(), read(in));
+                    JsonObject jsonObject = new JsonObject();
+                    jsonReader.beginObject();
+                    while (jsonReader.hasNext()) {
+                        jsonObject.add(jsonReader.nextName(), read(jsonReader));
                     }
-                    in.endObject();
-                    return object;
+                    jsonReader.endObject();
+                    jsonArray = jsonObject;
+                    break;
                 default:
                     throw new IllegalArgumentException();
             }
+            return jsonArray;
         }
 
-        public void write(JsonWriter out, JsonElement value) throws IOException {
-            if (value == null || value.isJsonNull()) {
-                out.nullValue();
-            } else if (value.isJsonPrimitive()) {
-                JsonPrimitive primitive = value.getAsJsonPrimitive();
-                if (primitive.isNumber()) {
-                    out.value(primitive.getAsNumber());
-                } else if (primitive.isBoolean()) {
-                    out.value(primitive.getAsBoolean());
+        public void write(JsonWriter jsonWriter, JsonElement jsonElement) throws IOException {
+            if (jsonElement == null || jsonElement.isJsonNull()) {
+                jsonWriter.nullValue();
+            } else if (jsonElement.isJsonPrimitive()) {
+                JsonPrimitive asJsonPrimitive = jsonElement.getAsJsonPrimitive();
+                if (asJsonPrimitive.isNumber()) {
+                    jsonWriter.value(asJsonPrimitive.getAsNumber());
+                } else if (asJsonPrimitive.isBoolean()) {
+                    jsonWriter.value(asJsonPrimitive.getAsBoolean());
                 } else {
-                    out.value(primitive.getAsString());
+                    jsonWriter.value(asJsonPrimitive.getAsString());
                 }
-            } else if (value.isJsonArray()) {
-                out.beginArray();
-                Iterator i$ = value.getAsJsonArray().iterator();
-                while (i$.hasNext()) {
-                    write(out, i$.next());
+            } else if (jsonElement.isJsonArray()) {
+                jsonWriter.beginArray();
+                Iterator<JsonElement> it = jsonElement.getAsJsonArray().iterator();
+                while (it.hasNext()) {
+                    write(jsonWriter, it.next());
                 }
-                out.endArray();
-            } else if (value.isJsonObject()) {
-                out.beginObject();
-                for (Map.Entry<String, JsonElement> e : value.getAsJsonObject().entrySet()) {
-                    out.name(e.getKey());
-                    write(out, e.getValue());
-                }
-                out.endObject();
+                jsonWriter.endArray();
+            } else if (!jsonElement.isJsonObject()) {
+                throw new IllegalArgumentException("Couldn't write " + jsonElement.getClass());
             } else {
-                throw new IllegalArgumentException("Couldn't write " + value.getClass());
+                jsonWriter.beginObject();
+                for (Map.Entry<String, JsonElement> entry : jsonElement.getAsJsonObject().entrySet()) {
+                    jsonWriter.name(entry.getKey());
+                    write(jsonWriter, entry.getValue());
+                }
+                jsonWriter.endObject();
             }
         }
     };
     public static final TypeAdapterFactory JSON_ELEMENT_FACTORY = newTypeHierarchyFactory(JsonElement.class, JSON_ELEMENT);
     public static final TypeAdapterFactory ENUM_FACTORY = newEnumTypeHierarchyFactory();
 
-    private TypeAdapters() {
-    }
-
     /* renamed from: com.google.gson.internal.bind.TypeAdapters$32 */
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/google/gson/internal/bind/TypeAdapters$32.class */
     static /* synthetic */ class AnonymousClass32 {
         static final /* synthetic */ int[] $SwitchMap$com$google$gson$stream$JsonToken = new int[JsonToken.values().length];
 
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:24:0x0081 -> B:33:0x0070). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:25:0x0085 -> B:47:0x0064). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:26:0x0089 -> B:43:0x0058). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:27:0x008d -> B:39:0x004c). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:28:0x0091 -> B:35:0x0040). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:29:0x0095 -> B:49:0x0035). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:30:0x0099 -> B:45:0x002a). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:31:0x009d -> B:41:0x001f). Please submit an issue!!! */
+        /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:32:0x00a1 -> B:37:0x0014). Please submit an issue!!! */
         static {
             try {
                 $SwitchMap$com$google$gson$stream$JsonToken[JsonToken.NUMBER.ordinal()] = 1;
@@ -702,27 +771,20 @@ public final class TypeAdapters {
         }
     }
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/google/gson/internal/bind/TypeAdapters$EnumTypeAdapter.class */
     private static final class EnumTypeAdapter<T extends Enum<T>> extends TypeAdapter<T> {
         private final Map<String, T> nameToConstant = new HashMap();
         private final Map<T, String> constantToName = new HashMap();
 
-        /* JADX DEBUG: Multi-variable search result rejected for r0v0, resolved type: com.google.gson.internal.bind.TypeAdapters$EnumTypeAdapter<T extends java.lang.Enum<T>> */
-        /* JADX WARN: Multi-variable type inference failed */
-        @Override // com.google.gson.TypeAdapter
-        public /* bridge */ /* synthetic */ void write(JsonWriter x0, Object x1) throws IOException {
-            write(x0, (JsonWriter) ((Enum) x1));
-        }
-
-        public EnumTypeAdapter(Class<T> classOfT) {
+        public EnumTypeAdapter(Class<T> cls) {
             T[] enumConstants;
             try {
-                for (T constant : classOfT.getEnumConstants()) {
-                    String name = constant.name();
-                    SerializedName annotation = (SerializedName) classOfT.getField(name).getAnnotation(SerializedName.class);
-                    name = annotation != null ? annotation.value() : name;
-                    this.nameToConstant.put(name, constant);
-                    this.constantToName.put(constant, name);
+                for (T t : cls.getEnumConstants()) {
+                    String name = t.name();
+                    SerializedName serializedName = (SerializedName) cls.getField(name).getAnnotation(SerializedName.class);
+                    name = serializedName != null ? serializedName.value() : name;
+                    this.nameToConstant.put(name, t);
+                    this.constantToName.put(t, name);
                 }
             } catch (NoSuchFieldException e) {
                 throw new AssertionError();
@@ -730,110 +792,111 @@ public final class TypeAdapters {
         }
 
         @Override // com.google.gson.TypeAdapter
-        public T read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
+        public T read(JsonReader jsonReader) throws IOException {
+            T t;
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                t = null;
+            } else {
+                t = this.nameToConstant.get(jsonReader.nextString());
             }
-            return this.nameToConstant.get(in.nextString());
+            return t;
         }
 
-        public void write(JsonWriter out, T value) throws IOException {
-            out.value(value == null ? null : this.constantToName.get(value));
+        public void write(JsonWriter jsonWriter, T t) throws IOException {
+            jsonWriter.value(t == null ? null : this.constantToName.get(t));
         }
+
+        /* JADX DEBUG: Multi-variable search result rejected for r4v0, resolved type: com.google.gson.internal.bind.TypeAdapters$EnumTypeAdapter<T extends java.lang.Enum<T>> */
+        /* JADX WARN: Multi-variable type inference failed */
+        @Override // com.google.gson.TypeAdapter
+        public /* bridge */ /* synthetic */ void write(JsonWriter jsonWriter, Object obj) throws IOException {
+            write(jsonWriter, (JsonWriter) ((Enum) obj));
+        }
+    }
+
+    private TypeAdapters() {
     }
 
     public static TypeAdapterFactory newEnumTypeHierarchyFactory() {
         return new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.26
             @Override // com.google.gson.TypeAdapterFactory
             public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-                Class rawType = typeToken.getRawType();
+                EnumTypeAdapter enumTypeAdapter;
+                Class<? super T> rawType = typeToken.getRawType();
                 if (!Enum.class.isAssignableFrom(rawType) || rawType == Enum.class) {
-                    return null;
+                    enumTypeAdapter = null;
+                } else {
+                    Class<? super Object> cls = rawType;
+                    if (!rawType.isEnum()) {
+                        cls = rawType.getSuperclass();
+                    }
+                    enumTypeAdapter = new EnumTypeAdapter(cls);
                 }
-                if (!rawType.isEnum()) {
-                    Class<? super T> rawType2 = rawType.getSuperclass();
-                    rawType = (Class<? super Object>) rawType2;
-                }
-                return new EnumTypeAdapter(rawType);
+                return enumTypeAdapter;
             }
         };
     }
 
-    public static <TT> TypeAdapterFactory newFactory(final TypeToken<TT> type, final TypeAdapter<TT> typeAdapter) {
+    public static <TT> TypeAdapterFactory newFactory(final TypeToken<TT> typeToken, final TypeAdapter<TT> typeAdapter) {
         return new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.27
             @Override // com.google.gson.TypeAdapterFactory
-            public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-                if (typeToken.equals(type)) {
-                    return typeAdapter;
-                }
-                return null;
+            public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken2) {
+                return typeToken2.equals(typeToken) ? typeAdapter : null;
             }
         };
     }
 
-    public static <TT> TypeAdapterFactory newFactory(final Class<TT> type, final TypeAdapter<TT> typeAdapter) {
+    public static <TT> TypeAdapterFactory newFactory(final Class<TT> cls, final TypeAdapter<TT> typeAdapter) {
         return new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.28
             @Override // com.google.gson.TypeAdapterFactory
             public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-                if (typeToken.getRawType() == type) {
-                    return typeAdapter;
-                }
-                return null;
+                return typeToken.getRawType() == cls ? typeAdapter : null;
             }
 
             public String toString() {
-                return "Factory[type=" + type.getName() + ",adapter=" + typeAdapter + "]";
+                return "Factory[type=" + cls.getName() + ",adapter=" + typeAdapter + "]";
             }
         };
     }
 
-    public static <TT> TypeAdapterFactory newFactory(final Class<TT> unboxed, final Class<TT> boxed, final TypeAdapter<? super TT> typeAdapter) {
+    public static <TT> TypeAdapterFactory newFactory(final Class<TT> cls, final Class<TT> cls2, final TypeAdapter<? super TT> typeAdapter) {
         return new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.29
             @Override // com.google.gson.TypeAdapterFactory
             public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
                 Class<? super T> rawType = typeToken.getRawType();
-                if (rawType == unboxed || rawType == boxed) {
-                    return typeAdapter;
-                }
-                return null;
+                return (rawType == cls || rawType == cls2) ? typeAdapter : null;
             }
 
             public String toString() {
-                return "Factory[type=" + boxed.getName() + "+" + unboxed.getName() + ",adapter=" + typeAdapter + "]";
+                return "Factory[type=" + cls2.getName() + "+" + cls.getName() + ",adapter=" + typeAdapter + "]";
             }
         };
     }
 
-    public static <TT> TypeAdapterFactory newFactoryForMultipleTypes(final Class<TT> base, final Class<? extends TT> sub, final TypeAdapter<? super TT> typeAdapter) {
+    public static <TT> TypeAdapterFactory newFactoryForMultipleTypes(final Class<TT> cls, final Class<? extends TT> cls2, final TypeAdapter<? super TT> typeAdapter) {
         return new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.30
             @Override // com.google.gson.TypeAdapterFactory
             public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
                 Class<? super T> rawType = typeToken.getRawType();
-                if (rawType == base || rawType == sub) {
-                    return typeAdapter;
-                }
-                return null;
+                return (rawType == cls || rawType == cls2) ? typeAdapter : null;
             }
 
             public String toString() {
-                return "Factory[type=" + base.getName() + "+" + sub.getName() + ",adapter=" + typeAdapter + "]";
+                return "Factory[type=" + cls.getName() + "+" + cls2.getName() + ",adapter=" + typeAdapter + "]";
             }
         };
     }
 
-    public static <TT> TypeAdapterFactory newTypeHierarchyFactory(final Class<TT> clazz, final TypeAdapter<TT> typeAdapter) {
+    public static <TT> TypeAdapterFactory newTypeHierarchyFactory(final Class<TT> cls, final TypeAdapter<TT> typeAdapter) {
         return new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TypeAdapters.31
             @Override // com.google.gson.TypeAdapterFactory
             public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-                if (clazz.isAssignableFrom(typeToken.getRawType())) {
-                    return typeAdapter;
-                }
-                return null;
+                return cls.isAssignableFrom(typeToken.getRawType()) ? typeAdapter : null;
             }
 
             public String toString() {
-                return "Factory[typeHierarchy=" + clazz.getName() + ",adapter=" + typeAdapter + "]";
+                return "Factory[typeHierarchy=" + cls.getName() + ",adapter=" + typeAdapter + "]";
             }
         };
     }

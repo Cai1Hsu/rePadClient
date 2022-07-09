@@ -9,32 +9,29 @@ import com.google.zxing.common.DetectorResult;
 import com.google.zxing.qrcode.detector.Detector;
 import com.google.zxing.qrcode.detector.FinderPatternInfo;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/multi/qrcode/detector/MultiDetector.class */
 public final class MultiDetector extends Detector {
     private static final DetectorResult[] EMPTY_DETECTOR_RESULTS = new DetectorResult[0];
 
-    public MultiDetector(BitMatrix image) {
-        super(image);
+    public MultiDetector(BitMatrix bitMatrix) {
+        super(bitMatrix);
     }
 
-    public DetectorResult[] detectMulti(Map<DecodeHintType, ?> hints) throws NotFoundException {
-        BitMatrix image = getImage();
-        ResultPointCallback resultPointCallback = hints == null ? null : (ResultPointCallback) hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
-        MultiFinderPatternFinder finder = new MultiFinderPatternFinder(image, resultPointCallback);
-        FinderPatternInfo[] infos = finder.findMulti(hints);
-        if (infos.length == 0) {
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:22:0x0084 -> B:15:0x0059). Please submit an issue!!! */
+    public DetectorResult[] detectMulti(Map<DecodeHintType, ?> map) throws NotFoundException {
+        FinderPatternInfo[] findMulti = new MultiFinderPatternFinder(getImage(), map == null ? null : (ResultPointCallback) map.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK)).findMulti(map);
+        if (findMulti.length == 0) {
             throw NotFoundException.getNotFoundInstance();
         }
-        List<DetectorResult> result = new ArrayList<>();
-        for (FinderPatternInfo info : infos) {
+        ArrayList arrayList = new ArrayList();
+        for (FinderPatternInfo finderPatternInfo : findMulti) {
             try {
-                result.add(processFinderPatternInfo(info));
+                arrayList.add(processFinderPatternInfo(finderPatternInfo));
             } catch (ReaderException e) {
             }
         }
-        return result.isEmpty() ? EMPTY_DETECTOR_RESULTS : (DetectorResult[]) result.toArray(new DetectorResult[result.size()]);
+        return arrayList.isEmpty() ? EMPTY_DETECTOR_RESULTS : (DetectorResult[]) arrayList.toArray(new DetectorResult[arrayList.size()]);
     }
 }

@@ -33,7 +33,7 @@ import org.apache.http.protocol.HTTP;
 import org.jivesoftware.smackx.entitycaps.EntityCapsManager;
 import org.json.JSONObject;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/daoxueben/until/UpOrDownFile.class */
 public class UpOrDownFile {
     public static String apihost = "";
     public static String ip = "";
@@ -87,243 +87,235 @@ public class UpOrDownFile {
         Log.d("CloudClientActivity", "privatekey:" + privatekey);
     }
 
-    public static HttpPost Post_addheader(String url) {
+    public static HttpPost Post_addheader(String str) {
+        HttpPost httpPost;
         if (hashmap == null) {
             Get_Config_infor();
         }
         try {
-            return Post_http_addheader(url, username, privatekey);
+            httpPost = Post_http_addheader(str, username, privatekey);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
-            return null;
+            httpPost = null;
+            return httpPost;
         } catch (IOException e2) {
             e2.printStackTrace();
-            return null;
+            httpPost = null;
+            return httpPost;
         }
+        return httpPost;
     }
 
-    /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x0133: INVOKE  (r25v12 int A[REMOVE]) = 
-      (wrap: org.apache.http.StatusLine : 0x012f: INVOKE  (r25v11 org.apache.http.StatusLine A[REMOVE]) = (r13v0 'httpResponse' org.apache.http.HttpResponse A[D('httpResponse' org.apache.http.HttpResponse)]) type: INTERFACE call: org.apache.http.HttpResponse.getStatusLine():org.apache.http.StatusLine)
+    private static HttpPost Post_http_addheader(String str, String str2, String str3) throws IOException, ClientProtocolException {
+        new HttpPost();
+        HttpPost httpPost = new HttpPost(str);
+        httpPost.addHeader("X-Edutech-Entity", String.valueOf(str2) + "+" + str3);
+        long currentTimeMillis = System.currentTimeMillis();
+        String Md5 = My_md5.Md5(String.valueOf(currentTimeMillis) + str2 + str3);
+        Log.e("Test2", "timestamp=" + currentTimeMillis + "   sign=" + Md5);
+        httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + Md5);
+        return httpPost;
+    }
+
+    public static boolean downFile(String str, String str2, String str3) throws IOException {
+        boolean z;
+        if (str3 == null || str3 == "") {
+            str3 = str.substring(str.lastIndexOf("/") + 1);
+        }
+        URLConnection openConnection = new URL(str).openConnection();
+        openConnection.connect();
+        InputStream inputStream = openConnection.getInputStream();
+        if (inputStream == null) {
+            z = false;
+        } else {
+            String headerField = openConnection.getHeaderField(MIME.CONTENT_DISPOSITION);
+            if (headerField == null || headerField.length() <= 23) {
+                AppEnvironment.DOWNFILENAME = str3;
+            } else {
+                AppEnvironment.DOWNFILENAME = headerField.substring(headerField.indexOf("attachment; filename=") + 22, headerField.length() - 1);
+                AppEnvironment.DOWNFILENAME = new String(AppEnvironment.DOWNFILENAME.getBytes("8859_1"), "utf-8");
+            }
+            long contentLength = openConnection.getContentLength();
+            File file = new File(String.valueOf(str2) + AppEnvironment.DOWNFILENAME);
+            Log.e("sdcard", String.valueOf(contentLength) + "," + file.length());
+            if (file.exists() && file.length() != contentLength) {
+                file.delete();
+            } else if (file.exists()) {
+                z = true;
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(String.valueOf(str2) + AppEnvironment.DOWNFILENAME);
+            byte[] bArr = new byte[1024];
+            int i = 0;
+            currentCacheLength = contentLength;
+            while (true) {
+                int read = inputStream.read(bArr);
+                if (read != -1) {
+                    fileOutputStream.write(bArr, 0, read);
+                    i += read;
+                    if (!isCacheFile) {
+                        Log.e("iscache", new StringBuilder(String.valueOf(isCacheFile)).toString());
+                        break;
+                    }
+                    currentCachePosition = i;
+                }
+            }
+            try {
+                inputStream.close();
+                fileOutputStream.flush();
+                fileOutputStream.close();
+                z = isCacheFile;
+            } catch (Exception e) {
+                z = false;
+            }
+        }
+        return z;
+    }
+
+    public static boolean downFileNormal(String str, String str2, String str3) throws IOException {
+        boolean z;
+        URLConnection openConnection = new URL(str).openConnection();
+        openConnection.connect();
+        InputStream inputStream = openConnection.getInputStream();
+        if (inputStream == null) {
+            z = false;
+        } else {
+            long contentLength = openConnection.getContentLength();
+            File file = new File(String.valueOf(str2) + str3);
+            Log.e("bookpicS", String.valueOf(contentLength) + "," + file.length() + "," + str3);
+            if (file.exists() && file.length() != contentLength) {
+                file.delete();
+            } else if (file.exists()) {
+                z = true;
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(String.valueOf(str2) + str3);
+            byte[] bArr = new byte[1024];
+            while (true) {
+                int read = inputStream.read(bArr);
+                if (read == -1) {
+                    try {
+                        break;
+                    } catch (Exception e) {
+                        z = false;
+                    }
+                } else {
+                    fileOutputStream.write(bArr, 0, read);
+                }
+            }
+            inputStream.close();
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            z = true;
+        }
+        return z;
+    }
+
+    /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x016a: INVOKE  (r2v14 int A[REMOVE]) = 
+      (wrap: org.apache.http.StatusLine : 0x0165: INVOKE  (r2v13 org.apache.http.StatusLine A[REMOVE]) = (r0v55 org.apache.http.HttpResponse) type: INTERFACE call: org.apache.http.HttpResponse.getStatusLine():org.apache.http.StatusLine)
      type: INTERFACE call: org.apache.http.StatusLine.getStatusCode():int)] */
-    public static int postAnswerFile(String filename, String load_zip, String url_str) {
-        if (url_str == null || url_str.equals("")) {
+    public static int postAnswerFile(String str, String str2, String str3) {
+        int i;
+        if (str3 == null || str3.equals("")) {
             Log.i("Test", "put_correct 入参有问题。。。");
-            return -1;
-        } else if (load_zip == null || load_zip.equals("")) {
-            return -1;
+            i = -1;
+        } else if (str2 == null || str2.equals("")) {
+            i = -1;
         } else {
             try {
-                String user_Name = username;
-                String Random_number_10 = privatekey;
-                HttpPost request = Post_http_addheader(url_str, user_Name, Random_number_10);
-                System.out.println("sendUrl:" + url_str + "," + privatekey);
-                FileBody bin = new FileBody(new File(load_zip));
-                StringBody comment = new StringBody("uploadedfile");
-                MultipartEntity reqEntity = new MultipartEntity();
-                reqEntity.addPart("uploadedfile", bin);
-                reqEntity.addPart(ClientCookie.COMMENT_ATTR, comment);
-                reqEntity.addPart("id", new StringBody(AppEnvironment.EXAM_ID));
-                reqEntity.addPart("studentid", new StringBody(AppEnvironment.StudentId));
-                request.setEntity(reqEntity);
+                HttpPost Post_http_addheader = Post_http_addheader(str3, username, privatekey);
+                System.out.println("sendUrl:" + str3 + "," + privatekey);
+                FileBody fileBody = new FileBody(new File(str2));
+                StringBody stringBody = new StringBody("uploadedfile");
+                MultipartEntity multipartEntity = new MultipartEntity();
+                multipartEntity.addPart("uploadedfile", fileBody);
+                multipartEntity.addPart(ClientCookie.COMMENT_ATTR, stringBody);
+                multipartEntity.addPart("id", new StringBody(AppEnvironment.EXAM_ID));
+                multipartEntity.addPart("studentid", new StringBody(AppEnvironment.StudentId));
+                Post_http_addheader.setEntity(multipartEntity);
                 Log.e("Test2", "代交作业提交HWID。。。" + AppEnvironment.EXAM_ID);
                 Log.e("Test2", "代交作业提交STID。。。" + AppEnvironment.StudentId);
-                Log.e("Test2", "代交作业提交URL。。。." + url_str);
-                Log.e("Test2", "代交作业提交。。。" + load_zip);
-                DefaultHttpClient httpClient = new DefaultHttpClient();
-                HttpResponse httpResponse = httpClient.execute(request);
-                Log.e("Test2", new StringBuilder().append(httpResponse.getStatusLine().getStatusCode()).toString());
-                if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                    StringBuilder builder = new StringBuilder();
-                    BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8"));
-                    for (String s = bufferedReader2.readLine(); s != null; s = bufferedReader2.readLine()) {
-                        builder.append(s);
+                Log.e("Test2", "代交作业提交URL。。。." + str3);
+                Log.e("Test2", "代交作业提交。。。" + str2);
+                HttpResponse execute = new DefaultHttpClient().execute(Post_http_addheader);
+                Log.e("Test2", new StringBuilder().append(execute.getStatusLine().getStatusCode()).toString());
+                if (execute.getStatusLine().getStatusCode() == 200) {
+                    StringBuilder sb = new StringBuilder();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(execute.getEntity().getContent(), "UTF-8"));
+                    for (String readLine = bufferedReader.readLine(); readLine != null; readLine = bufferedReader.readLine()) {
+                        sb.append(readLine);
                     }
-                    String resultString = builder.toString();
-                    System.out.println("返回的信息  ：" + resultString);
+                    String sb2 = sb.toString();
+                    System.out.println("返回的信息  ：" + sb2);
                     Log.e("Test2", "批阅作业提交完成。。。");
-                    JSONObject result_json = new JSONObject(resultString);
-                    String status = result_json.getString("status");
-                    String errorNum = result_json.getString("errorNum");
-                    String errorInfo = result_json.getString("errorInfo");
-                    Log.i("Test2", "status " + status);
-                    Log.i("Test2", "errorNum " + errorNum);
-                    Log.i("Test2", "errorInfo " + errorInfo);
-                    File file = new File(load_zip);
+                    JSONObject jSONObject = new JSONObject(sb2);
+                    String string = jSONObject.getString("status");
+                    String string2 = jSONObject.getString("errorNum");
+                    String string3 = jSONObject.getString("errorInfo");
+                    Log.i("Test2", "status " + string);
+                    Log.i("Test2", "errorNum " + string2);
+                    Log.i("Test2", "errorInfo " + string3);
+                    File file = new File(str2);
                     if (file.exists()) {
                         file.delete();
                     }
-                    if (errorNum != null && errorNum.equals("0")) {
-                        return 1;
-                    }
-                    return 4;
+                    i = (string2 == null || !string2.equals("0")) ? 4 : 1;
+                } else {
+                    Log.e("Test2", "与服务端连接失败。。。");
+                    Log.e("Test2", "ddddd=" + execute.getStatusLine().getStatusCode());
+                    Log.e("Test2", "ddddd=" + execute.getEntity());
+                    i = 4;
                 }
-                Log.e("Test2", "与服务端连接失败。。。");
-                Log.e("Test2", "ddddd=" + httpResponse.getStatusLine().getStatusCode());
-                Log.e("Test2", "ddddd=" + httpResponse.getEntity());
-                return 4;
             } catch (Exception e) {
                 e.printStackTrace();
-                return 4;
+                i = 4;
             }
         }
+        return i;
     }
 
-    private static HttpPost Post_http_addheader(String url, String user_Name, String Random_number_10) throws IOException, ClientProtocolException {
-        new HttpPost();
-        HttpPost request = new HttpPost(url);
-        request.addHeader("X-Edutech-Entity", String.valueOf(user_Name) + "+" + Random_number_10);
-        long imestamp = System.currentTimeMillis();
-        String sign = My_md5.Md5(String.valueOf(imestamp) + user_Name + Random_number_10);
-        Log.e("Test2", "timestamp=" + imestamp + "   sign=" + sign);
-        request.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-        return request;
-    }
-
-    public static boolean uploadFile(String filename, String localfile, String actionUrl) {
-        String boundary = UUID.randomUUID().toString();
+    public static boolean uploadFile(String str, String str2, String str3) {
+        boolean z;
+        String uuid = UUID.randomUUID().toString();
         try {
-            URL url = new URL(actionUrl);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.setRequestMethod(HttpPost.METHOD_NAME);
-            con.setRequestProperty(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
-            con.setRequestProperty("Charset", "UTF-8");
-            con.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-            DataOutputStream ds = new DataOutputStream(con.getOutputStream());
-            ds.writeBytes(String.valueOf("--") + boundary + "\r\n");
-            ds.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\"; filename=\"" + filename + "\"\r\n");
-            ds.writeBytes("\r\n");
-            FileInputStream fStream = new FileInputStream(localfile);
-            byte[] buffer = new byte[1024];
+            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(str3).openConnection();
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setUseCaches(false);
+            httpURLConnection.setRequestMethod(HttpPost.METHOD_NAME);
+            httpURLConnection.setRequestProperty(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
+            httpURLConnection.setRequestProperty("Charset", "UTF-8");
+            httpURLConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + uuid);
+            DataOutputStream dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
+            dataOutputStream.writeBytes(String.valueOf("--") + uuid + "\r\n");
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\"; filename=\"" + str + "\"\r\n");
+            dataOutputStream.writeBytes("\r\n");
+            FileInputStream fileInputStream = new FileInputStream(str2);
+            byte[] bArr = new byte[1024];
             while (true) {
-                int length = fStream.read(buffer);
-                if (length == -1) {
+                int read = fileInputStream.read(bArr);
+                if (read == -1) {
                     break;
                 }
-                ds.write(buffer, 0, length);
+                dataOutputStream.write(bArr, 0, read);
             }
-            fStream.close();
-            ds.writeBytes("\r\n");
-            ds.writeBytes(String.valueOf("--") + boundary + "--\r\n");
-            ds.flush();
-            InputStream is = con.getInputStream();
-            StringBuffer b = new StringBuffer();
+            fileInputStream.close();
+            dataOutputStream.writeBytes("\r\n");
+            dataOutputStream.writeBytes(String.valueOf("--") + uuid + "--\r\n");
+            dataOutputStream.flush();
+            InputStream inputStream = httpURLConnection.getInputStream();
+            StringBuffer stringBuffer = new StringBuffer();
             while (true) {
-                int ch = is.read();
-                if (ch != -1) {
-                    b.append((char) ch);
-                } else {
-                    ds.close();
-                    is.close();
-                    return true;
+                int read2 = inputStream.read();
+                if (read2 == -1) {
+                    break;
                 }
+                stringBuffer.append((char) read2);
             }
+            dataOutputStream.close();
+            inputStream.close();
+            z = true;
         } catch (Exception e) {
-            return false;
+            z = false;
         }
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:24:0x0101, code lost:
-        r11.close();
-        r10.flush();
-        r10.close();
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:26:0x010c, code lost:
-        if (com.edutech.daoxueben.until.UpOrDownFile.isCacheFile != false) goto L38;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:27:0x010e, code lost:
-        return false;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:37:0x0149, code lost:
-        return false;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:38:0x014d, code lost:
-        return true;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    public static boolean downFile(String url, String path, String fileName) throws IOException {
-        String myfilename;
-        if (fileName == null || fileName == "") {
-            myfilename = url.substring(url.lastIndexOf("/") + 1);
-        } else {
-            myfilename = fileName;
-        }
-        URL Url = new URL(url);
-        URLConnection conn = Url.openConnection();
-        conn.connect();
-        InputStream is = conn.getInputStream();
-        if (is == null) {
-            return false;
-        }
-        String str_httprsponse = conn.getHeaderField(MIME.CONTENT_DISPOSITION);
-        if (str_httprsponse != null && str_httprsponse.length() > 23) {
-            AppEnvironment.DOWNFILENAME = str_httprsponse.substring(str_httprsponse.indexOf("attachment; filename=") + 22, str_httprsponse.length() - 1);
-            AppEnvironment.DOWNFILENAME = new String(AppEnvironment.DOWNFILENAME.getBytes("8859_1"), "utf-8");
-        } else {
-            AppEnvironment.DOWNFILENAME = myfilename;
-        }
-        long length = conn.getContentLength();
-        File file = new File(String.valueOf(path) + AppEnvironment.DOWNFILENAME);
-        Log.e("sdcard", String.valueOf(length) + "," + file.length());
-        if (file.exists() && file.length() != length) {
-            file.delete();
-        } else if (file.exists()) {
-            return true;
-        }
-        FileOutputStream fos = new FileOutputStream(String.valueOf(path) + AppEnvironment.DOWNFILENAME);
-        byte[] buf = new byte[1024];
-        int downLoadFilePosition = 0;
-        currentCacheLength = length;
-        while (true) {
-            int numread = is.read(buf);
-            if (numread != -1) {
-                fos.write(buf, 0, numread);
-                downLoadFilePosition += numread;
-                if (!isCacheFile) {
-                    Log.e("iscache", new StringBuilder(String.valueOf(isCacheFile)).toString());
-                    break;
-                }
-                currentCachePosition = downLoadFilePosition;
-            }
-        }
-    }
-
-    public static boolean downFileNormal(String url, String path, String fileName) throws IOException {
-        URL Url = new URL(url);
-        URLConnection conn = Url.openConnection();
-        conn.connect();
-        InputStream is = conn.getInputStream();
-        if (is == null) {
-            return false;
-        }
-        long length = conn.getContentLength();
-        File file = new File(String.valueOf(path) + fileName);
-        Log.e("bookpicS", String.valueOf(length) + "," + file.length() + "," + fileName);
-        if (file.exists() && file.length() != length) {
-            file.delete();
-        } else if (file.exists()) {
-            return true;
-        }
-        FileOutputStream fos = new FileOutputStream(String.valueOf(path) + fileName);
-        byte[] buf = new byte[1024];
-        while (true) {
-            int numread = is.read(buf);
-            if (numread != -1) {
-                fos.write(buf, 0, numread);
-            } else {
-                try {
-                    is.close();
-                    fos.flush();
-                    fos.close();
-                    return true;
-                } catch (Exception e) {
-                    return false;
-                }
-            }
-        }
+        return z;
     }
 }

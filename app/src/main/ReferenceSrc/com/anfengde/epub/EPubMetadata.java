@@ -1,6 +1,6 @@
 package com.anfengde.epub;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/anfengde/epub/EPubMetadata.class */
 public class EPubMetadata {
     public String contributor;
     public String coverImage;

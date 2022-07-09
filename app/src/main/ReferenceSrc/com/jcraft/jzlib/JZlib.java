@@ -1,6 +1,6 @@
 package com.jcraft.jzlib;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/jcraft/jzlib/JZlib.class */
 public final class JZlib {
     public static final int Z_BEST_COMPRESSION = 9;
     public static final int Z_BEST_SPEED = 1;

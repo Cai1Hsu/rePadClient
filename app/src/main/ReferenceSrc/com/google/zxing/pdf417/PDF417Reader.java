@@ -15,122 +15,121 @@ import com.google.zxing.pdf417.decoder.Decoder;
 import com.google.zxing.pdf417.detector.Detector;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/pdf417/PDF417Reader.class */
 public final class PDF417Reader implements Reader {
     private static final ResultPoint[] NO_POINTS = new ResultPoint[0];
     private final Decoder decoder = new Decoder();
 
-    @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
-        return decode(image, null);
+    private static BitMatrix extractPureBits(BitMatrix bitMatrix) throws NotFoundException {
+        int[] topLeftOnBit = bitMatrix.getTopLeftOnBit();
+        int[] bottomRightOnBit = bitMatrix.getBottomRightOnBit();
+        if (topLeftOnBit == null || bottomRightOnBit == null) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        int moduleSize = moduleSize(topLeftOnBit, bitMatrix);
+        int i = topLeftOnBit[1];
+        int i2 = bottomRightOnBit[1];
+        int findPatternStart = findPatternStart(topLeftOnBit[0], i, bitMatrix);
+        int findPatternEnd = ((findPatternEnd(topLeftOnBit[0], i, bitMatrix) - findPatternStart) + 1) / moduleSize;
+        int i3 = ((i2 - i) + 1) / moduleSize;
+        if (findPatternEnd <= 0 || i3 <= 0) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        int i4 = moduleSize >> 1;
+        BitMatrix bitMatrix2 = new BitMatrix(findPatternEnd, i3);
+        for (int i5 = 0; i5 < i3; i5++) {
+            for (int i6 = 0; i6 < findPatternEnd; i6++) {
+                if (bitMatrix.get((i6 * moduleSize) + findPatternStart + i4, i + i4 + (i5 * moduleSize))) {
+                    bitMatrix2.set(i6, i5);
+                }
+            }
+        }
+        return bitMatrix2;
+    }
+
+    private static int findPatternEnd(int i, int i2, BitMatrix bitMatrix) throws NotFoundException {
+        int width = bitMatrix.getWidth() - 1;
+        while (width > i && !bitMatrix.get(width, i2)) {
+            width--;
+        }
+        int i3 = 0;
+        boolean z = true;
+        int i4 = width;
+        while (i4 > i && i3 < 9) {
+            i4--;
+            boolean z2 = bitMatrix.get(i4, i2);
+            int i5 = i3;
+            if (z != z2) {
+                i5 = i3 + 1;
+            }
+            z = z2;
+            i3 = i5;
+        }
+        if (i4 == i) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        return i4;
+    }
+
+    private static int findPatternStart(int i, int i2, BitMatrix bitMatrix) throws NotFoundException {
+        int width = bitMatrix.getWidth();
+        int i3 = 0;
+        boolean z = true;
+        int i4 = i;
+        while (i4 < width - 1 && i3 < 8) {
+            i4++;
+            boolean z2 = bitMatrix.get(i4, i2);
+            int i5 = i3;
+            if (z != z2) {
+                i5 = i3 + 1;
+            }
+            z = z2;
+            i3 = i5;
+        }
+        if (i4 == width - 1) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        return i4;
+    }
+
+    private static int moduleSize(int[] iArr, BitMatrix bitMatrix) throws NotFoundException {
+        int i = iArr[0];
+        int i2 = iArr[1];
+        int width = bitMatrix.getWidth();
+        while (i < width && bitMatrix.get(i, i2)) {
+            i++;
+        }
+        if (i == width) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        int i3 = (i - iArr[0]) >>> 3;
+        if (i3 != 0) {
+            return i3;
+        }
+        throw NotFoundException.getNotFoundInstance();
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, FormatException {
-        DecoderResult decoderResult;
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, FormatException {
+        return decode(binaryBitmap, null);
+    }
+
+    @Override // com.google.zxing.Reader
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, FormatException {
+        DecoderResult decode;
         ResultPoint[] points;
-        if (hints != null && hints.containsKey(DecodeHintType.PURE_BARCODE)) {
-            BitMatrix bits = extractPureBits(image.getBlackMatrix());
-            decoderResult = this.decoder.decode(bits);
-            points = NO_POINTS;
+        if (map == null || !map.containsKey(DecodeHintType.PURE_BARCODE)) {
+            DetectorResult detect = new Detector(binaryBitmap).detect();
+            decode = this.decoder.decode(detect.getBits());
+            points = detect.getPoints();
         } else {
-            DetectorResult detectorResult = new Detector(image).detect();
-            decoderResult = this.decoder.decode(detectorResult.getBits());
-            points = detectorResult.getPoints();
+            decode = this.decoder.decode(extractPureBits(binaryBitmap.getBlackMatrix()));
+            points = NO_POINTS;
         }
-        return new Result(decoderResult.getText(), decoderResult.getRawBytes(), points, BarcodeFormat.PDF_417);
+        return new Result(decode.getText(), decode.getRawBytes(), points, BarcodeFormat.PDF_417);
     }
 
     @Override // com.google.zxing.Reader
     public void reset() {
-    }
-
-    private static BitMatrix extractPureBits(BitMatrix image) throws NotFoundException {
-        int[] leftTopBlack = image.getTopLeftOnBit();
-        int[] rightBottomBlack = image.getBottomRightOnBit();
-        if (leftTopBlack == null || rightBottomBlack == null) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        int moduleSize = moduleSize(leftTopBlack, image);
-        int top = leftTopBlack[1];
-        int bottom = rightBottomBlack[1];
-        int left = findPatternStart(leftTopBlack[0], top, image);
-        int right = findPatternEnd(leftTopBlack[0], top, image);
-        int matrixWidth = ((right - left) + 1) / moduleSize;
-        int matrixHeight = ((bottom - top) + 1) / moduleSize;
-        if (matrixWidth <= 0 || matrixHeight <= 0) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        int nudge = moduleSize >> 1;
-        int top2 = top + nudge;
-        int left2 = left + nudge;
-        BitMatrix bits = new BitMatrix(matrixWidth, matrixHeight);
-        for (int y = 0; y < matrixHeight; y++) {
-            int iOffset = top2 + (y * moduleSize);
-            for (int x = 0; x < matrixWidth; x++) {
-                if (image.get((x * moduleSize) + left2, iOffset)) {
-                    bits.set(x, y);
-                }
-            }
-        }
-        return bits;
-    }
-
-    private static int moduleSize(int[] leftTopBlack, BitMatrix image) throws NotFoundException {
-        int x = leftTopBlack[0];
-        int y = leftTopBlack[1];
-        int width = image.getWidth();
-        while (x < width && image.get(x, y)) {
-            x++;
-        }
-        if (x == width) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        int moduleSize = (x - leftTopBlack[0]) >>> 3;
-        if (moduleSize == 0) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        return moduleSize;
-    }
-
-    private static int findPatternStart(int x, int y, BitMatrix image) throws NotFoundException {
-        int width = image.getWidth();
-        int start = x;
-        int transitions = 0;
-        boolean black = true;
-        while (start < width - 1 && transitions < 8) {
-            start++;
-            boolean newBlack = image.get(start, y);
-            if (black != newBlack) {
-                transitions++;
-            }
-            black = newBlack;
-        }
-        if (start == width - 1) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        return start;
-    }
-
-    private static int findPatternEnd(int x, int y, BitMatrix image) throws NotFoundException {
-        int width = image.getWidth();
-        int end = width - 1;
-        while (end > x && !image.get(end, y)) {
-            end--;
-        }
-        int transitions = 0;
-        boolean black = true;
-        while (end > x && transitions < 9) {
-            end--;
-            boolean newBlack = image.get(end, y);
-            if (black != newBlack) {
-                transitions++;
-            }
-            black = newBlack;
-        }
-        if (end == x) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        return end;
     }
 }

@@ -8,37 +8,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.blahti.drag.MyAbsoluteLayout;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/blahti/drag/DragLayer.class */
 public class DragLayer extends MyAbsoluteLayout implements DragSource, DropTarget {
     DragController mDragController;
 
-    public DragLayer(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public DragLayer(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
     }
 
-    @Override // com.blahti.drag.DragSource
-    public void setDragController(DragController controller) {
-        this.mDragController = controller;
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        return this.mDragController.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
-    }
-
-    @Override // android.view.ViewGroup
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return this.mDragController.onInterceptTouchEvent(ev);
-    }
-
-    @Override // android.view.View
-    public boolean onTouchEvent(MotionEvent ev) {
-        return this.mDragController.onTouchEvent(ev);
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public boolean dispatchUnhandledMove(View focused, int direction) {
-        return this.mDragController.dispatchUnhandledMove(focused, direction);
+    @Override // com.blahti.drag.DropTarget
+    public boolean acceptDrop(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj) {
+        return true;
     }
 
     @Override // com.blahti.drag.DragSource
@@ -46,40 +26,55 @@ public class DragLayer extends MyAbsoluteLayout implements DragSource, DropTarge
         return true;
     }
 
-    @Override // com.blahti.drag.DragSource
-    public void onDropCompleted(View target, boolean success) {
+    @Override // android.view.ViewGroup, android.view.View
+    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        return this.mDragController.dispatchKeyEvent(keyEvent) || super.dispatchKeyEvent(keyEvent);
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public boolean dispatchUnhandledMove(View view, int i) {
+        return this.mDragController.dispatchUnhandledMove(view, i);
     }
 
     @Override // com.blahti.drag.DropTarget
-    public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, DragView dragView, Object dragInfo) {
-        View v = (View) dragInfo;
-        int w = v.getWidth();
-        int h = v.getHeight();
-        int left = x - xOffset;
-        int top = y - yOffset;
-        MyAbsoluteLayout.LayoutParams lp = new MyAbsoluteLayout.LayoutParams(w, h, left, top);
-        updateViewLayout(v, lp);
-    }
-
-    @Override // com.blahti.drag.DropTarget
-    public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset, DragView dragView, Object dragInfo) {
-    }
-
-    @Override // com.blahti.drag.DropTarget
-    public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset, DragView dragView, Object dragInfo) {
-    }
-
-    @Override // com.blahti.drag.DropTarget
-    public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, DragView dragView, Object dragInfo) {
-    }
-
-    @Override // com.blahti.drag.DropTarget
-    public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, DragView dragView, Object dragInfo) {
-        return true;
-    }
-
-    @Override // com.blahti.drag.DropTarget
-    public Rect estimateDropLocation(DragSource source, int x, int y, int xOffset, int yOffset, DragView dragView, Object dragInfo, Rect recycle) {
+    public Rect estimateDropLocation(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj, Rect rect) {
         return null;
+    }
+
+    @Override // com.blahti.drag.DropTarget
+    public void onDragEnter(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj) {
+    }
+
+    @Override // com.blahti.drag.DropTarget
+    public void onDragExit(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj) {
+    }
+
+    @Override // com.blahti.drag.DropTarget
+    public void onDragOver(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj) {
+    }
+
+    @Override // com.blahti.drag.DropTarget
+    public void onDrop(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj) {
+        View view = (View) obj;
+        updateViewLayout(view, new MyAbsoluteLayout.LayoutParams(view.getWidth(), view.getHeight(), i - i3, i2 - i4));
+    }
+
+    @Override // com.blahti.drag.DragSource
+    public void onDropCompleted(View view, boolean z) {
+    }
+
+    @Override // android.view.ViewGroup
+    public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
+        return this.mDragController.onInterceptTouchEvent(motionEvent);
+    }
+
+    @Override // android.view.View
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        return this.mDragController.onTouchEvent(motionEvent);
+    }
+
+    @Override // com.blahti.drag.DragSource
+    public void setDragController(DragController dragController) {
+        this.mDragController = dragController;
     }
 }

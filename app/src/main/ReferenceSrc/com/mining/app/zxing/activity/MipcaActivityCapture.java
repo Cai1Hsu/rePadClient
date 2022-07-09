@@ -25,7 +25,7 @@ import com.mining.app.zxing.view.ViewfinderView;
 import java.io.IOException;
 import java.util.Vector;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mining/app/zxing/activity/MipcaActivityCapture.class */
 public class MipcaActivityCapture extends Activity implements SurfaceHolder.Callback {
     private static final float BEEP_VOLUME = 0.1f;
     private static final long VIBRATE_DURATION = 200;
@@ -46,18 +46,71 @@ public class MipcaActivityCapture extends Activity implements SurfaceHolder.Call
     private boolean vibrate;
     private ViewfinderView viewfinderView;
 
+    private void initCamera(SurfaceHolder surfaceHolder) {
+        try {
+            this.cameraManager.openDriver(surfaceHolder);
+            if (this.handler != null) {
+                return;
+            }
+            this.handler = new CaptureActivityHandler(this, this.decodeFormats, this.characterSet, this.cameraManager);
+        } catch (IOException e) {
+        } catch (RuntimeException e2) {
+        }
+    }
+
+    private void playBeepSoundAndVibrate() {
+        if (this.playBeep && this.mediaPlayer != null) {
+            this.mediaPlayer.start();
+        }
+        if (this.vibrate) {
+            ((Vibrator) getSystemService("vibrator")).vibrate(VIBRATE_DURATION);
+        }
+    }
+
+    public void drawViewfinder() {
+        this.viewfinderView.drawViewfinder();
+    }
+
+    public CameraManager getCameraManager() {
+        return this.cameraManager;
+    }
+
+    public Handler getHandler() {
+        return this.handler;
+    }
+
+    public ViewfinderView getViewfinderView() {
+        return this.viewfinderView;
+    }
+
+    public void handleDecode(Result result, Bitmap bitmap) {
+        this.inactivityTimer.onActivity();
+        playBeepSoundAndVibrate();
+        String text = result.getText();
+        if (text.equals("")) {
+            Toast.makeText(this, "Scan failed!", 0).show();
+        } else {
+            Intent intent = new Intent();
+            Bundle bundle = new Bundle();
+            Log.i("TAG", "resultString = " + text);
+            bundle.putString(Intents.Scan.RESULT, text);
+            intent.putExtras(bundle);
+            setResult(-1, intent);
+        }
+        finish();
+    }
+
     @Override // android.app.Activity
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         setContentView(R.layout.activity_capture);
         CameraManager.init(getApplication());
         this.cameraManager = CameraManager.get();
         this.viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
         this.viewfinderView.setCameraManager(this.cameraManager);
-        Button mButtonBack = (Button) findViewById(R.id.button_back);
-        mButtonBack.setOnClickListener(new View.OnClickListener() { // from class: com.mining.app.zxing.activity.MipcaActivityCapture.2
+        ((Button) findViewById(R.id.button_back)).setOnClickListener(new View.OnClickListener() { // from class: com.mining.app.zxing.activity.MipcaActivityCapture.2
             @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
+            public void onClick(View view) {
                 MipcaActivityCapture.this.finish();
             }
         });
@@ -66,28 +119,9 @@ public class MipcaActivityCapture extends Activity implements SurfaceHolder.Call
     }
 
     @Override // android.app.Activity
-    protected void onResume() {
-        super.onResume();
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
-        SurfaceHolder surfaceHolder = surfaceView.getHolder();
-        if (this.hasSurface) {
-            initCamera(surfaceHolder);
-        } else {
-            surfaceHolder.addCallback(this);
-            surfaceHolder.setType(3);
-        }
-        this.decodeFormats = null;
-        this.characterSet = null;
-        this.playBeep = true;
-        AudioManager audioService = (AudioManager) getSystemService("audio");
-        if (audioService.getRingerMode() != 2) {
-            this.playBeep = false;
-        }
-        this.vibrate = true;
-    }
-
-    public CameraManager getCameraManager() {
-        return this.cameraManager;
+    protected void onDestroy() {
+        this.inactivityTimer.shutdown();
+        super.onDestroy();
     }
 
     @Override // android.app.Activity
@@ -101,75 +135,38 @@ public class MipcaActivityCapture extends Activity implements SurfaceHolder.Call
     }
 
     @Override // android.app.Activity
-    protected void onDestroy() {
-        this.inactivityTimer.shutdown();
-        super.onDestroy();
-    }
-
-    public void handleDecode(Result result, Bitmap barcode) {
-        this.inactivityTimer.onActivity();
-        playBeepSoundAndVibrate();
-        String resultString = result.getText();
-        if (resultString.equals("")) {
-            Toast.makeText(this, "Scan failed!", 0).show();
+    protected void onResume() {
+        super.onResume();
+        SurfaceHolder holder = ((SurfaceView) findViewById(R.id.preview_view)).getHolder();
+        if (this.hasSurface) {
+            initCamera(holder);
         } else {
-            Intent resultIntent = new Intent();
-            Bundle bundle = new Bundle();
-            Log.i("TAG", "resultString = " + resultString);
-            bundle.putString(Intents.Scan.RESULT, resultString);
-            resultIntent.putExtras(bundle);
-            setResult(-1, resultIntent);
+            holder.addCallback(this);
+            holder.setType(3);
         }
-        finish();
-    }
-
-    private void initCamera(SurfaceHolder surfaceHolder) {
-        try {
-            this.cameraManager.openDriver(surfaceHolder);
-            if (this.handler == null) {
-                this.handler = new CaptureActivityHandler(this, this.decodeFormats, this.characterSet, this.cameraManager);
-            }
-        } catch (IOException e) {
-        } catch (RuntimeException e2) {
+        this.decodeFormats = null;
+        this.characterSet = null;
+        this.playBeep = true;
+        if (((AudioManager) getSystemService("audio")).getRingerMode() != 2) {
+            this.playBeep = false;
         }
+        this.vibrate = true;
     }
 
     @Override // android.view.SurfaceHolder.Callback
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
     }
 
     @Override // android.view.SurfaceHolder.Callback
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (!this.hasSurface) {
             this.hasSurface = true;
-            initCamera(holder);
+            initCamera(surfaceHolder);
         }
     }
 
     @Override // android.view.SurfaceHolder.Callback
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         this.hasSurface = false;
-    }
-
-    public ViewfinderView getViewfinderView() {
-        return this.viewfinderView;
-    }
-
-    public Handler getHandler() {
-        return this.handler;
-    }
-
-    public void drawViewfinder() {
-        this.viewfinderView.drawViewfinder();
-    }
-
-    private void playBeepSoundAndVibrate() {
-        if (this.playBeep && this.mediaPlayer != null) {
-            this.mediaPlayer.start();
-        }
-        if (this.vibrate) {
-            Vibrator vibrator = (Vibrator) getSystemService("vibrator");
-            vibrator.vibrate(VIBRATE_DURATION);
-        }
     }
 }

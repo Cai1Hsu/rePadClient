@@ -2,7 +2,7 @@ package com.edutech.mobilestudyclient.util;
 
 import android.graphics.drawable.Drawable;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/util/AppDetails.class */
 public class AppDetails {
     Drawable appIcon;
     String appName;
@@ -10,43 +10,43 @@ public class AppDetails {
     String appVersion;
     String appVersionCode;
 
+    public Drawable getAppIcon() {
+        return this.appIcon;
+    }
+
     public String getAppName() {
         return this.appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getAppVersion() {
-        return this.appVersion;
-    }
-
-    public void setAppVersion(String appVersion) {
-        this.appVersion = appVersion;
-    }
-
-    public String getAppVersionCode() {
-        return this.appVersionCode;
-    }
-
-    public void setAppVersionCode(String appVersionCode) {
-        this.appVersionCode = appVersionCode;
     }
 
     public String getAppPackageName() {
         return this.appPackageName;
     }
 
-    public void setAppPackageName(String appPackageName) {
-        this.appPackageName = appPackageName;
+    public String getAppVersion() {
+        return this.appVersion;
     }
 
-    public Drawable getAppIcon() {
-        return this.appIcon;
+    public String getAppVersionCode() {
+        return this.appVersionCode;
     }
 
-    public void setAppIcon(Drawable appIcon) {
-        this.appIcon = appIcon;
+    public void setAppIcon(Drawable drawable) {
+        this.appIcon = drawable;
+    }
+
+    public void setAppName(String str) {
+        this.appName = str;
+    }
+
+    public void setAppPackageName(String str) {
+        this.appPackageName = str;
+    }
+
+    public void setAppVersion(String str) {
+        this.appVersion = str;
+    }
+
+    public void setAppVersionCode(String str) {
+        this.appVersionCode = str;
     }
 }

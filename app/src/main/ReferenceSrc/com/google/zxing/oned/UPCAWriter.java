@@ -7,34 +7,38 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/UPCAWriter.class */
 public class UPCAWriter implements Writer {
     private final EAN13Writer subWriter = new EAN13Writer();
 
-    @Override // com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height) throws WriterException {
-        return encode(contents, format, width, height, null);
-    }
-
-    @Override // com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        if (format != BarcodeFormat.UPC_A) {
-            throw new IllegalArgumentException("Can only encode UPC-A, but got " + format);
-        }
-        return this.subWriter.encode(preencode(contents), BarcodeFormat.EAN_13, width, height, hints);
-    }
-
-    private static String preencode(String contents) {
-        int length = contents.length();
+    private static String preencode(String str) {
+        String str2;
+        int length = str.length();
         if (length == 11) {
-            int sum = 0;
-            for (int i = 0; i < 11; i++) {
-                sum += (i % 2 == 0 ? 3 : 1) * (contents.charAt(i) - '0');
+            int i = 0;
+            for (int i2 = 0; i2 < 11; i2++) {
+                i += (i2 % 2 == 0 ? 3 : 1) * (str.charAt(i2) - '0');
             }
-            contents = contents + ((1000 - sum) % 10);
-        } else if (length != 12) {
-            throw new IllegalArgumentException("Requested contents should be 11 or 12 digits long, but got " + contents.length());
+            str2 = str + ((1000 - i) % 10);
+        } else {
+            str2 = str;
+            if (length != 12) {
+                throw new IllegalArgumentException("Requested contents should be 11 or 12 digits long, but got " + str.length());
+            }
         }
-        return '0' + contents;
+        return '0' + str2;
+    }
+
+    @Override // com.google.zxing.Writer
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2) throws WriterException {
+        return encode(str, barcodeFormat, i, i2, null);
+    }
+
+    @Override // com.google.zxing.Writer
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (barcodeFormat != BarcodeFormat.UPC_A) {
+            throw new IllegalArgumentException("Can only encode UPC-A, but got " + barcodeFormat);
+        }
+        return this.subWriter.encode(preencode(str), BarcodeFormat.EAN_13, i, i2, map);
     }
 }

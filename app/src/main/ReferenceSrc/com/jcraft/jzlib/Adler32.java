@@ -1,8 +1,6 @@
 package com.jcraft.jzlib;
 
-import org.bson.BSON;
-
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/jcraft/jzlib/Adler32.class */
 final class Adler32 {
     private static final int BASE = 65521;
     private static final int NMAX = 5552;
@@ -10,80 +8,81 @@ final class Adler32 {
     Adler32() {
     }
 
-    long adler32(long adler, byte[] buf, int index, int len) {
-        int index2;
-        int index3;
-        int index4;
-        int index5;
-        int index6;
-        int index7;
-        int index8;
-        int index9;
-        int index10;
-        int index11;
-        int index12;
-        int index13;
-        int index14;
-        int index15;
-        int index16;
-        int index17;
-        if (buf == null) {
-            return 1L;
-        }
-        long s1 = adler & 65535;
-        long s2 = (adler >> 16) & 65535;
-        while (len > 0) {
-            int k = len < NMAX ? len : NMAX;
-            len -= k;
-            int index18 = index;
-            while (k >= 16) {
-                long s12 = s1 + (buf[index18] & BSON.MINKEY);
-                long s22 = s2 + s12;
-                long s13 = s12 + (buf[index3] & BSON.MINKEY);
-                long s23 = s22 + s13;
-                long s14 = s13 + (buf[index4] & BSON.MINKEY);
-                long s24 = s23 + s14;
-                long s15 = s14 + (buf[index5] & BSON.MINKEY);
-                long s25 = s24 + s15;
-                long s16 = s15 + (buf[index6] & BSON.MINKEY);
-                long s26 = s25 + s16;
-                long s17 = s16 + (buf[index7] & BSON.MINKEY);
-                long s27 = s26 + s17;
-                long s18 = s17 + (buf[index8] & BSON.MINKEY);
-                long s28 = s27 + s18;
-                long s19 = s18 + (buf[index9] & BSON.MINKEY);
-                long s29 = s28 + s19;
-                long s110 = s19 + (buf[index10] & BSON.MINKEY);
-                long s210 = s29 + s110;
-                long s111 = s110 + (buf[index11] & BSON.MINKEY);
-                long s211 = s210 + s111;
-                long s112 = s111 + (buf[index12] & BSON.MINKEY);
-                long s212 = s211 + s112;
-                long s113 = s112 + (buf[index13] & BSON.MINKEY);
-                long s213 = s212 + s113;
-                long s114 = s113 + (buf[index14] & BSON.MINKEY);
-                long s214 = s213 + s114;
-                long s115 = s114 + (buf[index15] & BSON.MINKEY);
-                long s215 = s214 + s115;
-                long s116 = s115 + (buf[index16] & BSON.MINKEY);
-                long s216 = s215 + s116;
-                index18 = index18 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1;
-                s1 = s116 + (buf[index17] & BSON.MINKEY);
-                s2 = s216 + s1;
-                k -= 16;
+    long adler32(long j, byte[] bArr, int i, int i2) {
+        long j2;
+        long j3;
+        long j4;
+        int i3;
+        int i4;
+        if (bArr == null) {
+            j2 = 1;
+        } else {
+            long j5 = j & 65535;
+            long j6 = (j >> 16) & 65535;
+            while (i2 > 0) {
+                int i5 = i2 < NMAX ? i2 : NMAX;
+                int i6 = i2 - i5;
+                int i7 = i5;
+                while (i7 >= 16) {
+                    long j7 = j5 + (bArr[i] & 255);
+                    int i8 = i + 1 + 1;
+                    long j8 = j7 + (bArr[i4] & 255);
+                    int i9 = i8 + 1;
+                    long j9 = j8 + (bArr[i8] & 255);
+                    int i10 = i9 + 1;
+                    long j10 = j9 + (bArr[i9] & 255);
+                    int i11 = i10 + 1;
+                    long j11 = j10 + (bArr[i10] & 255);
+                    int i12 = i11 + 1;
+                    long j12 = j11 + (bArr[i11] & 255);
+                    int i13 = i12 + 1;
+                    long j13 = j12 + (bArr[i12] & 255);
+                    int i14 = i13 + 1;
+                    long j14 = j13 + (bArr[i13] & 255);
+                    int i15 = i14 + 1;
+                    long j15 = j14 + (bArr[i14] & 255);
+                    int i16 = i15 + 1;
+                    long j16 = j15 + (bArr[i15] & 255);
+                    int i17 = i16 + 1;
+                    long j17 = j16 + (bArr[i16] & 255);
+                    int i18 = i17 + 1;
+                    long j18 = j17 + (bArr[i17] & 255);
+                    int i19 = i18 + 1;
+                    long j19 = j18 + (bArr[i18] & 255);
+                    int i20 = i19 + 1;
+                    long j20 = j19 + (bArr[i19] & 255);
+                    int i21 = i20 + 1;
+                    long j21 = j20 + (bArr[i20] & 255);
+                    i = i21 + 1;
+                    j5 = j21 + (bArr[i21] & 255);
+                    j6 = j6 + j7 + j8 + j9 + j10 + j11 + j12 + j13 + j14 + j15 + j16 + j17 + j18 + j19 + j20 + j21 + j5;
+                    i7 -= 16;
+                }
+                int i22 = i;
+                long j22 = j5;
+                long j23 = j6;
+                if (i7 != 0) {
+                    long j24 = j5;
+                    do {
+                        i22 = i + 1;
+                        j3 = j24 + (bArr[i] & 255);
+                        j4 = j6 + j3;
+                        i3 = i7 - 1;
+                        i = i22;
+                        i7 = i3;
+                        j24 = j3;
+                        j6 = j4;
+                    } while (i3 != 0);
+                    j23 = j4;
+                    j22 = j3;
+                }
+                i = i22;
+                j5 = j22 % 65521;
+                j6 = j23 % 65521;
+                i2 = i6;
             }
-            if (k != 0) {
-                do {
-                    index18++;
-                    s1 += buf[index2] & BSON.MINKEY;
-                    s2 += s1;
-                    k--;
-                } while (k != 0);
-            }
-            index = index18;
-            s1 %= 65521;
-            s2 %= 65521;
+            j2 = (j6 << 16) | j5;
         }
-        return (s2 << 16) | s1;
+        return j2;
     }
 }

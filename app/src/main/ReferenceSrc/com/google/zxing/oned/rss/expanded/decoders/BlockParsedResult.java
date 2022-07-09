@@ -1,17 +1,17 @@
 package com.google.zxing.oned.rss.expanded.decoders;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/BlockParsedResult.class */
 final class BlockParsedResult {
     private final DecodedInformation decodedInformation;
     private final boolean finished;
 
-    BlockParsedResult(boolean finished) {
-        this(null, finished);
+    BlockParsedResult(DecodedInformation decodedInformation, boolean z) {
+        this.finished = z;
+        this.decodedInformation = decodedInformation;
     }
 
-    BlockParsedResult(DecodedInformation information, boolean finished) {
-        this.finished = finished;
-        this.decodedInformation = information;
+    BlockParsedResult(boolean z) {
+        this(null, z);
     }
 
     DecodedInformation getDecodedInformation() {

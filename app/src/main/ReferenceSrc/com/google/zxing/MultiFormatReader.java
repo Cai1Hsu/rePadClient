@@ -10,98 +10,96 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/MultiFormatReader.class */
 public final class MultiFormatReader implements Reader {
     private Map<DecodeHintType, ?> hints;
     private Reader[] readers;
 
-    @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException {
-        setHints(null);
-        return decodeInternal(image);
-    }
-
-    @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException {
-        setHints(hints);
-        return decodeInternal(image);
-    }
-
-    public Result decodeWithState(BinaryBitmap image) throws NotFoundException {
-        if (this.readers == null) {
-            setHints(null);
-        }
-        return decodeInternal(image);
-    }
-
-    public void setHints(Map<DecodeHintType, ?> hints) {
-        boolean addOneDReader = false;
-        this.hints = hints;
-        boolean tryHarder = hints != null && hints.containsKey(DecodeHintType.TRY_HARDER);
-        Collection<BarcodeFormat> formats = hints == null ? null : (Collection) hints.get(DecodeHintType.POSSIBLE_FORMATS);
-        Collection<Reader> readers = new ArrayList<>();
-        if (formats != null) {
-            if (formats.contains(BarcodeFormat.UPC_A) || formats.contains(BarcodeFormat.UPC_E) || formats.contains(BarcodeFormat.EAN_13) || formats.contains(BarcodeFormat.EAN_8) || formats.contains(BarcodeFormat.CODE_39) || formats.contains(BarcodeFormat.CODE_93) || formats.contains(BarcodeFormat.CODE_128) || formats.contains(BarcodeFormat.ITF) || formats.contains(BarcodeFormat.RSS_14) || formats.contains(BarcodeFormat.RSS_EXPANDED)) {
-                addOneDReader = true;
-            }
-            if (addOneDReader && !tryHarder) {
-                readers.add(new MultiFormatOneDReader(hints));
-            }
-            if (formats.contains(BarcodeFormat.QR_CODE)) {
-                readers.add(new QRCodeReader());
-            }
-            if (formats.contains(BarcodeFormat.DATA_MATRIX)) {
-                readers.add(new DataMatrixReader());
-            }
-            if (formats.contains(BarcodeFormat.AZTEC)) {
-                readers.add(new AztecReader());
-            }
-            if (formats.contains(BarcodeFormat.PDF_417)) {
-                readers.add(new PDF417Reader());
-            }
-            if (formats.contains(BarcodeFormat.MAXICODE)) {
-                readers.add(new MaxiCodeReader());
-            }
-            if (addOneDReader && tryHarder) {
-                readers.add(new MultiFormatOneDReader(hints));
-            }
-        }
-        if (readers.isEmpty()) {
-            if (!tryHarder) {
-                readers.add(new MultiFormatOneDReader(hints));
-            }
-            readers.add(new QRCodeReader());
-            readers.add(new DataMatrixReader());
-            readers.add(new AztecReader());
-            readers.add(new PDF417Reader());
-            readers.add(new MaxiCodeReader());
-            if (tryHarder) {
-                readers.add(new MultiFormatOneDReader(hints));
-            }
-        }
-        this.readers = (Reader[]) readers.toArray(new Reader[readers.size()]);
-    }
-
-    @Override // com.google.zxing.Reader
-    public void reset() {
+    private Result decodeInternal(BinaryBitmap binaryBitmap) throws NotFoundException {
         if (this.readers != null) {
-            Reader[] arr$ = this.readers;
-            for (Reader reader : arr$) {
-                reader.reset();
-            }
-        }
-    }
-
-    private Result decodeInternal(BinaryBitmap image) throws NotFoundException {
-        if (this.readers != null) {
-            Reader[] arr$ = this.readers;
-            for (Reader reader : arr$) {
+            for (Reader reader : this.readers) {
                 try {
-                    return reader.decode(image, this.hints);
+                    return reader.decode(binaryBitmap, this.hints);
                 } catch (ReaderException e) {
                 }
             }
         }
         throw NotFoundException.getNotFoundInstance();
+    }
+
+    @Override // com.google.zxing.Reader
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException {
+        setHints(null);
+        return decodeInternal(binaryBitmap);
+    }
+
+    @Override // com.google.zxing.Reader
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException {
+        setHints(map);
+        return decodeInternal(binaryBitmap);
+    }
+
+    public Result decodeWithState(BinaryBitmap binaryBitmap) throws NotFoundException {
+        if (this.readers == null) {
+            setHints(null);
+        }
+        return decodeInternal(binaryBitmap);
+    }
+
+    @Override // com.google.zxing.Reader
+    public void reset() {
+        if (this.readers != null) {
+            for (Reader reader : this.readers) {
+                reader.reset();
+            }
+        }
+    }
+
+    public void setHints(Map<DecodeHintType, ?> map) {
+        boolean z = false;
+        this.hints = map;
+        boolean z2 = map != null && map.containsKey(DecodeHintType.TRY_HARDER);
+        Collection collection = map == null ? null : (Collection) map.get(DecodeHintType.POSSIBLE_FORMATS);
+        ArrayList arrayList = new ArrayList();
+        if (collection != null) {
+            if (collection.contains(BarcodeFormat.UPC_A) || collection.contains(BarcodeFormat.UPC_E) || collection.contains(BarcodeFormat.EAN_13) || collection.contains(BarcodeFormat.EAN_8) || collection.contains(BarcodeFormat.CODE_39) || collection.contains(BarcodeFormat.CODE_93) || collection.contains(BarcodeFormat.CODE_128) || collection.contains(BarcodeFormat.ITF) || collection.contains(BarcodeFormat.RSS_14) || collection.contains(BarcodeFormat.RSS_EXPANDED)) {
+                z = true;
+            }
+            if (z && !z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
+            }
+            if (collection.contains(BarcodeFormat.QR_CODE)) {
+                arrayList.add(new QRCodeReader());
+            }
+            if (collection.contains(BarcodeFormat.DATA_MATRIX)) {
+                arrayList.add(new DataMatrixReader());
+            }
+            if (collection.contains(BarcodeFormat.AZTEC)) {
+                arrayList.add(new AztecReader());
+            }
+            if (collection.contains(BarcodeFormat.PDF_417)) {
+                arrayList.add(new PDF417Reader());
+            }
+            if (collection.contains(BarcodeFormat.MAXICODE)) {
+                arrayList.add(new MaxiCodeReader());
+            }
+            if (z && z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
+            }
+        }
+        if (arrayList.isEmpty()) {
+            if (!z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
+            }
+            arrayList.add(new QRCodeReader());
+            arrayList.add(new DataMatrixReader());
+            arrayList.add(new AztecReader());
+            arrayList.add(new PDF417Reader());
+            arrayList.add(new MaxiCodeReader());
+            if (z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
+            }
+        }
+        this.readers = (Reader[]) arrayList.toArray(new Reader[arrayList.size()]);
     }
 }

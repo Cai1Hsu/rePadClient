@@ -3,63 +3,70 @@ package com.google.zxing.client.result;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/URIParsedResult.class */
 public final class URIParsedResult extends ParsedResult {
     private static final Pattern USER_IN_HOST = Pattern.compile(":/*([^/@]+)@[^/]+");
     private final String title;
     private final String uri;
 
-    public URIParsedResult(String uri, String title) {
+    public URIParsedResult(String str, String str2) {
         super(ParsedResultType.URI);
-        this.uri = massageURI(uri);
-        this.title = title;
+        this.uri = massageURI(str);
+        this.title = str2;
     }
 
-    public String getURI() {
-        return this.uri;
+    private static boolean isColonFollowedByPortNumber(String str, int i) {
+        boolean z;
+        int indexOf = str.indexOf(47, i + 1);
+        int i2 = indexOf;
+        if (indexOf < 0) {
+            i2 = str.length();
+        }
+        if (i2 > i + 1) {
+            while (true) {
+                i++;
+                if (i >= i2) {
+                    z = true;
+                    break;
+                }
+                z = false;
+                if (str.charAt(i) < '0') {
+                    break;
+                }
+                z = false;
+                if (str.charAt(i) > '9') {
+                    break;
+                }
+            }
+        } else {
+            z = false;
+        }
+        return z;
+    }
+
+    private static String massageURI(String str) {
+        String trim = str.trim();
+        int indexOf = trim.indexOf(58);
+        return indexOf < 0 ? "http://" + trim : isColonFollowedByPortNumber(trim, indexOf) ? "http://" + trim : trim.substring(0, indexOf).toLowerCase(Locale.ENGLISH) + trim.substring(indexOf);
+    }
+
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
+        StringBuilder sb = new StringBuilder(30);
+        maybeAppend(this.title, sb);
+        maybeAppend(this.uri, sb);
+        return sb.toString();
     }
 
     public String getTitle() {
         return this.title;
     }
 
+    public String getURI() {
+        return this.uri;
+    }
+
     public boolean isPossiblyMaliciousURI() {
         return USER_IN_HOST.matcher(this.uri).find();
-    }
-
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(30);
-        maybeAppend(this.title, result);
-        maybeAppend(this.uri, result);
-        return result.toString();
-    }
-
-    private static String massageURI(String uri) {
-        String uri2 = uri.trim();
-        int protocolEnd = uri2.indexOf(58);
-        if (protocolEnd < 0) {
-            return "http://" + uri2;
-        }
-        if (isColonFollowedByPortNumber(uri2, protocolEnd)) {
-            return "http://" + uri2;
-        }
-        return uri2.substring(0, protocolEnd).toLowerCase(Locale.ENGLISH) + uri2.substring(protocolEnd);
-    }
-
-    private static boolean isColonFollowedByPortNumber(String uri, int protocolEnd) {
-        int nextSlash = uri.indexOf(47, protocolEnd + 1);
-        if (nextSlash < 0) {
-            nextSlash = uri.length();
-        }
-        if (nextSlash <= protocolEnd + 1) {
-            return false;
-        }
-        for (int x = protocolEnd + 1; x < nextSlash; x++) {
-            if (uri.charAt(x) < '0' || uri.charAt(x) > '9') {
-                return false;
-            }
-        }
-        return true;
     }
 }

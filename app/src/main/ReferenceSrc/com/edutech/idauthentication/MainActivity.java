@@ -50,24 +50,20 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.commons.net.imap.IMAPSClient;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.util.DateUtils;
-import org.bson.BSON;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/idauthentication/MainActivity.class */
 public class MainActivity {
     private Button btnYes;
     public Context mContext;
@@ -86,605 +82,113 @@ public class MainActivity {
     public Thread apkUpdateThread = null;
     private Handler handler = new Handler() { // from class: com.edutech.idauthentication.MainActivity.1
         @Override // android.os.Handler
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
+        public void handleMessage(Message message) {
+            switch (message.what) {
                 case 1:
-                    InstallApkHelper installapk = new InstallApkHelper(MainActivity.this, MainActivity.selfpackageName);
-                    installapk.InstallAll();
+                    new InstallApkHelper(MainActivity.this, MainActivity.selfpackageName).InstallAll();
                     MainActivity.isDown = false;
                     break;
             }
-            super.handleMessage(msg);
+            super.handleMessage(message);
         }
     };
     Runnable apkUpdateRunnable = new Runnable() { // from class: com.edutech.idauthentication.MainActivity.2
         @Override // java.lang.Runnable
         public void run() {
             if (MainActivity.selfpackageName != null) {
-                HashMap<String, String> hashmap = XmlLoadHelper.loadIpXml();
-                String ip = hashmap.get("ip");
-                String username = hashmap.get("username");
-                if (ip != null && username != null && !"".equals(ip) && !"".equals(username)) {
-                    String url = AppEnvironment.SETTING_APK_UPDATE_HTTPPOST_URL(ip, username);
-                    File edutechDir = new File(AppEnvironment.FOLDER_EDUTECH);
-                    if (edutechDir.exists()) {
-                        try {
-                            FileInOutHelper.deleteDir(edutechDir);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                HashMap<String, String> loadIpXml = XmlLoadHelper.loadIpXml();
+                String str = loadIpXml.get("ip");
+                String str2 = loadIpXml.get("username");
+                if (str == null || str2 == null || "".equals(str) || "".equals(str2)) {
+                    return;
+                }
+                String SETTING_APK_UPDATE_HTTPPOST_URL = AppEnvironment.SETTING_APK_UPDATE_HTTPPOST_URL(str, str2);
+                File file = new File(AppEnvironment.FOLDER_EDUTECH);
+                if (file.exists()) {
+                    try {
+                        FileInOutHelper.deleteDir(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    String json = MainActivity.this.getUpdateJson(url);
-                    ArrayList<HashMap<String, String>> jsonAppInfoList = new ArrayList<>();
-                    if (json != null && !"".equals(json)) {
-                        jsonAppInfoList = JsonHelper.dataParse(jsonAppInfoList, json);
+                }
+                String updateJson = MainActivity.this.getUpdateJson(SETTING_APK_UPDATE_HTTPPOST_URL);
+                ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
+                ArrayList<HashMap<String, String>> arrayList2 = arrayList;
+                if (updateJson != null) {
+                    arrayList2 = arrayList;
+                    if (!"".equals(updateJson)) {
+                        arrayList2 = JsonHelper.dataParse(arrayList, updateJson);
                     }
-                    File file = new File(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apk.json");
-                    ArrayList<HashMap<String, String>> localjsonAppInfoList = new ArrayList<>();
-                    if (file.exists()) {
-                        String localjson = JsonHelper.getFileString(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apk.json");
-                        localjsonAppInfoList = JsonHelper.dataParse(localjsonAppInfoList, localjson);
+                }
+                File file2 = new File(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apk.json");
+                ArrayList<HashMap<String, String>> arrayList3 = new ArrayList<>();
+                ArrayList<HashMap<String, String>> arrayList4 = arrayList3;
+                if (file2.exists()) {
+                    arrayList4 = JsonHelper.dataParse(arrayList3, JsonHelper.getFileString(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apk.json"));
+                }
+                ArrayList<HashMap<String, String>> systemInfo = SystemInfoHelper.getSystemInfo(new ArrayList(), MainActivity.this.mContext);
+                File file3 = new File(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apkinfo.json");
+                if (!file3.exists()) {
+                    FileInOutHelper.createNewFile(file3);
+                }
+                JsonHelper.CreateFile(updateJson, String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apkinfo.json");
+                SystemInfoHelper.compareAppInfo(MainActivity.apkdownloadlist, arrayList2, arrayList4, systemInfo);
+                Iterator<HashMap<String, String>> it = MainActivity.apkdownloadlist.iterator();
+                while (it.hasNext()) {
+                    it.next().put("redownload_count", "0");
+                }
+                MainActivity.apkfinList = new ArrayList<>();
+                SystemInfoHelper.startDownLoadList(MainActivity.apkdownloadlist, MainActivity.apkTaskList);
+                int i = 0;
+                while (MainActivity.apkdownloadlist.size() > 0) {
+                    try {
+                        Thread.sleep(3000L);
+                    } catch (InterruptedException e2) {
+                        e2.printStackTrace();
                     }
-                    ArrayList<HashMap<String, String>> localAppInfoList = new ArrayList<>();
-                    ArrayList<HashMap<String, String>> localAppInfoList2 = SystemInfoHelper.getSystemInfo(localAppInfoList, MainActivity.this.mContext);
-                    File apkjsonFile = new File(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apkinfo.json");
-                    if (!apkjsonFile.exists()) {
-                        FileInOutHelper.createNewFile(apkjsonFile);
-                    }
-                    JsonHelper.CreateFile(json, String.valueOf(AppEnvironment.FOLDER_EDUTECH) + "apkinfo.json");
-                    SystemInfoHelper.compareAppInfo(MainActivity.apkdownloadlist, jsonAppInfoList, localjsonAppInfoList, localAppInfoList2);
-                    Iterator<HashMap<String, String>> it = MainActivity.apkdownloadlist.iterator();
-                    while (it.hasNext()) {
-                        it.next().put("redownload_count", "0");
-                    }
-                    MainActivity.apkfinList = new ArrayList<>();
-                    SystemInfoHelper.startDownLoadList(MainActivity.apkdownloadlist, MainActivity.apkTaskList);
-                    int i = 0;
-                    while (MainActivity.apkdownloadlist.size() > 0) {
-                        try {
-                            Thread.sleep(3000L);
-                        } catch (InterruptedException e2) {
-                            e2.printStackTrace();
-                        }
-                        if (MainActivity.apkfinList.size() > 0 && i != MainActivity.apkfinList.size()) {
-                            i = MainActivity.apkfinList.size();
-                            Iterator<HashMap<String, String>> it2 = jsonAppInfoList.iterator();
+                    int i2 = i;
+                    if (MainActivity.apkfinList.size() > 0) {
+                        i2 = i;
+                        if (i != MainActivity.apkfinList.size()) {
+                            i2 = MainActivity.apkfinList.size();
+                            Iterator<HashMap<String, String>> it2 = arrayList2.iterator();
                             while (it2.hasNext()) {
-                                HashMap<String, String> temp = it2.next();
+                                HashMap<String, String> next = it2.next();
                                 Iterator<String> it3 = MainActivity.apkfinList.iterator();
                                 while (it3.hasNext()) {
-                                    String temp1 = it3.next();
-                                    String path = String.valueOf(AppEnvironment.FOLDER_EDUTECH) + temp.get("appname");
-                                    if (path.equals(temp1)) {
-                                        temp.put("is_down_finish", LogHelp.TYPE_GUIDANCE);
+                                    if ((String.valueOf(AppEnvironment.FOLDER_EDUTECH) + next.get("appname")).equals(it3.next())) {
+                                        next.put("is_down_finish", LogHelp.TYPE_GUIDANCE);
                                     }
                                 }
                             }
                         }
-                        if (MainActivity.apkTaskList.size() < 5) {
-                            SystemInfoHelper.startDownLoadList(MainActivity.apkdownloadlist, MainActivity.apkTaskList);
-                        }
                     }
-                    if (MainActivity.apkdownloadlist.size() == 0 && MainActivity.apkfinList.size() > 0) {
-                        Message message = new Message();
-                        message.what = 1;
-                        MainActivity.this.handler.sendMessage(message);
+                    i = i2;
+                    if (MainActivity.apkTaskList.size() < 5) {
+                        SystemInfoHelper.startDownLoadList(MainActivity.apkdownloadlist, MainActivity.apkTaskList);
+                        i = i2;
                     }
                 }
+                if (MainActivity.apkdownloadlist.size() != 0 || MainActivity.apkfinList.size() <= 0) {
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                MainActivity.this.handler.sendMessage(message);
             }
         }
     };
     DialogInterface.OnKeyListener keylistener = new DialogInterface.OnKeyListener() { // from class: com.edutech.idauthentication.MainActivity.3
         @Override // android.content.DialogInterface.OnKeyListener
-        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-            return keyCode == 4 && event.getRepeatCount() == 0;
+        public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+            return i == 4 && keyEvent.getRepeatCount() == 0;
         }
     };
 
-    public MainActivity(Context context) {
-        this.mContext = null;
-        this.mContext = context;
-    }
-
-    public int checkIDAuth() {
-        if (!idfile.exists() || idfile.length() <= 0) {
-            return 1;
-        }
-        List<String> idInfo = readIDFile();
-        if (idInfo != null) {
-            String idString = idInfo.get(0);
-            String machineID = idInfo.get(1);
-            String resultString = idInfo.get(2);
-            String times = idInfo.get(3);
-            String date = idInfo.get(4);
-            String usedTimes = idInfo.get(5);
-            if (idString == null || idString.length() < 16) {
-                return 3;
-            }
-            if (machineID == null || machineID.length() < 32 || !machineID.equals(GetMachineID())) {
-                return 4;
-            }
-            if (resultString == null || resultString.length() <= 0 || (!resultString.equals("4") && !resultString.equals("5"))) {
-                return 5;
-            }
-            Date curretDate = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.ISO8601_DATE_PATTERN);
-            Date authDate = null;
-            if (date != null && date.length() >= 10) {
-                try {
-                    authDate = sdf.parse(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                if (authDate == null || curretDate.after(authDate)) {
-                    return 6;
-                }
-            }
-            if (times != null && times.length() > 0 && Integer.parseInt(times) > 0 && usedTimes != null && usedTimes.length() > 0) {
-                if (Integer.parseInt(times) <= Integer.parseInt(usedTimes)) {
-                    return 7;
-                }
-                if (Integer.parseInt(times) > 0) {
-                    int usedTimesInt = Integer.parseInt(usedTimes) + 1;
-                    writeidFile(idString, Integer.parseInt(resultString), times, date, String.valueOf(usedTimesInt));
-                }
-            }
-            return 0;
-        }
-        return 2;
-    }
-
-    public void addUsedTimes() {
-        List<String> idInfo;
-        if (idfile.exists() && idfile.length() > 0 && (idInfo = readIDFile()) != null) {
-            String idString = idInfo.get(0);
-            idInfo.get(1);
-            String resultString = idInfo.get(2);
-            String times = idInfo.get(3);
-            String date = idInfo.get(4);
-            String usedTimes = idInfo.get(5);
-            int usedTimesInt = Integer.parseInt(usedTimes) + 1;
-            writeidFile(idString, Integer.parseInt(resultString), times, date, String.valueOf(usedTimesInt));
-        }
-    }
-
-    public static final List<String> readIDFile() {
-        List<String> idInfo = new ArrayList<>();
-        String idString = null;
-        String machineID = null;
-        String resultString = null;
-        String times = null;
-        String date = null;
-        String usedTimes = null;
-        FileInputStream filein = null;
-        try {
-            FileInputStream filein2 = new FileInputStream(idfile);
-            filein = filein2;
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-        }
-        try {
-            XmlPullParserFactory pullParserFactory = XmlPullParserFactory.newInstance();
-            XmlPullParser xmlPullParser = pullParserFactory.newPullParser();
-            xmlPullParser.setInput(filein, "UTF-8");
-            for (int eventType = xmlPullParser.getEventType(); eventType != 1; eventType = xmlPullParser.next()) {
-                String nodeName = xmlPullParser.getName();
-                switch (eventType) {
-                    case 2:
-                        if ("a1".equals(nodeName)) {
-                            idString = xmlPullParser.nextText();
-                        }
-                        if ("b2".equals(nodeName)) {
-                            machineID = xmlPullParser.nextText();
-                        }
-                        if ("c3".equals(nodeName)) {
-                            resultString = xmlPullParser.nextText();
-                        }
-                        if ("d4".equals(nodeName)) {
-                            times = xmlPullParser.nextText();
-                        }
-                        if ("e5".equals(nodeName)) {
-                            date = xmlPullParser.nextText();
-                        }
-                        if ("f6".equals(nodeName)) {
-                            usedTimes = xmlPullParser.nextText();
-                            continue;
-                        } else {
-                            continue;
-                        }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e2) {
-            e2.printStackTrace();
-        }
-        try {
-            filein.close();
-        } catch (IOException e12) {
-            e12.printStackTrace();
-        }
-        idInfo.add("");
-        idInfo.add("");
-        idInfo.add("");
-        idInfo.add("");
-        idInfo.add("");
-        idInfo.add("");
-        if (idString != null) {
-            try {
-                idInfo.set(0, AES.decrypt(seed, idString));
-            } catch (Exception e3) {
-                e3.printStackTrace();
-            }
-        }
-        if (machineID != null) {
-            idInfo.set(1, AES.decrypt(seed, machineID));
-        }
-        if (resultString != null) {
-            idInfo.set(2, AES.decrypt(seed, resultString));
-        }
-        if (times != null) {
-            idInfo.set(3, AES.decrypt(seed, times));
-        }
-        if (date != null) {
-            idInfo.set(4, AES.decrypt(seed, date));
-        }
-        if (usedTimes != null) {
-            idInfo.set(5, AES.decrypt(seed, usedTimes));
-        }
-        return idInfo;
-    }
-
-    public void writeidFile(String idString, int result, String times, String date, String usedTimes) {
-        FileOutputStream fileos = null;
-        String hasUsedTimes = usedTimes;
-        if (idfile.exists()) {
-            if (usedTimes.equals("0")) {
-                List<String> idInfo = readIDFile();
-                if (idInfo.get(0).equals(idString) && idInfo.get(5) != null && idInfo.get(5).length() > 0) {
-                    hasUsedTimes = idInfo.get(5);
-                }
-            }
-            idfile.delete();
-        }
-        idfile = FileInOutHelper.setupOrOpenFile(filepath);
-        try {
-            FileOutputStream fileos2 = new FileOutputStream(idfile);
-            fileos = fileos2;
-        } catch (FileNotFoundException e) {
-        }
-        XmlSerializer serializer = Xml.newSerializer();
-        try {
-            serializer.setOutput(fileos, "UTF-8");
-            serializer.startDocument(null, true);
-            serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-            serializer.startTag(null, "id");
-            serializer.startTag(null, "a1");
-            serializer.text(AES.encrypt(seed, idString));
-            serializer.endTag(null, "a1");
-            serializer.startTag(null, "b2");
-            serializer.text(AES.encrypt(seed, GetMachineID()));
-            serializer.endTag(null, "b2");
-            serializer.startTag(null, "c3");
-            serializer.text(AES.encrypt(seed, String.valueOf(result)));
-            serializer.endTag(null, "c3");
-            serializer.startTag(null, "d4");
-            serializer.text(AES.encrypt(seed, times));
-            serializer.endTag(null, "d4");
-            serializer.startTag(null, "e5");
-            serializer.text(AES.encrypt(seed, date));
-            serializer.endTag(null, "e5");
-            serializer.startTag(null, "f6");
-            serializer.text(AES.encrypt(seed, hasUsedTimes));
-            serializer.endTag(null, "f6");
-            serializer.endTag(null, "id");
-            serializer.endDocument();
-            serializer.flush();
-            fileos.close();
-        } catch (Exception e2) {
-            e2.printStackTrace();
-        }
-    }
-
-    public final String getIDAuth() {
-        return null;
-    }
-
-    public final String GetMachineID() {
-        String m_szWLANMAC;
-        TelephonyManager tm = (TelephonyManager) this.mContext.getSystemService("phone");
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nModel = " + Build.MODEL);
-        sb.append("\nSerialNumber = " + Build.SERIAL);
-        sb.append("\nDeviceId(IMEI) = " + tm.getDeviceId());
-        String android_id = Settings.Secure.getString(this.mContext.getContentResolver(), "android_id");
-        sb.append("\nAndroidID = " + android_id);
-        try {
-            WifiManager wm = (WifiManager) this.mContext.getSystemService("wifi");
-            m_szWLANMAC = wm.getConnectionInfo().getMacAddress();
-        } catch (NullPointerException e) {
-            m_szWLANMAC = "";
-        } catch (Exception e2) {
-            m_szWLANMAC = "";
-        }
-        if (m_szWLANMAC == null || m_szWLANMAC.equals("")) {
-            for (int i = 0; i <= 5; i++) {
-                try {
-                    WifiManager wm2 = (WifiManager) this.mContext.getSystemService("wifi");
-                    m_szWLANMAC = wm2.getConnectionInfo().getMacAddress();
-                } catch (NullPointerException e3) {
-                    m_szWLANMAC = "";
-                } catch (Exception e4) {
-                    m_szWLANMAC = "";
-                }
-                if (m_szWLANMAC != null && m_szWLANMAC.length() > 0) {
-                    break;
-                }
-                try {
-                    Thread.sleep(org.apache.tools.ant.util.FileUtils.FAT_FILE_TIMESTAMP_GRANULARITY);
-                } catch (InterruptedException e5) {
-                    e5.printStackTrace();
-                }
-            }
-        }
-        if (m_szWLANMAC == null) {
-            m_szWLANMAC = "";
-        }
-        sb.append("\nMACAddress = " + m_szWLANMAC);
-        return String.valueOf(toHexString(toMd5(sb.toString().getBytes()), "")) + ":" + m_szWLANMAC.replaceAll(":", "");
-    }
-
-    public static byte[] toMd5(byte[] bytes) {
-        try {
-            MessageDigest algorithm = MessageDigest.getInstance("MD5");
-            algorithm.reset();
-            algorithm.update(bytes);
-            return algorithm.digest();
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
-    }
-
-    public static String toHexString(byte[] bytes, String separator) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            hexString.append(Integer.toHexString(b & BSON.MINKEY)).append(separator);
-        }
-        return hexString.toString();
-    }
-
-    private HttpClient sslClient(HttpClient client) {
-        try {
-            X509TrustManager tm = new X509TrustManager() { // from class: com.edutech.idauthentication.MainActivity.4
-                @Override // javax.net.ssl.X509TrustManager
-                public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-                }
-
-                @Override // javax.net.ssl.X509TrustManager
-                public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-                }
-
-                @Override // javax.net.ssl.X509TrustManager
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-            SSLContext ctx = SSLContext.getInstance(IMAPSClient.DEFAULT_PROTOCOL);
-            ctx.init(null, new TrustManager[]{tm}, null);
-            SSLSocketFactory ssf = new MySSLSocketFactory(ctx);
-            ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            ClientConnectionManager ccm = client.getConnectionManager();
-            SchemeRegistry sr = ccm.getSchemeRegistry();
-            sr.register(new Scheme("https", ssf, 443));
-            return new DefaultHttpClient(ccm, client.getParams());
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public String getStuId(String userName) {
-        return JsonHelper.idXmlParse(userName);
-    }
-
-    public void saveStuId(String userName, String stuId) {
-        JsonHelper.idXmlCreate(userName, stuId);
-    }
-
-    public LogInfo alogparserJson(String studentId, String machineId, LogInfo loginfo, String json) {
-        return JsonHelper.alogparserJson(studentId, machineId, loginfo, json);
-    }
-
-    public String logscreateJson(LogInfo loginfo, String logPath) {
-        String Logjson = JsonHelper.logscreateJson(loginfo, logPath);
-        return Logjson;
-    }
-
-    public void logPostHttp(String ip, String logPath) {
-        PostThreadHelper.logPostHttp(ip, logPath);
-    }
-
-    public LogInfo getExamLog(LogInfo loginfo, String MachineID, String Type, String UserID, String SubjectID, String BookID, String BookName, String AssetsID, String AssetsName) {
-        return JsonHelper.getExamLog(loginfo, MachineID, Type, UserID, SubjectID, BookID, BookName, AssetsID, AssetsName);
-    }
-
-    public boolean goBackError(String errorMessage, String jsName) {
-        return OnConsoleHelper.goBackError(errorMessage, jsName);
-    }
-
-    /* JADX WARN: Type inference failed for: r0v2, types: [com.edutech.idauthentication.MainActivity$5] */
-    public void settingPwdUpdateHttp() {
-        if (!isUpdatePwd) {
-            isUpdatePwd = true;
-            new Thread() { // from class: com.edutech.idauthentication.MainActivity.5
-                @Override // java.lang.Thread, java.lang.Runnable
-                public void run() {
-                    HashMap<String, String> hashmap = XmlLoadHelper.loadIpXml();
-                    String ip = hashmap.get("ip");
-                    String username = hashmap.get("username");
-                    if (ip != null && username != null && !"".equals(ip) && !"".equals(username)) {
-                        String url = AppEnvironment.SETTING_PWD_UPDATE_HTTPPOST_URL(ip, username);
-                        String json = MainActivity.this.getUpdateJson(url);
-                        String password = JsonHelper.parseSetPwdReturnJson(json);
-                        if (password != null && !"".equals(password)) {
-                            MainActivity.this.settingPwdUpdate("0", password);
-                        }
-                        MainActivity.isUpdatePwd = false;
-                    }
-                }
-            }.start();
-        }
-    }
-
-    public void settingPwdUpdate(String type, String password) {
-        PostThreadHelper.savdSettingPwd(type, password);
-    }
-
-    public String getSettingPwd() {
-        String password;
-        ArrayList<HashMap<String, String>> settinginfo = XmlLoadHelper.loadXml(new ArrayList<>());
-        String password2 = "";
-        if (settinginfo.size() == 1) {
-            password = settinginfo.get(0).get(AppEnvironment.PASSWORD);
-        } else {
-            if (settinginfo.size() >= 2) {
-                for (int i = 0; i < settinginfo.size(); i++) {
-                    String isNew = settinginfo.get(i).get(AppEnvironment.ISNEW);
-                    if (isNew != null && isNew.equals(LogHelp.TYPE_GUIDANCE)) {
-                        password2 = settinginfo.get(i).get(AppEnvironment.PASSWORD);
-                    }
-                }
-            }
-            password = password2;
-        }
-        if (password == null || "".equals(password)) {
-            return password;
-        }
-        AESSet aesSetting = new AESSet();
-        try {
-            return new String(aesSetting.decrypt(password), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (Exception e2) {
-            e2.printStackTrace();
-            return "";
-        }
-    }
-
-    public void apkUpdate(String packagename) {
-        selfpackageName = packagename;
-        if (!isDown) {
-            isDown = true;
-            if (this.apkUpdateThread == null) {
-                this.apkUpdateThread = new Thread(this.apkUpdateRunnable);
-            }
-            if (!this.apkUpdateThread.isAlive()) {
-                this.apkUpdateThread.start();
-            }
-        }
-    }
-
-    public String getUpdateJson(String url) {
-        int netCount = 0;
-        while (netCount < 6 && !NetWorkHelper.isNetworkConnected(this.mContext)) {
-            netCount++;
-            try {
-                Thread.sleep(5000L);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-        }
-        Log.e(MagicNames.ANT_FILE_TYPE_URL, url);
-        String json = PostThreadHelper.postHttp(url);
-        int i = 0;
-        while (i < 6 && (json == null || "".equals(json))) {
-            try {
-                Thread.sleep(5000L);
-                i++;
-                json = PostThreadHelper.postHttp(url);
-            } catch (InterruptedException e12) {
-                e12.printStackTrace();
-            }
-        }
-        return json;
-    }
-
-    public void getAppInfo() {
-        ArrayList<HashMap<String, String>> appInfoList = new ArrayList<>();
-        SystemInfoHelper.getSystemInfo(appInfoList, this.mContext);
-    }
-
-    public void InstallApk() {
-        InstallApkHelper installapk = new InstallApkHelper(this, selfpackageName);
-        installapk.InstallAll();
-    }
-
-    public boolean checkNotFoundUrl(String url) {
-        int status = -1;
-        try {
-            if (url.startsWith("http://")) {
-                HttpUriRequest head = new HttpHead(url);
-                HttpClient client = new DefaultHttpClient();
-                HttpResponse resp = client.execute(head);
-                status = resp.getStatusLine().getStatusCode();
-            }
-        } catch (Exception e) {
-        }
-        return status == 404 || status == 500;
-    }
-
-    public void clearTimer(Timer mTimer, TimerTask mTimerTask) {
-        if (mTimer != null) {
-            if (mTimerTask != null) {
-                mTimerTask.cancel();
-                return;
-            }
-            return;
-        }
-        new Timer(true);
-    }
-
-    public long setStartLoadingTime() {
-        return 3000L;
-    }
-
-    public long setStartLogSendTime(boolean isUnUpLog) {
-        if (!isUnUpLog) {
-            return 43200000L;
-        }
-        return 3600000L;
-    }
-
-    public void userLicenseAgreementDialog() {
-        View view = View.inflate(this.mContext, R.layout.layout_userlicense, null);
-        this.btnYes = (Button) view.findViewById(R.id.btnYes);
-        Button btnCancle = (Button) view.findViewById(R.id.btnCancle);
-        TextView tvUserLiceseContent = (TextView) view.findViewById(R.id.tvUserLiceseContent);
-        this.scrollView = (ScrollView) view.findViewById(R.id.ScrollView);
-        tvUserLiceseContent.setText(getDataFromAssets("UserLicenseAgreement.txt"));
-        if (!rightFile.exists()) {
-            final AlertDialog dialog = new AlertDialog.Builder(this.mContext).setTitle("用户最终许可协议").setView(view).setOnKeyListener(this.keylistener).setCancelable(false).show();
-            this.scrollView.setOnTouchListener(new TouchListenerImpl(this, null));
-            this.btnYes.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.idauthentication.MainActivity.6
-                @Override // android.view.View.OnClickListener
-                public void onClick(View v) {
-                    FileInOutHelper.setupOrOpenFile(MainActivity.rightFilePath);
-                    dialog.dismiss();
-                }
-            });
-            btnCancle.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.idauthentication.MainActivity.7
-                @Override // android.view.View.OnClickListener
-                public void onClick(View v) {
-                    ((Activity) MainActivity.this.mContext).finish();
-                }
-            });
-        }
-    }
-
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/edutech/idauthentication/MainActivity$TouchListenerImpl.class */
     private class TouchListenerImpl implements View.OnTouchListener {
         private TouchListenerImpl() {
-            MainActivity.this = r1;
+            MainActivity.this = r4;
         }
 
         /* synthetic */ TouchListenerImpl(MainActivity mainActivity, TouchListenerImpl touchListenerImpl) {
@@ -694,70 +198,688 @@ public class MainActivity {
         @Override // android.view.View.OnTouchListener
         public boolean onTouch(View view, MotionEvent motionEvent) {
             switch (motionEvent.getAction()) {
+                case 0:
+                case 1:
+                default:
+                    return false;
                 case 2:
                     int scrollY = view.getScrollY();
                     int height = view.getHeight();
-                    int scrollViewMeasuredHeight = MainActivity.this.scrollView.getChildAt(0).getMeasuredHeight();
-                    if (scrollViewMeasuredHeight > 20) {
-                        scrollViewMeasuredHeight -= 20;
+                    int measuredHeight = MainActivity.this.scrollView.getChildAt(0).getMeasuredHeight();
+                    int i = measuredHeight;
+                    if (measuredHeight > 20) {
+                        i = measuredHeight - 20;
                     }
-                    if (scrollY + height > scrollViewMeasuredHeight) {
-                        MainActivity.this.btnYes.setEnabled(true);
-                        break;
+                    if (scrollY + height <= i) {
+                        return false;
                     }
-                    break;
+                    MainActivity.this.btnYes.setEnabled(true);
+                    return false;
             }
-            return false;
         }
     }
 
-    public String getDataFromAssets(String filePath) {
+    public MainActivity(Context context) {
+        this.mContext = null;
+        this.mContext = context;
+    }
+
+    public static final List<String> readIDFile() {
+        ArrayList arrayList = new ArrayList();
+        String str = null;
+        String str2 = null;
+        String str3 = null;
+        String str4 = null;
+        String str5 = null;
+        String str6 = null;
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(idfile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String str7 = null;
+        String str8 = null;
+        String str9 = null;
+        String str10 = null;
+        String str11 = null;
+        String str12 = null;
+        String str13 = null;
+        String str14 = null;
+        String str15 = null;
+        String str16 = null;
+        String str17 = null;
+        String str18 = null;
+        try {
+            XmlPullParser newPullParser = XmlPullParserFactory.newInstance().newPullParser();
+            newPullParser.setInput(fileInputStream, "UTF-8");
+            int eventType = newPullParser.getEventType();
+            while (eventType != 1) {
+                str7 = str5;
+                str8 = str;
+                str9 = str2;
+                str10 = str3;
+                str11 = str4;
+                str12 = str6;
+                str13 = str5;
+                str14 = str;
+                str15 = str2;
+                str16 = str3;
+                str17 = str4;
+                str18 = str6;
+                String name = newPullParser.getName();
+                String str19 = str5;
+                String str20 = str;
+                String str21 = str2;
+                String str22 = str3;
+                String str23 = str4;
+                String str24 = str6;
+                switch (eventType) {
+                    case 0:
+                    case 1:
+                    case 3:
+                        break;
+                    case 2:
+                        String str25 = str;
+                        if ("a1".equals(name)) {
+                            String str26 = str5;
+                            str25 = newPullParser.nextText();
+                        }
+                        String str27 = str2;
+                        if ("b2".equals(name)) {
+                            String str28 = str5;
+                            str27 = newPullParser.nextText();
+                        }
+                        String str29 = str3;
+                        if ("c3".equals(name)) {
+                            String str30 = str5;
+                            str29 = newPullParser.nextText();
+                        }
+                        String str31 = str4;
+                        if ("d4".equals(name)) {
+                            String str32 = str5;
+                            str31 = newPullParser.nextText();
+                        }
+                        String str33 = str5;
+                        if ("e5".equals(name)) {
+                            String str34 = str5;
+                            str33 = newPullParser.nextText();
+                        }
+                        str19 = str33;
+                        str20 = str25;
+                        str21 = str27;
+                        str22 = str29;
+                        str23 = str31;
+                        str24 = str6;
+                        if ("f6".equals(name)) {
+                            String str35 = str33;
+                            str24 = newPullParser.nextText();
+                            str19 = str33;
+                            str20 = str25;
+                            str21 = str27;
+                            str22 = str29;
+                            str23 = str31;
+                            break;
+                        }
+                        break;
+                    default:
+                        str24 = str6;
+                        str23 = str4;
+                        str22 = str3;
+                        str21 = str2;
+                        str20 = str;
+                        str19 = str5;
+                        break;
+                }
+                eventType = newPullParser.next();
+                str5 = str19;
+                str = str20;
+                str2 = str21;
+                str3 = str22;
+                str4 = str23;
+                str6 = str24;
+            }
+        } catch (IOException e2) {
+            e2.printStackTrace();
+            str5 = str13;
+            str = str14;
+            str2 = str15;
+            str3 = str16;
+            str4 = str17;
+            str6 = str18;
+        } catch (XmlPullParserException e3) {
+            e3.printStackTrace();
+            str5 = str7;
+            str = str8;
+            str2 = str9;
+            str3 = str10;
+            str4 = str11;
+            str6 = str12;
+        }
+        try {
+            fileInputStream.close();
+        } catch (IOException e4) {
+            e4.printStackTrace();
+        }
+        arrayList.add("");
+        arrayList.add("");
+        arrayList.add("");
+        arrayList.add("");
+        arrayList.add("");
+        arrayList.add("");
+        if (str != null) {
+            try {
+                arrayList.set(0, AES.decrypt(seed, str));
+            } catch (Exception e5) {
+                e5.printStackTrace();
+            }
+        }
+        if (str2 != null) {
+            arrayList.set(1, AES.decrypt(seed, str2));
+        }
+        if (str3 != null) {
+            arrayList.set(2, AES.decrypt(seed, str3));
+        }
+        if (str4 != null) {
+            arrayList.set(3, AES.decrypt(seed, str4));
+        }
+        if (str5 != null) {
+            arrayList.set(4, AES.decrypt(seed, str5));
+        }
+        if (str6 != null) {
+            arrayList.set(5, AES.decrypt(seed, str6));
+        }
+        return arrayList;
+    }
+
+    private HttpClient sslClient(HttpClient httpClient) {
+        DefaultHttpClient defaultHttpClient;
+        try {
+            X509TrustManager x509TrustManager = new X509TrustManager() { // from class: com.edutech.idauthentication.MainActivity.4
+                @Override // javax.net.ssl.X509TrustManager
+                public void checkClientTrusted(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
+                }
+
+                @Override // javax.net.ssl.X509TrustManager
+                public void checkServerTrusted(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
+                }
+
+                @Override // javax.net.ssl.X509TrustManager
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+            };
+            SSLContext sSLContext = SSLContext.getInstance(IMAPSClient.DEFAULT_PROTOCOL);
+            sSLContext.init(null, new TrustManager[]{x509TrustManager}, null);
+            MySSLSocketFactory mySSLSocketFactory = new MySSLSocketFactory(sSLContext);
+            mySSLSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            ClientConnectionManager connectionManager = httpClient.getConnectionManager();
+            connectionManager.getSchemeRegistry().register(new Scheme("https", mySSLSocketFactory, 443));
+            defaultHttpClient = new DefaultHttpClient(connectionManager, httpClient.getParams());
+        } catch (Exception e) {
+            defaultHttpClient = null;
+        }
+        return defaultHttpClient;
+    }
+
+    public static String toHexString(byte[] bArr, String str) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bArr) {
+            sb.append(Integer.toHexString(b & 255)).append(str);
+        }
+        return sb.toString();
+    }
+
+    public static byte[] toMd5(byte[] bArr) {
+        byte[] bArr2;
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.reset();
+            messageDigest.update(bArr);
+            bArr2 = messageDigest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            bArr2 = null;
+        }
+        return bArr2;
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:7:0x00a3, code lost:
+        if (r6.equals("") != false) goto L8;
+     */
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:33:0x0149 -> B:27:0x0134). Please submit an issue!!! */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    public final String GetMachineID() {
+        String str;
+        String str2;
+        TelephonyManager telephonyManager = (TelephonyManager) this.mContext.getSystemService("phone");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nModel = " + Build.MODEL);
+        sb.append("\nSerialNumber = " + Build.SERIAL);
+        sb.append("\nDeviceId(IMEI) = " + telephonyManager.getDeviceId());
+        sb.append("\nAndroidID = " + Settings.Secure.getString(this.mContext.getContentResolver(), "android_id"));
+        try {
+            str = ((WifiManager) this.mContext.getSystemService("wifi")).getConnectionInfo().getMacAddress();
+        } catch (NullPointerException e) {
+            str = "";
+        } catch (Exception e2) {
+            str = "";
+        }
+        if (str != null) {
+            str2 = str;
+        }
+        int i = 0;
+        while (true) {
+            if (i > 5) {
+                str2 = str;
+                break;
+            }
+            try {
+                str = ((WifiManager) this.mContext.getSystemService("wifi")).getConnectionInfo().getMacAddress();
+            } catch (NullPointerException e3) {
+                str = "";
+            } catch (Exception e4) {
+                str = "";
+            }
+            if (str != null) {
+                str2 = str;
+                if (str.length() > 0) {
+                    break;
+                }
+            }
+            try {
+                Thread.sleep(org.apache.tools.ant.util.FileUtils.FAT_FILE_TIMESTAMP_GRANULARITY);
+            } catch (InterruptedException e5) {
+                e5.printStackTrace();
+            }
+            i++;
+        }
+        String str3 = str2;
+        if (str2 == null) {
+            str3 = "";
+        }
+        sb.append("\nMACAddress = " + str3);
+        return String.valueOf(toHexString(toMd5(sb.toString().getBytes()), "")) + ":" + str3.replaceAll(":", "");
+    }
+
+    public void InstallApk() {
+        new InstallApkHelper(this, selfpackageName).InstallAll();
+    }
+
+    public void addUsedTimes() {
+        List<String> readIDFile;
+        if (!idfile.exists() || idfile.length() <= 0 || (readIDFile = readIDFile()) == null) {
+            return;
+        }
+        String str = readIDFile.get(0);
+        readIDFile.get(1);
+        writeidFile(str, Integer.parseInt(readIDFile.get(2)), readIDFile.get(3), readIDFile.get(4), String.valueOf(Integer.parseInt(readIDFile.get(5)) + 1));
+    }
+
+    public LogInfo alogparserJson(String str, String str2, LogInfo logInfo, String str3) {
+        return JsonHelper.alogparserJson(str, str2, logInfo, str3);
+    }
+
+    public void apkUpdate(String str) {
+        selfpackageName = str;
+        if (!isDown) {
+            isDown = true;
+            if (this.apkUpdateThread == null) {
+                this.apkUpdateThread = new Thread(this.apkUpdateRunnable);
+            }
+            if (this.apkUpdateThread.isAlive()) {
+                return;
+            }
+            this.apkUpdateThread.start();
+        }
+    }
+
+    public int checkIDAuth() {
+        int i;
+        if (!idfile.exists() || idfile.length() <= 0) {
+            i = 1;
+        } else {
+            List<String> readIDFile = readIDFile();
+            if (readIDFile != null) {
+                String str = readIDFile.get(0);
+                String str2 = readIDFile.get(1);
+                String str3 = readIDFile.get(2);
+                String str4 = readIDFile.get(3);
+                String str5 = readIDFile.get(4);
+                String str6 = readIDFile.get(5);
+                if (str == null || str.length() < 16) {
+                    i = 3;
+                } else if (str2 == null || str2.length() < 32 || !str2.equals(GetMachineID())) {
+                    i = 4;
+                } else if (str3 == null || str3.length() <= 0 || (!str3.equals("4") && !str3.equals("5"))) {
+                    i = 5;
+                } else {
+                    Date date = new Date();
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtils.ISO8601_DATE_PATTERN);
+                    Date date2 = null;
+                    if (str5 != null && str5.length() >= 10) {
+                        try {
+                            date2 = simpleDateFormat.parse(str5);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        if (date2 == null || date.after(date2)) {
+                            i = 6;
+                        }
+                    }
+                    if (str4 != null && str4.length() > 0 && Integer.parseInt(str4) > 0 && str6 != null && str6.length() > 0) {
+                        if (Integer.parseInt(str4) <= Integer.parseInt(str6)) {
+                            i = 7;
+                        } else if (Integer.parseInt(str4) > 0) {
+                            writeidFile(str, Integer.parseInt(str3), str4, str5, String.valueOf(Integer.parseInt(str6) + 1));
+                        }
+                    }
+                    i = 0;
+                }
+            } else {
+                i = 2;
+            }
+        }
+        return i;
+    }
+
+    public boolean checkNotFoundUrl(String str) {
+        int i = -1;
+        try {
+            if (str.startsWith("http://")) {
+                i = new DefaultHttpClient().execute(new HttpHead(str)).getStatusLine().getStatusCode();
+            }
+        } catch (Exception e) {
+            i = -1;
+        }
+        return i == 404 || i == 500;
+    }
+
+    public void clearTimer(Timer timer, TimerTask timerTask) {
+        if (timer == null) {
+            new Timer(true);
+        } else if (timerTask == null) {
+        } else {
+            timerTask.cancel();
+        }
+    }
+
+    public void getAppInfo() {
+        SystemInfoHelper.getSystemInfo(new ArrayList(), this.mContext);
+    }
+
+    public String getDataFromAssets(String str) {
         Throwable th;
-        BufferedReader br = null;
-        StringBuffer sb = new StringBuffer();
+        BufferedReader bufferedReader;
+        StringBuffer stringBuffer = new StringBuffer();
+        BufferedReader bufferedReader2 = null;
         try {
             try {
-                BufferedReader br2 = new BufferedReader(new InputStreamReader(this.mContext.getAssets().open(filePath)));
+                BufferedReader bufferedReader3 = new BufferedReader(new InputStreamReader(this.mContext.getAssets().open(str)));
                 while (true) {
                     try {
-                        String line = br2.readLine();
-                        if (line != null) {
-                            sb.append(String.valueOf(line) + "\n");
-                        } else {
+                        bufferedReader2 = bufferedReader3.readLine();
+                        if (bufferedReader2 == null) {
                             try {
                                 break;
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                        } else {
+                            stringBuffer.append(String.valueOf(bufferedReader2) + "\n");
                         }
                     } catch (IOException e2) {
                         e = e2;
-                        br = br2;
+                        bufferedReader = bufferedReader3;
+                        bufferedReader2 = bufferedReader;
                         e.printStackTrace();
                         try {
-                            br.close();
+                            bufferedReader.close();
                         } catch (IOException e3) {
                             e3.printStackTrace();
                         }
-                        return sb.toString();
+                        return stringBuffer.toString();
                     } catch (Throwable th2) {
                         th = th2;
-                        br = br2;
+                        bufferedReader2 = bufferedReader3;
                         try {
-                            br.close();
+                            bufferedReader2.close();
                         } catch (IOException e4) {
                             e4.printStackTrace();
                         }
                         throw th;
                     }
                 }
-                br2.close();
-            } catch (IOException e5) {
-                e = e5;
+                bufferedReader3.close();
+            } catch (Throwable th3) {
+                th = th3;
             }
-            return sb.toString();
-        } catch (Throwable th3) {
-            th = th3;
+        } catch (IOException e5) {
+            e = e5;
+            bufferedReader = null;
+        }
+        return stringBuffer.toString();
+    }
+
+    public LogInfo getExamLog(LogInfo logInfo, String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8) {
+        return JsonHelper.getExamLog(logInfo, str, str2, str3, str4, str5, str6, str7, str8);
+    }
+
+    public final String getIDAuth() {
+        return null;
+    }
+
+    public String getSettingPwd() {
+        String str;
+        ArrayList<HashMap<String, String>> loadXml = XmlLoadHelper.loadXml(new ArrayList());
+        String str2 = "";
+        if (loadXml.size() == 1) {
+            str = loadXml.get(0).get(AppEnvironment.PASSWORD);
+        } else {
+            str = str2;
+            if (loadXml.size() >= 2) {
+                int i = 0;
+                while (true) {
+                    str = str2;
+                    if (i >= loadXml.size()) {
+                        break;
+                    }
+                    String str3 = loadXml.get(i).get(AppEnvironment.ISNEW);
+                    str2 = str;
+                    if (str3 != null) {
+                        str2 = str;
+                        if (str3.equals(LogHelp.TYPE_GUIDANCE)) {
+                            str2 = loadXml.get(i).get(AppEnvironment.PASSWORD);
+                        }
+                    }
+                    i++;
+                }
+            }
+        }
+        if (str != null && !"".equals(str)) {
+            try {
+                str = new String(new AESSet().decrypt(str), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                str = "";
+            } catch (Exception e2) {
+                str = "";
+                e2.printStackTrace();
+            }
+        }
+        return str;
+    }
+
+    public String getStuId(String str) {
+        return JsonHelper.idXmlParse(str);
+    }
+
+    public String getUpdateJson(String str) {
+        int i = 0;
+        while (i < 6 && !NetWorkHelper.isNetworkConnected(this.mContext)) {
+            i++;
+            try {
+                Thread.sleep(5000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.e(MagicNames.ANT_FILE_TYPE_URL, str);
+        String postHttp = PostThreadHelper.postHttp(str);
+        int i2 = 0;
+        while (i2 < 6 && (postHttp == null || "".equals(postHttp))) {
+            int i3 = i2;
+            try {
+                Thread.sleep(5000L);
+                i2++;
+                postHttp = PostThreadHelper.postHttp(str);
+            } catch (InterruptedException e2) {
+                e2.printStackTrace();
+                i2 = i3;
+            }
+        }
+        return postHttp;
+    }
+
+    public boolean goBackError(String str, String str2) {
+        return OnConsoleHelper.goBackError(str, str2);
+    }
+
+    public void logPostHttp(String str, String str2) {
+        PostThreadHelper.logPostHttp(str, str2);
+    }
+
+    public String logscreateJson(LogInfo logInfo, String str) {
+        return JsonHelper.logscreateJson(logInfo, str);
+    }
+
+    public void saveStuId(String str, String str2) {
+        JsonHelper.idXmlCreate(str, str2);
+    }
+
+    public long setStartLoadingTime() {
+        return 3000L;
+    }
+
+    public long setStartLogSendTime(boolean z) {
+        long j = 43200000;
+        if (z) {
+            j = 3600000;
+        }
+        return j;
+    }
+
+    public void settingPwdUpdate(String str, String str2) {
+        PostThreadHelper.savdSettingPwd(str, str2);
+    }
+
+    /* JADX WARN: Type inference failed for: r0v2, types: [com.edutech.idauthentication.MainActivity$5] */
+    public void settingPwdUpdateHttp() {
+        if (!isUpdatePwd) {
+            isUpdatePwd = true;
+            new Thread() { // from class: com.edutech.idauthentication.MainActivity.5
+                @Override // java.lang.Thread, java.lang.Runnable
+                public void run() {
+                    HashMap<String, String> loadIpXml = XmlLoadHelper.loadIpXml();
+                    String str = loadIpXml.get("ip");
+                    String str2 = loadIpXml.get("username");
+                    if (str == null || str2 == null || "".equals(str) || "".equals(str2)) {
+                        return;
+                    }
+                    String parseSetPwdReturnJson = JsonHelper.parseSetPwdReturnJson(MainActivity.this.getUpdateJson(AppEnvironment.SETTING_PWD_UPDATE_HTTPPOST_URL(str, str2)));
+                    if (parseSetPwdReturnJson != null && !"".equals(parseSetPwdReturnJson)) {
+                        MainActivity.this.settingPwdUpdate("0", parseSetPwdReturnJson);
+                    }
+                    MainActivity.isUpdatePwd = false;
+                }
+            }.start();
+        }
+    }
+
+    public void userLicenseAgreementDialog() {
+        View inflate = View.inflate(this.mContext, R.layout.layout_userlicense, null);
+        this.btnYes = (Button) inflate.findViewById(R.id.btnYes);
+        Button button = (Button) inflate.findViewById(R.id.btnCancle);
+        this.scrollView = (ScrollView) inflate.findViewById(R.id.ScrollView);
+        ((TextView) inflate.findViewById(R.id.tvUserLiceseContent)).setText(getDataFromAssets("UserLicenseAgreement.txt"));
+        if (rightFile.exists()) {
+            return;
+        }
+        final AlertDialog show = new AlertDialog.Builder(this.mContext).setTitle("用户最终许可协议").setView(inflate).setOnKeyListener(this.keylistener).setCancelable(false).show();
+        this.scrollView.setOnTouchListener(new TouchListenerImpl(this, null));
+        this.btnYes.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.idauthentication.MainActivity.6
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                FileInOutHelper.setupOrOpenFile(MainActivity.rightFilePath);
+                show.dismiss();
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.idauthentication.MainActivity.7
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                ((Activity) MainActivity.this.mContext).finish();
+            }
+        });
+    }
+
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:23:0x01cf -> B:16:0x008c). Please submit an issue!!! */
+    public void writeidFile(String str, int i, String str2, String str3, String str4) {
+        FileOutputStream fileOutputStream;
+        String str5 = str4;
+        if (idfile.exists()) {
+            str5 = str4;
+            if (str4.equals("0")) {
+                List<String> readIDFile = readIDFile();
+                str5 = str4;
+                if (readIDFile.get(0).equals(str)) {
+                    str5 = str4;
+                    if (readIDFile.get(5) != null) {
+                        str5 = str4;
+                        if (readIDFile.get(5).length() > 0) {
+                            str5 = readIDFile.get(5);
+                        }
+                    }
+                }
+            }
+            idfile.delete();
+        }
+        idfile = FileInOutHelper.setupOrOpenFile(filepath);
+        try {
+            fileOutputStream = new FileOutputStream(idfile);
+        } catch (FileNotFoundException e) {
+            fileOutputStream = null;
+        }
+        XmlSerializer newSerializer = Xml.newSerializer();
+        try {
+            newSerializer.setOutput(fileOutputStream, "UTF-8");
+            newSerializer.startDocument(null, true);
+            newSerializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+            newSerializer.startTag(null, "id");
+            newSerializer.startTag(null, "a1");
+            newSerializer.text(AES.encrypt(seed, str));
+            newSerializer.endTag(null, "a1");
+            newSerializer.startTag(null, "b2");
+            newSerializer.text(AES.encrypt(seed, GetMachineID()));
+            newSerializer.endTag(null, "b2");
+            newSerializer.startTag(null, "c3");
+            newSerializer.text(AES.encrypt(seed, String.valueOf(i)));
+            newSerializer.endTag(null, "c3");
+            newSerializer.startTag(null, "d4");
+            newSerializer.text(AES.encrypt(seed, str2));
+            newSerializer.endTag(null, "d4");
+            newSerializer.startTag(null, "e5");
+            newSerializer.text(AES.encrypt(seed, str3));
+            newSerializer.endTag(null, "e5");
+            newSerializer.startTag(null, "f6");
+            newSerializer.text(AES.encrypt(seed, str5));
+            newSerializer.endTag(null, "f6");
+            newSerializer.endTag(null, "id");
+            newSerializer.endDocument();
+            newSerializer.flush();
+            fileOutputStream.close();
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
     }
 }

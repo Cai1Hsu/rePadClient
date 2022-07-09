@@ -10,90 +10,92 @@ import com.launcher.activity.R;
 import java.util.HashMap;
 import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/NameListAdapter.class */
 public class NameListAdapter extends BaseAdapter {
     Context mcontext;
     NameHistoryInterface nameControl;
     List<HashMap<String, String>> names;
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/NameListAdapter$IpHolder.class */
+    class IpHolder {
+        TextView tv_delete;
+        TextView tv_ip;
+
+        IpHolder() {
+            NameListAdapter.this = r4;
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/NameListAdapter$NameHistoryInterface.class */
     public interface NameHistoryInterface {
         void deleteName(String str);
 
         void okName(String str);
     }
 
-    public NameListAdapter(List<HashMap<String, String>> names, Context mcontext, NameHistoryInterface nameControl) {
-        this.names = names;
-        this.mcontext = mcontext;
-        this.nameControl = nameControl;
+    public NameListAdapter(List<HashMap<String, String>> list, Context context, NameHistoryInterface nameHistoryInterface) {
+        this.names = list;
+        this.mcontext = context;
+        this.nameControl = nameHistoryInterface;
     }
 
     @Override // android.widget.Adapter
     public int getCount() {
-        if (this.names == null) {
-            return 0;
-        }
-        return this.names.size();
+        return this.names == null ? 0 : this.names.size();
     }
 
     @Override // android.widget.Adapter
-    public Object getItem(int position) {
-        return (this.names == null || this.names.size() <= position) ? "" : this.names.get(position);
+    public Object getItem(int i) {
+        return (this.names == null || this.names.size() <= i) ? "" : this.names.get(i);
     }
 
     @Override // android.widget.Adapter
-    public long getItemId(int position) {
-        return position;
+    public long getItemId(int i) {
+        return i;
     }
 
     @Override // android.widget.Adapter
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        IpHolder holder = new IpHolder();
-        if (convertView == null) {
-            convertView = LayoutInflater.from(this.mcontext).inflate(R.layout.adapter_iplist, (ViewGroup) null);
-            holder.tv_ip = (TextView) convertView.findViewById(R.id.adapter_tv_ip);
-            holder.tv_delete = (TextView) convertView.findViewById(R.id.adapter_tv_delete);
-            convertView.setTag(holder);
+    public View getView(final int i, View view, ViewGroup viewGroup) {
+        IpHolder ipHolder = new IpHolder();
+        if (view == null) {
+            view = LayoutInflater.from(this.mcontext).inflate(R.layout.adapter_iplist, (ViewGroup) null);
+            ipHolder.tv_ip = (TextView) view.findViewById(R.id.adapter_tv_ip);
+            ipHolder.tv_delete = (TextView) view.findViewById(R.id.adapter_tv_delete);
+            view.setTag(ipHolder);
         } else {
-            holder = (IpHolder) convertView.getTag();
+            ipHolder = (IpHolder) view.getTag();
         }
-        HashMap<String, String> infoMap = this.names.get(position);
-        String info = "";
-        if (infoMap.containsKey("name") && infoMap.containsKey("code")) {
-            info = String.valueOf(infoMap.get("code")) + ":  " + infoMap.get("name");
+        HashMap<String, String> hashMap = this.names.get(i);
+        String str = "";
+        if (hashMap.containsKey("name")) {
+            str = "";
+            if (hashMap.containsKey("code")) {
+                str = String.valueOf(hashMap.get("code")) + ":  " + hashMap.get("name");
+            }
         }
-        holder.tv_ip.setText(info);
-        holder.tv_delete.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.NameListAdapter.1
+        ipHolder.tv_ip.setText(str);
+        ipHolder.tv_delete.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.NameListAdapter.1
             @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
-                if (NameListAdapter.this.nameControl != null && NameListAdapter.this.names.get(position).containsKey("code")) {
-                    NameListAdapter.this.nameControl.deleteName(NameListAdapter.this.names.get(position).get("code"));
+            public void onClick(View view2) {
+                if (NameListAdapter.this.nameControl == null || !NameListAdapter.this.names.get(i).containsKey("code")) {
+                    return;
                 }
+                NameListAdapter.this.nameControl.deleteName(NameListAdapter.this.names.get(i).get("code"));
             }
         });
-        holder.tv_ip.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.NameListAdapter.2
+        ipHolder.tv_ip.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.NameListAdapter.2
             @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
-                if (NameListAdapter.this.nameControl != null && NameListAdapter.this.names.get(position).containsKey("code")) {
-                    NameListAdapter.this.nameControl.okName(NameListAdapter.this.names.get(position).get("code"));
+            public void onClick(View view2) {
+                if (NameListAdapter.this.nameControl == null || !NameListAdapter.this.names.get(i).containsKey("code")) {
+                    return;
                 }
+                NameListAdapter.this.nameControl.okName(NameListAdapter.this.names.get(i).get("code"));
             }
         });
-        return convertView;
+        return view;
     }
 
-    public void setIps(List<HashMap<String, String>> names) {
-        this.names = names;
-    }
-
-    /* loaded from: classes.dex */
-    class IpHolder {
-        TextView tv_delete;
-        TextView tv_ip;
-
-        IpHolder() {
-            NameListAdapter.this = r1;
-        }
+    public void setIps(List<HashMap<String, String>> list) {
+        this.names = list;
     }
 }

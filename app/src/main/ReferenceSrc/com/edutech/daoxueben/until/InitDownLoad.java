@@ -1,6 +1,6 @@
 package com.edutech.daoxueben.until;
 
-import com.edutech.idauthentication.AppEnvironment;
+import com.edutech.daoxueben.sysconfig.AppEnvironment;
 import com.edutech.json.Books;
 import com.edutech.json.CommonJSONParser;
 import com.edutech.json.JsonCreate;
@@ -11,13 +11,12 @@ import com.edutech.json.Tree;
 import com.edutech.publicedu.log.LogHelp;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONStringer;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/daoxueben/until/InitDownLoad.class */
 public class InitDownLoad {
     private long downloadsize = 0;
     private long size = 0;
@@ -26,268 +25,20 @@ public class InitDownLoad {
     private JsonPort jsonPort = new JsonPort();
     private CommonJSONParser common = new CommonJSONParser();
 
-    public void updateKeys(Tree<HashMap<String, Object>> tree) {
-        if (tree != null && tree.getHead() != null && tree.getHead().get("id") != null) {
-            String bookId = tree.getHead().get("id").toString();
-            addNewKeys(bookId, tree, tree.getHead(), "id");
-        }
-    }
-
-    public void addNewKeys(String bookId, Tree<HashMap<String, Object>> tree, HashMap<String, Object> head, String key) {
-        Object newObject;
-        Object newObject2;
-        Collection<HashMap<String, Object>> Successors = tree.getSuccessors(head);
-        for (HashMap<String, Object> tempSuccessors : Successors) {
-            if (tempSuccessors.get(key) != null) {
-                tempSuccessors.get(key).toString();
-                if (tempSuccessors.get("isdown") == null || tempSuccessors.get(AppEnvironment.ISNEW) == null) {
-                    this.jsonPort.changeTreeData(tree, tempSuccessors, false, "isdown");
-                    this.jsonPort.changeTreeData(tree, tempSuccessors, false, AppEnvironment.ISNEW);
-                }
-                if (tempSuccessors.get("dxitems") != null) {
-                    ArrayList<Object> dxitemsobjectList = this.jsonPort.getValueList(new ArrayList<>(), tempSuccessors.get("dxitems"));
-                    if (dxitemsobjectList != null && dxitemsobjectList.size() > 0) {
-                        boolean ischange = false;
-                        for (int i = 0; i < dxitemsobjectList.size(); i++) {
-                            HashMap<String, Object> tempMap = this.jsonPort.objectToMap(dxitemsobjectList.get(i));
-                            if (tempMap != null) {
-                                if (tempMap.get("isdown") == null || tempMap.get(AppEnvironment.ISNEW) == null) {
-                                    ischange = true;
-                                    tempMap.put("isdown", false);
-                                    tempMap.put(AppEnvironment.ISNEW, false);
-                                }
-                                if (tempMap.get(KeyEnvironment.KEYWEBPATH) != null && tempMap.get("path") != null && tempMap.get("size") != null) {
-                                    ArrayList<Object> webpathList = this.jsonPort.getValueList(new ArrayList<>(), tempMap.get(KeyEnvironment.KEYWEBPATH));
-                                    if (webpathList != null && webpathList.size() > 0 && (tempMap.get("progress") == null || tempMap.get(KeyEnvironment.KEYDOWNLOADSIZE) == null)) {
-                                        ArrayList<Object> progressList = new ArrayList<>();
-                                        ArrayList<Object> downloadsizeList = new ArrayList<>();
-                                        for (int j = 0; j < webpathList.size(); j++) {
-                                            progressList.add("0");
-                                            downloadsizeList.add(0);
-                                        }
-                                        ischange = true;
-                                        tempMap.put("progress", JsonCreate.toJSONArrayObject(progressList));
-                                        tempMap.put(KeyEnvironment.KEYDOWNLOADSIZE, JsonCreate.toJSONArrayObject(downloadsizeList));
-                                    }
-                                }
-                                if (tempMap.get("exams") != null) {
-                                    if (tempMap.get("dxid") != null) {
-                                        String dxid = tempMap.get("dxid").toString();
-                                        createExamsJson(0, bookId, dxid, tempMap.get("exams"), com.edutech.daoxueben.sysconfig.AppEnvironment.StudentId);
-                                    }
-                                    ArrayList<Object> examsobjectList = new ArrayList<>();
-                                    if (tempMap.get("0") == null) {
-                                        ischange = true;
-                                        tempMap.put("examsprogress", "100");
-                                    }
-                                    ArrayList<Object> examsobjectList2 = this.jsonPort.getValueList(examsobjectList, tempMap.get("exams"));
-                                    if (examsobjectList2 != null && examsobjectList2.size() > 0) {
-                                        boolean isexamchange = false;
-                                        for (int j2 = 0; j2 < examsobjectList2.size(); j2++) {
-                                            HashMap<String, Object> examtempMap = this.jsonPort.objectToMap(examsobjectList2.get(j2));
-                                            if (examtempMap != null && examtempMap.get(KeyEnvironment.KEYWEBPATH) != null && examtempMap.get("path") != null && examtempMap.get("sizes") != null) {
-                                                isexamchange = true;
-                                                ArrayList<Object> webpathList2 = this.jsonPort.getValueList(new ArrayList<>(), examtempMap.get(KeyEnvironment.KEYWEBPATH));
-                                                if (webpathList2 != null && webpathList2.size() > 0) {
-                                                    ischange = true;
-                                                    tempMap.put("examsprogress", "0");
-                                                }
-                                                if (webpathList2 != null && (examtempMap.get("progress") == null || examtempMap.get(KeyEnvironment.KEYDOWNLOADSIZE) == null)) {
-                                                    ischange = true;
-                                                    ArrayList<Object> progressList2 = new ArrayList<>();
-                                                    ArrayList<Object> downloadsizeList2 = new ArrayList<>();
-                                                    for (int k = 0; k < webpathList2.size(); k++) {
-                                                        progressList2.add("0");
-                                                        downloadsizeList2.add(0);
-                                                    }
-                                                    examtempMap.put("progress", JsonCreate.toJSONArrayObject(progressList2));
-                                                    examtempMap.put(KeyEnvironment.KEYDOWNLOADSIZE, JsonCreate.toJSONArrayObject(downloadsizeList2));
-                                                }
-                                            }
-                                            if (isexamchange && (newObject2 = JsonCreate.MaptoJSONObject(examtempMap)) != null) {
-                                                examsobjectList2.remove(j2);
-                                                examsobjectList2.add(j2, newObject2);
-                                            }
-                                        }
-                                        tempMap.put("exams", JsonCreate.toJSONArrayObject(examsobjectList2));
-                                    }
-                                }
-                            }
-                            if (ischange && (newObject = JsonCreate.MaptoJSONObject(tempMap)) != null) {
-                                dxitemsobjectList.remove(i);
-                                dxitemsobjectList.add(i, newObject);
-                            }
-                        }
-                        this.jsonPort.changeTreeData(tree, tempSuccessors, JsonCreate.toJSONArrayObject(dxitemsobjectList), "dxitems");
-                    }
-                }
-                addNewKeys(bookId, tree, tempSuccessors, key);
-            }
-        }
-    }
-
-    public void changeIsDown(Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> idtree, ArrayList<HashMap<String, String>> needDownloadList, ArrayList<HashMap<String, String>> isDownTrueDownloadList) {
-        if (tree != null && tree.getHead() != null && tree.getHead().get("id") != null) {
-            String bookId = tree.getHead().get("id").toString();
-            if (bookId.equals(idtree.getHead().get("id").toString())) {
-                ArrayList<String> idList = new ArrayList<>();
-                idList.add(bookId);
-                String dxid = getidList(idtree, idtree.getHead(), idList, "id", "");
-                String sourceId = this.jsonPort.listToSourceId(idList);
-                HashMap<String, Object> head = tree.getHead();
-                if (idList.size() > 1) {
-                    head = getNeedDownHead(tree, tree.getHead(), idList, "id");
-                }
-                if (dxid.equals("")) {
-                    tree.getSuccessors(head);
-                    if (head.get("isdown") != null) {
-                        boolean isdown = true;
-                        try {
-                            isdown = ((Boolean) head.get("isdown")).booleanValue();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (!isdown) {
-                            this.jsonPort.changeTreeData(tree, head, true, "isdown");
-                        }
-                    }
-                    updateDxiditemsIsDown(false, tree, head, dxid, bookId, sourceId, needDownloadList, isDownTrueDownloadList);
-                    getNeedDownLoadList(bookId, sourceId, tree, head, needDownloadList, "id", needDownloadList, isDownTrueDownloadList);
-                    return;
-                }
-                updateDxiditemsIsDown(true, tree, head, dxid, bookId, sourceId, needDownloadList, isDownTrueDownloadList);
-            }
-        }
-    }
-
-    public void updateDxiditemsIsDown(boolean isSingle, Tree<HashMap<String, Object>> tree, HashMap<String, Object> head, String dxid, String bookid, String soucrceId, ArrayList<HashMap<String, String>> needDownloadList, ArrayList<HashMap<String, String>> isDownTrueDownloadList) {
-        Object newObject;
-        if (head.get("dxitems") != null) {
-            ArrayList<Object> dxitemsobjectList = this.jsonPort.getValueList(new ArrayList<>(), head.get("dxitems"));
-            if (dxitemsobjectList != null && dxitemsobjectList.size() > 0) {
-                boolean ischange = false;
-                for (int i = 0; i < dxitemsobjectList.size(); i++) {
-                    HashMap<String, Object> tempMap = this.jsonPort.objectToMap(dxitemsobjectList.get(i));
-                    if (tempMap != null && tempMap.get("dxid") != null) {
-                        if (isSingle) {
-                            if (dxid.equals(tempMap.get("dxid").toString())) {
-                                ischange = true;
-                                boolean isdown = true;
-                                try {
-                                    isdown = ((Boolean) tempMap.get("isdown")).booleanValue();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                if (!isdown) {
-                                    tempMap.put("isdown", true);
-                                    addToneedDownloadList(bookid, soucrceId, tempMap, needDownloadList);
-                                } else {
-                                    addToneedDownloadList(bookid, soucrceId, tempMap, isDownTrueDownloadList);
-                                }
-                            }
-                        } else {
-                            ischange = true;
-                            boolean isdown2 = true;
-                            try {
-                                isdown2 = ((Boolean) tempMap.get("isdown")).booleanValue();
-                            } catch (Exception e2) {
-                                e2.printStackTrace();
-                            }
-                            if (!isdown2) {
-                                tempMap.put("isdown", true);
-                                addToneedDownloadList(bookid, soucrceId, tempMap, needDownloadList);
-                            } else {
-                                addToneedDownloadList(bookid, soucrceId, tempMap, isDownTrueDownloadList);
-                            }
-                        }
-                        if (ischange && (newObject = JsonCreate.MaptoJSONObject(tempMap)) != null) {
-                            dxitemsobjectList.remove(i);
-                            dxitemsobjectList.add(i, newObject);
-                        }
-                    }
-                }
-                this.jsonPort.changeTreeData(tree, head, JsonCreate.toJSONArrayObject(dxitemsobjectList), "dxitems");
-            }
-        }
-    }
-
-    public String getidList(Tree<HashMap<String, Object>> idtree, HashMap<String, Object> idhead, ArrayList<String> idList, String key, String dxid) {
-        Collection<HashMap<String, Object>> Successors = idtree.getSuccessors(idhead);
-        for (HashMap<String, Object> tempSuccessors : Successors) {
-            if (tempSuccessors != null && tempSuccessors.get(key) != null) {
-                String id = tempSuccessors.get(key).toString();
-                idList.add(id);
-                if (tempSuccessors.get("dxid") != null) {
-                    dxid = tempSuccessors.get("dxid").toString();
-                }
-                dxid = getidList(idtree, tempSuccessors, idList, key, dxid);
-            }
-        }
-        return dxid;
-    }
-
-    public HashMap<String, Object> getNeedDownHead(Tree<HashMap<String, Object>> tree, HashMap<String, Object> head, ArrayList<String> idList, String key) {
-        for (int i = 1; i < idList.size(); i++) {
-            String id = idList.get(i);
-            Collection<HashMap<String, Object>> Successors = tree.getSuccessors(head);
-            Iterator<HashMap<String, Object>> it = Successors.iterator();
-            while (true) {
-                if (!it.hasNext()) {
-                    break;
-                }
-                HashMap<String, Object> tempSuccessors = it.next();
-                if (tempSuccessors.get(key) != null && id.equals(tempSuccessors.get(key).toString())) {
-                    head = tempSuccessors;
-                    break;
-                }
-            }
-        }
-        return head;
-    }
-
-    public void getNeedDownLoadList(String bookId, String sourceId, Tree<HashMap<String, Object>> tree, HashMap<String, Object> head, ArrayList<HashMap<String, String>> downloadlist, String key, ArrayList<HashMap<String, String>> needDownloadList, ArrayList<HashMap<String, String>> isDownTrueDownloadList) {
-        String sourceId2;
-        Collection<HashMap<String, Object>> Successors = tree.getSuccessors(head);
-        for (HashMap<String, Object> tempSuccessors : Successors) {
-            if (tempSuccessors != null && tempSuccessors.get(key) != null) {
-                if ("".equals(sourceId)) {
-                    sourceId2 = tempSuccessors.get(key).toString();
-                } else {
-                    sourceId2 = String.valueOf(sourceId) + "_" + tempSuccessors.get(key).toString();
-                }
-                if (tempSuccessors.get("isdown") != null) {
-                    boolean isdown = true;
-                    try {
-                        isdown = ((Boolean) tempSuccessors.get("isdown")).booleanValue();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (!isdown) {
-                        this.jsonPort.changeTreeData(tree, tempSuccessors, true, "isdown");
-                    }
-                }
-                updateDxiditemsIsDown(false, tree, tempSuccessors, "", bookId, sourceId2, needDownloadList, isDownTrueDownloadList);
-                getNeedDownLoadList(bookId, sourceId2, tree, tempSuccessors, downloadlist, key, needDownloadList, isDownTrueDownloadList);
-                sourceId = this.jsonPort.removeSourceId(sourceId2);
-            }
-        }
-    }
-
-    private ArrayList<HashMap<String, String>> addToneedDownloadList(String bookId, String sourceId, HashMap<String, Object> tempDataMap, ArrayList<HashMap<String, String>> downloadlist) {
-        if (tempDataMap != null) {
+    private ArrayList<HashMap<String, String>> addToneedDownloadList(String str, String str2, HashMap<String, Object> hashMap, ArrayList<HashMap<String, String>> arrayList) {
+        if (hashMap != null) {
             try {
-                if (tempDataMap.get("dxid") != null) {
-                    String SourceID = String.valueOf(sourceId) + "_" + tempDataMap.get("dxid").toString();
-                    addToDownList(bookId, SourceID, tempDataMap, "size", downloadlist);
-                    if (tempDataMap.get("exams") != null) {
-                        String dxid = tempDataMap.get("dxid").toString();
-                        createExamsJson(1, bookId, dxid, tempDataMap.get("exams"), com.edutech.daoxueben.sysconfig.AppEnvironment.StudentId);
-                        ArrayList<Object> examsobjectList = this.jsonPort.getValueList(new ArrayList<>(), tempDataMap.get("exams"));
-                        if (examsobjectList != null && examsobjectList.size() > 0) {
-                            for (int j = 0; j < examsobjectList.size(); j++) {
-                                HashMap<String, Object> examDataMap = this.jsonPort.objectToMap(examsobjectList.get(j));
-                                if (examDataMap != null) {
-                                    addToDownList(bookId, SourceID, examDataMap, "sizes", downloadlist);
+                if (hashMap.get("dxid") != null) {
+                    String str3 = String.valueOf(str2) + "_" + hashMap.get("dxid").toString();
+                    addToDownList(str, str3, hashMap, "size", arrayList);
+                    if (hashMap.get("exams") != null) {
+                        createExamsJson(1, str, hashMap.get("dxid").toString(), hashMap.get("exams"), AppEnvironment.StudentId);
+                        ArrayList<Object> valueList = this.jsonPort.getValueList(new ArrayList<>(), hashMap.get("exams"));
+                        if (valueList != null && valueList.size() > 0) {
+                            for (int i = 0; i < valueList.size(); i++) {
+                                HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(valueList.get(i));
+                                if (objectToMap != null) {
+                                    addToDownList(str, str3, objectToMap, "sizes", arrayList);
                                 }
                             }
                         }
@@ -297,533 +48,983 @@ public class InitDownLoad {
                 e.printStackTrace();
             }
         }
-        return downloadlist;
+        return arrayList;
     }
 
-    public void addToDownList(String bookId, String sourceId, HashMap<String, Object> tempDataMap, String sizekey, ArrayList<HashMap<String, String>> downloadlist) {
-        if (tempDataMap.get(KeyEnvironment.KEYWEBPATH) != null && tempDataMap.get("path") != null && tempDataMap.get("progress") != null && tempDataMap.get(sizekey) != null) {
-            ArrayList<Object> webpathList = new ArrayList<>();
-            ArrayList<Object> pathList = new ArrayList<>();
-            ArrayList<Object> progressList = new ArrayList<>();
-            ArrayList<Object> sizeList = new ArrayList<>();
-            ArrayList<Object> webpathList2 = this.jsonPort.getValueList(webpathList, tempDataMap.get(KeyEnvironment.KEYWEBPATH));
-            ArrayList<Object> pathList2 = this.jsonPort.getValueList(pathList, tempDataMap.get("path"));
-            ArrayList<Object> progressList2 = this.jsonPort.getValueList(progressList, tempDataMap.get("progress"));
-            ArrayList<Object> sizeList2 = this.jsonPort.getValueList(sizeList, tempDataMap.get(sizekey));
-            if (webpathList2 != null && pathList2 != null && progressList2 != null && sizeList2 != null && webpathList2.size() != 0 && webpathList2.size() == pathList2.size() && pathList2.size() == progressList2.size() && progressList2.size() == sizeList2.size()) {
-                for (int i = 0; i < webpathList2.size(); i++) {
-                    if (!"100".equals(progressList2.get(i).toString())) {
-                        String webpath = webpathList2.get(i).toString();
-                        String path = pathList2.get(i).toString();
-                        String progress = progressList2.get(i).toString();
-                        String size = sizeList2.get(i).toString();
-                        HashMap<String, String> downInfo = new HashMap<>();
-                        downInfo.put("book_id", bookId);
-                        downInfo.put("source_id", sourceId);
-                        downInfo.put("source_webpath", webpath);
-                        downInfo.put("source_path", path);
-                        downInfo.put("source_progress", progress);
-                        downInfo.put("source_size", size);
-                        downInfo.put(com.edutech.daoxueben.sysconfig.AppEnvironment.SOURCE_ISDOWN, LogHelp.TYPE_GUIDANCE);
-                        downloadlist.add(downInfo);
+    private boolean compareTreewebpath(boolean z, ArrayList<String> arrayList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, String str) {
+        boolean z2;
+        int i = 1;
+        while (true) {
+            if (i >= arrayList.size()) {
+                break;
+            }
+            boolean z3 = false;
+            for (HashMap<String, Object> hashMap3 : tree.getSuccessors(hashMap)) {
+                if (hashMap3 != null && hashMap3.get(str) != null && arrayList.get(i).equals(hashMap3.get(str).toString())) {
+                    z3 = true;
+                    hashMap = hashMap3;
+                    if (i == arrayList.size() - 1) {
+                        z3 = true;
+                        hashMap = hashMap3;
+                        if (hashMap2 != null) {
+                            z3 = true;
+                            hashMap = hashMap3;
+                            if (hashMap2.get(com.edutech.idauthentication.AppEnvironment.ISNEW) != null) {
+                                try {
+                                    z2 = ((Boolean) hashMap2.get(com.edutech.idauthentication.AppEnvironment.ISNEW)).booleanValue();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    z2 = false;
+                                }
+                                z3 = true;
+                                hashMap = hashMap3;
+                                if (z2) {
+                                    z = true;
+                                    z3 = true;
+                                    hashMap = hashMap3;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!z3) {
+                z = true;
+                break;
+            }
+            i++;
+        }
+        return z;
+    }
+
+    private boolean compareWebpath(boolean z, HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, String str) {
+        if ((hashMap.get(KeyEnvironment.KEYWEBPATH) != null && hashMap2.get(KeyEnvironment.KEYWEBPATH) == null) || (hashMap.get(KeyEnvironment.KEYWEBPATH) == null && hashMap2.get(KeyEnvironment.KEYWEBPATH) != null)) {
+            z = true;
+        } else if (hashMap.get(KeyEnvironment.KEYWEBPATH) != null && hashMap2.get(KeyEnvironment.KEYWEBPATH) != null) {
+            ArrayList<Object> arrayList = new ArrayList<>();
+            ArrayList<Object> arrayList2 = new ArrayList<>();
+            ArrayList<Object> valueList = this.jsonPort.getValueList(arrayList, hashMap.get(KeyEnvironment.KEYWEBPATH));
+            ArrayList<Object> valueList2 = this.jsonPort.getValueList(arrayList2, hashMap2.get(KeyEnvironment.KEYWEBPATH));
+            if ((valueList != null && valueList.size() > 0 && valueList2.size() == 0) || (valueList.size() == 0 && valueList2 != null && valueList2.size() > 0)) {
+                z = true;
+            } else if (valueList != null && valueList2 != null) {
+                if (valueList.size() == valueList2.size()) {
+                    int i = 0;
+                    while (true) {
+                        if (i >= valueList.size()) {
+                            break;
+                        } else if (!valueList.get(i).equals(valueList2.get(i))) {
+                            z = true;
+                            break;
+                        } else {
+                            i++;
+                        }
+                    }
+                } else {
+                    z = true;
+                }
+            }
+        }
+        return z;
+    }
+
+    private boolean compareisDown(boolean z, ArrayList<String> arrayList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, String str) {
+        for (HashMap<String, Object> hashMap3 : tree2.getSuccessors(hashMap2)) {
+            if (hashMap3 != null && hashMap3.get(str) != null) {
+                arrayList.add(hashMap3.get(str).toString());
+                z = compareTreewebpath(z, arrayList, tree, tree2, hashMap, hashMap3, str);
+                if (z) {
+                    break;
+                }
+                boolean compareisDown = compareisDown(z, arrayList, tree, tree2, hashMap, hashMap3, str);
+                z = compareisDown;
+                if (arrayList.size() > 0) {
+                    arrayList.remove(arrayList.size() - 1);
+                    z = compareisDown;
+                }
+            }
+        }
+        return z;
+    }
+
+    private void getSourceRemovepath(String str, HashMap<String, Object> hashMap, ArrayList<HashMap<String, String>> arrayList) {
+        if (hashMap.get(KeyEnvironment.KEYWEBPATH) == null || hashMap.get("path") == null) {
+            return;
+        }
+        ArrayList<Object> arrayList2 = new ArrayList<>();
+        ArrayList<Object> arrayList3 = new ArrayList<>();
+        ArrayList<Object> valueList = this.jsonPort.getValueList(arrayList2, hashMap.get(KeyEnvironment.KEYWEBPATH));
+        ArrayList<Object> valueList2 = this.jsonPort.getValueList(arrayList3, hashMap.get("path"));
+        if (valueList == null || valueList2 == null || valueList.size() == 0 || valueList.size() != valueList2.size()) {
+            return;
+        }
+        for (int i = 0; i < valueList.size(); i++) {
+            updateSourceNeedRemoveList(str, valueList.get(i).toString(), valueList2.get(i).toString(), arrayList);
+        }
+    }
+
+    private void getidheadSourceRemoveList(String str, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, ArrayList<HashMap<String, String>> arrayList) {
+        ArrayList<Object> valueList;
+        getSourceRemovepath(str, hashMap, arrayList);
+        ArrayList<Object> arrayList2 = new ArrayList<>();
+        if (hashMap.get("exams") == null || (valueList = this.jsonPort.getValueList(arrayList2, hashMap.get("exams"))) == null || valueList.size() <= 0) {
+            return;
+        }
+        for (int i = 0; i < valueList.size(); i++) {
+            HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(valueList.get(i));
+            if (objectToMap != null && objectToMap.get("questionid") != null) {
+                getSourceRemovepath(str, objectToMap, arrayList);
+            }
+        }
+    }
+
+    private void getisDown(String str, ArrayList<String> arrayList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, String str2, ArrayList<HashMap<String, String>> arrayList2, ArrayList<HashMap<String, String>> arrayList3) {
+        for (HashMap<String, Object> hashMap3 : tree2.getSuccessors(hashMap2)) {
+            if (hashMap3 != null && hashMap3.get(str2) != null) {
+                arrayList.add(hashMap3.get(str2).toString());
+                rePlaceTreewebpath(str, arrayList, tree, tree2, tree.getHead(), hashMap3, str2, arrayList2, arrayList3);
+                getisDown(str, arrayList, tree, tree2, tree.getHead(), hashMap3, str2, arrayList2, arrayList3);
+                if (arrayList.size() > 0) {
+                    arrayList.remove(arrayList.size() - 1);
+                }
+            }
+        }
+    }
+
+    private void rePlaceTreewebpath(String str, ArrayList<String> arrayList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, String str2, ArrayList<HashMap<String, String>> arrayList2, ArrayList<HashMap<String, String>> arrayList3) {
+        HashMap<String, Object> hashMap3;
+        HashMap<String, Object> hashMap4;
+        String str3 = "";
+        if (arrayList.size() > 0) {
+            str3 = arrayList.get(0);
+        }
+        int i = 1;
+        while (i < arrayList.size()) {
+            HashMap<String, Object> hashMap5 = hashMap;
+            for (HashMap<String, Object> hashMap6 : tree.getSuccessors(hashMap)) {
+                if (hashMap6 != null && hashMap6.get(str2) != null && arrayList.get(i).equals(hashMap6.get(str2).toString())) {
+                    hashMap5 = hashMap6;
+                    if (i == arrayList.size() - 1) {
+                        if (hashMap2.get("isdown") != null) {
+                            boolean z = false;
+                            try {
+                                z = ((Boolean) hashMap2.get("isdown")).booleanValue();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            if (z) {
+                                this.jsonPort.changeTreeData(tree, hashMap6, true, "isdown");
+                            }
+                        }
+                        if (hashMap6.get("dxitems") != null) {
+                            ArrayList<Object> valueList = this.jsonPort.getValueList(new ArrayList<>(), hashMap6.get("dxitems"));
+                            if (valueList != null && valueList.size() > 0) {
+                                for (int i2 = 0; i2 < valueList.size(); i2++) {
+                                    Object obj = valueList.get(i2);
+                                    if (obj != null && (hashMap3 = JsonParse.geteObjectToMap(obj)) != null && hashMap3.get("dxid") != null) {
+                                        String obj2 = hashMap3.get("dxid").toString();
+                                        if (hashMap2.get("dxitems") != null) {
+                                            ArrayList<Object> valueList2 = this.jsonPort.getValueList(new ArrayList<>(), hashMap2.get("dxitems"));
+                                            if (valueList2 != null && valueList2.size() > 0) {
+                                                int i3 = 0;
+                                                while (true) {
+                                                    if (i3 >= valueList2.size()) {
+                                                        break;
+                                                    }
+                                                    Object obj3 = valueList2.get(i3);
+                                                    if (obj3 == null || (hashMap4 = JsonParse.geteObjectToMap(obj3)) == null || hashMap4.get("dxid") == null || !obj2.equals(hashMap4.get("dxid").toString()) || hashMap4.get("isdown") == null) {
+                                                        i3++;
+                                                    } else {
+                                                        try {
+                                                            ((Boolean) hashMap4.get("isdown")).booleanValue();
+                                                        } catch (Exception e2) {
+                                                            e2.printStackTrace();
+                                                        }
+                                                        if (1 != 0) {
+                                                            rePlaceWebpath(str3, false, tree, hashMap3, hashMap4, arrayList2);
+                                                            if (hashMap4.get("isdown") != null && hashMap4.get(com.edutech.idauthentication.AppEnvironment.ISNEW) != null && hashMap4.get("examsprogress") != null) {
+                                                                hashMap3.put("isdown", hashMap4.get("isdown"));
+                                                                hashMap3.put(com.edutech.idauthentication.AppEnvironment.ISNEW, false);
+                                                                hashMap3.put("examsprogress", hashMap4.get("examsprogress"));
+                                                            }
+                                                            ArrayList<Object> arrayList4 = new ArrayList<>();
+                                                            ArrayList<Object> arrayList5 = new ArrayList<>();
+                                                            ArrayList<Object> arrayList6 = arrayList4;
+                                                            int i4 = 0;
+                                                            if (hashMap3.get("exams") != null) {
+                                                                ArrayList<Object> valueList3 = this.jsonPort.getValueList(arrayList4, hashMap3.get("exams"));
+                                                                arrayList6 = valueList3;
+                                                                i4 = 0;
+                                                                if (valueList3 != null) {
+                                                                    arrayList6 = valueList3;
+                                                                    i4 = 0;
+                                                                    if (valueList3.size() > 0) {
+                                                                        i4 = valueList3.size();
+                                                                        arrayList6 = valueList3;
+                                                                    }
+                                                                }
+                                                            }
+                                                            ArrayList<Object> arrayList7 = arrayList5;
+                                                            int i5 = 0;
+                                                            if (hashMap4.get("exams") != null) {
+                                                                ArrayList<Object> valueList4 = this.jsonPort.getValueList(arrayList5, hashMap4.get("exams"));
+                                                                arrayList7 = valueList4;
+                                                                i5 = 0;
+                                                                if (valueList4 != null) {
+                                                                    arrayList7 = valueList4;
+                                                                    i5 = 0;
+                                                                    if (valueList4.size() > 0) {
+                                                                        i5 = valueList4.size();
+                                                                        arrayList7 = valueList4;
+                                                                    }
+                                                                }
+                                                            }
+                                                            if (i4 != 0 && i4 == i5) {
+                                                                for (int i6 = 0; i6 < arrayList6.size(); i6++) {
+                                                                    HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(arrayList6.get(i6));
+                                                                    HashMap<String, Object> objectToMap2 = this.jsonPort.objectToMap(arrayList7.get(i6));
+                                                                    if (objectToMap != null && objectToMap2 != null && objectToMap.get("questionid") != null && objectToMap2.get("questionid") != null) {
+                                                                        rePlaceWebpath(str3, true, tree, objectToMap, objectToMap2, arrayList2);
+                                                                        Object MaptoJSONObject = JsonCreate.MaptoJSONObject(objectToMap);
+                                                                        arrayList6.remove(i6);
+                                                                        arrayList6.add(i6, MaptoJSONObject);
+                                                                    }
+                                                                }
+                                                                hashMap3.put("exams", JsonCreate.toJSONArrayObject(arrayList6));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        Object MaptoJSONObject2 = JsonCreate.MaptoJSONObject(hashMap3);
+                                        if (MaptoJSONObject2 != null) {
+                                            valueList.remove(i2);
+                                            valueList.add(i2, MaptoJSONObject2);
+                                        }
+                                    }
+                                }
+                                this.jsonPort.changeTreeData(tree, hashMap6, JsonCreate.toJSONArrayObject(valueList), "dxitems");
+                            }
+                        }
+                        hashMap5 = hashMap6;
+                        if ("-2".equals(str)) {
+                            hashMap5 = hashMap6;
+                            if (arrayList.size() > 0) {
+                                hashMap5 = hashMap6;
+                                if (!"".equals(str3)) {
+                                    updateDxiditemsIsDown(tree, hashMap6, str3, this.jsonPort.listToSourceId(arrayList), arrayList3);
+                                    hashMap5 = hashMap6;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            i++;
+            hashMap = hashMap5;
+        }
+        if (0 != 0 || "".equals(str3)) {
+            return;
+        }
+        getidheadSourceRemoveList(str3, tree2, hashMap2, arrayList2);
+    }
+
+    private void rePlaceWebpath(String str, boolean z, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, ArrayList<HashMap<String, String>> arrayList) {
+        boolean z2;
+        if (hashMap2.get(KeyEnvironment.KEYWEBPATH) == null || hashMap2.get("progress") == null || hashMap2.get(KeyEnvironment.KEYDOWNLOADSIZE) == null) {
+            return;
+        }
+        ArrayList<Object> arrayList2 = new ArrayList<>();
+        ArrayList<Object> arrayList3 = new ArrayList<>();
+        ArrayList<Object> arrayList4 = new ArrayList<>();
+        ArrayList<Object> arrayList5 = new ArrayList<>();
+        ArrayList<Object> valueList = this.jsonPort.getValueList(arrayList2, hashMap2.get(KeyEnvironment.KEYWEBPATH));
+        ArrayList<Object> valueList2 = this.jsonPort.getValueList(arrayList3, hashMap2.get("progress"));
+        ArrayList<Object> valueList3 = this.jsonPort.getValueList(arrayList4, hashMap2.get(KeyEnvironment.KEYDOWNLOADSIZE));
+        ArrayList<Object> valueList4 = this.jsonPort.getValueList(arrayList5, hashMap2.get("path"));
+        ArrayList<Object> arrayList6 = new ArrayList<>();
+        ArrayList<Object> arrayList7 = new ArrayList<>();
+        ArrayList<Object> arrayList8 = new ArrayList<>();
+        if (valueList == null || valueList2 == null || valueList3 == null || valueList4 == null || valueList.size() <= 0 || valueList.size() != valueList2.size() || valueList2.size() != valueList3.size() || valueList3.size() != valueList4.size()) {
+            return;
+        }
+        int i = 0;
+        ArrayList<Object> arrayList9 = arrayList8;
+        ArrayList<Object> arrayList10 = arrayList7;
+        ArrayList<Object> arrayList11 = arrayList6;
+        if (hashMap.get(KeyEnvironment.KEYWEBPATH) != null) {
+            i = 0;
+            arrayList9 = arrayList8;
+            arrayList10 = arrayList7;
+            arrayList11 = arrayList6;
+            if (hashMap.get("progress") != null) {
+                i = 0;
+                arrayList9 = arrayList8;
+                arrayList10 = arrayList7;
+                arrayList11 = arrayList6;
+                if (hashMap.get(KeyEnvironment.KEYDOWNLOADSIZE) != null) {
+                    ArrayList<Object> valueList5 = this.jsonPort.getValueList(arrayList6, hashMap.get(KeyEnvironment.KEYWEBPATH));
+                    ArrayList<Object> valueList6 = this.jsonPort.getValueList(arrayList7, hashMap.get("progress"));
+                    ArrayList<Object> valueList7 = this.jsonPort.getValueList(arrayList8, hashMap.get(KeyEnvironment.KEYDOWNLOADSIZE));
+                    i = 0;
+                    arrayList9 = valueList7;
+                    arrayList10 = valueList6;
+                    arrayList11 = valueList5;
+                    if (valueList5 != null) {
+                        i = 0;
+                        arrayList9 = valueList7;
+                        arrayList10 = valueList6;
+                        arrayList11 = valueList5;
+                        if (valueList6 != null) {
+                            i = 0;
+                            arrayList9 = valueList7;
+                            arrayList10 = valueList6;
+                            arrayList11 = valueList5;
+                            if (valueList7 != null) {
+                                i = 0;
+                                arrayList9 = valueList7;
+                                arrayList10 = valueList6;
+                                arrayList11 = valueList5;
+                                if (valueList5.size() > 0) {
+                                    i = 0;
+                                    arrayList9 = valueList7;
+                                    arrayList10 = valueList6;
+                                    arrayList11 = valueList5;
+                                    if (valueList5.size() == valueList6.size()) {
+                                        i = 0;
+                                        arrayList9 = valueList7;
+                                        arrayList10 = valueList6;
+                                        arrayList11 = valueList5;
+                                        if (valueList6.size() == valueList7.size()) {
+                                            i = valueList5.size();
+                                            arrayList11 = valueList5;
+                                            arrayList10 = valueList6;
+                                            arrayList9 = valueList7;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+        for (int i2 = 0; i2 < valueList.size(); i2++) {
+            String obj = valueList.get(i2).toString();
+            String obj2 = valueList4.get(i2).toString();
+            int i3 = 0;
+            while (true) {
+                if (i3 >= i) {
+                    z2 = false;
+                    break;
+                } else if (obj.equals(arrayList11.get(i3).toString())) {
+                    arrayList10.remove(i3);
+                    arrayList10.add(i3, valueList2.get(i2));
+                    arrayList9.remove(i3);
+                    arrayList9.add(i3, valueList3.get(i2));
+                    z2 = true;
+                    break;
+                } else {
+                    i3++;
+                }
+            }
+            if (!z2) {
+                updateSourceNeedRemoveList(str, obj, obj2, arrayList);
+            }
+        }
+        hashMap.put("progress", JsonCreate.toJSONArrayObject(arrayList10));
+        hashMap.put(KeyEnvironment.KEYDOWNLOADSIZE, JsonCreate.toJSONArrayObject(arrayList9));
     }
 
-    public void createExamsJson(int jsupdate, String bookid, String dxid, Object exams, String studentid) {
-        if (exams != null && !"".equals(bookid) && !"".equals(dxid)) {
-            JSONStringer jsonStringer = new JSONStringer();
-            try {
-                jsonStringer.object();
-                jsonStringer.key("studentid").value(studentid);
-                jsonStringer.key("exams").value(exams);
-                jsonStringer.endObject();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (Exception e2) {
-                e2.printStackTrace();
+    private void updateBooksJson(Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap) {
+        HashMap<String, Object> hashMap2;
+        for (HashMap<String, Object> hashMap3 : tree.getSuccessors(hashMap)) {
+            if (hashMap3.get("dxitems") != null) {
+                ArrayList<Object> valueList = this.jsonPort.getValueList(new ArrayList<>(), hashMap3.get("dxitems"));
+                if (valueList != null && valueList.size() > 0) {
+                    for (int i = 0; i < valueList.size(); i++) {
+                        Object obj = valueList.get(i);
+                        if (obj != null && (hashMap2 = JsonParse.geteObjectToMap(obj)) != null && hashMap2.get("dxid") != null) {
+                            boolean z = false;
+                            if (hashMap2.get("isdown") != null) {
+                                try {
+                                    z = ((Boolean) hashMap2.get("isdown")).booleanValue();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    z = false;
+                                }
+                            }
+                            if (hashMap2.get(KeyEnvironment.KEYWEBPATH) != null) {
+                                ArrayList<Object> valueList2 = this.jsonPort.getValueList(new ArrayList<>(), hashMap2.get(KeyEnvironment.KEYWEBPATH));
+                                this.total += valueList2.size();
+                                if (z) {
+                                    getSize(hashMap2, "size", valueList2);
+                                }
+                            }
+                            if (hashMap2.get("exams") != null) {
+                                ArrayList<Object> valueList3 = this.jsonPort.getValueList(new ArrayList<>(), hashMap2.get("exams"));
+                                if (valueList3 != null && valueList3.size() > 0) {
+                                    this.total += valueList3.size();
+                                    if (z) {
+                                        for (int i2 = 0; i2 < valueList3.size(); i2++) {
+                                            HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(valueList3.get(i2));
+                                            if (objectToMap != null && objectToMap.get(KeyEnvironment.KEYWEBPATH) != null) {
+                                                ArrayList<Object> valueList4 = this.jsonPort.getValueList(new ArrayList<>(), objectToMap.get(KeyEnvironment.KEYWEBPATH));
+                                                if (valueList4 != null && valueList4.size() > 0 && z) {
+                                                    getSize(objectToMap, "sizes", valueList4);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            String json = jsonStringer.toString();
-            String pathdir = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + bookid + "/" + dxid + "/" + studentid + "/";
-            String path = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + bookid + "/" + dxid + "/" + studentid + "/" + dxid + ".json";
-            File outFile = new File(path);
-            if (jsupdate == 0) {
-                if (!FileInOutHelper.fileIsExists(pathdir)) {
-                    FileInOutHelper.createNewFile(outFile);
-                    com.edutech.idauthentication.JsonHelper.CreateFile(json, path);
+            if (hashMap3.get(com.edutech.idauthentication.AppEnvironment.ISNEW) != null) {
+                boolean z2 = false;
+                try {
+                    z2 = ((Boolean) hashMap3.get(com.edutech.idauthentication.AppEnvironment.ISNEW)).booleanValue();
+                } catch (Exception e2) {
+                    e2.printStackTrace();
                 }
-            } else if (jsupdate == 1) {
-                if (outFile.exists()) {
-                    outFile.delete();
+                if (z2) {
+                    this.isnewCount++;
                 }
-                FileInOutHelper.createNewFile(outFile);
-                com.edutech.idauthentication.JsonHelper.CreateFile(json, path);
+            }
+            updateBooksJson(tree, hashMap3);
+        }
+    }
+
+    private void updateSourceNeedRemoveList(String str, String str2, String str3, ArrayList<HashMap<String, String>> arrayList) {
+        if (!"".equals(str)) {
+            HashMap<String, String> hashMap = new HashMap<>();
+            hashMap.put("book_id", str);
+            hashMap.put("source_webpath", str2);
+            hashMap.put("source_path", str3);
+            arrayList.add(hashMap);
+        }
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:29:0x00f7, code lost:
+        if (r0.get(com.edutech.idauthentication.AppEnvironment.ISNEW) == null) goto L30;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:44:0x0184, code lost:
+        if (r0.get(com.edutech.json.KeyEnvironment.KEYDOWNLOADSIZE) == null) goto L45;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:90:0x035e, code lost:
+        if (r0.get(com.edutech.json.KeyEnvironment.KEYDOWNLOADSIZE) == null) goto L91;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    public void addNewKeys(String str, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, String str2) {
+        Object MaptoJSONObject;
+        boolean z;
+        Object MaptoJSONObject2;
+        for (HashMap<String, Object> hashMap2 : tree.getSuccessors(hashMap)) {
+            if (hashMap2.get(str2) != null) {
+                hashMap2.get(str2).toString();
+                if (hashMap2.get("isdown") == null || hashMap2.get(com.edutech.idauthentication.AppEnvironment.ISNEW) == null) {
+                    this.jsonPort.changeTreeData(tree, hashMap2, false, "isdown");
+                    this.jsonPort.changeTreeData(tree, hashMap2, false, com.edutech.idauthentication.AppEnvironment.ISNEW);
+                }
+                if (hashMap2.get("dxitems") != null) {
+                    ArrayList<Object> valueList = this.jsonPort.getValueList(new ArrayList<>(), hashMap2.get("dxitems"));
+                    if (valueList != null && valueList.size() > 0) {
+                        boolean z2 = false;
+                        int i = 0;
+                        while (i < valueList.size()) {
+                            HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(valueList.get(i));
+                            boolean z3 = z2;
+                            if (objectToMap != null) {
+                                if (objectToMap.get("isdown") != null) {
+                                    z = z2;
+                                }
+                                z = true;
+                                objectToMap.put("isdown", false);
+                                objectToMap.put(com.edutech.idauthentication.AppEnvironment.ISNEW, false);
+                                boolean z4 = z;
+                                if (objectToMap.get(KeyEnvironment.KEYWEBPATH) != null) {
+                                    z4 = z;
+                                    if (objectToMap.get("path") != null) {
+                                        z4 = z;
+                                        if (objectToMap.get("size") != null) {
+                                            ArrayList<Object> valueList2 = this.jsonPort.getValueList(new ArrayList<>(), objectToMap.get(KeyEnvironment.KEYWEBPATH));
+                                            z4 = z;
+                                            if (valueList2 != null) {
+                                                z4 = z;
+                                                if (valueList2.size() > 0) {
+                                                    if (objectToMap.get("progress") != null) {
+                                                        z4 = z;
+                                                    }
+                                                    ArrayList arrayList = new ArrayList();
+                                                    ArrayList arrayList2 = new ArrayList();
+                                                    for (int i2 = 0; i2 < valueList2.size(); i2++) {
+                                                        arrayList.add("0");
+                                                        arrayList2.add(0);
+                                                    }
+                                                    z4 = true;
+                                                    objectToMap.put("progress", JsonCreate.toJSONArrayObject(arrayList));
+                                                    objectToMap.put(KeyEnvironment.KEYDOWNLOADSIZE, JsonCreate.toJSONArrayObject(arrayList2));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                z3 = z4;
+                                if (objectToMap.get("exams") != null) {
+                                    if (objectToMap.get("dxid") != null) {
+                                        createExamsJson(0, str, objectToMap.get("dxid").toString(), objectToMap.get("exams"), AppEnvironment.StudentId);
+                                    }
+                                    ArrayList<Object> arrayList3 = new ArrayList<>();
+                                    if (objectToMap.get("0") == null) {
+                                        z4 = true;
+                                        objectToMap.put("examsprogress", "100");
+                                    }
+                                    ArrayList<Object> valueList3 = this.jsonPort.getValueList(arrayList3, objectToMap.get("exams"));
+                                    z3 = z4;
+                                    if (valueList3 != null) {
+                                        z3 = z4;
+                                        if (valueList3.size() > 0) {
+                                            boolean z5 = false;
+                                            int i3 = 0;
+                                            while (i3 < valueList3.size()) {
+                                                HashMap<String, Object> objectToMap2 = this.jsonPort.objectToMap(valueList3.get(i3));
+                                                boolean z6 = z4;
+                                                boolean z7 = z5;
+                                                if (objectToMap2 != null) {
+                                                    z6 = z4;
+                                                    z7 = z5;
+                                                    if (objectToMap2.get(KeyEnvironment.KEYWEBPATH) != null) {
+                                                        z6 = z4;
+                                                        z7 = z5;
+                                                        if (objectToMap2.get("path") != null) {
+                                                            z6 = z4;
+                                                            z7 = z5;
+                                                            if (objectToMap2.get("sizes") != null) {
+                                                                ArrayList<Object> valueList4 = this.jsonPort.getValueList(new ArrayList<>(), objectToMap2.get(KeyEnvironment.KEYWEBPATH));
+                                                                boolean z8 = z4;
+                                                                if (valueList4 != null) {
+                                                                    z8 = z4;
+                                                                    if (valueList4.size() > 0) {
+                                                                        z8 = true;
+                                                                        objectToMap.put("examsprogress", "0");
+                                                                    }
+                                                                }
+                                                                z6 = z8;
+                                                                z7 = true;
+                                                                if (valueList4 != null) {
+                                                                    if (objectToMap2.get("progress") != null) {
+                                                                        z6 = z8;
+                                                                        z7 = true;
+                                                                    }
+                                                                    z6 = true;
+                                                                    ArrayList arrayList4 = new ArrayList();
+                                                                    ArrayList arrayList5 = new ArrayList();
+                                                                    for (int i4 = 0; i4 < valueList4.size(); i4++) {
+                                                                        arrayList4.add("0");
+                                                                        arrayList5.add(0);
+                                                                    }
+                                                                    objectToMap2.put("progress", JsonCreate.toJSONArrayObject(arrayList4));
+                                                                    objectToMap2.put(KeyEnvironment.KEYDOWNLOADSIZE, JsonCreate.toJSONArrayObject(arrayList5));
+                                                                    z7 = true;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                if (z7 && (MaptoJSONObject2 = JsonCreate.MaptoJSONObject(objectToMap2)) != null) {
+                                                    valueList3.remove(i3);
+                                                    valueList3.add(i3, MaptoJSONObject2);
+                                                }
+                                                i3++;
+                                                z4 = z6;
+                                                z5 = z7;
+                                            }
+                                            objectToMap.put("exams", JsonCreate.toJSONArrayObject(valueList3));
+                                            z3 = z4;
+                                        }
+                                    }
+                                }
+                            }
+                            if (z3 && (MaptoJSONObject = JsonCreate.MaptoJSONObject(objectToMap)) != null) {
+                                valueList.remove(i);
+                                valueList.add(i, MaptoJSONObject);
+                            }
+                            i++;
+                            z2 = z3;
+                        }
+                        this.jsonPort.changeTreeData(tree, hashMap2, JsonCreate.toJSONArrayObject(valueList), "dxitems");
+                    }
+                }
+                addNewKeys(str, tree, hashMap2, str2);
             }
         }
     }
 
-    public void updateBooksJson(Tree<HashMap<String, Object>> tree) {
-        Books book = new Books();
-        this.jsonPort.updateBooksJson(getBooks(tree, book), com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File);
+    public void addToDownList(String str, String str2, HashMap<String, Object> hashMap, String str3, ArrayList<HashMap<String, String>> arrayList) {
+        if (hashMap.get(KeyEnvironment.KEYWEBPATH) == null || hashMap.get("path") == null || hashMap.get("progress") == null || hashMap.get(str3) == null) {
+            return;
+        }
+        ArrayList<Object> arrayList2 = new ArrayList<>();
+        ArrayList<Object> arrayList3 = new ArrayList<>();
+        ArrayList<Object> arrayList4 = new ArrayList<>();
+        ArrayList<Object> arrayList5 = new ArrayList<>();
+        ArrayList<Object> valueList = this.jsonPort.getValueList(arrayList2, hashMap.get(KeyEnvironment.KEYWEBPATH));
+        ArrayList<Object> valueList2 = this.jsonPort.getValueList(arrayList3, hashMap.get("path"));
+        ArrayList<Object> valueList3 = this.jsonPort.getValueList(arrayList4, hashMap.get("progress"));
+        ArrayList<Object> valueList4 = this.jsonPort.getValueList(arrayList5, hashMap.get(str3));
+        if (valueList == null || valueList2 == null || valueList3 == null || valueList4 == null || valueList.size() == 0 || valueList.size() != valueList2.size() || valueList2.size() != valueList3.size() || valueList3.size() != valueList4.size()) {
+            return;
+        }
+        for (int i = 0; i < valueList.size(); i++) {
+            if (!"100".equals(valueList3.get(i).toString())) {
+                String obj = valueList.get(i).toString();
+                String obj2 = valueList2.get(i).toString();
+                String obj3 = valueList3.get(i).toString();
+                String obj4 = valueList4.get(i).toString();
+                HashMap<String, String> hashMap2 = new HashMap<>();
+                hashMap2.put("book_id", str);
+                hashMap2.put("source_id", str2);
+                hashMap2.put("source_webpath", obj);
+                hashMap2.put("source_path", obj2);
+                hashMap2.put("source_progress", obj3);
+                hashMap2.put("source_size", obj4);
+                hashMap2.put(AppEnvironment.SOURCE_ISDOWN, LogHelp.TYPE_GUIDANCE);
+                arrayList.add(hashMap2);
+            }
+        }
     }
 
-    public Books getBooks(Tree<HashMap<String, Object>> tree, Books book) {
+    public void changeIsDown(Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, ArrayList<HashMap<String, String>> arrayList, ArrayList<HashMap<String, String>> arrayList2) {
+        boolean z;
+        if (tree == null || tree.getHead() == null || tree.getHead().get("id") == null) {
+            return;
+        }
+        String obj = tree.getHead().get("id").toString();
+        if (!obj.equals(tree2.getHead().get("id").toString())) {
+            return;
+        }
+        ArrayList<String> arrayList3 = new ArrayList<>();
+        arrayList3.add(obj);
+        String str = getidList(tree2, tree2.getHead(), arrayList3, "id", "");
+        String listToSourceId = this.jsonPort.listToSourceId(arrayList3);
+        HashMap<String, Object> head = tree.getHead();
+        if (arrayList3.size() > 1) {
+            head = getNeedDownHead(tree, tree.getHead(), arrayList3, "id");
+        }
+        if (!str.equals("")) {
+            updateDxiditemsIsDown(true, tree, head, str, obj, listToSourceId, arrayList, arrayList2);
+            return;
+        }
+        tree.getSuccessors(head);
+        if (head.get("isdown") != null) {
+            try {
+                z = ((Boolean) head.get("isdown")).booleanValue();
+            } catch (Exception e) {
+                e.printStackTrace();
+                z = true;
+            }
+            if (!z) {
+                this.jsonPort.changeTreeData(tree, head, true, "isdown");
+            }
+        }
+        updateDxiditemsIsDown(false, tree, head, str, obj, listToSourceId, arrayList, arrayList2);
+        getNeedDownLoadList(obj, listToSourceId, tree, head, arrayList, "id", arrayList, arrayList2);
+    }
+
+    public void createExamsJson(int i, String str, String str2, Object obj, String str3) {
+        if (obj == null || "".equals(str) || "".equals(str2)) {
+            return;
+        }
+        JSONStringer jSONStringer = new JSONStringer();
+        try {
+            jSONStringer.object();
+            jSONStringer.key("studentid").value(str3);
+            jSONStringer.key("exams").value(obj);
+            jSONStringer.endObject();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+        String jSONStringer2 = jSONStringer.toString();
+        String str4 = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + str + "/" + str2 + "/" + str3 + "/";
+        String str5 = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + str + "/" + str2 + "/" + str3 + "/" + str2 + ".json";
+        File file = new File(str5);
+        if (i == 0) {
+            if (FileInOutHelper.fileIsExists(str4)) {
+                return;
+            }
+            FileInOutHelper.createNewFile(file);
+            com.edutech.idauthentication.JsonHelper.CreateFile(jSONStringer2, str5);
+        } else if (i != 1) {
+        } else {
+            if (file.exists()) {
+                file.delete();
+            }
+            FileInOutHelper.createNewFile(file);
+            com.edutech.idauthentication.JsonHelper.CreateFile(jSONStringer2, str5);
+        }
+    }
+
+    public Books getBooks(Tree<HashMap<String, Object>> tree, Books books) {
         if (tree != null && tree.getHead() != null && tree.getHead().get("id") != null) {
-            String id = tree.getHead().get("id").toString();
-            String name = tree.getHead().get("name").toString();
-            String updatetime = tree.getHead().get("updatetime").toString();
-            if (id != null) {
-                book.setbook_id(id);
-                book.setbook_path("../offlinedownload/" + id + "/");
+            String obj = tree.getHead().get("id").toString();
+            String obj2 = tree.getHead().get("name").toString();
+            String obj3 = tree.getHead().get("updatetime").toString();
+            if (obj != null) {
+                books.setbook_id(obj);
+                books.setbook_path("../offlinedownload/" + obj + "/");
             }
-            if (name != null) {
-                book.setbook_name(name);
+            if (obj2 != null) {
+                books.setbook_name(obj2);
             }
-            if (updatetime != null) {
-                book.setBook_updatetime(updatetime);
+            if (obj3 != null) {
+                books.setBook_updatetime(obj3);
             }
             this.downloadsize = 0L;
             this.size = 0L;
             this.total = 0;
             this.isnewCount = 0;
             updateBooksJson(tree, tree.getHead());
-            book.setBook_total(this.total);
-            book.setBookdownloadsize(this.downloadsize);
-            book.setBooksize(this.size);
+            books.setBook_total(this.total);
+            books.setBookdownloadsize(this.downloadsize);
+            books.setBooksize(this.size);
             if (this.size == 0) {
-                book.setProgress("100");
+                books.setProgress("100");
             } else {
-                String newprogress = Long.toString((((float) this.downloadsize) * 100.0f) / ((float) this.size));
+                String l = Long.toString((((float) this.downloadsize) * 100.0f) / ((float) this.size));
                 if (this.downloadsize == this.size) {
-                    book.setProgress("100");
-                } else if (this.downloadsize > 0 && "0".equals(newprogress)) {
-                    book.setProgress(LogHelp.TYPE_GUIDANCE);
+                    books.setProgress("100");
+                } else if (this.downloadsize <= 0 || !"0".equals(l)) {
+                    books.setProgress(l);
                 } else {
-                    book.setProgress(newprogress);
+                    books.setProgress(LogHelp.TYPE_GUIDANCE);
                 }
             }
             if (this.isnewCount == 0) {
-                book.setBook_isnew(0);
+                books.setBook_isnew(0);
             } else {
-                book.setBook_isnew(1);
+                books.setBook_isnew(1);
             }
         }
         this.downloadsize = 0L;
         this.size = 0L;
         this.total = 0;
         this.isnewCount = 0;
-        return book;
+        return books;
     }
 
-    private void updateBooksJson(Tree<HashMap<String, Object>> tree, HashMap<String, Object> head) {
-        HashMap<String, Object> tempDxitemsMap;
-        Collection<HashMap<String, Object>> Successors = tree.getSuccessors(head);
-        for (HashMap<String, Object> tempSuccessors : Successors) {
-            if (tempSuccessors.get("dxitems") != null) {
-                ArrayList<Object> dxitemsList = this.jsonPort.getValueList(new ArrayList<>(), tempSuccessors.get("dxitems"));
-                if (dxitemsList != null && dxitemsList.size() > 0) {
-                    for (int i = 0; i < dxitemsList.size(); i++) {
-                        Object dxitemsObject = dxitemsList.get(i);
-                        if (dxitemsObject != null && (tempDxitemsMap = JsonParse.geteObjectToMap(dxitemsObject)) != null && tempDxitemsMap.get("dxid") != null) {
-                            boolean booklisdown = false;
-                            if (tempDxitemsMap.get("isdown") != null) {
-                                try {
-                                    booklisdown = ((Boolean) tempDxitemsMap.get("isdown")).booleanValue();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (tempDxitemsMap.get(KeyEnvironment.KEYWEBPATH) != null) {
-                                ArrayList<Object> webpathList = this.jsonPort.getValueList(new ArrayList<>(), tempDxitemsMap.get(KeyEnvironment.KEYWEBPATH));
-                                this.total += webpathList.size();
-                                if (booklisdown) {
-                                    getSize(tempDxitemsMap, "size", webpathList);
-                                }
-                            }
-                            if (tempDxitemsMap.get("exams") != null) {
-                                ArrayList<Object> examsobjectList = this.jsonPort.getValueList(new ArrayList<>(), tempDxitemsMap.get("exams"));
-                                if (examsobjectList != null && examsobjectList.size() > 0) {
-                                    this.total += examsobjectList.size();
-                                    if (booklisdown) {
-                                        for (int j = 0; j < examsobjectList.size(); j++) {
-                                            HashMap<String, Object> tempDataMap = this.jsonPort.objectToMap(examsobjectList.get(j));
-                                            if (tempDataMap != null && tempDataMap.get(KeyEnvironment.KEYWEBPATH) != null) {
-                                                ArrayList<Object> webpathList2 = this.jsonPort.getValueList(new ArrayList<>(), tempDataMap.get(KeyEnvironment.KEYWEBPATH));
-                                                if (webpathList2 != null && webpathList2.size() > 0 && booklisdown) {
-                                                    getSize(tempDataMap, "sizes", webpathList2);
-                                                }
-                                            }
-                                        }
-                                    }
+    public HashMap<String, Object> getNeedDownHead(Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, ArrayList<String> arrayList, String str) {
+        for (int i = 1; i < arrayList.size(); i++) {
+            String str2 = arrayList.get(i);
+            Iterator<HashMap<String, Object>> it = tree.getSuccessors(hashMap).iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    break;
+                }
+                HashMap<String, Object> next = it.next();
+                if (next.get(str) != null && str2.equals(next.get(str).toString())) {
+                    hashMap = next;
+                    break;
+                }
+            }
+        }
+        return hashMap;
+    }
+
+    public void getNeedDownLoadList(String str, String str2, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, ArrayList<HashMap<String, String>> arrayList, String str3, ArrayList<HashMap<String, String>> arrayList2, ArrayList<HashMap<String, String>> arrayList3) {
+        for (HashMap<String, Object> hashMap2 : tree.getSuccessors(hashMap)) {
+            if (hashMap2 != null && hashMap2.get(str3) != null) {
+                String obj = "".equals(str2) ? hashMap2.get(str3).toString() : String.valueOf(str2) + "_" + hashMap2.get(str3).toString();
+                if (hashMap2.get("isdown") != null) {
+                    boolean z = true;
+                    try {
+                        z = ((Boolean) hashMap2.get("isdown")).booleanValue();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (!z) {
+                        this.jsonPort.changeTreeData(tree, hashMap2, true, "isdown");
+                    }
+                }
+                updateDxiditemsIsDown(false, tree, hashMap2, "", str, obj, arrayList2, arrayList3);
+                getNeedDownLoadList(str, obj, tree, hashMap2, arrayList, str3, arrayList2, arrayList3);
+                str2 = this.jsonPort.removeSourceId(obj);
+            }
+        }
+    }
+
+    public void getSize(HashMap<String, Object> hashMap, String str, ArrayList<Object> arrayList) {
+        if (hashMap.get(KeyEnvironment.KEYDOWNLOADSIZE) == null || hashMap.get(str) == null) {
+            return;
+        }
+        ArrayList<Object> arrayList2 = new ArrayList<>();
+        ArrayList<Object> arrayList3 = new ArrayList<>();
+        ArrayList<Object> valueList = this.jsonPort.getValueList(arrayList2, hashMap.get(KeyEnvironment.KEYDOWNLOADSIZE));
+        ArrayList<Object> valueList2 = this.jsonPort.getValueList(arrayList3, hashMap.get(str));
+        if (arrayList == null || valueList == null || valueList2 == null || arrayList.size() == 0 || arrayList.size() != valueList.size() || valueList.size() != valueList2.size()) {
+            return;
+        }
+        for (int i = 0; i < arrayList.size(); i++) {
+            this.downloadsize += Long.valueOf(valueList.get(i).toString()).longValue();
+            this.size += Long.valueOf(valueList2.get(i).toString()).longValue();
+        }
+    }
+
+    public String getidList(Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, ArrayList<String> arrayList, String str, String str2) {
+        for (HashMap<String, Object> hashMap2 : tree.getSuccessors(hashMap)) {
+            if (hashMap2 != null && hashMap2.get(str) != null) {
+                arrayList.add(hashMap2.get(str).toString());
+                if (hashMap2.get("dxid") != null) {
+                    str2 = hashMap2.get("dxid").toString();
+                }
+                str2 = getidList(tree, hashMap2, arrayList, str, str2);
+            }
+        }
+        return str2;
+    }
+
+    public boolean treeIschange(boolean z, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2) {
+        boolean z2 = z;
+        if (tree != null) {
+            z2 = z;
+            if (tree2 != null) {
+                z2 = z;
+                if (tree.getHead() != null) {
+                    z2 = z;
+                    if (tree2.getHead() != null) {
+                        z2 = z;
+                        if (tree.getHead().get("id") != null) {
+                            z2 = z;
+                            if (tree2.getHead().get("id") != null) {
+                                String obj = tree.getHead().get("id").toString();
+                                z2 = z;
+                                if (obj.equals(tree2.getHead().get("id").toString())) {
+                                    ArrayList<String> arrayList = new ArrayList<>();
+                                    arrayList.add(obj);
+                                    z2 = compareisDown(z, arrayList, tree, tree2, tree.getHead(), tree2.getHead(), "id");
                                 }
                             }
                         }
                     }
                 }
             }
-            if (tempSuccessors.get(AppEnvironment.ISNEW) != null) {
-                boolean boolisnew = false;
-                try {
-                    boolisnew = ((Boolean) tempSuccessors.get(AppEnvironment.ISNEW)).booleanValue();
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-                if (boolisnew) {
-                    this.isnewCount++;
-                }
-            }
-            updateBooksJson(tree, tempSuccessors);
         }
+        return z2;
     }
 
-    public void getSize(HashMap<String, Object> tempDataMap, String sizekey, ArrayList<Object> webpathList) {
-        if (tempDataMap.get(KeyEnvironment.KEYDOWNLOADSIZE) != null && tempDataMap.get(sizekey) != null) {
-            ArrayList<Object> downloadsizelist = new ArrayList<>();
-            ArrayList<Object> sizeList = new ArrayList<>();
-            ArrayList<Object> downloadsizelist2 = this.jsonPort.getValueList(downloadsizelist, tempDataMap.get(KeyEnvironment.KEYDOWNLOADSIZE));
-            ArrayList<Object> sizeList2 = this.jsonPort.getValueList(sizeList, tempDataMap.get(sizekey));
-            if (webpathList != null && downloadsizelist2 != null && sizeList2 != null && webpathList.size() != 0 && webpathList.size() == downloadsizelist2.size() && downloadsizelist2.size() == sizeList2.size()) {
-                for (int i = 0; i < webpathList.size(); i++) {
-                    this.downloadsize += Long.valueOf(downloadsizelist2.get(i).toString()).longValue();
-                    this.size += Long.valueOf(sizeList2.get(i).toString()).longValue();
-                }
-            }
+    public void treeReplace(String str, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, ArrayList<HashMap<String, String>> arrayList, ArrayList<HashMap<String, String>> arrayList2) {
+        if (tree == null || tree2 == null || tree.getHead() == null || tree2.getHead() == null || tree.getHead().get("id") == null || tree2.getHead().get("id") == null) {
+            return;
         }
+        String obj = tree.getHead().get("id").toString();
+        if (!obj.equals(tree2.getHead().get("id").toString())) {
+            return;
+        }
+        ArrayList<String> arrayList3 = new ArrayList<>();
+        arrayList3.add(obj);
+        getisDown(str, arrayList3, tree, tree2, tree.getHead(), tree2.getHead(), "id", arrayList2, arrayList);
     }
 
-    public boolean treeIschange(boolean ischange, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree) {
-        if (tree != null && localtree != null && tree.getHead() != null && localtree.getHead() != null && tree.getHead().get("id") != null && localtree.getHead().get("id") != null) {
-            String bookid = tree.getHead().get("id").toString();
-            if (bookid.equals(localtree.getHead().get("id").toString())) {
-                ArrayList<String> idList = new ArrayList<>();
-                idList.add(bookid);
-                return compareisDown(ischange, idList, tree, localtree, tree.getHead(), localtree.getHead(), "id");
-            }
-            return ischange;
-        }
-        return ischange;
+    public void updateBooksJson(Tree<HashMap<String, Object>> tree) {
+        this.jsonPort.updateBooksJson(getBooks(tree, new Books()), AppEnvironment.JSON_BOOKS_File);
     }
 
-    private boolean compareisDown(boolean ischange, ArrayList<String> idList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree, HashMap<String, Object> head, HashMap<String, Object> idhead, String key) {
-        Collection<HashMap<String, Object>> idSuccessors = localtree.getSuccessors(idhead);
-        for (HashMap<String, Object> tempidSuccessors : idSuccessors) {
-            if (tempidSuccessors != null && tempidSuccessors.get(key) != null) {
-                idList.add(tempidSuccessors.get(key).toString());
-                boolean ischange2 = compareTreewebpath(ischange, idList, tree, localtree, head, tempidSuccessors, key);
-                if (ischange2) {
-                    return ischange2;
-                }
-                ischange = compareisDown(ischange2, idList, tree, localtree, head, tempidSuccessors, key);
-                if (idList.size() > 0) {
-                    idList.remove(idList.size() - 1);
-                }
+    public void updateDxiditemsIsDown(Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, String str, String str2, ArrayList<HashMap<String, String>> arrayList) {
+        boolean z;
+        if (hashMap.get("dxitems") != null) {
+            ArrayList<Object> valueList = this.jsonPort.getValueList(new ArrayList<>(), hashMap.get("dxitems"));
+            if (valueList == null || valueList.size() <= 0) {
+                return;
             }
-        }
-        return ischange;
-    }
-
-    private boolean compareTreewebpath(boolean ischange, ArrayList<String> idList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree, HashMap<String, Object> head, HashMap<String, Object> idhead, String key) {
-        for (int i = 1; i < idList.size(); i++) {
-            Collection<HashMap<String, Object>> Successors = tree.getSuccessors(head);
-            boolean isfound = false;
-            for (HashMap<String, Object> tempSuccessors : Successors) {
-                if (tempSuccessors != null && tempSuccessors.get(key) != null && idList.get(i).equals(tempSuccessors.get(key).toString())) {
-                    isfound = true;
-                    head = tempSuccessors;
-                    if (i == idList.size() - 1 && idhead != null && idhead.get(AppEnvironment.ISNEW) != null) {
-                        boolean isnew = false;
-                        try {
-                            isnew = ((Boolean) idhead.get(AppEnvironment.ISNEW)).booleanValue();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (isnew) {
-                            ischange = true;
-                        }
+            for (int i = 0; i < valueList.size(); i++) {
+                HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(valueList.get(i));
+                if (objectToMap != null && objectToMap.get("dxid") != null) {
+                    try {
+                        z = ((Boolean) objectToMap.get("isdown")).booleanValue();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        z = true;
                     }
-                }
-            }
-            if (!isfound) {
-                return true;
-            }
-        }
-        return ischange;
-    }
-
-    private boolean compareWebpath(boolean ischange, HashMap<String, Object> head, HashMap<String, Object> idhead, String key) {
-        if ((head.get(KeyEnvironment.KEYWEBPATH) != null && idhead.get(KeyEnvironment.KEYWEBPATH) == null) || (head.get(KeyEnvironment.KEYWEBPATH) == null && idhead.get(KeyEnvironment.KEYWEBPATH) != null)) {
-            return true;
-        }
-        if (head.get(KeyEnvironment.KEYWEBPATH) != null && idhead.get(KeyEnvironment.KEYWEBPATH) != null) {
-            ArrayList<Object> headwebpathList = new ArrayList<>();
-            ArrayList<Object> idheadwebpathList = new ArrayList<>();
-            ArrayList<Object> headwebpathList2 = this.jsonPort.getValueList(headwebpathList, head.get(KeyEnvironment.KEYWEBPATH));
-            ArrayList<Object> idheadwebpathList2 = this.jsonPort.getValueList(idheadwebpathList, idhead.get(KeyEnvironment.KEYWEBPATH));
-            if ((headwebpathList2 != null && headwebpathList2.size() > 0 && idheadwebpathList2.size() == 0) || (headwebpathList2.size() == 0 && idheadwebpathList2 != null && idheadwebpathList2.size() > 0)) {
-                return true;
-            }
-            if (headwebpathList2 != null && idheadwebpathList2 != null) {
-                if (headwebpathList2.size() != idheadwebpathList2.size()) {
-                    return true;
-                }
-                for (int i = 0; i < headwebpathList2.size(); i++) {
-                    if (!headwebpathList2.get(i).equals(idheadwebpathList2.get(i))) {
-                        return true;
+                    if (z) {
+                        addToneedDownloadList(str, str2, objectToMap, arrayList);
                     }
                 }
             }
         }
-        return ischange;
     }
 
-    public void treeReplace(String downloadjsonbookid, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree, ArrayList<HashMap<String, String>> isDownTrueDownloadList, ArrayList<HashMap<String, String>> sourceNeedRemove) {
-        if (tree != null && localtree != null && tree.getHead() != null && localtree.getHead() != null && tree.getHead().get("id") != null && localtree.getHead().get("id") != null) {
-            String bookid = tree.getHead().get("id").toString();
-            if (bookid.equals(localtree.getHead().get("id").toString())) {
-                ArrayList<String> idList = new ArrayList<>();
-                idList.add(bookid);
-                getisDown(downloadjsonbookid, idList, tree, localtree, tree.getHead(), localtree.getHead(), "id", sourceNeedRemove, isDownTrueDownloadList);
+    public void updateDxiditemsIsDown(boolean z, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, String str, String str2, String str3, ArrayList<HashMap<String, String>> arrayList, ArrayList<HashMap<String, String>> arrayList2) {
+        if (hashMap.get("dxitems") != null) {
+            ArrayList<Object> valueList = this.jsonPort.getValueList(new ArrayList<>(), hashMap.get("dxitems"));
+            if (valueList == null || valueList.size() <= 0) {
+                return;
             }
-        }
-    }
-
-    private void getisDown(String downloadjsonbookid, ArrayList<String> idList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree, HashMap<String, Object> head, HashMap<String, Object> idhead, String key, ArrayList<HashMap<String, String>> sourceNeedRemove, ArrayList<HashMap<String, String>> isDownTrueDownloadList) {
-        Collection<HashMap<String, Object>> idSuccessors = localtree.getSuccessors(idhead);
-        for (HashMap<String, Object> tempidSuccessors : idSuccessors) {
-            if (tempidSuccessors != null && tempidSuccessors.get(key) != null) {
-                idList.add(tempidSuccessors.get(key).toString());
-                rePlaceTreewebpath(downloadjsonbookid, idList, tree, localtree, tree.getHead(), tempidSuccessors, key, sourceNeedRemove, isDownTrueDownloadList);
-                getisDown(downloadjsonbookid, idList, tree, localtree, tree.getHead(), tempidSuccessors, key, sourceNeedRemove, isDownTrueDownloadList);
-                if (idList.size() > 0) {
-                    idList.remove(idList.size() - 1);
-                }
-            }
-        }
-    }
-
-    private void rePlaceTreewebpath(String downloadjsonbookid, ArrayList<String> idList, Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree, HashMap<String, Object> head, HashMap<String, Object> idhead, String key, ArrayList<HashMap<String, String>> sourceNeedRemove, ArrayList<HashMap<String, String>> isDownTrueDownloadList) {
-        HashMap<String, Object> tempMap;
-        HashMap<String, Object> idtempMap;
-        String bookId = "";
-        if (idList.size() > 0) {
-            String bookId2 = idList.get(0);
-            bookId = bookId2;
-        }
-        for (int i = 1; i < idList.size(); i++) {
-            Collection<HashMap<String, Object>> Successors = tree.getSuccessors(head);
-            for (HashMap<String, Object> tempSuccessors : Successors) {
-                if (tempSuccessors != null && tempSuccessors.get(key) != null && idList.get(i).equals(tempSuccessors.get(key).toString())) {
-                    head = tempSuccessors;
-                    if (i == idList.size() - 1) {
-                        if (idhead.get("isdown") != null) {
-                            boolean isdown = false;
+            boolean z2 = false;
+            int i = 0;
+            while (i < valueList.size()) {
+                HashMap<String, Object> objectToMap = this.jsonPort.objectToMap(valueList.get(i));
+                boolean z3 = z2;
+                if (objectToMap != null) {
+                    z3 = z2;
+                    if (objectToMap.get("dxid") != null) {
+                        if (!z) {
+                            z2 = true;
+                            boolean z4 = true;
                             try {
-                                isdown = ((Boolean) idhead.get("isdown")).booleanValue();
+                                z4 = ((Boolean) objectToMap.get("isdown")).booleanValue();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            if (isdown) {
-                                this.jsonPort.changeTreeData(tree, head, true, "isdown");
-                            }
-                        }
-                        if (head.get("dxitems") != null) {
-                            ArrayList<Object> dxitemsList = this.jsonPort.getValueList(new ArrayList<>(), head.get("dxitems"));
-                            if (dxitemsList != null && dxitemsList.size() > 0) {
-                                for (int j = 0; j < dxitemsList.size(); j++) {
-                                    Object object = dxitemsList.get(j);
-                                    if (object != null && (tempMap = JsonParse.geteObjectToMap(object)) != null && tempMap.get("dxid") != null) {
-                                        String dxidString = tempMap.get("dxid").toString();
-                                        if (idhead.get("dxitems") != null) {
-                                            ArrayList<Object> iddxitemsList = this.jsonPort.getValueList(new ArrayList<>(), idhead.get("dxitems"));
-                                            if (iddxitemsList != null && iddxitemsList.size() > 0) {
-                                                int k = 0;
-                                                while (true) {
-                                                    if (k >= iddxitemsList.size()) {
-                                                        break;
-                                                    }
-                                                    Object idobject = iddxitemsList.get(k);
-                                                    if (idobject == null || (idtempMap = JsonParse.geteObjectToMap(idobject)) == null || idtempMap.get("dxid") == null || !dxidString.equals(idtempMap.get("dxid").toString()) || idtempMap.get("isdown") == null) {
-                                                        k++;
-                                                    } else {
-                                                        try {
-                                                            ((Boolean) idtempMap.get("isdown")).booleanValue();
-                                                        } catch (Exception e2) {
-                                                            e2.printStackTrace();
-                                                        }
-                                                        if (1 != 0) {
-                                                            rePlaceWebpath(bookId, false, tree, tempMap, idtempMap, sourceNeedRemove);
-                                                            if (idtempMap.get("isdown") != null && idtempMap.get(AppEnvironment.ISNEW) != null && idtempMap.get("examsprogress") != null) {
-                                                                tempMap.put("isdown", idtempMap.get("isdown"));
-                                                                tempMap.put(AppEnvironment.ISNEW, false);
-                                                                tempMap.put("examsprogress", idtempMap.get("examsprogress"));
-                                                            }
-                                                            ArrayList<Object> headexamsobjectList = new ArrayList<>();
-                                                            ArrayList<Object> idheadexamsobjectList = new ArrayList<>();
-                                                            int headexamssize = 0;
-                                                            int idheadexamssize = 0;
-                                                            if (tempMap.get("exams") != null && (headexamsobjectList = this.jsonPort.getValueList(headexamsobjectList, tempMap.get("exams"))) != null && headexamsobjectList.size() > 0) {
-                                                                headexamssize = headexamsobjectList.size();
-                                                            }
-                                                            if (idtempMap.get("exams") != null && (idheadexamsobjectList = this.jsonPort.getValueList(idheadexamsobjectList, idtempMap.get("exams"))) != null && idheadexamsobjectList.size() > 0) {
-                                                                idheadexamssize = idheadexamsobjectList.size();
-                                                            }
-                                                            if (headexamssize != 0 && headexamssize == idheadexamssize) {
-                                                                for (int m = 0; m < headexamsobjectList.size(); m++) {
-                                                                    HashMap<String, Object> headtempMap = this.jsonPort.objectToMap(headexamsobjectList.get(m));
-                                                                    HashMap<String, Object> iheadidtempMap = this.jsonPort.objectToMap(idheadexamsobjectList.get(m));
-                                                                    if (headtempMap != null && iheadidtempMap != null && headtempMap.get("questionid") != null && iheadidtempMap.get("questionid") != null) {
-                                                                        rePlaceWebpath(bookId, true, tree, headtempMap, iheadidtempMap, sourceNeedRemove);
-                                                                        Object newobject = JsonCreate.MaptoJSONObject(headtempMap);
-                                                                        headexamsobjectList.remove(m);
-                                                                        headexamsobjectList.add(m, newobject);
-                                                                    }
-                                                                }
-                                                                Object arrayObject = JsonCreate.toJSONArrayObject(headexamsobjectList);
-                                                                tempMap.put("exams", arrayObject);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        Object newObject = JsonCreate.MaptoJSONObject(tempMap);
-                                        if (newObject != null) {
-                                            dxitemsList.remove(j);
-                                            dxitemsList.add(j, newObject);
-                                        }
-                                    }
-                                }
-                                this.jsonPort.changeTreeData(tree, head, JsonCreate.toJSONArrayObject(dxitemsList), "dxitems");
-                            }
-                        }
-                        if ("-2".equals(downloadjsonbookid) && idList.size() > 0 && !"".equals(bookId)) {
-                            String sourceId = this.jsonPort.listToSourceId(idList);
-                            updateDxiditemsIsDown(tree, head, bookId, sourceId, isDownTrueDownloadList);
-                        }
-                    }
-                }
-            }
-        }
-        if (0 == 0 && !"".equals(bookId)) {
-            getidheadSourceRemoveList(bookId, localtree, idhead, sourceNeedRemove);
-        }
-    }
-
-    public void updateDxiditemsIsDown(Tree<HashMap<String, Object>> tree, HashMap<String, Object> head, String bookid, String soucrceId, ArrayList<HashMap<String, String>> isDownTrueDownloadList) {
-        if (head.get("dxitems") != null) {
-            ArrayList<Object> dxitemsobjectList = this.jsonPort.getValueList(new ArrayList<>(), head.get("dxitems"));
-            if (dxitemsobjectList != null && dxitemsobjectList.size() > 0) {
-                for (int i = 0; i < dxitemsobjectList.size(); i++) {
-                    HashMap<String, Object> tempMap = this.jsonPort.objectToMap(dxitemsobjectList.get(i));
-                    if (tempMap != null && tempMap.get("dxid") != null) {
-                        boolean isdown = true;
-                        try {
-                            isdown = ((Boolean) tempMap.get("isdown")).booleanValue();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (isdown) {
-                            addToneedDownloadList(bookid, soucrceId, tempMap, isDownTrueDownloadList);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void rePlaceWebpath(String bookId, boolean isexam, Tree<HashMap<String, Object>> tree, HashMap<String, Object> head, HashMap<String, Object> idhead, ArrayList<HashMap<String, String>> sourceNeedRemove) {
-        if (idhead.get(KeyEnvironment.KEYWEBPATH) != null && idhead.get("progress") != null && idhead.get(KeyEnvironment.KEYDOWNLOADSIZE) != null) {
-            ArrayList<Object> idheadwebpathList = new ArrayList<>();
-            ArrayList<Object> idheadprogressList = new ArrayList<>();
-            ArrayList<Object> idheaddownloadsizeList = new ArrayList<>();
-            ArrayList<Object> idheadpathList = new ArrayList<>();
-            ArrayList<Object> idheadwebpathList2 = this.jsonPort.getValueList(idheadwebpathList, idhead.get(KeyEnvironment.KEYWEBPATH));
-            ArrayList<Object> idheadprogressList2 = this.jsonPort.getValueList(idheadprogressList, idhead.get("progress"));
-            ArrayList<Object> idheaddownloadsizeList2 = this.jsonPort.getValueList(idheaddownloadsizeList, idhead.get(KeyEnvironment.KEYDOWNLOADSIZE));
-            ArrayList<Object> idheadpathList2 = this.jsonPort.getValueList(idheadpathList, idhead.get("path"));
-            ArrayList<Object> headwebpathList = new ArrayList<>();
-            ArrayList<Object> headprogressList = new ArrayList<>();
-            ArrayList<Object> headdownloadsizeList = new ArrayList<>();
-            int headListSize = 0;
-            if (idheadwebpathList2 != null && idheadprogressList2 != null && idheaddownloadsizeList2 != null && idheadpathList2 != null && idheadwebpathList2.size() > 0 && idheadwebpathList2.size() == idheadprogressList2.size() && idheadprogressList2.size() == idheaddownloadsizeList2.size() && idheaddownloadsizeList2.size() == idheadpathList2.size()) {
-                if (head.get(KeyEnvironment.KEYWEBPATH) != null && head.get("progress") != null && head.get(KeyEnvironment.KEYDOWNLOADSIZE) != null) {
-                    headwebpathList = this.jsonPort.getValueList(headwebpathList, head.get(KeyEnvironment.KEYWEBPATH));
-                    headprogressList = this.jsonPort.getValueList(headprogressList, head.get("progress"));
-                    headdownloadsizeList = this.jsonPort.getValueList(headdownloadsizeList, head.get(KeyEnvironment.KEYDOWNLOADSIZE));
-                    if (headwebpathList != null && headprogressList != null && headdownloadsizeList != null && headwebpathList.size() > 0 && headwebpathList.size() == headprogressList.size() && headprogressList.size() == headdownloadsizeList.size()) {
-                        headListSize = headwebpathList.size();
-                    }
-                }
-                for (int i = 0; i < idheadwebpathList2.size(); i++) {
-                    String idheadwebpath = idheadwebpathList2.get(i).toString();
-                    String idpath = idheadpathList2.get(i).toString();
-                    boolean isfound = false;
-                    int j = 0;
-                    while (true) {
-                        if (j < headListSize) {
-                            if (!idheadwebpath.equals(headwebpathList.get(j).toString())) {
-                                j++;
+                            if (!z4) {
+                                objectToMap.put("isdown", true);
+                                addToneedDownloadList(str2, str3, objectToMap, arrayList);
                             } else {
-                                headprogressList.remove(j);
-                                headprogressList.add(j, idheadprogressList2.get(i));
-                                headdownloadsizeList.remove(j);
-                                headdownloadsizeList.add(j, idheaddownloadsizeList2.get(i));
-                                isfound = true;
-                                break;
+                                addToneedDownloadList(str2, str3, objectToMap, arrayList2);
                             }
-                        } else {
-                            break;
+                        } else if (str.equals(objectToMap.get("dxid").toString())) {
+                            z2 = true;
+                            boolean z5 = true;
+                            try {
+                                z5 = ((Boolean) objectToMap.get("isdown")).booleanValue();
+                            } catch (Exception e2) {
+                                e2.printStackTrace();
+                            }
+                            if (!z5) {
+                                objectToMap.put("isdown", true);
+                                addToneedDownloadList(str2, str3, objectToMap, arrayList);
+                            } else {
+                                addToneedDownloadList(str2, str3, objectToMap, arrayList2);
+                            }
+                        }
+                        z3 = z2;
+                        if (z2) {
+                            Object MaptoJSONObject = JsonCreate.MaptoJSONObject(objectToMap);
+                            z3 = z2;
+                            if (MaptoJSONObject != null) {
+                                valueList.remove(i);
+                                valueList.add(i, MaptoJSONObject);
+                                z3 = z2;
+                            }
                         }
                     }
-                    if (!isfound) {
-                        updateSourceNeedRemoveList(bookId, idheadwebpath, idpath, sourceNeedRemove);
-                    }
                 }
-                head.put("progress", JsonCreate.toJSONArrayObject(headprogressList));
-                head.put(KeyEnvironment.KEYDOWNLOADSIZE, JsonCreate.toJSONArrayObject(headdownloadsizeList));
+                i++;
+                z2 = z3;
             }
+            this.jsonPort.changeTreeData(tree, hashMap, JsonCreate.toJSONArrayObject(valueList), "dxitems");
         }
     }
 
-    private void getidheadSourceRemoveList(String bookId, Tree<HashMap<String, Object>> localtree, HashMap<String, Object> idhead, ArrayList<HashMap<String, String>> sourceNeedRemove) {
-        ArrayList<Object> idheadexamsobjectList;
-        getSourceRemovepath(bookId, idhead, sourceNeedRemove);
-        ArrayList<Object> idheadexamsobjectList2 = new ArrayList<>();
-        if (idhead.get("exams") != null && (idheadexamsobjectList = this.jsonPort.getValueList(idheadexamsobjectList2, idhead.get("exams"))) != null && idheadexamsobjectList.size() > 0) {
-            for (int k = 0; k < idheadexamsobjectList.size(); k++) {
-                HashMap<String, Object> tempMap = this.jsonPort.objectToMap(idheadexamsobjectList.get(k));
-                if (tempMap != null && tempMap.get("questionid") != null) {
-                    getSourceRemovepath(bookId, tempMap, sourceNeedRemove);
-                }
-            }
+    public void updateKeys(Tree<HashMap<String, Object>> tree) {
+        if (tree == null || tree.getHead() == null || tree.getHead().get("id") == null) {
+            return;
         }
-    }
-
-    private void getSourceRemovepath(String bookId, HashMap<String, Object> idhead, ArrayList<HashMap<String, String>> sourceNeedRemove) {
-        if (idhead.get(KeyEnvironment.KEYWEBPATH) != null && idhead.get("path") != null) {
-            ArrayList<Object> idheadwebpathList = new ArrayList<>();
-            ArrayList<Object> idheadpathList = new ArrayList<>();
-            ArrayList<Object> idheadwebpathList2 = this.jsonPort.getValueList(idheadwebpathList, idhead.get(KeyEnvironment.KEYWEBPATH));
-            ArrayList<Object> idheadpathList2 = this.jsonPort.getValueList(idheadpathList, idhead.get("path"));
-            if (idheadwebpathList2 != null && idheadpathList2 != null && idheadwebpathList2.size() != 0 && idheadwebpathList2.size() == idheadpathList2.size()) {
-                for (int i = 0; i < idheadwebpathList2.size(); i++) {
-                    String idheadwebpath = idheadwebpathList2.get(i).toString();
-                    String idpath = idheadpathList2.get(i).toString();
-                    updateSourceNeedRemoveList(bookId, idheadwebpath, idpath, sourceNeedRemove);
-                }
-            }
-        }
-    }
-
-    private void updateSourceNeedRemoveList(String bookId, String webpath, String path, ArrayList<HashMap<String, String>> sourceNeedRemove) {
-        if (!"".equals(bookId)) {
-            HashMap<String, String> sources = new HashMap<>();
-            sources.put("book_id", bookId);
-            sources.put("source_webpath", webpath);
-            sources.put("source_path", path);
-            sourceNeedRemove.add(sources);
-        }
+        addNewKeys(tree.getHead().get("id").toString(), tree, tree.getHead(), "id");
     }
 }

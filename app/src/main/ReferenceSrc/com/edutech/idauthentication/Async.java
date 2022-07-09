@@ -15,7 +15,7 @@ import org.apache.commons.net.tftp.TFTP;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.HTTP;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/idauthentication/Async.class */
 public class Async extends AsyncTask<String, Integer, String> {
     public static List<ProgressBar> listPb = new ArrayList();
     public static int peerdata = 10240;
@@ -24,74 +24,101 @@ public class Async extends AsyncTask<String, Integer, String> {
     public long downloadsize = 0;
     public boolean isFinish = false;
 
-    public boolean isPaused() {
-        return this.paused;
+    public void continued() {
+        this.paused = false;
     }
 
-    /* JADX DEBUG: Don't trust debug lines info. Repeating lines: [268=5, 269=5, 273=5, 274=5, 276=5, 278=5, 280=5, 283=5, 285=5] */
-    public String doInBackground(String... Params) {
+    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:157:0x0675 */
+    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:189:0x0052 */
+    /* JADX DEBUG: Multi-variable search result rejected for r8v10, resolved type: java.io.IOException */
+    /* JADX DEBUG: Multi-variable search result rejected for r8v16, resolved type: java.io.IOException */
+    /* JADX DEBUG: Multi-variable search result rejected for r8v6, resolved type: java.io.IOException */
+    /* JADX DEBUG: Multi-variable search result rejected for r8v8, resolved type: java.io.IOException */
+    /* JADX WARN: Multi-variable type inference failed */
+    public String doInBackground(String... strArr) {
+        HttpURLConnection httpURLConnection;
+        RandomAccessFile randomAccessFile;
+        HttpURLConnection httpURLConnection2;
+        InputStream inputStream;
+        RandomAccessFile randomAccessFile2;
         Throwable th;
         InterruptedException e;
-        RandomAccessFile outputStream;
-        String filename = Params[0];
-        String webpath = Params[1];
-        HttpURLConnection httpURLConnection = null;
-        InputStream inputStream = null;
-        RandomAccessFile outputStream2 = null;
+        InputStream inputStream2;
+        RandomAccessFile randomAccessFile3;
+        String str = strArr[0];
+        String str2 = strArr[1];
+        HttpURLConnection httpURLConnection3 = null;
+        InputStream inputStream3 = null;
+        HttpURLConnection httpURLConnection4 = null;
+        InputStream inputStream4 = null;
+        RandomAccessFile randomAccessFile4 = null;
         try {
             try {
-                URL url = new URL(webpath);
+                URL url = new URL(str2);
+                httpURLConnection = null;
+                InputStream inputStream5 = null;
+                HttpURLConnection httpURLConnection5 = null;
+                InputStream inputStream6 = null;
+                HttpURLConnection httpURLConnection6 = null;
+                InputStream inputStream7 = null;
+                HttpURLConnection httpURLConnection7 = null;
+                inputStream = null;
                 try {
-                    HttpURLConnection tempURLCon = (HttpURLConnection) url.openConnection();
-                    tempURLCon.setRequestProperty("Range", "bytes=0-1024");
-                    tempURLCon.connect();
-                    int templength = tempURLCon.getContentLength();
-                    boolean isSuppertRange = templength == 1025;
-                    if (tempURLCon != null) {
-                        tempURLCon.disconnect();
+                    HttpURLConnection httpURLConnection8 = (HttpURLConnection) url.openConnection();
+                    httpURLConnection8.setRequestProperty("Range", "bytes=0-1024");
+                    httpURLConnection8.connect();
+                    boolean z = httpURLConnection8.getContentLength() == 1025;
+                    if (httpURLConnection8 != null) {
+                        httpURLConnection8.disconnect();
                     }
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setConnectTimeout(TFTP.DEFAULT_TIMEOUT);
-                    httpURLConnection.setRequestMethod(HttpGet.METHOD_NAME);
-                    httpURLConnection.setRequestProperty("Accept", "image/gif, image/jpeg, image/pjpeg, image/pjpeg, application/x-shockwave-flash, application/xaml+xml, application/vnd.ms-xpsdocument, application/x-ms-xbap, application/x-ms-application, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*");
-                    httpURLConnection.setRequestProperty("Accept-Language", "zh-CN");
-                    httpURLConnection.setRequestProperty("Referer", webpath);
-                    httpURLConnection.setRequestProperty("Charset", "UTF-8");
-                    httpURLConnection.setRequestProperty(HTTP.USER_AGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)");
-                    httpURLConnection.setRequestProperty(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
-                    String savepath = String.valueOf(AppEnvironment.FOLDER_EDUTECH) + filename;
-                    File outFile = new File(savepath);
-                    long startPosition = 0;
-                    if (outFile.exists()) {
-                        startPosition = isSuppertRange ? outFile.length() : 0L;
-                        httpURLConnection.setRequestProperty("Range", "bytes=" + startPosition + "-");
+                    httpURLConnection4 = (HttpURLConnection) url.openConnection();
+                    httpURLConnection4.setConnectTimeout(TFTP.DEFAULT_TIMEOUT);
+                    httpURLConnection4.setRequestMethod(HttpGet.METHOD_NAME);
+                    httpURLConnection4.setRequestProperty("Accept", "image/gif, image/jpeg, image/pjpeg, image/pjpeg, application/x-shockwave-flash, application/xaml+xml, application/vnd.ms-xpsdocument, application/x-ms-xbap, application/x-ms-application, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*");
+                    httpURLConnection4.setRequestProperty("Accept-Language", "zh-CN");
+                    httpURLConnection4.setRequestProperty("Referer", str2);
+                    httpURLConnection4.setRequestProperty("Charset", "UTF-8");
+                    httpURLConnection4.setRequestProperty(HTTP.USER_AGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)");
+                    httpURLConnection4.setRequestProperty(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
+                    File file = new File(String.valueOf(AppEnvironment.FOLDER_EDUTECH) + str);
+                    long j = 0;
+                    if (file.exists()) {
+                        j = z ? file.length() : 0L;
+                        httpURLConnection4.setRequestProperty("Range", "bytes=" + j + "-");
                     } else {
-                        FileInOutHelper.createNewFile(outFile);
+                        FileInOutHelper.createNewFile(file);
                     }
-                    httpURLConnection.connect();
-                    long length = httpURLConnection.getContentLength();
-                    if (length == -1) {
+                    httpURLConnection4.connect();
+                    long contentLength = httpURLConnection4.getContentLength();
+                    if (contentLength == -1) {
                         this.downloadsize = -1L;
                     }
-                    inputStream = httpURLConnection.getInputStream();
-                    outputStream = new RandomAccessFile(outFile, "rw");
+                    inputStream4 = httpURLConnection4.getInputStream();
+                    httpURLConnection = httpURLConnection4;
+                    inputStream5 = inputStream4;
+                    httpURLConnection5 = httpURLConnection4;
+                    inputStream6 = inputStream4;
+                    httpURLConnection6 = httpURLConnection4;
+                    inputStream7 = inputStream4;
+                    httpURLConnection7 = httpURLConnection4;
+                    inputStream = inputStream4;
+                    randomAccessFile4 = new RandomAccessFile(file, "rw");
                     try {
-                        outputStream.seek(startPosition);
-                        byte[] buf = new byte[peerdata];
-                        long curSize = startPosition;
-                        long length2 = length + startPosition;
+                        randomAccessFile4.seek(j);
+                        byte[] bArr = new byte[peerdata];
+                        long j2 = j;
                         while (true) {
                             if (this.finished) {
                                 while (this.paused) {
                                     Thread.sleep(500L);
                                 }
-                                int read = inputStream.read(buf);
+                                int read = inputStream4.read(bArr);
                                 if (read == -1) {
                                     break;
                                 }
-                                outputStream.write(buf, 0, read);
-                                curSize += read;
-                                if (curSize == length2) {
+                                randomAccessFile4.write(bArr, 0, read);
+                                j2 += read;
+                                if (j2 == contentLength + j) {
                                     this.isFinish = true;
                                     break;
                                 }
@@ -100,130 +127,170 @@ public class Async extends AsyncTask<String, Integer, String> {
                                 break;
                             }
                         }
-                        inputStream.close();
-                        outputStream.close();
-                        httpURLConnection.disconnect();
+                        inputStream4.close();
+                        randomAccessFile4.close();
+                        httpURLConnection4.disconnect();
                         this.finished = false;
-                    } catch (MalformedURLException e2) {
-                        e = e2;
-                        outputStream2 = outputStream;
-                        e.printStackTrace();
-                        this.finished = false;
-                        if (inputStream != null) {
+                        httpURLConnection4 = httpURLConnection4;
+                        if (inputStream4 != null) {
                             try {
-                                inputStream.close();
-                                if (outputStream2 != null) {
-                                    outputStream2.close();
+                                inputStream4.close();
+                                if (randomAccessFile4 != null) {
+                                    randomAccessFile4.close();
                                 }
-                                if (httpURLConnection != null) {
-                                    httpURLConnection.disconnect();
+                                httpURLConnection4 = httpURLConnection4;
+                                if (httpURLConnection4 != null) {
+                                    httpURLConnection4.disconnect();
+                                    httpURLConnection4 = httpURLConnection4;
                                 }
-                            } catch (IOException e3) {
-                                e3.printStackTrace();
+                            } catch (IOException e2) {
+                                e2.printStackTrace();
+                                httpURLConnection4 = e2;
                             }
                         }
-                        return webpath;
-                    } catch (IOException e4) {
-                        e = e4;
-                        outputStream2 = outputStream;
+                    } catch (IOException e3) {
+                        e = e3;
+                        randomAccessFile2 = randomAccessFile4;
+                        inputStream = inputStream4;
+                        httpURLConnection2 = httpURLConnection4;
+                        HttpURLConnection httpURLConnection9 = httpURLConnection2;
+                        inputStream4 = inputStream;
+                        randomAccessFile4 = randomAccessFile2;
                         e.printStackTrace();
                         this.finished = false;
+                        httpURLConnection4 = httpURLConnection9;
                         if (inputStream != null) {
                             try {
                                 inputStream.close();
-                                if (outputStream2 != null) {
-                                    outputStream2.close();
+                                if (randomAccessFile2 != null) {
+                                    randomAccessFile2.close();
                                 }
-                                if (httpURLConnection != null) {
-                                    httpURLConnection.disconnect();
+                                httpURLConnection4 = httpURLConnection9;
+                                if (httpURLConnection2 != null) {
+                                    httpURLConnection2.disconnect();
+                                    httpURLConnection4 = httpURLConnection9;
                                 }
-                            } catch (IOException e5) {
-                                e5.printStackTrace();
+                            } catch (IOException e4) {
+                                e4.printStackTrace();
+                                httpURLConnection4 = e4;
                             }
                         }
-                        return webpath;
-                    } catch (InterruptedException e6) {
-                        e = e6;
-                        outputStream2 = outputStream;
+                        return str2;
+                    } catch (InterruptedException e5) {
+                        e = e5;
+                        httpURLConnection3 = httpURLConnection4;
+                        inputStream2 = inputStream4;
+                        randomAccessFile3 = randomAccessFile4;
+                        HttpURLConnection httpURLConnection10 = httpURLConnection3;
+                        inputStream4 = inputStream2;
+                        randomAccessFile4 = randomAccessFile3;
                         e.printStackTrace();
                         this.finished = false;
-                        if (inputStream != null) {
+                        httpURLConnection4 = httpURLConnection10;
+                        if (inputStream2 != null) {
                             try {
-                                inputStream.close();
-                                if (outputStream2 != null) {
-                                    outputStream2.close();
+                                inputStream2.close();
+                                if (randomAccessFile3 != null) {
+                                    randomAccessFile3.close();
                                 }
-                                if (httpURLConnection != null) {
-                                    httpURLConnection.disconnect();
+                                httpURLConnection4 = httpURLConnection10;
+                                if (httpURLConnection3 != null) {
+                                    httpURLConnection3.disconnect();
+                                    httpURLConnection4 = httpURLConnection10;
                                 }
-                            } catch (IOException e7) {
-                                e7.printStackTrace();
+                            } catch (IOException e6) {
+                                e6.printStackTrace();
+                                httpURLConnection4 = e6;
                             }
                         }
-                        return webpath;
-                    } catch (Throwable th2) {
-                        th = th2;
-                        outputStream2 = outputStream;
+                        return str2;
+                    } catch (MalformedURLException e7) {
+                        e = e7;
+                        httpURLConnection = httpURLConnection4;
+                        inputStream3 = inputStream4;
+                        randomAccessFile = randomAccessFile4;
+                        HttpURLConnection httpURLConnection11 = httpURLConnection;
+                        inputStream4 = inputStream3;
+                        randomAccessFile4 = randomAccessFile;
+                        e.printStackTrace();
                         this.finished = false;
-                        if (inputStream != null) {
+                        httpURLConnection4 = httpURLConnection11;
+                        if (inputStream3 != null) {
                             try {
-                                inputStream.close();
-                                if (outputStream2 != null) {
-                                    outputStream2.close();
+                                inputStream3.close();
+                                if (randomAccessFile != null) {
+                                    randomAccessFile.close();
                                 }
+                                httpURLConnection4 = httpURLConnection11;
                                 if (httpURLConnection != null) {
                                     httpURLConnection.disconnect();
+                                    httpURLConnection4 = httpURLConnection11;
                                 }
                             } catch (IOException e8) {
                                 e8.printStackTrace();
+                                httpURLConnection4 = e8;
+                            }
+                        }
+                        return str2;
+                    } catch (Throwable th2) {
+                        th = th2;
+                        this.finished = false;
+                        if (inputStream4 != null) {
+                            try {
+                                inputStream4.close();
+                                if (randomAccessFile4 != null) {
+                                    randomAccessFile4.close();
+                                }
+                                if (httpURLConnection4 != null) {
+                                    httpURLConnection4.disconnect();
+                                }
+                            } catch (IOException e9) {
+                                e9.printStackTrace();
                             }
                         }
                         throw th;
                     }
-                } catch (InterruptedException e9) {
-                    e = e9;
-                } catch (MalformedURLException e10) {
+                } catch (InterruptedException e10) {
                     e = e10;
-                } catch (IOException e11) {
+                    httpURLConnection3 = httpURLConnection6;
+                    inputStream2 = inputStream7;
+                    randomAccessFile3 = null;
+                } catch (MalformedURLException e11) {
                     e = e11;
+                    randomAccessFile = null;
+                    inputStream3 = inputStream5;
+                } catch (IOException e12) {
+                    e = e12;
+                    httpURLConnection2 = httpURLConnection7;
+                    randomAccessFile2 = null;
                 } catch (Throwable th3) {
                     th = th3;
+                    httpURLConnection4 = httpURLConnection5;
+                    inputStream4 = inputStream6;
+                    randomAccessFile4 = null;
                 }
             } catch (Throwable th4) {
                 th = th4;
             }
-        } catch (InterruptedException e12) {
-            e = e12;
-        } catch (MalformedURLException e13) {
+        } catch (IOException e13) {
             e = e13;
-        } catch (IOException e14) {
+            httpURLConnection2 = null;
+            inputStream = null;
+            randomAccessFile2 = null;
+        } catch (InterruptedException e14) {
             e = e14;
+            randomAccessFile3 = null;
+            inputStream2 = null;
+        } catch (MalformedURLException e15) {
+            e = e15;
+            httpURLConnection = null;
+            randomAccessFile = null;
         }
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e15) {
-                e15.printStackTrace();
-            }
-            if (httpURLConnection != null) {
-                httpURLConnection.disconnect();
-                outputStream2 = outputStream;
-                return webpath;
-            }
-        }
-        outputStream2 = outputStream;
-        return webpath;
+        return str2;
     }
 
-    public void pause() {
-        this.paused = true;
-    }
-
-    public void continued() {
-        this.paused = false;
+    public boolean isPaused() {
+        return this.paused;
     }
 
     @Override // android.os.AsyncTask
@@ -232,74 +299,72 @@ public class Async extends AsyncTask<String, Integer, String> {
         super.onCancelled();
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:10:0x0024, code lost:
-        if (r8.isFinish == false) goto L22;
+    /* JADX WARN: Code restructure failed: missing block: B:10:0x0027, code lost:
+        r5.finished = false;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:11:0x0026, code lost:
-        r7 = com.edutech.idauthentication.MainActivity.apkdownloadlist.iterator();
+    /* JADX WARN: Code restructure failed: missing block: B:11:0x0030, code lost:
+        if (r5.isFinish == false) goto L25;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:13:0x0030, code lost:
-        if (r7.hasNext() != false) goto L17;
+    /* JADX WARN: Code restructure failed: missing block: B:12:0x0033, code lost:
+        r0 = com.edutech.idauthentication.MainActivity.apkdownloadlist.iterator();
      */
-    /* JADX WARN: Code restructure failed: missing block: B:14:0x0032, code lost:
-        com.edutech.idauthentication.MainActivity.apkTaskList.remove(r1);
+    /* JADX WARN: Code restructure failed: missing block: B:15:0x0042, code lost:
+        if (r0.hasNext() != false) goto L20;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:17:0x003d, code lost:
-        r4 = r7.next();
+    /* JADX WARN: Code restructure failed: missing block: B:17:0x0048, code lost:
+        com.edutech.idauthentication.MainActivity.apkTaskList.remove(r7);
      */
-    /* JADX WARN: Code restructure failed: missing block: B:18:0x004a, code lost:
-        if (r4.get("appwebpath") == null) goto L40;
+    /* JADX WARN: Code restructure failed: missing block: B:20:0x005a, code lost:
+        r0 = r0.next();
      */
-    /* JADX WARN: Code restructure failed: missing block: B:20:0x0059, code lost:
-        if (r4.get("appwebpath").equals(r9) == false) goto L41;
+    /* JADX WARN: Code restructure failed: missing block: B:21:0x006e, code lost:
+        if (r0.get("appwebpath") == null) goto L45;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:21:0x005b, code lost:
-        r2 = java.lang.String.valueOf(com.edutech.idauthentication.AppEnvironment.FOLDER_EDUTECH) + r4.get("appname");
-        com.edutech.idauthentication.MainActivity.apkfinList.add(r2);
-        com.edutech.idauthentication.MainActivity.apkdownloadlist.remove(r4);
+    /* JADX WARN: Code restructure failed: missing block: B:23:0x0080, code lost:
+        if (r0.get("appwebpath").equals(r6) == false) goto L46;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:22:0x0082, code lost:
-        r7 = com.edutech.idauthentication.MainActivity.apkdownloadlist.iterator();
+    /* JADX WARN: Code restructure failed: missing block: B:24:0x0083, code lost:
+        com.edutech.idauthentication.MainActivity.apkfinList.add(java.lang.String.valueOf(com.edutech.idauthentication.AppEnvironment.FOLDER_EDUTECH) + r0.get("appname"));
+        com.edutech.idauthentication.MainActivity.apkdownloadlist.remove(r0);
      */
-    /* JADX WARN: Code restructure failed: missing block: B:24:0x008c, code lost:
-        if (r7.hasNext() == false) goto L43;
+    /* JADX WARN: Code restructure failed: missing block: B:25:0x00bd, code lost:
+        r0 = com.edutech.idauthentication.MainActivity.apkdownloadlist.iterator();
      */
-    /* JADX WARN: Code restructure failed: missing block: B:25:0x008e, code lost:
-        r4 = r7.next();
+    /* JADX WARN: Code restructure failed: missing block: B:28:0x00cc, code lost:
+        if (r0.hasNext() == false) goto L48;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:26:0x009b, code lost:
-        if (r4.get("appwebpath") == null) goto L46;
+    /* JADX WARN: Code restructure failed: missing block: B:29:0x00cf, code lost:
+        r0 = r0.next();
      */
-    /* JADX WARN: Code restructure failed: missing block: B:28:0x00aa, code lost:
-        if (r4.get("appwebpath").equals(r9) == false) goto L47;
+    /* JADX WARN: Code restructure failed: missing block: B:30:0x00e3, code lost:
+        if (r0.get("appwebpath") == null) goto L51;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:29:0x00ac, code lost:
-        r3 = java.lang.Integer.valueOf(r4.get("redownload_count")).intValue();
+    /* JADX WARN: Code restructure failed: missing block: B:32:0x00f5, code lost:
+        if (r0.get("appwebpath").equals(r6) == false) goto L52;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:30:0x00be, code lost:
-        if (r3 >= 3) goto L32;
+    /* JADX WARN: Code restructure failed: missing block: B:33:0x00f8, code lost:
+        r0 = java.lang.Integer.valueOf(r0.get("redownload_count")).intValue();
      */
-    /* JADX WARN: Code restructure failed: missing block: B:31:0x00c0, code lost:
-        r4.put("redownload_count", java.lang.String.valueOf(r3 + 1));
+    /* JADX WARN: Code restructure failed: missing block: B:35:0x010c, code lost:
+        if (r0 >= 3) goto L37;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:32:0x00ce, code lost:
-        r2 = java.lang.String.valueOf(com.edutech.idauthentication.AppEnvironment.FOLDER_EDUTECH) + r4.get("appname");
-        com.edutech.idauthentication.MainActivity.apkfinList.add(r2);
-        com.edutech.idauthentication.MainActivity.apkdownloadlist.remove(r4);
+    /* JADX WARN: Code restructure failed: missing block: B:36:0x010f, code lost:
+        r0.put("redownload_count", java.lang.String.valueOf(r0 + 1));
      */
-    /* JADX WARN: Code restructure failed: missing block: B:9:0x001f, code lost:
-        r8.finished = false;
+    /* JADX WARN: Code restructure failed: missing block: B:37:0x0121, code lost:
+        com.edutech.idauthentication.MainActivity.apkfinList.add(java.lang.String.valueOf(com.edutech.idauthentication.AppEnvironment.FOLDER_EDUTECH) + r0.get("appname"));
+        com.edutech.idauthentication.MainActivity.apkdownloadlist.remove(r0);
      */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
     */
-    public void onPostExecute(String result) {
+    public void onPostExecute(String str) {
         int i = 0;
         while (true) {
             try {
                 if (i >= MainActivity.apkTaskList.size()) {
                     break;
-                } else if (MainActivity.apkTaskList.get(i).get(result) != null) {
+                } else if (MainActivity.apkTaskList.get(i).get(str) != null) {
                     break;
                 } else {
                     i++;
@@ -308,7 +373,7 @@ public class Async extends AsyncTask<String, Integer, String> {
                 e.printStackTrace();
             }
         }
-        super.onPostExecute((Async) result);
+        super.onPostExecute((Async) str);
     }
 
     @Override // android.os.AsyncTask
@@ -316,8 +381,12 @@ public class Async extends AsyncTask<String, Integer, String> {
         super.onPreExecute();
     }
 
-    public void onProgressUpdate(Integer... values) {
-        listPb.get(values[1].intValue()).setProgress(values[0].intValue());
-        super.onProgressUpdate((Object[]) values);
+    public void onProgressUpdate(Integer... numArr) {
+        listPb.get(numArr[1].intValue()).setProgress(numArr[0].intValue());
+        super.onProgressUpdate((Object[]) numArr);
+    }
+
+    public void pause() {
+        this.paused = true;
     }
 }

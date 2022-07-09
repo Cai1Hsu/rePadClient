@@ -9,9 +9,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import java.io.IOException;
-import org.apache.commons.io.IOUtils;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mining/app/zxing/camera/CameraManager.class */
 public final class CameraManager {
     private static final int MAX_FRAME_HEIGHT = 675;
     private static final int MAX_FRAME_WIDTH = 1200;
@@ -32,23 +31,13 @@ public final class CameraManager {
     private final boolean useOneShotPreviewCallback;
 
     static {
-        int sdkInt;
+        int i;
         try {
-            sdkInt = Integer.parseInt(Build.VERSION.SDK);
+            i = Integer.parseInt(Build.VERSION.SDK);
         } catch (NumberFormatException e) {
-            sdkInt = 10000;
+            i = 10000;
         }
-        SDK_INT = sdkInt;
-    }
-
-    public static void init(Context context) {
-        if (cameraManager == null) {
-            cameraManager = new CameraManager(context);
-        }
-    }
-
-    public static CameraManager get() {
-        return cameraManager;
+        SDK_INT = i;
     }
 
     private CameraManager(Context context) {
@@ -59,20 +48,43 @@ public final class CameraManager {
         this.autoFocusCallback = new AutoFocusCallback();
     }
 
-    public void openDriver(SurfaceHolder holder) throws IOException {
-        if (this.camera == null) {
-            this.camera = Camera.open();
-            if (this.camera == null) {
-                throw new IOException();
-            }
-            this.camera.setPreviewDisplay(holder);
-            if (!this.initialized) {
-                this.initialized = true;
-                this.configManager.initFromCameraParameters(this.camera);
-            }
-            this.configManager.setDesiredCameraParameters(this.camera);
-            FlashlightManager.enableFlashlight();
+    private static int findDesiredDimensionInRange(int i, int i2, int i3) {
+        int i4 = (i * 5) / 8;
+        if (i4 >= i2) {
+            i2 = i4 > i3 ? i3 : i4;
         }
+        return i2;
+    }
+
+    public static CameraManager get() {
+        return cameraManager;
+    }
+
+    public static void init(Context context) {
+        if (cameraManager == null) {
+            cameraManager = new CameraManager(context);
+        }
+    }
+
+    public PlanarYUVLuminanceSource buildLuminanceSource(byte[] bArr, int i, int i2) {
+        PlanarYUVLuminanceSource planarYUVLuminanceSource;
+        Rect framingRectInPreview = getFramingRectInPreview();
+        int previewFormat = this.configManager.getPreviewFormat();
+        String previewFormatString = this.configManager.getPreviewFormatString();
+        Log.i(TAG, "width = " + i + " height = " + i2 + " rect.left = " + framingRectInPreview.left + " rect.top = " + framingRectInPreview.top + " rect.width = " + framingRectInPreview.width() + " rect.height = " + framingRectInPreview.height());
+        switch (previewFormat) {
+            case 16:
+            case 17:
+                planarYUVLuminanceSource = new PlanarYUVLuminanceSource(bArr, i, i2, framingRectInPreview.left, framingRectInPreview.top, framingRectInPreview.width(), framingRectInPreview.height());
+                break;
+            default:
+                if (!"yuv420p".equals(previewFormatString)) {
+                    throw new IllegalArgumentException("Unsupported picture format: " + previewFormat + '/' + previewFormatString);
+                }
+                planarYUVLuminanceSource = new PlanarYUVLuminanceSource(bArr, i, i2, framingRectInPreview.left, framingRectInPreview.top, framingRectInPreview.width(), framingRectInPreview.height());
+                break;
+        }
+        return planarYUVLuminanceSource;
     }
 
     public void closeDriver() {
@@ -83,68 +95,27 @@ public final class CameraManager {
         }
     }
 
-    public void startPreview() {
-        if (this.camera != null && !this.previewing) {
-            this.camera.startPreview();
-            this.previewing = true;
-        }
+    public Context getContext() {
+        return this.context;
     }
 
-    public void stopPreview() {
-        if (this.camera != null && this.previewing) {
-            if (!this.useOneShotPreviewCallback) {
-                this.camera.setPreviewCallback(null);
-            }
-            this.camera.stopPreview();
-            this.previewCallback.setHandler(null, 0);
-            this.autoFocusCallback.setHandler(null, 0);
-            this.previewing = false;
-        }
-    }
-
-    public void requestPreviewFrame(Handler handler, int message) {
-        if (this.camera != null && this.previewing) {
-            this.previewCallback.setHandler(handler, message);
-            if (this.useOneShotPreviewCallback) {
-                this.camera.setOneShotPreviewCallback(this.previewCallback);
-            } else {
-                this.camera.setPreviewCallback(this.previewCallback);
-            }
-        }
-    }
-
-    public void requestAutoFocus(Handler handler, int message) {
-        if (this.camera != null && this.previewing) {
-            this.autoFocusCallback.setHandler(handler, message);
-            this.camera.autoFocus(this.autoFocusCallback);
-        }
-    }
-
-    public synchronized Rect getFramingRect() {
+    public Rect getFramingRect() {
         Point screenResolution;
         Rect rect = null;
         synchronized (this) {
             if (this.framingRect == null) {
                 if (this.camera != null && (screenResolution = this.configManager.getScreenResolution()) != null) {
-                    int width = findDesiredDimensionInRange(screenResolution.x, 240, MAX_FRAME_WIDTH);
-                    int height = findDesiredDimensionInRange(screenResolution.y, 240, MAX_FRAME_HEIGHT);
-                    int leftOffset = (screenResolution.x - width) / 2;
-                    int topOffset = (screenResolution.y - height) / 2;
-                    this.framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+                    int findDesiredDimensionInRange = findDesiredDimensionInRange(screenResolution.x, 240, MAX_FRAME_WIDTH);
+                    int findDesiredDimensionInRange2 = findDesiredDimensionInRange(screenResolution.y, 240, MAX_FRAME_HEIGHT);
+                    int i = (screenResolution.x - findDesiredDimensionInRange) / 2;
+                    int i2 = (screenResolution.y - findDesiredDimensionInRange2) / 2;
+                    this.framingRect = new Rect(i, i2, i + findDesiredDimensionInRange, i2 + findDesiredDimensionInRange2);
                     Log.d(TAG, "Calculated framing rect: " + this.framingRect);
                 }
             }
             rect = this.framingRect;
         }
         return rect;
-    }
-
-    private static int findDesiredDimensionInRange(int resolution, int hardMin, int hardMax) {
-        int dim = (resolution * 5) / 8;
-        if (dim < hardMin) {
-            return hardMin;
-        }
-        return dim > hardMax ? hardMax : dim;
     }
 
     public Rect getFramingRectInPreview() {
@@ -162,24 +133,60 @@ public final class CameraManager {
         return this.framingRectInPreview;
     }
 
-    public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
-        Rect rect = getFramingRectInPreview();
-        int previewFormat = this.configManager.getPreviewFormat();
-        String previewFormatString = this.configManager.getPreviewFormatString();
-        Log.i(TAG, "width = " + width + " height = " + height + " rect.left = " + rect.left + " rect.top = " + rect.top + " rect.width = " + rect.width() + " rect.height = " + rect.height());
-        switch (previewFormat) {
-            case 16:
-            case 17:
-                return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top, rect.width(), rect.height());
-            default:
-                if ("yuv420p".equals(previewFormatString)) {
-                    return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top, rect.width(), rect.height());
-                }
-                throw new IllegalArgumentException("Unsupported picture format: " + previewFormat + IOUtils.DIR_SEPARATOR_UNIX + previewFormatString);
+    public void openDriver(SurfaceHolder surfaceHolder) throws IOException {
+        if (this.camera == null) {
+            this.camera = Camera.open();
+            if (this.camera == null) {
+                throw new IOException();
+            }
+            this.camera.setPreviewDisplay(surfaceHolder);
+            if (!this.initialized) {
+                this.initialized = true;
+                this.configManager.initFromCameraParameters(this.camera);
+            }
+            this.configManager.setDesiredCameraParameters(this.camera);
+            FlashlightManager.enableFlashlight();
         }
     }
 
-    public Context getContext() {
-        return this.context;
+    public void requestAutoFocus(Handler handler, int i) {
+        if (this.camera == null || !this.previewing) {
+            return;
+        }
+        this.autoFocusCallback.setHandler(handler, i);
+        this.camera.autoFocus(this.autoFocusCallback);
+    }
+
+    public void requestPreviewFrame(Handler handler, int i) {
+        if (this.camera == null || !this.previewing) {
+            return;
+        }
+        this.previewCallback.setHandler(handler, i);
+        if (this.useOneShotPreviewCallback) {
+            this.camera.setOneShotPreviewCallback(this.previewCallback);
+        } else {
+            this.camera.setPreviewCallback(this.previewCallback);
+        }
+    }
+
+    public void startPreview() {
+        if (this.camera == null || this.previewing) {
+            return;
+        }
+        this.camera.startPreview();
+        this.previewing = true;
+    }
+
+    public void stopPreview() {
+        if (this.camera == null || !this.previewing) {
+            return;
+        }
+        if (!this.useOneShotPreviewCallback) {
+            this.camera.setPreviewCallback(null);
+        }
+        this.camera.stopPreview();
+        this.previewCallback.setHandler(null, 0);
+        this.autoFocusCallback.setHandler(null, 0);
+        this.previewing = false;
     }
 }

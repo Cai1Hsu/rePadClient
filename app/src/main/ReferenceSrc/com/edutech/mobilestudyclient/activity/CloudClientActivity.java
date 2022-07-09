@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
-import android.app.enterprise.DateTimePolicy;
 import android.app.enterprise.EnterpriseDeviceManager;
 import android.app.enterprise.RestrictionPolicy;
 import android.app.enterprise.kioskmode.KioskMode;
@@ -31,7 +30,6 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -107,7 +105,6 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -117,12 +114,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.SQLExec;
-import org.bson.BSON;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity.class */
 public class CloudClientActivity extends ActivityBase implements View.OnClickListener {
     public static final String BROADCASTER_LOCKSCREEN = "com.edu.action.LAUNCHER_STRAT";
     public static final String Intent_STATUSBAR_INVISIBILITY = "android.intent.action.STATUSBAR_INVISIBILITY";
@@ -253,426 +249,463 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
     public static int installApkFlag = -1;
     public static final String TEMP = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + "MobileStudyClient" + File.separatorChar + ".System" + File.separatorChar + "DaoXueBen" + File.separatorChar + "temp" + File.separatorChar;
 
-    public CloudClientActivity(Context pContext) {
-        this.imageViews = new ImageView[12];
-        this.textViews = new TextView[12];
-        this.mPackageManager = null;
-        this.mAllApps = null;
-        this.idauth = new MainActivity(this);
-        this.mobileStudyClientUpdateThread = null;
-        this.is3G = false;
-        this.isLenovo = false;
-        this.hashmap = null;
-        this.username = "";
-        this.UPDATEAPK = "android.edutech.updateapk";
-        this.isInteraction = true;
-        this.send_ip = "";
-        this.send_name = "";
-        this.send_privatekey = "";
-        this.send_demo = "";
-        this.send_pwd = "";
-        this.send_usercode = "";
-        this.send_schoolid = "";
-        this.wpsPackage = "cn.wps.moffice_eng";
-        this.officesuitPackage = "com.mobisystems.office";
-        this.LANGUAGEPATH = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + "MobileStudyClient" + File.separatorChar + ".System" + File.separatorChar + "language.xml";
-        this.onconfigureChange = false;
-        this.launcherPath = "";
-        this.updateTime = 0;
-        this.isGetLauncher = false;
-        this.hasGeted = false;
-        this.isGetApks = false;
-        this.hasUpdated = false;
-        this.addApksList = new ArrayList<>();
-        this.myappList = new ArrayList();
-        this.showTime = true;
-        this.isnotice = true;
-        this.deletingFiles = false;
-        this.LicenseOK = false;
-        this.apkUpdateList = new ArrayList();
-        this.apkUpdatePkgList = new ArrayList();
-        this.currentCachePosition = 0L;
-        this.currentCacheLength = 0L;
-        this.canRefresh = false;
-        this.language = "";
-        this.installHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.1
-            @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                PackageInfo packageInfo2;
-                switch (msg.what) {
-                    case 1:
-                        CloudClientActivity.this.installNewApk();
-                        return;
-                    case 3:
-                        CloudClientActivity.this.updateThread = null;
-                        CloudClientActivity.this.updateTime = HttpStatus.SC_MULTIPLE_CHOICES;
-                        CloudClientActivity.this.showFailedApkInfo();
-                        return;
-                    case 4:
-                        Intent intent2 = new Intent("android.intent.action.MAIN");
-                        intent2.addFlags(268435456);
-                        ComponentName cn = new ComponentName("com.edutech.assistantdemo", "com.edutech.assistantdemo.MainActivity");
-                        intent2.setComponent(cn);
-                        try {
-                            packageInfo2 = CloudClientActivity.this.getPackageManager().getPackageInfo("com.edutech.assistantdemo", 0);
-                        } catch (PackageManager.NameNotFoundException e) {
-                            packageInfo2 = null;
-                            e.printStackTrace();
-                        }
-                        if (packageInfo2 != null) {
-                            CloudClientActivity.this.startActivity(intent2);
-                            return;
-                        }
-                        return;
-                    case CloudClientActivity.UPDATE_PROGRESS /* 4113 */:
-                        try {
-                            CloudClientActivity.this.refreshDownloadPB();
-                            return;
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                            return;
-                        }
-                    case CloudClientActivity.UPDATE_INSTALLSTATE /* 4114 */:
-                    default:
-                        return;
-                    case CloudClientActivity.START_PROGRESS /* 4115 */:
-                        try {
-                            if (CloudClientActivity.this.tv_updatemsg != null) {
-                                CloudClientActivity.this.tv_updatemsg.setVisibility(0);
-                            }
-                            CloudClientActivity.this.refreshDownloadPB();
-                            return;
-                        } catch (Exception e3) {
-                            e3.printStackTrace();
-                            return;
-                        }
-                    case CloudClientActivity.UPDATE_INSTALLSINGLE /* 4116 */:
-                        String path = (String) msg.obj;
-                        CloudClientActivity.this.installSingleApk(path);
-                        return;
+    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$BatteryReceiver.class */
+    class BatteryReceiver extends BroadcastReceiver {
+        BatteryReceiver() {
+            CloudClientActivity.this = r4;
+        }
+
+        @Override // android.content.BroadcastReceiver
+        public void onReceive(Context context, Intent intent) {
+            if ("android.intent.action.BATTERY_CHANGED".equals(intent.getAction())) {
+                int intExtra = intent.getIntExtra("level", 0);
+                int intExtra2 = intent.getIntExtra("scale", 100);
+                int intExtra3 = intent.getIntExtra("status", -1);
+                Message obtainMessage = CloudClientActivity.this.batteryChangedHandler.obtainMessage();
+                obtainMessage.arg1 = (intExtra * 100) / intExtra2;
+                obtainMessage.arg2 = intExtra3;
+                obtainMessage.sendToTarget();
+            }
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$HostPwd.class */
+    class HostPwd extends Thread {
+        HostPwd() {
+            CloudClientActivity.this = r4;
+        }
+
+        /* JADX WARN: Code restructure failed: missing block: B:13:0x0056, code lost:
+            if (r0.equals("") != false) goto L14;
+         */
+        @Override // java.lang.Thread, java.lang.Runnable
+        /*
+            Code decompiled incorrectly, please refer to instructions dump.
+        */
+        public void run() {
+            String str;
+            SharedPreferences sharedPreferences = CloudClientActivity.this.getSharedPreferences("privatekey", 0);
+            String string = sharedPreferences.getString("key", "");
+            String string2 = sharedPreferences.getString("apihost", "");
+            String string3 = sharedPreferences.getString("name", "");
+            if (string2 != null && !string2.equals("") && string3 != null && !string3.equals("") && string != null) {
+                str = string;
+            }
+            HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
+            if (loadXml == null) {
+                return;
+            }
+            String str2 = loadXml.get("ip");
+            String str3 = loadXml.get("usercode");
+            String str4 = loadXml.get("privatekey");
+            string2 = str2;
+            str = str4;
+            string3 = str3;
+            if (str2 != null) {
+                string2 = str2;
+                str = str4;
+                string3 = str3;
+                if (str3 != null) {
+                    string2 = str2;
+                    str = str4;
+                    string3 = str3;
+                    if (str4 != null) {
+                        sharedPreferences.edit().putString("key", str4).commit();
+                        sharedPreferences.edit().putString("apihost", str2).commit();
+                        sharedPreferences.edit().putString("name", str3).commit();
+                        string3 = str3;
+                        str = str4;
+                        string2 = str2;
+                    }
                 }
             }
-        };
-        this.InteractionReceiver = new BroadcastReceiver() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.2
-            @Override // android.content.BroadcastReceiver
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals("android.intent.action.STATUSBAR_INVISIBILITY")) {
-                    CloudClientActivity.this.isInteraction = true;
-                } else if (action.equals("android.intent.action.STATUSBAR_VISIBILITY")) {
-                    CloudClientActivity.this.isInteraction = false;
+            String str5 = "http://" + string2 + "/api/padpwd";
+            HttpPost httpPost = new HttpPost(str5);
+            httpPost.addHeader("X-Edutech-Entity", string3);
+            long currentTimeMillis = System.currentTimeMillis();
+            httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + string3 + str));
+            DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
+            Log.e("hhh", str5);
+            try {
+                HttpResponse execute = defaultHttpClient.execute(httpPost);
+                Log.e("hhh", "code:" + execute.getStatusLine().getStatusCode());
+                String string4 = new JSONObject(CloudClientActivity.this.getJsonStringFromGZIP(execute)).getString("data");
+                Log.e("hhh", string4);
+                File file = new File(String.valueOf(AppEnvironment.PWDFILEPATH) + string2 + "pwd.xml");
+                if (file.exists() && string4 != null && !string4.equals("")) {
+                    file.delete();
+                }
+                file.createNewFile();
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                fileOutputStream.write(string4.getBytes());
+                if (fileOutputStream == null) {
+                    return;
+                }
+                fileOutputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$NoticeAdapter.class */
+    class NoticeAdapter extends BaseAdapter {
+        private List<Noticebean> noticeMsgs = new ArrayList();
+
+        /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$NoticeAdapter$Holder.class */
+        class Holder {
+            TextView discuss_adapter_web;
+
+            Holder() {
+                NoticeAdapter.this = r4;
+            }
+        }
+
+        NoticeAdapter() {
+            CloudClientActivity.this = r5;
+        }
+
+        @Override // android.widget.Adapter
+        public int getCount() {
+            return this.noticeMsgs.size();
+        }
+
+        @Override // android.widget.Adapter
+        public Object getItem(int i) {
+            return this.noticeMsgs.get(i);
+        }
+
+        @Override // android.widget.Adapter
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override // android.widget.Adapter
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            Holder holder;
+            if (view == null) {
+                view = LayoutInflater.from(CloudClientActivity.this).inflate(R.layout.discuss_adapter, (ViewGroup) null);
+                holder = new Holder();
+                holder.discuss_adapter_web = (TextView) view.findViewById(R.id.discuss_adapter_web);
+                view.setTag(holder);
+            } else {
+                holder = (Holder) view.getTag();
+            }
+            holder.discuss_adapter_web.setText("作业: " + this.noticeMsgs.get(i).getMessage());
+            holder.discuss_adapter_web.setTextColor(CloudClientActivity.this.getResources().getColor(R.color.gray_color));
+            return view;
+        }
+
+        public void setDatas(List<Noticebean> list) {
+            this.noticeMsgs = list;
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$TouchListenerImpl.class */
+    private class TouchListenerImpl implements View.OnTouchListener {
+        private TouchListenerImpl() {
+            CloudClientActivity.this = r4;
+        }
+
+        /* synthetic */ TouchListenerImpl(CloudClientActivity cloudClientActivity, TouchListenerImpl touchListenerImpl) {
+            this();
+        }
+
+        @Override // android.view.View.OnTouchListener
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+                case 0:
+                case 1:
+                default:
+                    return false;
+                case 2:
+                    int scrollY = view.getScrollY();
+                    int height = view.getHeight();
+                    int measuredHeight = CloudClientActivity.this.scrollView.getChildAt(0).getMeasuredHeight();
+                    int i = measuredHeight;
+                    if (measuredHeight > 20) {
+                        i = measuredHeight - 20;
+                    }
+                    if (scrollY + height <= i) {
+                        return false;
+                    }
+                    CloudClientActivity.this.btnYes.setEnabled(true);
+                    return false;
+            }
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$UpdateThread.class */
+    class UpdateThread extends Thread {
+        UpdateThread() {
+            CloudClientActivity.this = r4;
+        }
+
+        /* JADX WARN: Code restructure failed: missing block: B:195:0x0578, code lost:
+            r27 = java.lang.Long.parseLong(r0.get("versioncode"));
+         */
+        /* JADX WARN: Code restructure failed: missing block: B:19:0x007e, code lost:
+            if (r0.equals("") != false) goto L20;
+         */
+        /* JADX WARN: Code restructure failed: missing block: B:208:0x05b4, code lost:
+            r29 = move-exception;
+         */
+        /* JADX WARN: Code restructure failed: missing block: B:210:0x05ba, code lost:
+            r29.printStackTrace();
+         */
+        /* JADX WARN: Code restructure failed: missing block: B:211:0x05c1, code lost:
+            r27 = 1;
+         */
+        /* JADX WARN: Code restructure failed: missing block: B:218:0x05e7, code lost:
+            r27 = 1;
+         */
+        /* JADX WARN: Code restructure failed: missing block: B:63:0x0201, code lost:
+            if (r0 == 0) goto L64;
+         */
+        /* JADX WARN: Removed duplicated region for block: B:148:0x045f  */
+        @Override // java.lang.Thread, java.lang.Runnable
+        /*
+            Code decompiled incorrectly, please refer to instructions dump.
+        */
+        public void run() {
+            String str;
+            boolean z;
+            boolean z2;
+            int i;
+            long j;
+            boolean z3;
+            HashMap<String, String> next;
+            long j2;
+            CloudClientActivity.this.isGetApks = true;
+            try {
+                Thread.sleep(4000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (CloudClientActivity.this.addApksList != null) {
+                CloudClientActivity.this.addApksList.clear();
+            } else {
+                CloudClientActivity.this.addApksList = new ArrayList();
+            }
+            CloudClientActivity.this.launcherPath = "";
+            SharedPreferences sharedPreferences = CloudClientActivity.this.getSharedPreferences("privatekey", 0);
+            String string = sharedPreferences.getString("key", "");
+            String string2 = sharedPreferences.getString("apihost", "");
+            String string3 = sharedPreferences.getString("name", "");
+            if (string2 != null && !string2.equals("") && string3 != null && !string3.equals("") && string != null) {
+                str = string;
+            }
+            HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
+            if (loadXml == null) {
+                return;
+            }
+            string2 = loadXml.get("ip");
+            string3 = loadXml.get("usercode");
+            str = loadXml.get("privatekey");
+            HttpPost httpPost = new HttpPost("http://" + string2 + "/api/app/projectcode/ebag/os/android/");
+            httpPost.addHeader("X-Edutech-Entity", string3);
+            long currentTimeMillis = System.currentTimeMillis();
+            httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + string3 + str));
+            DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
+            ArrayList arrayList = new ArrayList();
+            z = false;
+            boolean z4 = false;
+            try {
+                JSONObject jSONObject = new JSONObject(CloudClientActivity.this.getJsonStringFromGZIP(defaultHttpClient.execute(httpPost)));
+                boolean z5 = jSONObject.getBoolean("status");
+                int i2 = jSONObject.getInt("errorNum");
+                CloudClientActivity.this.apkUpdateList = new ArrayList();
+                CloudClientActivity.this.apkUpdatePkgList = new ArrayList();
+                CloudClientActivity.this.currentCacheLength = 0L;
+                CloudClientActivity.this.currentCachePosition = 0L;
+                new ApkUpdateBean();
+                if (!z5) {
+                    z2 = false;
+                }
+                CloudClientActivity.this.hasGeted = true;
+                JSONArray jSONArray = jSONObject.getJSONArray("data");
+                z2 = false;
+                if (jSONArray != null) {
+                    z2 = false;
+                    if (jSONArray.length() > 0) {
+                        ArrayList<HashMap<String, String>> systemInfo = SystemInfoHelper.getSystemInfo(new ArrayList(), CloudClientActivity.this);
+                        i = 0;
+                        while (i < jSONArray.length()) {
+                            JSONObject jSONObject2 = jSONArray.getJSONObject(i);
+                            boolean z6 = z;
+                            jSONObject2.getString("appwebpath");
+                            boolean z7 = z;
+                            long j3 = jSONObject2.getLong("appsize");
+                            boolean z8 = z;
+                            jSONObject2.getString("apkname");
+                            boolean z9 = z;
+                            String string4 = jSONObject2.getString("versionname");
+                            boolean z10 = z;
+                            String string5 = jSONObject2.getString("packagename");
+                            boolean z11 = z;
+                            String string6 = jSONObject2.getString("versioncode");
+                            j = 1;
+                            try {
+                                j = Long.parseLong(string6);
+                            } catch (NumberFormatException e2) {
+                            } catch (Exception e3) {
+                            }
+                            Iterator<HashMap<String, String>> it = systemInfo.iterator();
+                            while (true) {
+                                if (!it.hasNext()) {
+                                    z3 = false;
+                                    break;
+                                }
+                                next = it.next();
+                                boolean z12 = z;
+                                if (next.get("packagename") != null) {
+                                    z4 = z;
+                                    if (string5.equals(next.get("packagename"))) {
+                                        break;
+                                    }
+                                }
+                            }
+                            boolean z13 = z;
+                            if (!z3) {
+                                z13 = z;
+                                if (string5.equals("com.launcher.activity")) {
+                                    z13 = true;
+                                }
+                                boolean z14 = z13;
+                                CloudClientActivity.this.currentCacheLength += j3;
+                                boolean z15 = z13;
+                                boolean z16 = z13;
+                                ApkUpdateBean apkUpdateBean = new ApkUpdateBean();
+                                boolean z17 = z13;
+                                apkUpdateBean.setPackagename(string5);
+                                boolean z18 = z13;
+                                apkUpdateBean.setApkDownloadSize(0L);
+                                boolean z19 = z13;
+                                apkUpdateBean.setApkSize(j3);
+                                boolean z20 = z13;
+                                apkUpdateBean.setInstallState(-1);
+                                boolean z21 = z13;
+                                apkUpdateBean.setApkLocalPath("");
+                                boolean z22 = z13;
+                                apkUpdateBean.setApkUrl(jSONObject2.getString("appwebpath"));
+                                boolean z23 = z13;
+                                apkUpdateBean.setAppName(jSONObject2.getString("apkname"));
+                                boolean z24 = z13;
+                                apkUpdateBean.setVersioncode(string6);
+                                boolean z25 = z13;
+                                apkUpdateBean.setVersionname(string4);
+                                boolean z26 = z13;
+                                CloudClientActivity.this.apkUpdateList.add(apkUpdateBean);
+                                boolean z27 = z13;
+                                CloudClientActivity.this.apkUpdatePkgList.add(string5);
+                            }
+                            i++;
+                            z = z13;
+                        }
+                        boolean z28 = z;
+                        boolean z29 = z;
+                        Message message = new Message();
+                        boolean z30 = z;
+                        message.what = CloudClientActivity.START_PROGRESS;
+                        boolean z31 = z;
+                        CloudClientActivity.this.installHandler.sendMessage(message);
+                        boolean z32 = z;
+                        Utils.saveUpdateApks(CloudClientActivity.this.apkUpdateList, CloudClientActivity.this, string2);
+                        boolean z33 = z;
+                        List parseDownload = CloudClientActivity.this.parseDownload(arrayList, CloudClientActivity.this.apkUpdateList);
+                        z2 = z;
+                        if (CloudClientActivity.this.launcherPath != null) {
+                            z2 = z;
+                            if (!CloudClientActivity.this.launcherPath.equals("")) {
+                                boolean z34 = z;
+                                parseDownload.add(CloudClientActivity.this.launcherPath);
+                                z4 = z;
+                                CloudClientActivity.this.addApksList.add("com.launcher.activity");
+                                z2 = z;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e4) {
+                e4.printStackTrace();
+                z2 = z4;
+            }
+            if (CloudClientActivity.this.addApksList != null && CloudClientActivity.this.addApksList.size() > 0) {
+                Intent intent = new Intent();
+                intent.setAction(sysProtectService.ADDINSTALL);
+                intent.putStringArrayListExtra("packages", CloudClientActivity.this.addApksList);
+                CloudClientActivity.this.sendBroadcast(intent);
+            }
+            if (z2 && !TextUtils.isEmpty(CloudClientActivity.this.launcherPath)) {
+                Message message2 = new Message();
+                message2.what = 4;
+                CloudClientActivity.this.installHandler.sendMessage(message2);
+                CloudClientActivity.this.sendInstallMessage(-1, CloudClientActivity.this.launcherPath, CloudClientActivity.UPDATE_INSTALLSINGLE);
+            }
+            Message message3 = new Message();
+            message3.what = 3;
+            CloudClientActivity.this.installHandler.sendMessage(message3);
+            CloudClientActivity.this.getSharedPreferences("resumeconfig", 0).edit().putLong("updateapks", System.currentTimeMillis()).commit();
+            CloudClientActivity.this.isGetApks = false;
+            return;
+            boolean z35 = z;
+            if (next.get("versioncode") != null) {
+                boolean z36 = z;
+                if (next.get("versionname") != null && j > j2) {
+                    z3 = false;
+                    boolean z132 = z;
+                    if (!z3) {
+                    }
+                    i++;
+                    z = z132;
                 }
             }
-        };
-        this.callHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.3
-            @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                int what = msg.what;
-                switch (what) {
-                    case 0:
-                        if (CloudClientActivity.this.is3G.booleanValue()) {
-                            Intent intent_tel = new Intent();
-                            if (CloudClientActivity.this.isLenovo.booleanValue()) {
-                                intent_tel.setPackage("com.lenovo.ideafriend");
-                                intent_tel.setType("vnd.android-dir/mms-sms");
-                            } else {
-                                intent_tel.setPackage("com.android.mms");
-                                intent_tel.setType("vnd.android-dir/mms-sms");
-                                intent_tel.setAction("android.intent.action.MAIN");
-                            }
-                            CloudClientActivity.this.startActivity(intent_tel);
-                            return;
-                        }
-                        return;
-                    case 1:
-                        if (!CloudClientActivity.this.is3G.booleanValue() || !Build.DISPLAY.contains("TB-8703N")) {
-                            if (CloudClientActivity.this.is3G.booleanValue()) {
-                                Intent intent = new Intent();
-                                intent.setAction("android.intent.action.CALL_BUTTON");
-                                CloudClientActivity.this.startActivity(intent);
-                                return;
-                            }
-                            return;
-                        }
-                        Intent intent2 = new Intent();
-                        intent2.setClassName("com.android.dialer", "com.android.dialer.DialtactsActivity");
-                        intent2.setFlags(268435456);
-                        intent2.setFlags(536870912);
-                        CloudClientActivity.this.startActivity(intent2);
-                        return;
-                    case 2:
-                        Toast.makeText(CloudClientActivity.this, (int) R.string.notthetime, 0).show();
-                        return;
-                    default:
-                        return;
-                }
+            z3 = true;
+            boolean z1322 = z;
+            if (!z3) {
             }
-        };
-        this.checkIdThread = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.4
-            @Override // java.lang.Runnable
-            public void run() {
-                boolean userlicenseFlag;
-                Looper.prepare();
-                int result = CloudClientActivity.this.idauth.checkIDAuth();
-                int i = Build.VERSION.SDK_INT;
-                Log.e("iaduth", "result1:" + result);
-                if (result != 0) {
-                    userlicenseFlag = false;
+            i++;
+            z = z1322;
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/CloudClientActivity$WifiReceiver.class */
+    class WifiReceiver extends BroadcastReceiver {
+        WifiReceiver() {
+            CloudClientActivity.this = r4;
+        }
+
+        @Override // android.content.BroadcastReceiver
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals("android.net.wifi.STATE_CHANGE")) {
+                NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra("networkInfo");
+                if (networkInfo.getState().equals(NetworkInfo.State.DISCONNECTED)) {
+                    CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + CloudClientActivity.this.getString(R.string.disconnected));
+                } else if (!networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
                 } else {
-                    userlicenseFlag = true;
-                }
-                if (userlicenseFlag) {
-                    My_Application.Allow_Flag = true;
-                } else {
-                    My_Application.Allow_Flag = false;
-                }
-                Looper.loop();
-            }
-        };
-        this.batteryChangedHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.5
-            @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                int battery = msg.arg1;
-                int status = msg.arg2;
-                if (status == 2) {
-                    if (AppEnvironment.isSNZT) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_batterying), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (AppEnvironment.isSDYB) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_batterying), (Drawable) null, (Drawable) null);
-                    } else if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_newcharge), (Drawable) null);
-                    } else {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_charging), (Drawable) null, (Drawable) null, (Drawable) null);
-                    }
-                } else if (AppEnvironment.isSNZT) {
-                    if (battery > 0 && battery <= 10) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery1), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 10 && battery <= 20) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery2), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 20 && battery <= 30) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery3), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 30 && battery <= 40) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery4), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 40 && battery <= 50) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery5), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 50 && battery <= 60) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery6), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 60 && battery <= 70) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery7), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 70 && battery <= 80) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery8), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 80 && battery <= 90) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery9), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 90 && battery <= 100) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery10), (Drawable) null, (Drawable) null, (Drawable) null);
-                    }
-                } else if (AppEnvironment.isSDYB) {
-                    if (battery > 0 && battery <= 10) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery1), (Drawable) null, (Drawable) null);
-                    } else if (battery > 10 && battery <= 20) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery2), (Drawable) null, (Drawable) null);
-                    } else if (battery > 20 && battery <= 30) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery3), (Drawable) null, (Drawable) null);
-                    } else if (battery > 30 && battery <= 40) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery4), (Drawable) null, (Drawable) null);
-                    } else if (battery > 40 && battery <= 50) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery5), (Drawable) null, (Drawable) null);
-                    } else if (battery > 50 && battery <= 60) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery6), (Drawable) null, (Drawable) null);
-                    } else if (battery > 60 && battery <= 70) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery7), (Drawable) null, (Drawable) null);
-                    } else if (battery > 70 && battery <= 80) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery8), (Drawable) null, (Drawable) null);
-                    } else if (battery > 80 && battery <= 90) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery9), (Drawable) null, (Drawable) null);
-                    } else if (battery > 90 && battery <= 100) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery10), (Drawable) null, (Drawable) null);
-                    }
-                } else if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
-                    if (battery > 0 && battery <= 10) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new1), (Drawable) null);
-                    } else if (battery > 10 && battery <= 20) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new2), (Drawable) null);
-                    } else if (battery > 20 && battery <= 30) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new3), (Drawable) null);
-                    } else if (battery > 30 && battery <= 40) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new4), (Drawable) null);
-                    } else if (battery > 40 && battery <= 50) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new5), (Drawable) null);
-                    } else if (battery > 50 && battery <= 60) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new6), (Drawable) null);
-                    } else if (battery > 60 && battery <= 70) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new7), (Drawable) null);
-                    } else if (battery > 70 && battery <= 80) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new8), (Drawable) null);
-                    } else if (battery > 80 && battery <= 90) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new9), (Drawable) null);
-                    } else if (battery > 90 && battery <= 100) {
-                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new10), (Drawable) null);
-                    }
-                } else if (battery > 0 && battery <= 10) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_01), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 10 && battery <= 20) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_02), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 20 && battery <= 30) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_03), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 30 && battery <= 40) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_04), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 40 && battery <= 50) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_05), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 50 && battery <= 60) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_06), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 60 && battery <= 70) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_07), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 70 && battery <= 80) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_08), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 80 && battery <= 90) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_09), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 90 && battery <= 100) {
-                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_0full), (Drawable) null, (Drawable) null, (Drawable) null);
-                }
-                CloudClientActivity.this.tv_battery.setText(String.valueOf(battery) + "%");
-            }
-        };
-        this.keylistener = new DialogInterface.OnKeyListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.6
-            @Override // android.content.DialogInterface.OnKeyListener
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                return keyCode == 4 && event.getRepeatCount() == 0;
-            }
-        };
-        this.apkInstallReceiver = new BroadcastReceiver() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.7
-            @Override // android.content.BroadcastReceiver
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals("android.intent.action.PACKAGE_ADDED")) {
-                    Message msg = CloudClientActivity.this.apkHandler.obtainMessage();
-                    msg.sendToTarget();
-                    String packageName = intent.getDataString().replace("package:", "");
                     try {
-                        if (CloudClientActivity.this.apkUpdatePkgList != null && CloudClientActivity.this.apkUpdatePkgList.contains(packageName)) {
-                            CloudClientActivity.this.apkUpdatePkgList.remove(packageName);
-                        }
+                        CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + CloudClientActivity.this.getWIFISSID(CloudClientActivity.this));
                     } catch (Exception e) {
+                        CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + ((WifiManager) context.getSystemService("wifi")).getConnectionInfo().getSSID());
                     }
+                    CloudClientActivity.this.getDesignView();
+                    CloudClientActivity.this.apkUpdate();
                 }
+            } else if (action.equals(sysProtectService.SERVICE_START)) {
+                CloudClientActivity.this.lockPad();
+            } else if (!action.equals("edm.intent.action.license.status")) {
+                action.equals("com.edutech.getadmin");
+            } else if (intent.getIntExtra("edm.intent.extra.license.errorcode", -1) == 601 || intent.getIntExtra("edm.intent.extra.license.result_type", -1) != 800) {
+                CloudClientActivity.this.LicenseOK = false;
+                Log.e("license", "license fail");
+                CloudClientActivity.this.getSharedPreferences("license", 0).edit().putBoolean("licenseok", false).commit();
+            } else {
+                CloudClientActivity.this.LicenseOK = true;
+                CloudClientActivity.this.getSharedPreferences("license", 0).edit().putBoolean("licenseok", true).commit();
+                Log.e("license", "license ok");
             }
-        };
-        this.apkHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.8
-            @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                CloudClientActivity.this.showFailedApkInfo();
-            }
-        };
-        this.timeRunnable = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.9
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x00f8: INVOKE  (r13v2 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x010d: INVOKE  (r13v5 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (12 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x0122: INVOKE  (r13v8 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (13 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x01a7: INVOKE  (r13v12 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            @Override // java.lang.Runnable
-            public void run() {
-                String time;
-                while (CloudClientActivity.this.showTime) {
-                    Calendar cal = Calendar.getInstance();
-                    int month = cal.get(2);
-                    int year = cal.get(1);
-                    int day = cal.get(5);
-                    String hour = cal.get(11) < 10 ? "0" + cal.get(11) : new StringBuilder().append(cal.get(11)).toString();
-                    String minute = cal.get(12) < 10 ? "0" + cal.get(12) : new StringBuilder().append(cal.get(12)).toString();
-                    if (cal.get(13) < 10) {
-                        String str = "0" + cal.get(13);
-                    } else {
-                        new StringBuilder().append(cal.get(13)).toString();
-                    }
-                    int weekday = cal.get(7);
-                    if (!AppEnvironment.isSDYB) {
-                        if (!AppEnvironment.isMAINNEW && !AppEnvironment.isDEMO) {
-                            if (!CloudClientActivity.this.language.equals("en")) {
-                                time = String.valueOf(hour) + ":" + minute + " " + CloudClientActivity.this.getWeekDay(weekday) + "\n" + year + "年" + (month + 1) + "月" + day + "日 ";
-                            } else {
-                                time = String.valueOf(hour) + ":" + minute + " " + CloudClientActivity.this.getWeekDay(weekday) + "\n" + CloudClientActivity.this.getMonth(month) + "," + day + "," + year;
-                            }
-                        } else if (cal.get(11) <= 12) {
-                            time = "上午 " + hour + ":" + minute;
-                        } else {
-                            String hour2 = cal.get(11) + (-12) < 10 ? "0" + (cal.get(11) - 12) : new StringBuilder().append(cal.get(11)).toString();
-                            time = "下午 " + hour2 + ":" + minute;
-                        }
-                    } else {
-                        time = String.valueOf(hour) + ":" + minute + "\n" + year + "年" + (month + 1) + "月" + day + "日\n" + CloudClientActivity.this.getWeekDay(weekday);
-                    }
-                    Message msg = CloudClientActivity.this.timeHandler.obtainMessage();
-                    msg.what = 1;
-                    msg.obj = time;
-                    msg.sendToTarget();
-                    try {
-                        Thread.sleep(1000L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        this.timeHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.10
-            @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 1:
-                        String time = (String) msg.obj;
-                        if (CloudClientActivity.this.sdyb_time != null && time != null) {
-                            CloudClientActivity.this.sdyb_time.setText(time);
-                            return;
-                        }
-                        return;
-                    default:
-                        return;
-                }
-            }
-        };
-        this.noticeHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.11
-            @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 1:
-                        int obj = msg.arg1;
-                        if (CloudClientActivity.this.three_noticetv != null) {
-                            CloudClientActivity.this.three_noticetv.setVisibility(0);
-                            if (obj <= 0) {
-                                CloudClientActivity.this.three_noticetv.setVisibility(8);
-                            } else {
-                                String obj_str = obj < 100 ? new StringBuilder(String.valueOf(obj)).toString() : "99+";
-                                CloudClientActivity.this.three_noticetv.setText(obj_str);
-                            }
-                        }
-                        try {
-                            CloudClientActivity.this.showNoticeDetails();
-                            return;
-                        } catch (Exception e) {
-                            return;
-                        }
-                    default:
-                        return;
-                }
-            }
-        };
-        this.noticeRunnable = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.12
-            @Override // java.lang.Runnable
-            public void run() {
-                while (CloudClientActivity.this.isnotice) {
-                    SharedPreferences sp = CloudClientActivity.this.getSharedPreferences("notice", 0);
-                    long start = sp.getLong("lasttime", 0L);
-                    long now = System.currentTimeMillis();
-                    if (start == 0 || Math.abs(now - start) >= 600000) {
-                        sp.edit().putLong("lasttime", now).commit();
-                        CloudClientActivity.this.getMyWorkNotification();
-                    }
-                    try {
-                        Thread.sleep(300000L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
+        }
     }
 
     public CloudClientActivity() {
@@ -719,9 +752,9 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         this.language = "";
         this.installHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.1
             @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                PackageInfo packageInfo2;
-                switch (msg.what) {
+            public void handleMessage(Message message) {
+                PackageInfo packageInfo;
+                switch (message.what) {
                     case 1:
                         CloudClientActivity.this.installNewApk();
                         return;
@@ -731,20 +764,19 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                         CloudClientActivity.this.showFailedApkInfo();
                         return;
                     case 4:
-                        Intent intent2 = new Intent("android.intent.action.MAIN");
-                        intent2.addFlags(268435456);
-                        ComponentName cn = new ComponentName("com.edutech.assistantdemo", "com.edutech.assistantdemo.MainActivity");
-                        intent2.setComponent(cn);
+                        Intent intent = new Intent("android.intent.action.MAIN");
+                        intent.addFlags(268435456);
+                        intent.setComponent(new ComponentName("com.edutech.assistantdemo", "com.edutech.assistantdemo.MainActivity"));
                         try {
-                            packageInfo2 = CloudClientActivity.this.getPackageManager().getPackageInfo("com.edutech.assistantdemo", 0);
+                            packageInfo = CloudClientActivity.this.getPackageManager().getPackageInfo("com.edutech.assistantdemo", 0);
                         } catch (PackageManager.NameNotFoundException e) {
-                            packageInfo2 = null;
+                            packageInfo = null;
                             e.printStackTrace();
                         }
-                        if (packageInfo2 != null) {
-                            CloudClientActivity.this.startActivity(intent2);
+                        if (packageInfo == null) {
                             return;
                         }
+                        CloudClientActivity.this.startActivity(intent);
                         return;
                     case CloudClientActivity.UPDATE_PROGRESS /* 4113 */:
                         try {
@@ -769,8 +801,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                             return;
                         }
                     case CloudClientActivity.UPDATE_INSTALLSINGLE /* 4116 */:
-                        String path = (String) msg.obj;
-                        CloudClientActivity.this.installSingleApk(path);
+                        CloudClientActivity.this.installSingleApk((String) message.obj);
                         return;
                 }
             }
@@ -781,46 +812,46 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                 String action = intent.getAction();
                 if (action.equals("android.intent.action.STATUSBAR_INVISIBILITY")) {
                     CloudClientActivity.this.isInteraction = true;
-                } else if (action.equals("android.intent.action.STATUSBAR_VISIBILITY")) {
+                } else if (!action.equals("android.intent.action.STATUSBAR_VISIBILITY")) {
+                } else {
                     CloudClientActivity.this.isInteraction = false;
                 }
             }
         };
         this.callHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.3
             @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                int what = msg.what;
-                switch (what) {
+            public void handleMessage(Message message) {
+                switch (message.what) {
                     case 0:
-                        if (CloudClientActivity.this.is3G.booleanValue()) {
-                            Intent intent_tel = new Intent();
-                            if (CloudClientActivity.this.isLenovo.booleanValue()) {
-                                intent_tel.setPackage("com.lenovo.ideafriend");
-                                intent_tel.setType("vnd.android-dir/mms-sms");
-                            } else {
-                                intent_tel.setPackage("com.android.mms");
-                                intent_tel.setType("vnd.android-dir/mms-sms");
-                                intent_tel.setAction("android.intent.action.MAIN");
-                            }
-                            CloudClientActivity.this.startActivity(intent_tel);
+                        if (!CloudClientActivity.this.is3G.booleanValue()) {
                             return;
                         }
+                        Intent intent = new Intent();
+                        if (CloudClientActivity.this.isLenovo.booleanValue()) {
+                            intent.setPackage("com.lenovo.ideafriend");
+                            intent.setType("vnd.android-dir/mms-sms");
+                        } else {
+                            intent.setPackage("com.android.mms");
+                            intent.setType("vnd.android-dir/mms-sms");
+                            intent.setAction("android.intent.action.MAIN");
+                        }
+                        CloudClientActivity.this.startActivity(intent);
                         return;
                     case 1:
                         if (!CloudClientActivity.this.is3G.booleanValue() || !Build.DISPLAY.contains("TB-8703N")) {
-                            if (CloudClientActivity.this.is3G.booleanValue()) {
-                                Intent intent = new Intent();
-                                intent.setAction("android.intent.action.CALL_BUTTON");
-                                CloudClientActivity.this.startActivity(intent);
+                            if (!CloudClientActivity.this.is3G.booleanValue()) {
                                 return;
                             }
+                            Intent intent2 = new Intent();
+                            intent2.setAction("android.intent.action.CALL_BUTTON");
+                            CloudClientActivity.this.startActivity(intent2);
                             return;
                         }
-                        Intent intent2 = new Intent();
-                        intent2.setClassName("com.android.dialer", "com.android.dialer.DialtactsActivity");
-                        intent2.setFlags(268435456);
-                        intent2.setFlags(536870912);
-                        CloudClientActivity.this.startActivity(intent2);
+                        Intent intent3 = new Intent();
+                        intent3.setClassName("com.android.dialer", "com.android.dialer.DialtactsActivity");
+                        intent3.setFlags(268435456);
+                        intent3.setFlags(536870912);
+                        CloudClientActivity.this.startActivity(intent3);
                         return;
                     case 2:
                         Toast.makeText(CloudClientActivity.this, (int) R.string.notthetime, 0).show();
@@ -833,17 +864,11 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         this.checkIdThread = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.4
             @Override // java.lang.Runnable
             public void run() {
-                boolean userlicenseFlag;
                 Looper.prepare();
-                int result = CloudClientActivity.this.idauth.checkIDAuth();
+                int checkIDAuth = CloudClientActivity.this.idauth.checkIDAuth();
                 int i = Build.VERSION.SDK_INT;
-                Log.e("iaduth", "result1:" + result);
-                if (result != 0) {
-                    userlicenseFlag = false;
-                } else {
-                    userlicenseFlag = true;
-                }
-                if (userlicenseFlag) {
+                Log.e("iaduth", "result1:" + checkIDAuth);
+                if (checkIDAuth == 0) {
                     My_Application.Allow_Flag = true;
                 } else {
                     My_Application.Allow_Flag = false;
@@ -853,10 +878,9 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         };
         this.batteryChangedHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.5
             @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                int battery = msg.arg1;
-                int status = msg.arg2;
-                if (status == 2) {
+            public void handleMessage(Message message) {
+                int i = message.arg1;
+                if (message.arg2 == 2) {
                     if (AppEnvironment.isSNZT) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_batterying), (Drawable) null, (Drawable) null, (Drawable) null);
                     } else if (AppEnvironment.isSDYB) {
@@ -867,113 +891,112 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_charging), (Drawable) null, (Drawable) null, (Drawable) null);
                     }
                 } else if (AppEnvironment.isSNZT) {
-                    if (battery > 0 && battery <= 10) {
+                    if (i > 0 && i <= 10) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery1), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 10 && battery <= 20) {
+                    } else if (i > 10 && i <= 20) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery2), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 20 && battery <= 30) {
+                    } else if (i > 20 && i <= 30) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery3), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 30 && battery <= 40) {
+                    } else if (i > 30 && i <= 40) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery4), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 40 && battery <= 50) {
+                    } else if (i > 40 && i <= 50) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery5), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 50 && battery <= 60) {
+                    } else if (i > 50 && i <= 60) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery6), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 60 && battery <= 70) {
+                    } else if (i > 60 && i <= 70) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery7), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 70 && battery <= 80) {
+                    } else if (i > 70 && i <= 80) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery8), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 80 && battery <= 90) {
+                    } else if (i > 80 && i <= 90) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery9), (Drawable) null, (Drawable) null, (Drawable) null);
-                    } else if (battery > 90 && battery <= 100) {
+                    } else if (i > 90 && i <= 100) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery10), (Drawable) null, (Drawable) null, (Drawable) null);
                     }
                 } else if (AppEnvironment.isSDYB) {
-                    if (battery > 0 && battery <= 10) {
+                    if (i > 0 && i <= 10) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery1), (Drawable) null, (Drawable) null);
-                    } else if (battery > 10 && battery <= 20) {
+                    } else if (i > 10 && i <= 20) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery2), (Drawable) null, (Drawable) null);
-                    } else if (battery > 20 && battery <= 30) {
+                    } else if (i > 20 && i <= 30) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery3), (Drawable) null, (Drawable) null);
-                    } else if (battery > 30 && battery <= 40) {
+                    } else if (i > 30 && i <= 40) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery4), (Drawable) null, (Drawable) null);
-                    } else if (battery > 40 && battery <= 50) {
+                    } else if (i > 40 && i <= 50) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery5), (Drawable) null, (Drawable) null);
-                    } else if (battery > 50 && battery <= 60) {
+                    } else if (i > 50 && i <= 60) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery6), (Drawable) null, (Drawable) null);
-                    } else if (battery > 60 && battery <= 70) {
+                    } else if (i > 60 && i <= 70) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery7), (Drawable) null, (Drawable) null);
-                    } else if (battery > 70 && battery <= 80) {
+                    } else if (i > 70 && i <= 80) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery8), (Drawable) null, (Drawable) null);
-                    } else if (battery > 80 && battery <= 90) {
+                    } else if (i > 80 && i <= 90) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery9), (Drawable) null, (Drawable) null);
-                    } else if (battery > 90 && battery <= 100) {
+                    } else if (i > 90 && i <= 100) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery10), (Drawable) null, (Drawable) null);
                     }
                 } else if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
-                    if (battery > 0 && battery <= 10) {
+                    if (i > 0 && i <= 10) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new1), (Drawable) null);
-                    } else if (battery > 10 && battery <= 20) {
+                    } else if (i > 10 && i <= 20) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new2), (Drawable) null);
-                    } else if (battery > 20 && battery <= 30) {
+                    } else if (i > 20 && i <= 30) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new3), (Drawable) null);
-                    } else if (battery > 30 && battery <= 40) {
+                    } else if (i > 30 && i <= 40) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new4), (Drawable) null);
-                    } else if (battery > 40 && battery <= 50) {
+                    } else if (i > 40 && i <= 50) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new5), (Drawable) null);
-                    } else if (battery > 50 && battery <= 60) {
+                    } else if (i > 50 && i <= 60) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new6), (Drawable) null);
-                    } else if (battery > 60 && battery <= 70) {
+                    } else if (i > 60 && i <= 70) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new7), (Drawable) null);
-                    } else if (battery > 70 && battery <= 80) {
+                    } else if (i > 70 && i <= 80) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new8), (Drawable) null);
-                    } else if (battery > 80 && battery <= 90) {
+                    } else if (i > 80 && i <= 90) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new9), (Drawable) null);
-                    } else if (battery > 90 && battery <= 100) {
+                    } else if (i > 90 && i <= 100) {
                         CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new10), (Drawable) null);
                     }
-                } else if (battery > 0 && battery <= 10) {
+                } else if (i > 0 && i <= 10) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_01), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 10 && battery <= 20) {
+                } else if (i > 10 && i <= 20) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_02), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 20 && battery <= 30) {
+                } else if (i > 20 && i <= 30) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_03), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 30 && battery <= 40) {
+                } else if (i > 30 && i <= 40) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_04), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 40 && battery <= 50) {
+                } else if (i > 40 && i <= 50) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_05), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 50 && battery <= 60) {
+                } else if (i > 50 && i <= 60) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_06), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 60 && battery <= 70) {
+                } else if (i > 60 && i <= 70) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_07), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 70 && battery <= 80) {
+                } else if (i > 70 && i <= 80) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_08), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 80 && battery <= 90) {
+                } else if (i > 80 && i <= 90) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_09), (Drawable) null, (Drawable) null, (Drawable) null);
-                } else if (battery > 90 && battery <= 100) {
+                } else if (i > 90 && i <= 100) {
                     CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_0full), (Drawable) null, (Drawable) null, (Drawable) null);
                 }
-                CloudClientActivity.this.tv_battery.setText(String.valueOf(battery) + "%");
+                CloudClientActivity.this.tv_battery.setText(String.valueOf(i) + "%");
             }
         };
         this.keylistener = new DialogInterface.OnKeyListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.6
             @Override // android.content.DialogInterface.OnKeyListener
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                return keyCode == 4 && event.getRepeatCount() == 0;
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                return i == 4 && keyEvent.getRepeatCount() == 0;
             }
         };
         this.apkInstallReceiver = new BroadcastReceiver() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.7
             @Override // android.content.BroadcastReceiver
             public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals("android.intent.action.PACKAGE_ADDED")) {
-                    Message msg = CloudClientActivity.this.apkHandler.obtainMessage();
-                    msg.sendToTarget();
-                    String packageName = intent.getDataString().replace("package:", "");
+                if (intent.getAction().equals("android.intent.action.PACKAGE_ADDED")) {
+                    CloudClientActivity.this.apkHandler.obtainMessage().sendToTarget();
+                    String replace = intent.getDataString().replace("package:", "");
                     try {
-                        if (CloudClientActivity.this.apkUpdatePkgList != null && CloudClientActivity.this.apkUpdatePkgList.contains(packageName)) {
-                            CloudClientActivity.this.apkUpdatePkgList.remove(packageName);
+                        if (CloudClientActivity.this.apkUpdatePkgList == null || !CloudClientActivity.this.apkUpdatePkgList.contains(replace)) {
+                            return;
                         }
+                        CloudClientActivity.this.apkUpdatePkgList.remove(replace);
                     } catch (Exception e) {
                     }
                 }
@@ -981,51 +1004,44 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         };
         this.apkHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.8
             @Override // android.os.Handler
-            public void handleMessage(Message msg) {
+            public void handleMessage(Message message) {
                 CloudClientActivity.this.showFailedApkInfo();
             }
         };
         this.timeRunnable = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.9
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x00f8: INVOKE  (r13v2 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x010d: INVOKE  (r13v5 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (12 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x0122: INVOKE  (r13v8 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (13 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
-            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x01a7: INVOKE  (r13v12 int A[REMOVE]) = (r0v0 'cal' java.util.Calendar A[D('cal' java.util.Calendar)]), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x011a: INVOKE  (r1v7 int A[REMOVE]) = (r0v3 java.util.Calendar), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x0132: INVOKE  (r1v12 int A[REMOVE]) = (r0v3 java.util.Calendar), (12 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x014a: INVOKE  (r1v17 int A[REMOVE]) = (r0v3 java.util.Calendar), (13 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x01e0: INVOKE  (r1v26 int A[REMOVE]) = (r0v3 java.util.Calendar), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
             @Override // java.lang.Runnable
             public void run() {
-                String time;
+                String str;
                 while (CloudClientActivity.this.showTime) {
-                    Calendar cal = Calendar.getInstance();
-                    int month = cal.get(2);
-                    int year = cal.get(1);
-                    int day = cal.get(5);
-                    String hour = cal.get(11) < 10 ? "0" + cal.get(11) : new StringBuilder().append(cal.get(11)).toString();
-                    String minute = cal.get(12) < 10 ? "0" + cal.get(12) : new StringBuilder().append(cal.get(12)).toString();
-                    if (cal.get(13) < 10) {
-                        String str = "0" + cal.get(13);
+                    Calendar calendar = Calendar.getInstance();
+                    int i = calendar.get(2);
+                    int i2 = calendar.get(1);
+                    int i3 = calendar.get(5);
+                    String sb = calendar.get(11) < 10 ? "0" + calendar.get(11) : new StringBuilder().append(calendar.get(11)).toString();
+                    String sb2 = calendar.get(12) < 10 ? "0" + calendar.get(12) : new StringBuilder().append(calendar.get(12)).toString();
+                    if (calendar.get(13) < 10) {
+                        String str2 = "0" + calendar.get(13);
                     } else {
-                        new StringBuilder().append(cal.get(13)).toString();
+                        new StringBuilder().append(calendar.get(13)).toString();
                     }
-                    int weekday = cal.get(7);
-                    if (!AppEnvironment.isSDYB) {
-                        if (!AppEnvironment.isMAINNEW && !AppEnvironment.isDEMO) {
-                            if (!CloudClientActivity.this.language.equals("en")) {
-                                time = String.valueOf(hour) + ":" + minute + " " + CloudClientActivity.this.getWeekDay(weekday) + "\n" + year + "年" + (month + 1) + "月" + day + "日 ";
-                            } else {
-                                time = String.valueOf(hour) + ":" + minute + " " + CloudClientActivity.this.getWeekDay(weekday) + "\n" + CloudClientActivity.this.getMonth(month) + "," + day + "," + year;
-                            }
-                        } else if (cal.get(11) <= 12) {
-                            time = "上午 " + hour + ":" + minute;
-                        } else {
-                            String hour2 = cal.get(11) + (-12) < 10 ? "0" + (cal.get(11) - 12) : new StringBuilder().append(cal.get(11)).toString();
-                            time = "下午 " + hour2 + ":" + minute;
-                        }
+                    int i4 = calendar.get(7);
+                    if (AppEnvironment.isSDYB) {
+                        str = String.valueOf(sb) + ":" + sb2 + "\n" + i2 + "年" + (i + 1) + "月" + i3 + "日\n" + CloudClientActivity.this.getWeekDay(i4);
+                    } else if (!AppEnvironment.isMAINNEW && !AppEnvironment.isDEMO) {
+                        str = !CloudClientActivity.this.language.equals("en") ? String.valueOf(sb) + ":" + sb2 + " " + CloudClientActivity.this.getWeekDay(i4) + "\n" + i2 + "年" + (i + 1) + "月" + i3 + "日 " : String.valueOf(sb) + ":" + sb2 + " " + CloudClientActivity.this.getWeekDay(i4) + "\n" + CloudClientActivity.this.getMonth(i) + "," + i3 + "," + i2;
+                    } else if (calendar.get(11) <= 12) {
+                        str = "上午 " + sb + ":" + sb2;
                     } else {
-                        time = String.valueOf(hour) + ":" + minute + "\n" + year + "年" + (month + 1) + "月" + day + "日\n" + CloudClientActivity.this.getWeekDay(weekday);
+                        str = "下午 " + (calendar.get(11) - 12 < 10 ? "0" + (calendar.get(11) - 12) : new StringBuilder().append(calendar.get(11)).toString()) + ":" + sb2;
                     }
-                    Message msg = CloudClientActivity.this.timeHandler.obtainMessage();
-                    msg.what = 1;
-                    msg.obj = time;
-                    msg.sendToTarget();
+                    Message obtainMessage = CloudClientActivity.this.timeHandler.obtainMessage();
+                    obtainMessage.what = 1;
+                    obtainMessage.obj = str;
+                    obtainMessage.sendToTarget();
                     try {
                         Thread.sleep(1000L);
                     } catch (InterruptedException e) {
@@ -1036,14 +1052,14 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         };
         this.timeHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.10
             @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
+            public void handleMessage(Message message) {
+                switch (message.what) {
                     case 1:
-                        String time = (String) msg.obj;
-                        if (CloudClientActivity.this.sdyb_time != null && time != null) {
-                            CloudClientActivity.this.sdyb_time.setText(time);
+                        String str = (String) message.obj;
+                        if (CloudClientActivity.this.sdyb_time == null || str == null) {
                             return;
                         }
+                        CloudClientActivity.this.sdyb_time.setText(str);
                         return;
                     default:
                         return;
@@ -1052,17 +1068,16 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         };
         this.noticeHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.11
             @Override // android.os.Handler
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
+            public void handleMessage(Message message) {
+                switch (message.what) {
                     case 1:
-                        int obj = msg.arg1;
+                        int i = message.arg1;
                         if (CloudClientActivity.this.three_noticetv != null) {
                             CloudClientActivity.this.three_noticetv.setVisibility(0);
-                            if (obj <= 0) {
-                                CloudClientActivity.this.three_noticetv.setVisibility(8);
+                            if (i > 0) {
+                                CloudClientActivity.this.three_noticetv.setText((i < 100 ? new StringBuilder(String.valueOf(i)).toString() : "99+"));
                             } else {
-                                String obj_str = obj < 100 ? new StringBuilder(String.valueOf(obj)).toString() : "99+";
-                                CloudClientActivity.this.three_noticetv.setText(obj_str);
+                                CloudClientActivity.this.three_noticetv.setVisibility(8);
                             }
                         }
                         try {
@@ -1080,11 +1095,11 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
             @Override // java.lang.Runnable
             public void run() {
                 while (CloudClientActivity.this.isnotice) {
-                    SharedPreferences sp = CloudClientActivity.this.getSharedPreferences("notice", 0);
-                    long start = sp.getLong("lasttime", 0L);
-                    long now = System.currentTimeMillis();
-                    if (start == 0 || Math.abs(now - start) >= 600000) {
-                        sp.edit().putLong("lasttime", now).commit();
+                    SharedPreferences sharedPreferences = CloudClientActivity.this.getSharedPreferences("notice", 0);
+                    long j = sharedPreferences.getLong("lasttime", 0L);
+                    long currentTimeMillis = System.currentTimeMillis();
+                    if (j == 0 || Math.abs(currentTimeMillis - j) >= 600000) {
+                        sharedPreferences.edit().putLong("lasttime", currentTimeMillis).commit();
                         CloudClientActivity.this.getMyWorkNotification();
                     }
                     try {
@@ -1097,2041 +1112,479 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         };
     }
 
-    @Override // android.app.Activity
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.agreement_sp = getSharedPreferences("myAgreement", 0);
-        boolean hasLicensed = this.agreement_sp.getBoolean("agreement_key", false);
-        if (!hasLicensed) {
-        }
-        try {
-            cleanApplicationData(this);
-            getLanguage();
-            setMainView();
-            openScreenShot();
-            openLockScreen();
-            Log.e(TAG, BROADCASTER_LOCKSCREEN);
-            try {
-                setDefaultSetting();
-            } catch (Exception e) {
-            }
-            initWidget();
-            startService(new Intent(this, sysProtectService.class));
-            lockPad();
-            loadUserInfo();
-            new HostPwd().start();
-            showPackageMain();
-            resetAutoSp();
-            initBroadReceiver();
-            removeIllegalApks();
-            setDesignView();
-        } catch (NullPointerException e2) {
-        } catch (Exception e3) {
-        }
-    }
-
-    private void openScreenShot() {
-        PackageInfo packageInfo2;
-        try {
-            SharedPreferences sp = getSharedPreferences("screenshot", 0);
-            boolean boo = sp.getBoolean("opened", false);
-            Log.e(TAG, "open screenshot:" + boo);
-            Intent intent2 = new Intent("android.intent.action.MAIN");
-            intent2.addFlags(268435456);
-            ComponentName cn = new ComponentName("com.edutech.screenshot", "com.edutech.screenshot.ScreenShotActivity");
-            intent2.setComponent(cn);
-            try {
-                packageInfo2 = getPackageManager().getPackageInfo("com.edutech.screenshot", 0);
-            } catch (PackageManager.NameNotFoundException e) {
-                packageInfo2 = null;
-                e.printStackTrace();
-            }
-            if (packageInfo2 != null) {
-                startActivity(intent2);
-            }
-            Log.e(TAG, "open screenshot.....");
-            sp.edit().putBoolean("opened", true).commit();
-        } catch (Exception e2) {
-        }
-    }
-
-    private void openLockScreen() {
-        PackageInfo packageInfo2;
-        try {
-            SharedPreferences sp = getSharedPreferences("screenshot", 0);
-            sp.getBoolean("locked", false);
-            Intent intent2 = new Intent("android.intent.action.MAIN");
-            intent2.addFlags(268435456);
-            ComponentName cn = new ComponentName("com.edutech.lockscreen", "com.edutech.lockscreen.MainActivity");
-            intent2.setComponent(cn);
-            try {
-                packageInfo2 = getPackageManager().getPackageInfo("com.edutech.lockscreen", 0);
-            } catch (PackageManager.NameNotFoundException e) {
-                packageInfo2 = null;
-                e.printStackTrace();
-            }
-            if (packageInfo2 != null) {
-                startActivity(intent2);
-            }
-            sp.edit().putBoolean("locked", true).commit();
-        } catch (Exception e2) {
-        }
-    }
-
-    private void initWidget() {
-        this.tv_line = (TextView) findViewById(R.id.tv_line);
-        this.tv_main_eryproc = (Switch) findViewById(R.id.tv_main_eryproc);
-        this.tv_stuname = (TextView) findViewById(R.id.tv_main_stuname);
-        this.sdyb_time = (TextView) findViewById(R.id.sdyb_timedetails);
-        this.sdyb_time = (TextView) findViewById(R.id.sdyb_timedetails);
-        this.tv_updatemsg = (TextView) findViewById(R.id.tv_updatemsg);
+    public CloudClientActivity(Context context) {
+        this.imageViews = new ImageView[12];
+        this.textViews = new TextView[12];
+        this.mPackageManager = null;
+        this.mAllApps = null;
+        this.idauth = new MainActivity(this);
+        this.mobileStudyClientUpdateThread = null;
+        this.is3G = false;
+        this.isLenovo = false;
+        this.hashmap = null;
+        this.username = "";
+        this.UPDATEAPK = "android.edutech.updateapk";
+        this.isInteraction = true;
+        this.send_ip = "";
+        this.send_name = "";
+        this.send_privatekey = "";
+        this.send_demo = "";
+        this.send_pwd = "";
+        this.send_usercode = "";
+        this.send_schoolid = "";
+        this.wpsPackage = "cn.wps.moffice_eng";
+        this.officesuitPackage = "com.mobisystems.office";
+        this.LANGUAGEPATH = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + "MobileStudyClient" + File.separatorChar + ".System" + File.separatorChar + "language.xml";
+        this.onconfigureChange = false;
+        this.launcherPath = "";
+        this.updateTime = 0;
+        this.isGetLauncher = false;
+        this.hasGeted = false;
+        this.isGetApks = false;
+        this.hasUpdated = false;
+        this.addApksList = new ArrayList<>();
+        this.myappList = new ArrayList();
         this.showTime = true;
-        if (this.tv_stuname != null) {
-            if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
-                this.tv_stuname.setText("");
-            } else {
-                this.tv_stuname.setText("学生: ");
-            }
-        }
-        if (AppEnvironment.isSNZT) {
-            initSuiningView();
-        } else {
-            initView();
-        }
-        if (AppEnvironment.isSDYB) {
-            this.sdyb_btn1 = (ImageButton) findViewById(R.id.sdyb_btn1);
-            this.sdyb_btn2 = (ImageButton) findViewById(R.id.sdyb_btn2);
-            this.sdyb_btn3 = (ImageButton) findViewById(R.id.sdyb_btn3);
-            this.sdyb_btn4 = (ImageButton) findViewById(R.id.sdyb_btn4);
-            this.sdyb_btn5 = (ImageButton) findViewById(R.id.sdyb_btn5);
-            this.sdyb_myapp = (TextView) findViewById(R.id.sdyb_myapp);
-            this.sdyb_btn1.setOnClickListener(this);
-            this.sdyb_btn2.setOnClickListener(this);
-            this.sdyb_btn3.setOnClickListener(this);
-            this.sdyb_btn4.setOnClickListener(this);
-            this.sdyb_btn5.setOnClickListener(this);
-            this.sdyb_myapp.setOnClickListener(this);
-        }
-        initVariable();
-        if (AppEnvironment.isSNZT) {
-            initSuiningListener();
-        } else {
-            initListener();
-        }
-        if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
-            initNewLayout();
-        }
-        this.three_noticetv = (TextView) findViewById(R.id.three_noticetv);
-        this.three_noticetv.setVisibility(8);
-        if (AppEnvironment.isSNZT) {
-            assignmentSuining();
-        } else {
-            assignment();
-        }
-        SharedPreferences sp = getSharedPreferences("eyeproc", 0);
-        boolean boo = sp.getBoolean("state", false);
-        if (this.tv_main_eryproc != null) {
-            this.tv_main_eryproc.setChecked(boo);
-            broadEyeProc(this, boo);
-        }
-        this.tv_main_eryproc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.13
-            @Override // android.widget.CompoundButton.OnCheckedChangeListener
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sp2 = CloudClientActivity.this.getSharedPreferences("eyeproc", 0);
-                CloudClientActivity.this.broadEyeProc(CloudClientActivity.this, isChecked);
-                sp2.edit().putBoolean("state", isChecked).commit();
-            }
-        });
-        try {
-            if (Build.DISPLAY.contains("M1016Pro") || Build.DISPLAY.contains("P990S.V") || Build.DISPLAY.contains("S1016") || Build.DISPLAY.contains("M856.V")) {
-                this.tv_line.setVisibility(0);
-                this.tv_main_eryproc.setVisibility(0);
-            } else {
-                this.tv_line.setVisibility(4);
-                this.tv_main_eryproc.setVisibility(4);
-                this.tv_main_eryproc.setWidth(1);
-                this.tv_main_eryproc.setHeight(1);
-            }
-        } catch (Exception e) {
-        }
-    }
-
-    private void initBroadReceiver() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("android.net.wifi.STATE_CHANGE");
-        filter.addAction(sysProtectService.SERVICE_START);
-        filter.addAction("edm.intent.action.license.status");
-        filter.addAction("com.edutech.getadmin");
-        this.wifiReceiver = new WifiReceiver();
-        registerReceiver(this.wifiReceiver, filter);
-        IntentFilter intentApkFilter = new IntentFilter();
-        intentApkFilter.addAction("android.intent.action.PACKAGE_ADDED");
-        intentApkFilter.addAction("android.intent.action.PACKAGE_REMOVED");
-        intentApkFilter.addDataScheme("package");
-        registerReceiver(this.apkInstallReceiver, intentApkFilter);
-        if (AppEnvironment.openBMD) {
-            Intent in = new Intent();
-            in.setAction("com.edutech.intent.TrafficStatsService");
-            in.setClassName("com.edutech.firewall", "eu.faircode.netguard.TrafficStatsService");
-            in.putExtra("ip", this.send_ip);
-            in.putExtra("privatekey", this.send_privatekey);
-            in.putExtra("name", this.send_name);
-            in.putExtra("schoolid", this.send_schoolid);
-            startService(in);
-        }
-    }
-
-    private void setDefaultSetting() {
-        this.cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
-        this.mHwPDM = new HwDevicePolicyManager(this);
-        this.mHwPDM.setCustomLauncher(this.cn, "com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
-        if (Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
-            MiaMdmPolicyManager miaMdmPolicyManager = new MiaMdmPolicyManager(getApplicationContext());
-            miaMdmPolicyManager.setCustomLauncher("com.launcher.activity");
-            miaMdmPolicyManager.controlBluetooth(false);
-        }
-        this.mDPM = (DevicePolicyManager) getSystemService("device_policy");
-        this.mDeviceAdmin = new ComponentName(this, SampleAdmin.class);
-        PgyCrashManager.register(this, AppEnvironment.My_APPID);
-        if (AppEnvironment.isNL || AppEnvironment.isNLEZ) {
-            try {
-                if (!this.deletingFiles) {
-                    new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.14
-                        @Override // java.lang.Runnable
-                        public void run() {
-                            CloudClientActivity.this.deletingFiles = true;
-                            CloudClientActivity.this.deleteCameraFiles();
+        this.isnotice = true;
+        this.deletingFiles = false;
+        this.LicenseOK = false;
+        this.apkUpdateList = new ArrayList();
+        this.apkUpdatePkgList = new ArrayList();
+        this.currentCachePosition = 0L;
+        this.currentCacheLength = 0L;
+        this.canRefresh = false;
+        this.language = "";
+        this.installHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.1
+            @Override // android.os.Handler
+            public void handleMessage(Message message) {
+                PackageInfo packageInfo;
+                switch (message.what) {
+                    case 1:
+                        CloudClientActivity.this.installNewApk();
+                        return;
+                    case 3:
+                        CloudClientActivity.this.updateThread = null;
+                        CloudClientActivity.this.updateTime = HttpStatus.SC_MULTIPLE_CHOICES;
+                        CloudClientActivity.this.showFailedApkInfo();
+                        return;
+                    case 4:
+                        Intent intent = new Intent("android.intent.action.MAIN");
+                        intent.addFlags(268435456);
+                        intent.setComponent(new ComponentName("com.edutech.assistantdemo", "com.edutech.assistantdemo.MainActivity"));
+                        try {
+                            packageInfo = CloudClientActivity.this.getPackageManager().getPackageInfo("com.edutech.assistantdemo", 0);
+                        } catch (PackageManager.NameNotFoundException e) {
+                            packageInfo = null;
+                            e.printStackTrace();
                         }
-                    }).start();
+                        if (packageInfo == null) {
+                            return;
+                        }
+                        CloudClientActivity.this.startActivity(intent);
+                        return;
+                    case CloudClientActivity.UPDATE_PROGRESS /* 4113 */:
+                        try {
+                            CloudClientActivity.this.refreshDownloadPB();
+                            return;
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                            return;
+                        }
+                    case CloudClientActivity.UPDATE_INSTALLSTATE /* 4114 */:
+                    default:
+                        return;
+                    case CloudClientActivity.START_PROGRESS /* 4115 */:
+                        try {
+                            if (CloudClientActivity.this.tv_updatemsg != null) {
+                                CloudClientActivity.this.tv_updatemsg.setVisibility(0);
+                            }
+                            CloudClientActivity.this.refreshDownloadPB();
+                            return;
+                        } catch (Exception e3) {
+                            e3.printStackTrace();
+                            return;
+                        }
+                    case CloudClientActivity.UPDATE_INSTALLSINGLE /* 4116 */:
+                        CloudClientActivity.this.installSingleApk((String) message.obj);
+                        return;
                 }
-            } catch (NullPointerException e) {
-            } catch (Exception e2) {
             }
-        }
-    }
-
-    private void setMainView() {
-        if (AppEnvironment.isSNZT) {
-            setContentView(R.layout.main_suining);
-        } else if (AppEnvironment.isSDYB) {
-            setContentView(R.layout.main_sdyb);
-        } else if (AppEnvironment.isQZEZ) {
-            setContentView(R.layout.main_qzez);
-        } else if (AppEnvironment.isPDSSZ) {
-            setContentView(R.layout.main_pds);
-        } else if (AppEnvironment.isNL) {
-            setContentView(R.layout.main_nnxm);
-        } else if (AppEnvironment.isNLEZ) {
-            setContentView(R.layout.main_nnez);
-        } else if (AppEnvironment.isDEMO) {
-            setContentView(R.layout.main_demo);
-        } else if (AppEnvironment.isMAINNEW) {
-            setContentView(R.layout.main_news);
-        } else if (AppEnvironment.isYWYT) {
-            setContentView(R.layout.main_ywyt);
-        } else if (AppEnvironment.isYWJD) {
-            setContentView(R.layout.main_ywjd);
-        } else if (AppEnvironment.isXF) {
-            setContentView(R.layout.main_xf);
-        } else if (AppEnvironment.isCH) {
-            setContentView(R.layout.main_ch);
-        } else if (AppEnvironment.isXH) {
-            setContentView(R.layout.main_xh);
-        } else if (AppEnvironment.isYWHZ) {
-            setContentView(R.layout.main_ywhz);
-        } else if (AppEnvironment.isPHNS) {
-            setContentView(R.layout.main_phns);
-        } else if (AppEnvironment.isCJLY) {
-            setContentView(R.layout.main_cjly);
-        } else {
-            setContentView(R.layout.main);
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void getDesignView() {
-        if (!this.hasGeted && !this.isGetLauncher) {
-            Log.e("design", "design");
-            new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.15
-                @Override // java.lang.Runnable
-                public void run() {
-                    CloudClientActivity.this.isGetLauncher = true;
+        };
+        this.InteractionReceiver = new BroadcastReceiver() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.2
+            @Override // android.content.BroadcastReceiver
+            public void onReceive(Context context2, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals("android.intent.action.STATUSBAR_INVISIBILITY")) {
+                    CloudClientActivity.this.isInteraction = true;
+                } else if (!action.equals("android.intent.action.STATUSBAR_VISIBILITY")) {
+                } else {
+                    CloudClientActivity.this.isInteraction = false;
+                }
+            }
+        };
+        this.callHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.3
+            @Override // android.os.Handler
+            public void handleMessage(Message message) {
+                switch (message.what) {
+                    case 0:
+                        if (!CloudClientActivity.this.is3G.booleanValue()) {
+                            return;
+                        }
+                        Intent intent = new Intent();
+                        if (CloudClientActivity.this.isLenovo.booleanValue()) {
+                            intent.setPackage("com.lenovo.ideafriend");
+                            intent.setType("vnd.android-dir/mms-sms");
+                        } else {
+                            intent.setPackage("com.android.mms");
+                            intent.setType("vnd.android-dir/mms-sms");
+                            intent.setAction("android.intent.action.MAIN");
+                        }
+                        CloudClientActivity.this.startActivity(intent);
+                        return;
+                    case 1:
+                        if (!CloudClientActivity.this.is3G.booleanValue() || !Build.DISPLAY.contains("TB-8703N")) {
+                            if (!CloudClientActivity.this.is3G.booleanValue()) {
+                                return;
+                            }
+                            Intent intent2 = new Intent();
+                            intent2.setAction("android.intent.action.CALL_BUTTON");
+                            CloudClientActivity.this.startActivity(intent2);
+                            return;
+                        }
+                        Intent intent3 = new Intent();
+                        intent3.setClassName("com.android.dialer", "com.android.dialer.DialtactsActivity");
+                        intent3.setFlags(268435456);
+                        intent3.setFlags(536870912);
+                        CloudClientActivity.this.startActivity(intent3);
+                        return;
+                    case 2:
+                        Toast.makeText(CloudClientActivity.this, (int) R.string.notthetime, 0).show();
+                        return;
+                    default:
+                        return;
+                }
+            }
+        };
+        this.checkIdThread = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.4
+            @Override // java.lang.Runnable
+            public void run() {
+                Looper.prepare();
+                int checkIDAuth = CloudClientActivity.this.idauth.checkIDAuth();
+                int i = Build.VERSION.SDK_INT;
+                Log.e("iaduth", "result1:" + checkIDAuth);
+                if (checkIDAuth == 0) {
+                    My_Application.Allow_Flag = true;
+                } else {
+                    My_Application.Allow_Flag = false;
+                }
+                Looper.loop();
+            }
+        };
+        this.batteryChangedHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.5
+            @Override // android.os.Handler
+            public void handleMessage(Message message) {
+                int i = message.arg1;
+                if (message.arg2 == 2) {
+                    if (AppEnvironment.isSNZT) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_batterying), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (AppEnvironment.isSDYB) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_batterying), (Drawable) null, (Drawable) null);
+                    } else if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_newcharge), (Drawable) null);
+                    } else {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_charging), (Drawable) null, (Drawable) null, (Drawable) null);
+                    }
+                } else if (AppEnvironment.isSNZT) {
+                    if (i > 0 && i <= 10) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery1), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 10 && i <= 20) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery2), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 20 && i <= 30) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery3), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 30 && i <= 40) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery4), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 40 && i <= 50) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery5), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 50 && i <= 60) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery6), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 60 && i <= 70) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery7), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 70 && i <= 80) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery8), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 80 && i <= 90) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery9), (Drawable) null, (Drawable) null, (Drawable) null);
+                    } else if (i > 90 && i <= 100) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.suining_battery10), (Drawable) null, (Drawable) null, (Drawable) null);
+                    }
+                } else if (AppEnvironment.isSDYB) {
+                    if (i > 0 && i <= 10) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery1), (Drawable) null, (Drawable) null);
+                    } else if (i > 10 && i <= 20) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery2), (Drawable) null, (Drawable) null);
+                    } else if (i > 20 && i <= 30) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery3), (Drawable) null, (Drawable) null);
+                    } else if (i > 30 && i <= 40) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery4), (Drawable) null, (Drawable) null);
+                    } else if (i > 40 && i <= 50) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery5), (Drawable) null, (Drawable) null);
+                    } else if (i > 50 && i <= 60) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery6), (Drawable) null, (Drawable) null);
+                    } else if (i > 60 && i <= 70) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery7), (Drawable) null, (Drawable) null);
+                    } else if (i > 70 && i <= 80) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery8), (Drawable) null, (Drawable) null);
+                    } else if (i > 80 && i <= 90) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery9), (Drawable) null, (Drawable) null);
+                    } else if (i > 90 && i <= 100) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.sdyb_battery10), (Drawable) null, (Drawable) null);
+                    }
+                } else if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
+                    if (i > 0 && i <= 10) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new1), (Drawable) null);
+                    } else if (i > 10 && i <= 20) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new2), (Drawable) null);
+                    } else if (i > 20 && i <= 30) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new3), (Drawable) null);
+                    } else if (i > 30 && i <= 40) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new4), (Drawable) null);
+                    } else if (i > 40 && i <= 50) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new5), (Drawable) null);
+                    } else if (i > 50 && i <= 60) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new6), (Drawable) null);
+                    } else if (i > 60 && i <= 70) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new7), (Drawable) null);
+                    } else if (i > 70 && i <= 80) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new8), (Drawable) null);
+                    } else if (i > 80 && i <= 90) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new9), (Drawable) null);
+                    } else if (i > 90 && i <= 100) {
+                        CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_new10), (Drawable) null);
+                    }
+                } else if (i > 0 && i <= 10) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_01), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 10 && i <= 20) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_02), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 20 && i <= 30) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_03), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 30 && i <= 40) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_04), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 40 && i <= 50) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_05), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 50 && i <= 60) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_06), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 60 && i <= 70) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_07), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 70 && i <= 80) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_08), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 80 && i <= 90) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_09), (Drawable) null, (Drawable) null, (Drawable) null);
+                } else if (i > 90 && i <= 100) {
+                    CloudClientActivity.this.tv_battery.setCompoundDrawablesWithIntrinsicBounds(CloudClientActivity.this.getResources().getDrawable(R.drawable.battery_0full), (Drawable) null, (Drawable) null, (Drawable) null);
+                }
+                CloudClientActivity.this.tv_battery.setText(String.valueOf(i) + "%");
+            }
+        };
+        this.keylistener = new DialogInterface.OnKeyListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.6
+            @Override // android.content.DialogInterface.OnKeyListener
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                return i == 4 && keyEvent.getRepeatCount() == 0;
+            }
+        };
+        this.apkInstallReceiver = new BroadcastReceiver() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.7
+            @Override // android.content.BroadcastReceiver
+            public void onReceive(Context context2, Intent intent) {
+                if (intent.getAction().equals("android.intent.action.PACKAGE_ADDED")) {
+                    CloudClientActivity.this.apkHandler.obtainMessage().sendToTarget();
+                    String replace = intent.getDataString().replace("package:", "");
                     try {
-                        Thread.sleep(3000L);
+                        if (CloudClientActivity.this.apkUpdatePkgList == null || !CloudClientActivity.this.apkUpdatePkgList.contains(replace)) {
+                            return;
+                        }
+                        CloudClientActivity.this.apkUpdatePkgList.remove(replace);
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        };
+        this.apkHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.8
+            @Override // android.os.Handler
+            public void handleMessage(Message message) {
+                CloudClientActivity.this.showFailedApkInfo();
+            }
+        };
+        this.timeRunnable = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.9
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x011a: INVOKE  (r1v7 int A[REMOVE]) = (r0v3 java.util.Calendar), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x0132: INVOKE  (r1v12 int A[REMOVE]) = (r0v3 java.util.Calendar), (12 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x014a: INVOKE  (r1v17 int A[REMOVE]) = (r0v3 java.util.Calendar), (13 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x01e0: INVOKE  (r1v26 int A[REMOVE]) = (r0v3 java.util.Calendar), (11 int) type: VIRTUAL call: java.util.Calendar.get(int):int)] */
+            @Override // java.lang.Runnable
+            public void run() {
+                String str;
+                while (CloudClientActivity.this.showTime) {
+                    Calendar calendar = Calendar.getInstance();
+                    int i = calendar.get(2);
+                    int i2 = calendar.get(1);
+                    int i3 = calendar.get(5);
+                    String sb = calendar.get(11) < 10 ? "0" + calendar.get(11) : new StringBuilder().append(calendar.get(11)).toString();
+                    String sb2 = calendar.get(12) < 10 ? "0" + calendar.get(12) : new StringBuilder().append(calendar.get(12)).toString();
+                    if (calendar.get(13) < 10) {
+                        String str2 = "0" + calendar.get(13);
+                    } else {
+                        new StringBuilder().append(calendar.get(13)).toString();
+                    }
+                    int i4 = calendar.get(7);
+                    if (AppEnvironment.isSDYB) {
+                        str = String.valueOf(sb) + ":" + sb2 + "\n" + i2 + "年" + (i + 1) + "月" + i3 + "日\n" + CloudClientActivity.this.getWeekDay(i4);
+                    } else if (!AppEnvironment.isMAINNEW && !AppEnvironment.isDEMO) {
+                        str = !CloudClientActivity.this.language.equals("en") ? String.valueOf(sb) + ":" + sb2 + " " + CloudClientActivity.this.getWeekDay(i4) + "\n" + i2 + "年" + (i + 1) + "月" + i3 + "日 " : String.valueOf(sb) + ":" + sb2 + " " + CloudClientActivity.this.getWeekDay(i4) + "\n" + CloudClientActivity.this.getMonth(i) + "," + i3 + "," + i2;
+                    } else if (calendar.get(11) <= 12) {
+                        str = "上午 " + sb + ":" + sb2;
+                    } else {
+                        str = "下午 " + (calendar.get(11) - 12 < 10 ? "0" + (calendar.get(11) - 12) : new StringBuilder().append(calendar.get(11)).toString()) + ":" + sb2;
+                    }
+                    Message obtainMessage = CloudClientActivity.this.timeHandler.obtainMessage();
+                    obtainMessage.what = 1;
+                    obtainMessage.obj = str;
+                    obtainMessage.sendToTarget();
+                    try {
+                        Thread.sleep(1000L);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    CloudClientActivity.this.getSpecialLauncher();
-                }
-            }).start();
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void deleteCameraFiles() {
-        String OPEN_DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
-        if (OPEN_DCIM != null && !OPEN_DCIM.equals("")) {
-            File file = new File(String.valueOf(OPEN_DCIM) + "/Camera/");
-            File file2 = new File(String.valueOf(OPEN_DCIM) + "/Screenshots/");
-            if (file.exists() && file.isDirectory()) {
-                File[] files = file.listFiles();
-                for (File tempFile : files) {
-                    if (tempFile.exists()) {
-                        tempFile.delete();
-                    }
                 }
             }
-            if (file2.exists() && file2.isDirectory()) {
-                File[] files2 = file2.listFiles();
-                for (File tempFile2 : files2) {
-                    if (tempFile2.exists()) {
-                        tempFile2.delete();
-                    }
+        };
+        this.timeHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.10
+            @Override // android.os.Handler
+            public void handleMessage(Message message) {
+                switch (message.what) {
+                    case 1:
+                        String str = (String) message.obj;
+                        if (CloudClientActivity.this.sdyb_time == null || str == null) {
+                            return;
+                        }
+                        CloudClientActivity.this.sdyb_time.setText(str);
+                        return;
+                    default:
+                        return;
                 }
             }
-            this.deletingFiles = false;
-        }
-    }
-
-    private void initNewLayout() {
-        this.ll_one = (LinearLayout) findViewById(R.id.ll_one);
-        this.ll_two = (LinearLayout) findViewById(R.id.ll_two);
-        this.ll_three = (LinearLayout) findViewById(R.id.ll_three);
-        this.ll_four = (LinearLayout) findViewById(R.id.ll_four);
-        this.ll_five = (LinearLayout) findViewById(R.id.ll_five);
-        this.ll_six = (LinearLayout) findViewById(R.id.ll_six);
-        this.ll_seven = (LinearLayout) findViewById(R.id.ll_seven);
-        this.ll_eight = (LinearLayout) findViewById(R.id.ll_eight);
-        this.ll_nine = (LinearLayout) findViewById(R.id.ll_nine);
-        this.ll_ten = (LinearLayout) findViewById(R.id.ll_ten);
-        this.ll_eleven = (LinearLayout) findViewById(R.id.ll_eleven);
-        this.ll_twelve = (LinearLayout) findViewById(R.id.ll_twelve);
-        if (AppEnvironment.isDEMO) {
-            this.ll_sms = (LinearLayout) findViewById(R.id.ll_sms);
-            this.ll_sms.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.16
-                @Override // android.view.View.OnClickListener
-                public void onClick(View arg0) {
-                    PackageManager pm = CloudClientActivity.this.getPackageManager();
-                    Intent intent = pm.getLaunchIntentForPackage("com.hjwordgames");
-                    intent.addFlags(335544320);
-                    if (intent != null) {
-                        CloudClientActivity.this.startActivity(intent);
-                    }
-                }
-            });
-        }
-        this.ll_one.setOnClickListener(this);
-        this.ll_two.setOnClickListener(this);
-        this.ll_three.setOnClickListener(this);
-        this.ll_four.setOnClickListener(this);
-        this.ll_five.setOnClickListener(this);
-        this.ll_six.setOnClickListener(this);
-        this.ll_seven.setOnClickListener(this);
-        this.ll_eight.setOnClickListener(this);
-        this.ll_nine.setOnClickListener(this);
-        this.ll_ten.setOnClickListener(this);
-        this.ll_eleven.setOnClickListener(this);
-        this.ll_twelve.setOnClickListener(this);
-    }
-
-    private void loadUserInfo() {
-        SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-        HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
-        if (hashmap != null) {
-            this.send_ip = hashmap.get("ip");
-            this.send_name = hashmap.get("username");
-            this.send_usercode = hashmap.get("usercode");
-            this.send_privatekey = hashmap.get("privatekey");
-            this.send_pwd = hashmap.get("pwd");
-            this.send_schoolid = hashmap.get("schoolid");
-            String userid = hashmap.get("stuid");
-            sharePre.edit().putString("key", this.send_privatekey).commit();
-            sharePre.edit().putString("apihost", this.send_ip).commit();
-            sharePre.edit().putString("name", this.send_usercode).commit();
-            sharePre.edit().putString("pwd", this.send_pwd).commit();
-            sharePre.edit().putString("userid", userid).commit();
-            sharePre.edit().putString("schoolid", this.send_schoolid).commit();
-        }
-    }
-
-    public void apkUpdate() {
-        if (!this.hasUpdated && !this.isGetApks) {
-            if (this.updateThread == null) {
-                if (this.tv_updatemsg != null) {
-                    this.tv_updatemsg.setVisibility(0);
-                }
-                this.updateThread = new UpdateThread();
-                this.updateThread.start();
-                return;
-            }
-            this.updateThread = null;
-        }
-    }
-
-    /* loaded from: classes.dex */
-    class UpdateThread extends Thread {
-        UpdateThread() {
-        }
-
-        /* JADX WARN: Code restructure failed: missing block: B:67:0x049b, code lost:
-            r40 = 1;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:68:0x049f, code lost:
-            r40 = java.lang.Long.parseLong(r22.get("versioncode"));
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:76:0x04d2, code lost:
-            r8 = move-exception;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:77:0x04d3, code lost:
-            r8.printStackTrace();
-         */
-        /* JADX WARN: Removed duplicated region for block: B:58:0x03e2 A[Catch: Exception -> 0x04d7, TryCatch #2 {Exception -> 0x04d7, blocks: (B:25:0x0168, B:28:0x01d6, B:30:0x01ee, B:32:0x01f4, B:33:0x0208, B:35:0x0210, B:37:0x026f, B:39:0x0282, B:50:0x0388, B:54:0x03d6, B:55:0x03da, B:58:0x03e2, B:61:0x03f1, B:62:0x046f, B:63:0x0473, B:65:0x0486, B:69:0x04b0, B:71:0x04bd, B:77:0x04d3, B:68:0x049f), top: B:85:0x0168, inners: #4, #5 }] */
-        /* JADX WARN: Removed duplicated region for block: B:95:0x046f A[SYNTHETIC] */
-        @Override // java.lang.Thread, java.lang.Runnable
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-        */
-        public void run() {
-            int i;
-            long vercodeLong;
-            boolean isInstall;
-            HashMap<String, String> localTempApp;
-            long tempcode;
-            CloudClientActivity.this.isGetApks = true;
-            try {
-                Thread.sleep(4000L);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            if (CloudClientActivity.this.addApksList != null) {
-                CloudClientActivity.this.addApksList.clear();
-            } else {
-                CloudClientActivity.this.addApksList = new ArrayList();
-            }
-            CloudClientActivity.this.launcherPath = "";
-            SharedPreferences sharePre = CloudClientActivity.this.getSharedPreferences("privatekey", 0);
-            String privatekey = sharePre.getString("key", "");
-            String ip = sharePre.getString("apihost", "");
-            String username = sharePre.getString("name", "");
-            if (ip == null || ip.equals("") || username == null || username.equals("") || privatekey == null || privatekey.equals("")) {
-                HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
-                if (hashmap != null) {
-                    ip = hashmap.get("ip");
-                    username = hashmap.get("usercode");
-                    privatekey = hashmap.get("privatekey");
-                } else {
-                    return;
-                }
-            }
-            String url = "http://" + ip + "/api/app/projectcode/ebag/os/android/";
-            HttpPost post = new HttpPost(url);
-            post.addHeader("X-Edutech-Entity", username);
-            long imestamp = System.currentTimeMillis();
-            String sign = My_md5.Md5(String.valueOf(imestamp) + username + privatekey);
-            post.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-            DefaultHttpClient client = new DefaultHttpClient();
-            List<String> resultList = new ArrayList<>();
-            boolean launchereNeedUpdate = false;
-            try {
-                HttpResponse response = client.execute(post);
-                String result = CloudClientActivity.this.getJsonStringFromGZIP(response);
-                JSONObject jobj = new JSONObject(result);
-                boolean status = jobj.getBoolean("status");
-                int errorNum = jobj.getInt("errorNum");
-                CloudClientActivity.this.apkUpdateList = new ArrayList();
-                CloudClientActivity.this.apkUpdatePkgList = new ArrayList();
-                CloudClientActivity.this.currentCacheLength = 0L;
-                CloudClientActivity.this.currentCachePosition = 0L;
-                new ApkUpdateBean();
-                if (status || errorNum == 0) {
-                    CloudClientActivity.this.hasGeted = true;
-                    JSONArray data = jobj.getJSONArray("data");
-                    if (data != null && data.length() > 0) {
-                        ArrayList<HashMap<String, String>> localAppInfoList = new ArrayList<>();
-                        ArrayList<HashMap<String, String>> localAppInfoList2 = SystemInfoHelper.getSystemInfo(localAppInfoList, CloudClientActivity.this);
-                        for (i = 0; i < data.length(); i++) {
-                            JSONObject json = data.getJSONObject(i);
-                            json.getString("appwebpath");
-                            long size = json.getLong("appsize");
-                            json.getString("apkname");
-                            String version = json.getString("versionname");
-                            String packagename = json.getString("packagename");
-                            String versionCode = json.getString("versioncode");
-                            vercodeLong = 1;
-                            try {
-                                vercodeLong = Long.parseLong(versionCode);
-                            } catch (NumberFormatException e) {
-                            } catch (Exception e2) {
-                            }
-                            isInstall = false;
-                            Iterator<HashMap<String, String>> it = localAppInfoList2.iterator();
-                            while (true) {
-                                if (!it.hasNext()) {
-                                    break;
-                                }
-                                localTempApp = it.next();
-                                if (localTempApp.get("packagename") != null && packagename.equals(localTempApp.get("packagename"))) {
-                                    break;
-                                }
-                                isInstall = false;
-                            }
-                            if (!isInstall) {
-                                if (packagename.equals("com.launcher.activity")) {
-                                    launchereNeedUpdate = true;
-                                }
-                                CloudClientActivity.this.currentCacheLength += size;
-                                ApkUpdateBean apkUpdateBean = new ApkUpdateBean();
-                                apkUpdateBean.setPackagename(packagename);
-                                apkUpdateBean.setApkDownloadSize(0L);
-                                apkUpdateBean.setApkSize(size);
-                                apkUpdateBean.setInstallState(-1);
-                                apkUpdateBean.setApkLocalPath("");
-                                apkUpdateBean.setApkUrl(json.getString("appwebpath"));
-                                apkUpdateBean.setAppName(json.getString("apkname"));
-                                apkUpdateBean.setVersioncode(versionCode);
-                                apkUpdateBean.setVersionname(version);
-                                CloudClientActivity.this.apkUpdateList.add(apkUpdateBean);
-                                CloudClientActivity.this.apkUpdatePkgList.add(packagename);
+        };
+        this.noticeHandler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.11
+            @Override // android.os.Handler
+            public void handleMessage(Message message) {
+                switch (message.what) {
+                    case 1:
+                        int i = message.arg1;
+                        if (CloudClientActivity.this.three_noticetv != null) {
+                            CloudClientActivity.this.three_noticetv.setVisibility(0);
+                            if (i > 0) {
+                                CloudClientActivity.this.three_noticetv.setText((i < 100 ? new StringBuilder(String.valueOf(i)).toString() : "99+"));
+                            } else {
+                                CloudClientActivity.this.three_noticetv.setVisibility(8);
                             }
                         }
-                        Message msg = new Message();
-                        msg.what = CloudClientActivity.START_PROGRESS;
-                        CloudClientActivity.this.installHandler.sendMessage(msg);
-                        Utils.saveUpdateApks(CloudClientActivity.this.apkUpdateList, CloudClientActivity.this, ip);
-                        List<String> resultList2 = CloudClientActivity.this.parseDownload(resultList, CloudClientActivity.this.apkUpdateList);
-                        if (CloudClientActivity.this.launcherPath != null && !CloudClientActivity.this.launcherPath.equals("")) {
-                            resultList2.add(CloudClientActivity.this.launcherPath);
-                            CloudClientActivity.this.addApksList.add("com.launcher.activity");
-                        }
-                    }
-                }
-            } catch (Exception e3) {
-                e3.printStackTrace();
-            }
-            if (CloudClientActivity.this.addApksList != null && CloudClientActivity.this.addApksList.size() > 0) {
-                Intent intent = new Intent();
-                intent.setAction(sysProtectService.ADDINSTALL);
-                intent.putStringArrayListExtra("packages", CloudClientActivity.this.addApksList);
-                CloudClientActivity.this.sendBroadcast(intent);
-            }
-            if (launchereNeedUpdate && !TextUtils.isEmpty(CloudClientActivity.this.launcherPath)) {
-                Message msg1 = new Message();
-                msg1.what = 4;
-                CloudClientActivity.this.installHandler.sendMessage(msg1);
-                CloudClientActivity.this.sendInstallMessage(-1, CloudClientActivity.this.launcherPath, CloudClientActivity.UPDATE_INSTALLSINGLE);
-            }
-            Message msg3 = new Message();
-            msg3.what = 3;
-            CloudClientActivity.this.installHandler.sendMessage(msg3);
-            SharedPreferences sp = CloudClientActivity.this.getSharedPreferences("resumeconfig", 0);
-            sp.edit().putLong("updateapks", System.currentTimeMillis()).commit();
-            CloudClientActivity.this.isGetApks = false;
-            return;
-            if (localTempApp.get("versioncode") != null && localTempApp.get("versionname") != null && vercodeLong > tempcode) {
-                isInstall = false;
-            } else {
-                isInstall = true;
-            }
-            if (!isInstall) {
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void installSingleApk(String path) {
-        if (!TextUtils.isEmpty(path) && path.lastIndexOf(".apk") != -1) {
-            boolean boo = false;
-            this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
-            try {
-                boo = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (boo) {
-                try {
-                    this.mHwPDM.installPackage(this.cn, path);
-                } catch (Exception e2) {
-                }
-            } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
-                this.mMiaMdmPolicyManager.silentInstall(path);
-            } else {
-                try {
-                    if (Build.DISPLAY.indexOf("M1016Pro") < 0 && Build.DISPLAY.indexOf("P990S.V") < 0 && Build.DISPLAY.indexOf("S1016PRO") < 0 && Build.DISPLAY.indexOf("D13B") < 0 && Build.DISPLAY.indexOf("QC80A") < 0 && Build.DISPLAY.indexOf("N5110ZB") < 0 && Build.DISPLAY.indexOf(".T360Z") < 0 && Build.DISPLAY.indexOf("P350") < 0 && Build.DISPLAY.indexOf("P550") < 0 && Build.DISPLAY.indexOf("M856.V") < 0 && Build.DISPLAY.indexOf("S1016.V1") < 0 && Build.DISPLAY.indexOf("S106.V1") < 0 && Build.DISPLAY.indexOf("S1016E") < 0 && Build.DISPLAY.indexOf("P583") < 0) {
-                        Intent intent = new Intent();
-                        intent.setAction(sysProtectService.INSTALL);
-                        sendBroadcast(intent);
-                        apkinstall(path);
-                    } else {
-                        apkinstall_samsung(path);
-                    }
-                } catch (Exception e3) {
-                }
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public List<String> parseDownload(List<String> resultList, List<ApkUpdateBean> apks) {
-        int length;
-        for (int i = 0; i < apks.size(); i++) {
-            ApkUpdateBean bean = apks.get(i);
-            String packagename = bean.getPackagename();
-            String apkUrl = bean.getApkUrl();
-            String name = bean.getAppName();
-            long size = bean.getApkSize();
-            File dir = new File(AppEnvironment.ASSETS_APKS);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            if (dir.isDirectory()) {
-                File file = new File(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
-                if (file.exists()) {
-                    file.delete();
-                }
-                byte[] bys = new byte[10240];
-                long getsize = 0;
-                HttpURLConnection urlConnection = null;
-                try {
-                    URL url2 = new URL(apkUrl);
-                    urlConnection = (HttpURLConnection) url2.openConnection();
-                    urlConnection.connect();
-                    InputStream in = urlConnection.getInputStream();
-                    FileOutputStream out = new FileOutputStream(file);
-                    int num = 0;
-                    while (getsize < size && (length = in.read(bys)) != -1) {
-                        getsize += length;
-                        this.currentCachePosition += length;
-                        out.write(bys, 0, length);
-                        num++;
-                        if (num % 10 == 0) {
-                            sendInstallMessage(i, Long.valueOf(getsize), UPDATE_PROGRESS);
-                        }
-                    }
-                    sendInstallMessage(i, Long.valueOf(getsize), UPDATE_PROGRESS);
-                    out.close();
-                    in.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e2) {
-                    e2.printStackTrace();
-                } catch (Exception e3) {
-                }
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (getsize == size) {
-                    if (!packagename.equals("com.launcher.activity")) {
-                        resultList.add(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
-                        sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + name, UPDATE_INSTALLSINGLE);
-                        sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
-                        this.addApksList.add(packagename);
-                    } else {
                         try {
-                            ApkUpdateBean apkBean = this.apkUpdateList.get(i);
-                            apkBean.setApkLocalPath(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
-                            this.apkUpdateList.set(i, apkBean);
-                        } catch (Exception e4) {
+                            CloudClientActivity.this.showNoticeDetails();
+                            return;
+                        } catch (Exception e) {
+                            return;
                         }
-                        if (apks.size() == 1) {
-                            sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + name, UPDATE_INSTALLSINGLE);
-                            sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
-                        }
-                        this.launcherPath = String.valueOf(AppEnvironment.ASSETS_DIR) + name;
-                    }
-                } else {
-                    sendInstallMessage(i, -2, UPDATE_INSTALLSTATE);
+                    default:
+                        return;
                 }
             }
-        }
-        return resultList;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void sendInstallMessage(int arg1, Object obj, int what) {
-        Message msgInstall = new Message();
-        msgInstall.arg1 = arg1;
-        msgInstall.what = what;
-        msgInstall.obj = obj;
-        this.installHandler.sendMessage(msgInstall);
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void refreshDownloadPB() {
-        if (this.canRefresh && this.tv_updatemsg != null) {
-            DecimalFormat df = new DecimalFormat("##0.00");
-            String alllength = df.format(((this.currentCacheLength * 1.0d) / 1024.0d) / 1024.0d);
-            String currentPosition = df.format(((this.currentCachePosition * 1.0d) / 1024.0d) / 1024.0d);
-            String allStateString = String.valueOf(currentPosition) + "MB/" + alllength + "MB";
-            this.tv_updatemsg.setText(String.valueOf(getResources().getString(R.string.updateapks)) + allStateString);
-        }
-    }
-
-    private void showPackageMain() {
-        Intent intent = new Intent("android.intent.action.MAIN");
-        intent.addCategory("android.intent.category.HOME");
-        PackageManager manager = getPackageManager();
-        manager.resolveActivity(intent, 0);
-    }
-
-    private void getLanguage() {
-        int length;
-        File file = new File(this.LANGUAGEPATH);
-        if (file.exists()) {
-            byte[] by = new byte[512];
-            FileInputStream in = null;
-            try {
-                FileInputStream in2 = new FileInputStream(file);
-                in = in2;
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
-            }
-            if (in != null) {
-                String strs = "";
-                while (true) {
+        };
+        this.noticeRunnable = new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.12
+            @Override // java.lang.Runnable
+            public void run() {
+                while (CloudClientActivity.this.isnotice) {
+                    SharedPreferences sharedPreferences = CloudClientActivity.this.getSharedPreferences("notice", 0);
+                    long j = sharedPreferences.getLong("lasttime", 0L);
+                    long currentTimeMillis = System.currentTimeMillis();
+                    if (j == 0 || Math.abs(currentTimeMillis - j) >= 600000) {
+                        sharedPreferences.edit().putLong("lasttime", currentTimeMillis).commit();
+                        CloudClientActivity.this.getMyWorkNotification();
+                    }
                     try {
-                        length = in.read(by);
-                    } catch (IOException e) {
+                        Thread.sleep(300000L);
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (length <= 0) {
-                        break;
-                    }
-                    strs = String.valueOf(strs) + new String(by, 0, length);
-                }
-                if (strs.contains("english")) {
-                    SharedPreferences sp = getSharedPreferences("language", 0);
-                    LanguageUtils.SetLanguage(this, "en");
-                    sp.edit().putString("language", "en").commit();
-                    this.language = "en";
-                    return;
-                }
-                SharedPreferences sp2 = getSharedPreferences("language", 0);
-                LanguageUtils.SetLanguage(this, "chinese");
-                sp2.edit().putString("language", "chinese").commit();
-                this.language = "chinese";
-            }
-        }
-    }
-
-    @Override // android.app.Activity, android.view.ContextThemeWrapper, android.content.ContextWrapper
-    protected void attachBaseContext(Context newBase) {
-        try {
-            SharedPreferences sp = newBase.getSharedPreferences("language", 0);
-            String type = sp.getString("language", "chinese");
-            super.attachBaseContext(LanguageUtils.attachBaseContext(newBase, type));
-        } catch (Exception e) {
-        }
-    }
-
-    @Override // android.app.Activity
-    protected void onPause() {
-        super.onPause();
-        try {
-            unregisterReceiver(this.batteryReceiver);
-            unregisterReceiver(this.InteractionReceiver);
-        } catch (Exception e) {
-        }
-        this.showTime = false;
-        this.timeThread = null;
-        this.isnotice = false;
-        this.noticeThread = null;
-        this.canRefresh = false;
-        Log.e(TAG, "on pause:norefresh");
-    }
-
-    @Override // android.app.Activity
-    protected void onStop() {
-        super.onStop();
-        this.showTime = false;
-        this.timeThread = null;
-        this.isnotice = false;
-        this.noticeThread = null;
-    }
-
-    @Override // android.app.Activity
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(this.wifiReceiver);
-        unregisterReceiver(this.apkInstallReceiver);
-        this.showTime = false;
-        this.timeThread = null;
-        this.isnotice = false;
-        this.noticeThread = null;
-    }
-
-    /* loaded from: classes.dex */
-    class HostPwd extends Thread {
-        HostPwd() {
-        }
-
-        @Override // java.lang.Thread, java.lang.Runnable
-        public void run() {
-            SharedPreferences sharePre = CloudClientActivity.this.getSharedPreferences("privatekey", 0);
-            String privatekey = sharePre.getString("key", "");
-            String ip = sharePre.getString("apihost", "");
-            String username = sharePre.getString("name", "");
-            if (ip == null || ip.equals("") || username == null || username.equals("") || privatekey == null || privatekey.equals("")) {
-                HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
-                if (hashmap != null) {
-                    ip = hashmap.get("ip");
-                    username = hashmap.get("usercode");
-                    privatekey = hashmap.get("privatekey");
-                    if (ip != null && username != null && privatekey != null) {
-                        sharePre.edit().putString("key", privatekey).commit();
-                        sharePre.edit().putString("apihost", ip).commit();
-                        sharePre.edit().putString("name", username).commit();
-                    }
-                } else {
-                    return;
                 }
             }
-            String url = "http://" + ip + "/api/padpwd";
-            HttpPost post = new HttpPost(url);
-            post.addHeader("X-Edutech-Entity", username);
-            long imestamp = System.currentTimeMillis();
-            String sign = My_md5.Md5(String.valueOf(imestamp) + username + privatekey);
-            post.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-            DefaultHttpClient client = new DefaultHttpClient();
-            Log.e("hhh", url);
-            try {
-                HttpResponse response = client.execute(post);
-                Log.e("hhh", "code:" + response.getStatusLine().getStatusCode());
-                String result = CloudClientActivity.this.getJsonStringFromGZIP(response);
-                JSONObject jobj = new JSONObject(result);
-                String data = jobj.getString("data");
-                Log.e("hhh", data);
-                File file = new File(String.valueOf(AppEnvironment.PWDFILEPATH) + ip + "pwd.xml");
-                if (file.exists() && data != null && !data.equals("")) {
-                    file.delete();
-                }
-                file.createNewFile();
-                FileOutputStream out = new FileOutputStream(file);
-                out.write(data.getBytes());
-                if (out != null) {
-                    out.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        };
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public String getJsonStringFromGZIP(HttpResponse response) {
-        InputStream is;
-        try {
-            if (response.getStatusLine().getStatusCode() == 200) {
-                InputStream is2 = response.getEntity().getContent();
-                BufferedInputStream bis = new BufferedInputStream(is2);
-                bis.mark(2);
-                byte[] header = new byte[2];
-                int result = bis.read(header);
-                bis.reset();
-                int headerData = getShort(header);
-                if (result != -1 && headerData == 8075) {
-                    is = new GZIPInputStream(bis);
-                } else {
-                    is = bis;
-                }
-                InputStreamReader reader = new InputStreamReader(is, "utf-8");
-                char[] data = new char[100];
-                StringBuffer sb = new StringBuffer();
-                while (true) {
-                    int readSize = reader.read(data);
-                    if (readSize > 0) {
-                        sb.append(data, 0, readSize);
-                    } else {
-                        String jsonString = sb.toString();
-                        bis.close();
-                        reader.close();
-                        return jsonString;
-                    }
-                }
-            } else {
-                Log.e(TAG, "与服务端连接失败。。。");
-                return "";
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.toString(), e);
-            return "";
-        }
-    }
-
-    private int getShort(byte[] data) {
-        return (data[0] << 8) | (data[1] & BSON.MINKEY);
-    }
-
-    public static void cleanInternalCache(Context context) {
-        Log.e(TAG, context.getCacheDir().getAbsolutePath());
-        deleteFilesByDirectory(context.getCacheDir());
-    }
-
-    public static void cleanSharedPreference(Context context) {
-        deleteFilesByDirectory(new File("/data/data/" + context.getPackageName() + "/shared_prefs"));
-    }
-
-    public static void cleanFiles(Context context) {
-        deleteFilesByDirectory(context.getFilesDir());
-    }
-
-    public static void cleanExternalCache(Context context) {
-        if (Environment.getExternalStorageState().equals("mounted")) {
-            deleteFilesByDirectory(context.getExternalCacheDir());
-        }
-    }
-
-    public static void cleanApplicationData(Context context) {
-        cleanCacheFile(TEMP);
-    }
-
-    private static void deleteFilesByDirectory(File directory) {
-        File[] listFiles;
-        if (directory != null && directory.exists() && directory.isDirectory()) {
-            File[] items = directory.listFiles();
-            if (items != null) {
-                for (File item : directory.listFiles()) {
-                    item.delete();
-                }
-            }
-        }
-    }
-
-    private static void cleanCacheFile(String path) {
-        File[] files;
-        File file = new File(path);
-        if (file.isDirectory() && (files = file.listFiles()) != null) {
-            for (File tep : files) {
-                tep.delete();
-            }
-        }
-    }
-
-    private void judgePadType() {
-        PackageInfo packageInfo;
-        try {
-            packageInfo = getPackageManager().getPackageInfo("com.android.mms", 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            packageInfo = null;
-            e.printStackTrace();
-        }
-        if (packageInfo == null) {
-            System.out.println("非3G");
-            this.is3G = false;
-        } else {
-            System.out.println("3G");
-            this.is3G = true;
-        }
-        if (Build.MODEL.equals("Lenovo B8000-H")) {
-            this.isLenovo = true;
-            this.is3G = true;
-        } else {
-            this.isLenovo = false;
-        }
-        try {
-            getPackageManager().getPackageInfo(AppEnvironment.MHZX_PACKNAME, 0);
-        } catch (PackageManager.NameNotFoundException e2) {
-            e2.printStackTrace();
-        }
-    }
-
-    @Override // android.app.Activity, android.content.ComponentCallbacks
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        this.onconfigureChange = true;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void lockPad() {
-        SharedPreferences spf = getSharedPreferences("lockscreen", 4);
-        boolean locked = spf.getBoolean("locked", false);
-        long startTime = spf.getLong("lockstartTime", 0L);
-        long tempStartTime = spf.getLong("tmplockedtime", 0L);
-        int tempLock = spf.getInt("tmplocked", 0);
-        if (locked && startTime != 0) {
-            Intent intent2 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
-            intent2.putExtra("state", LogHelp.TYPE_MYWORK);
-            sendBroadcast(intent2);
-        } else if (tempLock == 1 && tempStartTime != 0) {
-            Intent intent22 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
-            intent22.putExtra("state", LogHelp.TYPE_GUIDANCE);
-            sendBroadcast(intent22);
-        } else {
-            Intent intent3 = new Intent(AppEnvironment.Intent_UNLOCKWINDOW);
-            sendBroadcast(intent3);
-        }
-    }
-
-    @Override // android.app.Activity
-    protected void onResume() {
-        super.onResume();
-        try {
-            this.canRefresh = true;
-            Log.e(TAG, "on resume:canrefresh");
-            init_public_infor();
-            Intent intent = new Intent("ENTERPASS");
-            sendBroadcast(intent);
-            SharedPreferences callSp = getSharedPreferences("allowcall", 4);
-            callSp.edit().putBoolean("cancall", false).commit();
-            lockPad();
-            IntentFilter batteryFilter = new IntentFilter();
-            batteryFilter.addAction("android.intent.action.BATTERY_CHANGED");
-            this.batteryReceiver = new BatteryReceiver();
-            registerReceiver(this.batteryReceiver, batteryFilter);
-            this.mActivityManager = (ActivityManager) getSystemService("activity");
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction("PASSWDPASS");
-            intentFilter.addAction("android.intent.action.mdm");
-            intentFilter.addAction(this.UPDATEAPK);
-            IntentFilter intentFilter2 = new IntentFilter();
-            intentFilter2.addAction("android.intent.action.STATUSBAR_INVISIBILITY");
-            intentFilter2.addAction("android.intent.action.STATUSBAR_VISIBILITY");
-            registerReceiver(this.InteractionReceiver, intentFilter2);
-            try {
-                if (!My_Application.Allow_Flag) {
-                    new Thread(this.checkIdThread).start();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (Build.DISPLAY.contains("T355") || Build.DISPLAY.contains("P550") || Build.DISPLAY.contains("P350") || Build.DISPLAY.contains("P583")) {
+    public static boolean SlientInstall(String str) throws IOException {
+        boolean z;
+        Process exec = Runtime.getRuntime().exec("pm install -r " + str);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(exec.getInputStream()));
+        StringBuilder sb = new StringBuilder("");
+        while (true) {
+            String readLine = bufferedReader.readLine();
+            if (readLine == null) {
                 try {
-                    SharedPreferences sp = getSharedPreferences("license", 0);
-                    this.LicenseOK = sp.getBoolean("licenseok", false);
-                    if (!this.mDPM.isAdminActive(this.mDeviceAdmin)) {
-                        Intent intent_dpm = new Intent(this, AddAdminActivity.class);
-                        startActivity(intent_dpm);
-                    }
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-                SamSungInCharge();
-            }
-            this.showTime = true;
-            this.timeThread = null;
-            this.timeThread = new Thread(this.timeRunnable);
-            this.timeThread.start();
-            showFailedApkInfo();
-        } catch (NullPointerException e3) {
-        } catch (Exception e4) {
-        }
-        try {
-            uploadLogs();
-        } catch (Exception e5) {
-        }
-        try {
-            if (!AppEnvironment.isSDYB) {
-                this.noticeThread = null;
-                this.isnotice = true;
-                this.noticeThread = new Thread(this.noticeRunnable);
-                this.noticeThread.start();
-            }
-        } catch (NullPointerException e6) {
-        } catch (Exception e7) {
-        }
-        try {
-            autoUpdateApks();
-            autoUpdateDesigns();
-        } catch (Exception e8) {
-        }
-        try {
-            DensityUtil.isMyLauncherDefault(this);
-        } catch (Exception e9) {
-        }
-    }
-
-    private void resetAutoSp() {
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        sp.edit().putLong("updateapks", 0L).commit();
-        sp.edit().putLong("updatedesign", 0L).commit();
-        SharedPreferences callSp = getSharedPreferences("noticemessage", 0);
-        callSp.edit().putLong("noticetime", 0L).commit();
-    }
-
-    private void autoUpdateApks() {
-        long time = System.currentTimeMillis();
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        long pretime = sp.getLong("updateapks", 0L);
-        if (time - pretime > 86400000 || pretime == 0) {
-            this.hasUpdated = false;
-            apkUpdate();
-        } else if (time - pretime > 3600000) {
-            SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-            String ip = sharePre.getString("apihost", "");
-            List<String> failedApks = Utils.getFailedEbagUpdated(this, ip);
-            if (failedApks != null && failedApks.size() > 0) {
-                this.hasUpdated = false;
-                apkUpdate();
-            }
-        }
-    }
-
-    private void autoUpdateDesigns() {
-        long time = System.currentTimeMillis();
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        long pretime = sp.getLong("updatedesign", 0L);
-        if (time - pretime > 86400000 || pretime == 0) {
-            this.hasGeted = false;
-            getDesignView();
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void setDesignView() {
-        try {
-            if (!this.isGetLauncher) {
-                new ArrayList();
-                ArrayList<AppBean> apps = XmlLoadHelper.loadXml2();
-                enableButtons(apps);
-                changeIcons(apps);
-            }
-        } catch (Exception e) {
-        }
-    }
-
-    private void uploadLogs() {
-        final File file = new File(AppEnvironment.LOG_PATH);
-        if (file.exists()) {
-            long lastModified = file.lastModified();
-            long currentMill = System.currentTimeMillis();
-            if (Math.abs(currentMill - lastModified) > 3600000 && this.send_ip != null && !this.send_ip.equals("")) {
-                new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.17
-                    @Override // java.lang.Runnable
-                    public void run() {
-                        String url = "http://" + CloudClientActivity.this.send_ip + "/api/padlog/";
-                        String json = "";
-                        try {
-                            json = FileUtils.readFileToString(file, "UTF-8");
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                        if (url != null && json != null && !"".equals(url) && !"".equals(json)) {
-                            HttpPost httpRequest = CloudClientActivity.httpPostInit(url, CloudClientActivity.this.send_privatekey, CloudClientActivity.this.send_name);
-                            List<NameValuePair> params = new ArrayList<>();
-                            params.add(new BasicNameValuePair("data", json));
-                            try {
-                                try {
-                                    httpRequest.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-                                    HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
-                                    if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                                        try {
-                                            String strResult = EntityUtils.toString(httpResponse.getEntity());
-                                            JSONObject jsonObject = new JSONObject(strResult);
-                                            if (jsonObject.getBoolean("status")) {
-                                                file.delete();
-                                            }
-                                        } catch (NullPointerException e) {
-                                        } catch (JSONException e2) {
-                                            e2.printStackTrace();
-                                        } catch (Exception e3) {
-                                        }
-                                    } else {
-                                        System.out.println("Error Response: " + httpResponse.getStatusLine().toString());
-                                    }
-                                } catch (ClientProtocolException e4) {
-                                    e4.printStackTrace();
-                                }
-                            } catch (Exception e5) {
-                                e5.printStackTrace();
-                            }
-                        }
-                    }
-                }).start();
-            }
-        }
-    }
-
-    public static HttpPost httpPostInit(String url, String privatekey, String username) {
-        HttpPost post = new HttpPost(url);
-        post.addHeader("X-Edutech-Entity", String.valueOf(username) + "+" + privatekey);
-        long imestamp = System.currentTimeMillis();
-        String sign = My_md5.Md5(String.valueOf(imestamp) + username + privatekey);
-        post.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-        return post;
-    }
-
-    private void enableButtons(ArrayList<AppBean> apps) {
-        if (apps != null && apps.size() > 0) {
-            AppEnvironment.ONE_IMG = false;
-            AppEnvironment.TWO_IMG = false;
-            AppEnvironment.THREE_IMG = false;
-            AppEnvironment.FOUR_IMG = false;
-            AppEnvironment.FIVE_IMG = false;
-            AppEnvironment.SIX_IMG = false;
-            AppEnvironment.SEVEN_IMG = false;
-            AppEnvironment.EIGHT_IMG = false;
-            AppEnvironment.NINE_IMG = false;
-            AppEnvironment.TEN_IMG = false;
-            AppEnvironment.ELEVEN_IMG = false;
-            AppEnvironment.TWELVE_IMG = false;
-            for (int i = 0; i < apps.size(); i++) {
-                AppBean app = apps.get(i);
-                String code = app.getCode();
-                int enable = app.getEnable();
-                judgeApp(code, enable);
-            }
-        }
-    }
-
-    private void judgeIcon(AppBean app) {
-        String code = app.getCode();
-        if (code.equals("daoxueben")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[0].setText(app.getName());
-            }
-            this.textViews[0].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b != null) {
-                this.imageViews[0].setImageBitmap(b);
-            }
-        } else if (code.equals("zuoyefudao")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[1].setText(app.getName());
-            }
-            this.textViews[1].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b2 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b2 != null) {
-                this.imageViews[1].setImageBitmap(b2);
-            }
-        } else if (code.equals("myhomework")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[2].setText(app.getName());
-            }
-            this.textViews[2].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b3 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b3 != null) {
-                this.imageViews[2].setImageBitmap(b3);
-            }
-        } else if (code.equals("cuotiji")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[3].setText(app.getName());
-            }
-            this.textViews[3].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b4 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b4 != null) {
-                this.imageViews[3].setImageBitmap(b4);
-            }
-        } else if (code.equals("afd_mybook")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[4].setText(app.getName());
-            }
-            this.textViews[4].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b5 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b5 != null) {
-                this.imageViews[4].setImageBitmap(b5);
-            }
-        } else if (code.equals("my_app")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[5].setText(app.getName());
-            }
-            this.textViews[5].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b6 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b6 != null) {
-                this.imageViews[5].setImageBitmap(b6);
-            }
-        } else if (code.equals("my_camera")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[6].setText(app.getName());
-            }
-            this.textViews[6].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b7 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b7 != null) {
-                this.imageViews[6].setImageBitmap(b7);
-            }
-        } else if (code.equals("myfiles")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[7].setText(app.getName());
-            }
-            this.textViews[7].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b8 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b8 != null) {
-                this.imageViews[7].setImageBitmap(b8);
-            }
-        } else if (code.equals("home_school")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[8].setText(app.getName());
-            }
-            this.textViews[8].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b9 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b9 != null) {
-                this.imageViews[8].setImageBitmap(b9);
-            }
-        } else if (code.equals("hudongtaolun")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[9].setText(app.getName());
-            }
-            this.textViews[9].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b10 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b10 != null) {
-                this.imageViews[9].setImageBitmap(b10);
-            }
-        } else if (code.equals("study_store")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[10].setText(app.getName());
-            }
-            this.textViews[10].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b11 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b11 != null) {
-                this.imageViews[10].setImageBitmap(b11);
-            }
-        } else if (code.equals("happ_class")) {
-            if (!TextUtils.isEmpty(app.getName())) {
-                this.textViews[11].setText(app.getName());
-            }
-            this.textViews[11].setTextColor(Color.parseColor(app.getColor()));
-            Bitmap b12 = BitmapFactory.decodeFile(app.getIconLocal());
-            if (b12 != null) {
-                this.imageViews[11].setImageBitmap(b12);
-            }
-        }
-    }
-
-    private void judgeApp(String code, int enable) {
-        if (code.equals("daoxueben")) {
-            if (enable == 1) {
-                AppEnvironment.ONE_IMG = true;
-            } else {
-                AppEnvironment.ONE_IMG = false;
-            }
-        } else if (code.equals("zuoyefudao")) {
-            if (enable == 1) {
-                AppEnvironment.TWO_IMG = true;
-            } else {
-                AppEnvironment.TWO_IMG = false;
-            }
-        } else if (code.equals("myhomework")) {
-            if (enable == 1) {
-                AppEnvironment.THREE_IMG = true;
-            } else {
-                AppEnvironment.THREE_IMG = false;
-            }
-        } else if (code.equals("cuotiji")) {
-            if (enable == 1) {
-                AppEnvironment.FOUR_IMG = true;
-            } else {
-                AppEnvironment.FOUR_IMG = false;
-            }
-        } else if (code.equals("afd_mybook")) {
-            if (enable == 1) {
-                AppEnvironment.FIVE_IMG = true;
-            } else {
-                AppEnvironment.FIVE_IMG = false;
-            }
-        } else if (code.equals("my_app")) {
-            if (enable == 1) {
-                AppEnvironment.SIX_IMG = true;
-            } else {
-                AppEnvironment.SIX_IMG = false;
-            }
-        } else if (code.equals("my_camera")) {
-            if (enable == 1) {
-                AppEnvironment.SEVEN_IMG = true;
-            } else {
-                AppEnvironment.SEVEN_IMG = false;
-            }
-        } else if (code.equals("myfiles")) {
-            if (enable == 1) {
-                AppEnvironment.EIGHT_IMG = true;
-            } else {
-                AppEnvironment.EIGHT_IMG = false;
-            }
-        } else if (code.equals("home_school")) {
-            if (enable == 1) {
-                AppEnvironment.NINE_IMG = true;
-            } else {
-                AppEnvironment.NINE_IMG = false;
-            }
-        } else if (code.equals("hudongtaolun")) {
-            if (enable == 1) {
-                AppEnvironment.TEN_IMG = true;
-            } else {
-                AppEnvironment.TEN_IMG = false;
-            }
-        } else if (code.equals("study_store")) {
-            if (enable == 1) {
-                AppEnvironment.ELEVEN_IMG = true;
-            } else {
-                AppEnvironment.ELEVEN_IMG = false;
-            }
-        } else if (code.equals("happ_class")) {
-            if (enable == 1) {
-                AppEnvironment.TWELVE_IMG = true;
-            } else {
-                AppEnvironment.TWELVE_IMG = false;
-            }
-        }
-    }
-
-    private void changeIcons(ArrayList<AppBean> apps) {
-        if (apps != null) {
-            try {
-                if (apps.size() > 0) {
-                    getDataFromLocal(AppEnvironment.icon, apps);
-                }
-            } catch (Exception e) {
-                SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-                sharePre.edit().putString("updatetime", "0").commit();
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void getSpecialLauncher() {
-        this.isGetLauncher = true;
-        SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-        String ip = sharePre.getString("apihost", "");
-        String username = sharePre.getString("name", "");
-        if (ip == null || ip.equals("") || username == null || username.equals("")) {
-            HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
-            if (hashmap != null) {
-                ip = hashmap.get("ip");
-                username = hashmap.get("usercode");
-            } else {
-                return;
-            }
-        }
-        String url = "http://" + ip + "/api/config/";
-        if (username == null || username.equals("")) {
-            this.isGetLauncher = false;
-            return;
-        }
-        String json = HttpUtils.getConfigData(url, username);
-        this.isGetLauncher = false;
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        sp.edit().putLong("updatedesign", System.currentTimeMillis()).commit();
-        if (json == null || !json.equals("")) {
-            int result = XmlUtils.saveLauncher(json, this);
-            if (result == 1) {
-                this.hasGeted = true;
-            }
-            SharedPreferences spLauncher = getSharedPreferences("splauncher", 0);
-            spLauncher.edit().putLong("refreshtime", System.currentTimeMillis()).commit();
-            runOnUiThread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.18
-                @Override // java.lang.Runnable
-                public void run() {
-                    CloudClientActivity.this.setDesignView();
-                }
-            });
-        }
-    }
-
-    @SuppressLint({"NewApi"})
-    private void getDataFromLocal(String path, ArrayList<AppBean> apps) {
-        for (int i = 0; i < apps.size(); i++) {
-            try {
-                String code = apps.get(i).getCode();
-                if ("wifi".equals(code) || "large".equals(code) || SQLExec.DelimiterType.NORMAL.equals(code) || "small".equals(code)) {
-                    String iconpath = String.valueOf(AppEnvironment.icon) + apps.get(i).getIcon().substring(apps.get(i).getIcon().lastIndexOf("/") + 1);
-                    if (iconpath != null && "large".equals(code)) {
-                        File file = new File(iconpath);
-                        if (file.exists()) {
-                            Drawable background = new BitmapDrawable(BitmapFactory.decodeFile(String.valueOf(AppEnvironment.icon) + apps.get(i).getIcon().substring(apps.get(i).getIcon().lastIndexOf("/") + 1)));
-                            this.mainbackground.setBackground(background);
-                        } else {
-                            SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-                            sharePre.edit().putString("updatetime", "0").commit();
-                        }
-                    }
-                } else {
-                    judgeIcon(apps.get(i));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.i("liu", "Exception:" + e);
-                SharedPreferences sharePre2 = getSharedPreferences("privatekey", 0);
-                sharePre2.edit().putString("updatetime", "0").commit();
-                return;
-            }
-        }
-    }
-
-    public void SamSungInCharge() {
-        try {
-            try {
-                if (!this.LicenseOK) {
-                    try {
-                        EnterpriseLicenseManager elmMgr = EnterpriseLicenseManager.getInstance(this);
-                        if (isWifiConn()) {
-                            elmMgr.activateLicense(SKEY);
-                        } else {
-                            startWifiActivity();
-                        }
-                    } catch (NoClassDefFoundError e) {
-                    }
-                } else if (this.mDPM.isAdminActive(this.mDeviceAdmin)) {
-                    try {
-                        if (MultiUserManager.getInstance(this).isUserCreationAllowed()) {
-                            MultiUserManager.getInstance(this).allowUserCreation(false);
-                        }
-                    } catch (Exception e2) {
-                    }
-                    try {
-                        if (MultiUserManager.getInstance(this).multipleUsersAllowed()) {
-                            MultiUserManager.getInstance(this).allowMultipleUsers(false);
-                        }
-                    } catch (Exception e3) {
-                    }
-                    try {
-                        KioskMode kioskMode = KioskMode.getInstance(this);
-                        kioskMode.allowMultiWindowMode(true);
-                        kioskMode.allowMultiWindowMode(false);
-                    } catch (Exception e4) {
-                    }
-                    EnterpriseDeviceManager edm = (EnterpriseDeviceManager) getSystemService("enterprise_policy");
-                    RestrictionPolicy restrictionPolicy = edm.getRestrictionPolicy();
-                    try {
-                        restrictionPolicy.allowStatusBarExpansion(false);
-                    } catch (SecurityException e5) {
-                        Log.w(TAG, "SecurityException: " + e5);
-                    }
-                    try {
-                        boolean result = restrictionPolicy.allowBluetooth(false);
-                        if (result) {
-                            Log.w(TAG, "Bluetooth is disabled and cannot be enabled by user ");
-                        }
-                    } catch (SecurityException e6) {
-                        Log.w(TAG, "SecurityException: " + e6);
-                    }
-                    try {
-                        if (restrictionPolicy.setUsbMediaPlayerAvailability(false)) {
-                            Log.e("mainactivity", "set MTP disallow true");
-                        } else {
-                            Log.e("mainactivity", "set MTP disallow false");
-                        }
-                    } catch (SecurityException e7) {
-                        Log.e("mainactivity", "SecurityException: " + e7);
-                        try {
-                            EnterpriseLicenseManager elmMgr2 = EnterpriseLicenseManager.getInstance(this);
-                            if (isWifiConn()) {
-                                elmMgr2.activateLicense(SKEY);
-                            } else {
-                                startWifiActivity();
-                            }
-                        } catch (NoClassDefFoundError e8) {
-                        }
-                    }
-                    EnterpriseDeviceManager mEDM = (EnterpriseDeviceManager) getSystemService("enterprise_policy");
-                    DateTimePolicy mDateTimePolicy = mEDM.getDateTimePolicy();
-                    try {
-                        mDateTimePolicy.setAutomaticTime(true);
-                    } catch (SecurityException e9) {
-                        Log.w(TAG, "SecurityException: " + e9);
-                    }
-                }
-            } catch (Exception e10) {
-                e10.printStackTrace();
-                try {
-                    EnterpriseLicenseManager elmMgr3 = EnterpriseLicenseManager.getInstance(this);
-                    if (isWifiConn()) {
-                        elmMgr3.activateLicense(SKEY);
-                    } else {
-                        startWifiActivity();
-                    }
-                } catch (NoClassDefFoundError e11) {
-                }
-            }
-        } catch (NoClassDefFoundError e12) {
-            e12.printStackTrace();
-        }
-    }
-
-    public boolean isWifiConn() {
-        WifiManager wifiManager = (WifiManager) getSystemService("wifi");
-        if (wifiManager == null) {
-            return false;
-        }
-        int wifiState = wifiManager.getWifiState();
-        return wifiState != 1;
-    }
-
-    private void startWifiActivity() {
-        PackageInfo packageInfo;
-        PackageInfo packageInfo2;
-        if (Build.DISPLAY.contains("YOGATablet2-1050LC") && Build.DISPLAY.contains("YiJiao")) {
-            String pkgWifi = AppEnvironment.WIFI_PACKNAME;
-            String clsWifi = "zte.com.wilink.wifi.WifiSettingActivity";
-            try {
-                packageInfo2 = getPackageManager().getPackageInfo(pkgWifi, 0);
-            } catch (PackageManager.NameNotFoundException e) {
-                packageInfo2 = null;
-                pkgWifi = "com.edutech.wificonn";
-                clsWifi = "com.edutech.wificonn.WifiConnActivity";
-                e.printStackTrace();
-            }
-            try {
-                packageInfo2 = getPackageManager().getPackageInfo(pkgWifi, 0);
-            } catch (PackageManager.NameNotFoundException e2) {
-                packageInfo2 = null;
-                e2.printStackTrace();
-            } catch (Exception e3) {
-            }
-            if (packageInfo2 != null) {
-                Log.i("qwe", "packageInfo != null");
-                ComponentName componet = new ComponentName(pkgWifi, clsWifi);
-                Intent intent = new Intent();
-                intent.setComponent(componet);
-                intent.addFlags(268435456);
-                intent.setAction("android.intent.action.MAIN");
-                intent.addCategory("android.intent.category.LAUNCHER");
-                startActivity(intent, pkgWifi);
-                return;
-            }
-            return;
-        }
-        String pkgWifi2 = "com.edutech.wificonn";
-        String clsWifi2 = "com.edutech.wificonn.WifiConnActivity";
-        try {
-            packageInfo = getPackageManager().getPackageInfo(pkgWifi2, 0);
-        } catch (PackageManager.NameNotFoundException e4) {
-            packageInfo = null;
-            pkgWifi2 = AppEnvironment.WIFI_PACKNAME;
-            clsWifi2 = "zte.com.wilink.wifi.WifiSettingActivity";
-            e4.printStackTrace();
-        }
-        try {
-            packageInfo = getPackageManager().getPackageInfo(pkgWifi2, 0);
-        } catch (PackageManager.NameNotFoundException e5) {
-            packageInfo = null;
-            e5.printStackTrace();
-        } catch (Exception e6) {
-        }
-        if (packageInfo != null) {
-            ComponentName componet2 = new ComponentName(pkgWifi2, clsWifi2);
-            Intent intent2 = new Intent();
-            intent2.setComponent(componet2);
-            intent2.addFlags(268435456);
-            intent2.setAction("android.intent.action.MAIN");
-            intent2.addCategory("android.intent.category.LAUNCHER");
-            startActivity(intent2, pkgWifi2);
-        }
-    }
-
-    private void init_public_infor() {
-        this.hashmap = XmlLoadHelper.loadXml();
-        if (this.hashmap != null) {
-            this.username = this.hashmap.get("username");
-            if (this.hashmap.containsKey("stuname")) {
-            }
-            String name = this.hashmap.get("stuname");
-            if (name != null && this.tv_stuname != null) {
-                if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
-                    this.tv_stuname.setText(name);
-                } else {
-                    this.tv_stuname.setText(String.valueOf(getResources().getString(R.string.student)) + " " + name);
-                }
-            }
-            My_Application.LoginName = this.username;
-        }
-    }
-
-    private void initSuiningView() {
-        this.imageViews[0] = (ImageView) findViewById(R.id.five_img);
-        this.imageViews[1] = (ImageView) findViewById(R.id.one_img);
-        this.imageViews[2] = (ImageView) findViewById(R.id.two_img);
-        this.imageViews[3] = (ImageView) findViewById(R.id.four_img);
-        this.imageViews[4] = (ImageView) findViewById(R.id.twelve_img);
-        this.imageViews[5] = (ImageView) findViewById(R.id.three_img);
-        this.imageViews[6] = (ImageView) findViewById(R.id.six_img);
-        this.imageViews[7] = (ImageView) findViewById(R.id.thirteen_img);
-        this.imageViews[8] = (ImageView) findViewById(R.id.seven_img);
-        this.imageViews[9] = (ImageView) findViewById(R.id.eight_img);
-        this.textViews[0] = (TextView) findViewById(R.id.five_txt);
-        this.textViews[1] = (TextView) findViewById(R.id.one_txt);
-        this.textViews[2] = (TextView) findViewById(R.id.two_txt);
-        this.textViews[3] = (TextView) findViewById(R.id.four_txt);
-        this.textViews[4] = (TextView) findViewById(R.id.twelve_txt);
-        this.textViews[5] = (TextView) findViewById(R.id.three_txt);
-        this.textViews[6] = (TextView) findViewById(R.id.six_txt);
-        this.textViews[7] = (TextView) findViewById(R.id.thirteen_txt);
-        this.textViews[8] = (TextView) findViewById(R.id.seven_txt);
-        this.textViews[9] = (TextView) findViewById(R.id.eight_txt);
-        this.imageViewSetting = (TextView) findViewById(R.id.setting_img);
-        this.wifi_btn = (TextView) findViewById(R.id.wifi_btn);
-        this.tv_wifi = (TextView) findViewById(R.id.tv_wifi);
-        this.tv_battery = (TextView) findViewById(R.id.tv_battery);
-        this.tv_msg = (TextView) findViewById(R.id.tv_sms);
-        this.tv_tel = (TextView) findViewById(R.id.tv_tel);
-        this.tv_msg.setVisibility(8);
-        this.tv_tel.setVisibility(8);
-        this.tv_msg.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.19
-            @Override // android.view.View.OnClickListener
-            public void onClick(View arg0) {
-                CloudClientActivity.this.getNetworkTime(0);
-            }
-        });
-        this.tv_tel.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.20
-            @Override // android.view.View.OnClickListener
-            public void onClick(View arg0) {
-                CloudClientActivity.this.getNetworkTime(1);
-            }
-        });
-        for (int i = 0; i < 10 && i < 10; i++) {
-            isShowView(this.imageViews[i], true);
-            isShowView(this.textViews[i], true);
-        }
-    }
-
-    private void initView() {
-        this.imageViews[0] = (ImageView) findViewById(R.id.one_img);
-        this.imageViews[1] = (ImageView) findViewById(R.id.two_img);
-        this.imageViews[2] = (ImageView) findViewById(R.id.three_img);
-        this.imageViews[3] = (ImageView) findViewById(R.id.four_img);
-        this.imageViews[4] = (ImageView) findViewById(R.id.five_img);
-        this.imageViews[5] = (ImageView) findViewById(R.id.six_img);
-        this.imageViews[6] = (ImageView) findViewById(R.id.seven_img);
-        this.imageViews[7] = (ImageView) findViewById(R.id.eight_img);
-        this.imageViews[8] = (ImageView) findViewById(R.id.nine_img);
-        this.imageViews[9] = (ImageView) findViewById(R.id.ten_img);
-        this.imageViews[10] = (ImageView) findViewById(R.id.eleven_img);
-        this.imageViews[11] = (ImageView) findViewById(R.id.twelve_img);
-        this.textViews[0] = (TextView) findViewById(R.id.one_txt);
-        this.textViews[1] = (TextView) findViewById(R.id.two_txt);
-        this.textViews[2] = (TextView) findViewById(R.id.three_txt);
-        this.textViews[3] = (TextView) findViewById(R.id.four_txt);
-        this.textViews[4] = (TextView) findViewById(R.id.five_txt);
-        this.textViews[5] = (TextView) findViewById(R.id.six_txt);
-        this.textViews[6] = (TextView) findViewById(R.id.seven_txt);
-        this.textViews[7] = (TextView) findViewById(R.id.eight_txt);
-        this.textViews[8] = (TextView) findViewById(R.id.nine_txt);
-        this.textViews[9] = (TextView) findViewById(R.id.ten_txt);
-        this.textViews[10] = (TextView) findViewById(R.id.eleven_txt);
-        this.textViews[11] = (TextView) findViewById(R.id.twelve_txt);
-        this.mainbackground = (LinearLayout) findViewById(R.id.mainbackground);
-        this.imageViewSetting = (TextView) findViewById(R.id.setting_img);
-        this.wifi_btn = (TextView) findViewById(R.id.wifi_btn);
-        this.tv_wifi = (TextView) findViewById(R.id.tv_wifi);
-        this.tv_battery = (TextView) findViewById(R.id.tv_battery);
-        this.tv_msg = (TextView) findViewById(R.id.tv_sms);
-        this.tv_tel = (TextView) findViewById(R.id.tv_tel);
-        this.tv_msg.setVisibility(8);
-        this.tv_tel.setVisibility(8);
-        this.tv_msg.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.21
-            @Override // android.view.View.OnClickListener
-            public void onClick(View arg0) {
-                CloudClientActivity.this.getNetworkTime(0);
-            }
-        });
-        this.tv_tel.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.22
-            @Override // android.view.View.OnClickListener
-            public void onClick(View arg0) {
-                CloudClientActivity.this.getNetworkTime(1);
-            }
-        });
-        for (int i = 0; i < this.imageViews.length && i < this.textViews.length; i++) {
-            isShowView(this.imageViews[i], true);
-            isShowView(this.textViews[i], true);
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void getNetworkTime(final int type) {
-        new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.23
-            @Override // java.lang.Runnable
-            public void run() {
-                try {
-                    URL url = new URL("http://www.ntsc.ac.cn");
-                    URLConnection uc = url.openConnection();
-                    uc.connect();
-                    long ld = uc.getDate();
-                    Date date = new Date(ld);
-                    date.getHours();
-                    date.getMinutes();
-                    Message msg = CloudClientActivity.this.callHandler.obtainMessage();
-                    msg.what = type;
-                    msg.sendToTarget();
-                    SharedPreferences callSp = CloudClientActivity.this.getSharedPreferences("allowcall", 4);
-                    callSp.edit().putBoolean("cancall", true).commit();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Message msg2 = CloudClientActivity.this.callHandler.obtainMessage();
-                    msg2.what = 2;
-                    msg2.sendToTarget();
-                    SharedPreferences callSp2 = CloudClientActivity.this.getSharedPreferences("allowcall", 4);
-                    callSp2.edit().putBoolean("cancall", false).commit();
-                }
-            }
-        }).start();
-    }
-
-    private void removeIllegalApks() {
-        new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.24
-            @Override // java.lang.Runnable
-            public void run() {
-                try {
-                    Thread.sleep(3000L);
+                    break;
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.err.println(e);
                 }
-                if (!Build.DISPLAY.contains("A10-70LC") && !Build.DISPLAY.contains("TB-8703N") && !Build.DISPLAY.contains("TB-8604F") && !Build.DISPLAY.contains("A10-70F") && !Build.DISPLAY.contains("YiJiao") && !Build.DISPLAY.contains("YOGATablet2-1050LC") && Build.DISPLAY.indexOf("S1016PRO") < 0 && Build.DISPLAY.indexOf("M1016Pro") < 0 && Build.DISPLAY.indexOf("P990S.V") < 0 && Build.DISPLAY.indexOf("D13B") < 0 && Build.DISPLAY.indexOf("QC80A") < 0 && Build.DISPLAY.indexOf("N5110ZB") < 0 && Build.DISPLAY.indexOf(".T360Z") < 0 && Build.DISPLAY.indexOf("P583") < 0 && Build.DISPLAY.indexOf("P350") < 0 && Build.DISPLAY.indexOf("P550") < 0 && Build.DISPLAY.indexOf("M856.V") < 0 && Build.DISPLAY.indexOf("S1016.V1") < 0 && Build.DISPLAY.indexOf("S106.V1") < 0 && Build.DISPLAY.indexOf("S1016E") < 0) {
-                    return;
-                }
-                try {
-                    CloudClientActivity.this.getMyApps(CloudClientActivity.this.send_ip, CloudClientActivity.this.send_privatekey);
-                } catch (Exception e2) {
-                }
-            }
-        }).start();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void getMyApps(String ip, String privatekey) {
-        String sppref;
-        SharedPreferences sp;
-        if (this.myappList == null) {
-            this.myappList = new ArrayList();
-        }
-        if (ip != null && !ip.equals("") && (sppref = ip.trim()) != null && !sppref.equals("")) {
-            try {
-                sp = getSharedPreferences(sppref, 0);
-            } catch (NullPointerException e) {
-                sp = null;
-            } catch (Exception e2) {
-                sp = null;
-            }
-            if (sp != null) {
-                long lasttime = sp.getLong("updatetime", 0L);
-                long time = System.currentTimeMillis();
-                String myapps = sp.getString("data", "");
-                if (Math.abs((time - lasttime) / 1000) >= 10800) {
-                    String url = "http://" + ip + "/api/app/projectcode/myapp/os/android";
-                    HttpGet httpRequest = httpGetInit(url, privatekey, this.username);
-                    try {
-                        HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
-                        if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                            String strResult = EntityUtils.toString(httpResponse.getEntity());
-                            System.out.println("strResult:" + strResult);
-                            if (strResult != null && !strResult.equals("")) {
-                                JSONObject jobj = new JSONObject(strResult);
-                                boolean status = jobj.getBoolean("status");
-                                jobj.getString("errorInfo");
-                                if (status) {
-                                    sp.edit().putLong("updatetime", System.currentTimeMillis()).commit();
-                                    sp.edit().putString("data", strResult).commit();
-                                    myapps = strResult;
-                                }
-                            }
-                        }
-                    } catch (ClientProtocolException e3) {
-                        e3.printStackTrace();
-                    } catch (IOException e4) {
-                        e4.printStackTrace();
-                    } catch (Exception e5) {
-                        e5.printStackTrace();
-                    }
-                }
-                if (myapps != null) {
-                    try {
-                        if (!myapps.equals("")) {
-                            JSONObject jobj2 = new JSONObject(myapps);
-                            boolean status2 = jobj2.getBoolean("status");
-                            jobj2.getString("errorInfo");
-                            if (status2) {
-                                JSONObject jdata = jobj2.getJSONObject("data");
-                                JSONArray jsonArray = jdata.getJSONArray("app");
-                                if (jsonArray != null && jsonArray.length() > 0) {
-                                    this.myappList.clear();
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        String pkg = jsonArray.getJSONObject(i).getString("packagename");
-                                        String apptype = jsonArray.getJSONObject(i).getString("apptype");
-                                        if (LogHelp.TYPE_GUIDANCE.equals(apptype)) {
-                                            this.myappList.add(pkg);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } catch (NullPointerException e6) {
-                        e6.printStackTrace();
-                    } catch (JSONException e7) {
-                        e7.printStackTrace();
-                    } catch (Exception e8) {
-                        e8.printStackTrace();
-                    }
-                }
-                getOtherApps();
+            } else {
+                sb.append(readLine);
             }
         }
-    }
-
-    public static HttpGet httpGetInit(String url, String privatekey, String username) {
-        HttpGet get = new HttpGet(url);
-        get.addHeader("X-Edutech-Entity", String.valueOf(username) + "+" + privatekey);
-        long imestamp = System.currentTimeMillis();
-        String sign = My_md5.Md5(String.valueOf(imestamp) + username + privatekey);
-        get.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-        return get;
-    }
-
-    private void getOtherApps() {
-        new ArrayList();
-        List<String> uninstallpackages = new ArrayList<>();
-        ArrayList<String> selfApps = new ArrayList<>();
-        selfApps.add("com.launcher.activity");
-        selfApps.add("dolphin.video.players");
-        selfApps.add("com.onlinesys.student");
-        selfApps.add("com.google.android.inputmethod.pinyin");
-        selfApps.add("com.akson.timeep");
-        selfApps.add("com.akson.timeepstudent");
-        selfApps.add("com.webgenie.swf.play");
-        selfApps.add("com.ashleytech.falswf");
-        if (AppEnvironment.isDEMO) {
-            selfApps.add("com.lejent.zuoyeshenqi.afanti");
-            selfApps.add("com.A17zuoye.mobile.homework");
-            selfApps.add("com.jinxin.namibox");
-            selfApps.add("com.haojiazhang.activity");
-            selfApps.add(AppEnvironment.YOUDAO_PACKNAME);
-            selfApps.add("org.hisand.zidian.zhs");
-            selfApps.add("com.record.ing");
-            selfApps.add("com.xueersi.parentsmeeting");
-            selfApps.add("com.hjwordgames");
+        if (exec.waitFor() != 0) {
+            System.err.println("exit value = " + exec.exitValue());
         }
+        if (sb.toString().equals("Success")) {
+            Log.d("InstallApkUtil", "SlientInstall success");
+            z = true;
+        } else {
+            Log.d("InstallApkUtil", "SlientInstall failed");
+            z = false;
+        }
+        return z;
+    }
+
+    private void apkIntentInstall(String str) {
+        Intent intent = new Intent("android.intent.action.VIEW");
+        intent.setDataAndType(Uri.fromFile(new File(str)), "application/vnd.android.package-archive");
+        intent.setFlags(268435456);
+        startActivity(intent);
+    }
+
+    private void apkinstall(String str) {
         try {
-            List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
-            if (packages != null && packages.size() > 0) {
-                for (int i = 0; i < packages.size(); i++) {
-                    PackageInfo info = packages.get(i);
-                    String pkName = info.packageName;
-                    if ((info.applicationInfo.flags & 1) <= 0 && !selfApps.contains(pkName) && !pkName.contains("com.edutech") && !pkName.contains("cn.wps.moffice_eng") && (info.applicationInfo.flags & 1) <= 0 && (this.myappList == null || !this.myappList.contains(pkName))) {
-                        uninstallpackages.add(pkName);
-                    }
-                }
+            if (InstallApkUtil.SlientInstall(str)) {
+                Log.d("sysService", String.valueOf(str) + ":SlientInstall安装成功！");
+            } else if (!InstallApkUtil.SuSlientInstall(str)) {
+                apkIntentInstall(str);
+            } else {
+                Log.d("sysService", String.valueOf(str) + ":SuSlientInstall安装成功！");
             }
-            if (uninstallpackages == null) {
-                return;
-            }
-            if (uninstallpackages.size() > 0) {
-                for (int i2 = 0; i2 < uninstallpackages.size(); i2++) {
-                    try {
-                        String pkname = uninstallpackages.get(i2);
-                        Intent installIntent = new Intent(sysProtectService.UNSTALLAPK);
-                        installIntent.putExtra("packagename", pkname);
-                        sendBroadcast(installIntent);
-                        Thread.sleep(100L);
-                    } catch (Exception e) {
-                        return;
-                    }
-                }
-            }
-        } catch (NullPointerException e2) {
-        } catch (Exception e3) {
-        }
-    }
-
-    private void isShowView(View view, boolean flag) {
-        view.setVisibility(flag ? 0 : 8);
-    }
-
-    private void initListener() {
-        if (!AppEnvironment.isMAINNEW && !AppEnvironment.isDEMO) {
-            for (int i = 0; i < 12; i++) {
-                this.imageViews[i].setOnClickListener(this);
-            }
-        }
-        this.imageViewSetting.setOnClickListener(this);
-        this.wifi_btn.setOnClickListener(this);
-    }
-
-    private void initSuiningListener() {
-        for (int i = 0; i < 10; i++) {
-            this.imageViews[i].setOnClickListener(this);
-        }
-        this.imageViewSetting.setOnClickListener(this);
-        this.wifi_btn.setOnClickListener(this);
-    }
-
-    private void initVariable() {
-        this.mPackageManager = getPackageManager();
-        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
-        mWidth = mDisplayMetrics.widthPixels;
-        mHight = mDisplayMetrics.heightPixels;
-    }
-
-    private void assignmentSuining() {
-        this.imageViews[0].setImageResource(R.drawable.afd_mybook);
-        this.imageViews[0].setImageResource(R.drawable.mybook);
-        this.imageViews[0].setVisibility(0);
-        this.textViews[0].setTextColor(-1);
-        this.textViews[0].setText(getResources().getString(R.string.app_name_mybook));
-        this.textViews[0].setVisibility(0);
-        this.imageViews[1].setImageResource(R.drawable.dxb);
-        this.imageViews[1].setImageResource(R.drawable.dxb_suining);
-        this.textViews[1].setTextColor(-1);
-        this.imageViews[1].setVisibility(0);
-        this.textViews[1].setText(getResources().getString(R.string.dxb_name));
-        this.textViews[1].setVisibility(0);
-        this.imageViews[2].setImageResource(R.drawable.zyfd);
-        this.imageViews[2].setImageResource(R.drawable.zyfd_suining);
-        this.textViews[2].setTextColor(-1);
-        this.imageViews[2].setVisibility(0);
-        this.textViews[2].setText(getResources().getString(R.string.zyfd_name));
-        this.textViews[2].setVisibility(0);
-        this.imageViews[3].setImageResource(R.drawable.ctj);
-        this.imageViews[3].setImageResource(R.drawable.ctj_suining);
-        this.textViews[3].setTextColor(-1);
-        this.imageViews[3].setVisibility(0);
-        this.textViews[3].setText(getResources().getString(R.string.cuotiji_name));
-        this.textViews[3].setVisibility(0);
-        this.imageViews[4].setImageResource(R.drawable.happ_class);
-        this.imageViews[4].setImageResource(R.drawable.zhkt);
-        this.textViews[4].setTextColor(-1);
-        this.imageViews[4].setVisibility(0);
-        this.textViews[4].setText(getResources().getString(R.string.app_name_happ_class));
-        this.textViews[4].setVisibility(0);
-        this.imageViews[5].setImageResource(R.drawable.my_homework);
-        this.imageViews[5].setImageResource(R.drawable.zysf);
-        this.textViews[5].setTextColor(-1);
-        this.imageViews[5].setVisibility(0);
-        this.textViews[5].setText(getResources().getString(R.string.homework_name));
-        this.textViews[5].setVisibility(0);
-        this.imageViews[6].setImageResource(R.drawable.my_app);
-        this.imageViews[6].setImageResource(R.drawable.mhzx);
-        this.textViews[6].setTextColor(-1);
-        this.imageViews[6].setVisibility(0);
-        this.textViews[6].setText(getResources().getString(R.string.app_name_appmanage));
-        this.textViews[6].setVisibility(0);
-        this.imageViews[7].setImageResource(R.drawable.myfiles);
-        this.imageViews[7].setImageResource(R.drawable.bdc_suining);
-        this.textViews[7].setTextColor(-1);
-        this.imageViews[7].setVisibility(0);
-        this.textViews[7].setText(getResources().getString(R.string.eword));
-        this.textViews[7].setVisibility(0);
-        this.imageViews[8].setImageResource(R.drawable.my_camera);
-        this.imageViews[8].setImageResource(R.drawable.suining_xj);
-        this.textViews[8].setTextColor(-1);
-        this.imageViews[8].setVisibility(0);
-        this.textViews[8].setText(getResources().getString(R.string.app_name_mycamera));
-        this.textViews[8].setVisibility(0);
-        this.imageViews[9].setImageResource(R.drawable.myfiles);
-        this.imageViews[9].setImageResource(R.drawable.myfile);
-        this.textViews[9].setTextColor(-1);
-        this.imageViews[9].setVisibility(0);
-        this.textViews[9].setText(getResources().getString(R.string.app_name_myfile));
-        this.textViews[9].setVisibility(0);
-        if (this.mAllApps != null && this.mAllApps.size() > 0) {
-            for (int i = 10; i < 10; i++) {
-                if (this.mAllApps.size() + 10 > i && this.mAllApps.get(i - 10) != null) {
-                    this.imageViews[i].setImageDrawable(this.mAllApps.get(i - 10).loadIcon(this.mPackageManager));
-                    this.imageViews[i].setVisibility(0);
-                    this.textViews[i].setText(this.mAllApps.get(i - 10).loadLabel(this.mPackageManager).toString());
-                    this.textViews[i].setTextColor(getResources().getColor(R.color.showcolor));
-                    this.textViews[i].setVisibility(0);
+        } catch (Exception e) {
+            try {
+                if (!InstallApkUtil.SuSlientInstall(str)) {
+                    apkIntentInstall(str);
                 } else {
-                    this.imageViews[i].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
-                    this.imageViews[i].setVisibility(0);
-                    this.textViews[i].setText(getResources().getString(R.string.add_app));
-                    this.textViews[i].setTextColor(getResources().getColor(R.color.addcolor));
-                    this.textViews[i].setVisibility(0);
+                    Log.d("sysService", String.valueOf(str) + ":SuSlientInstall安装成功！");
                 }
+            } catch (Exception e2) {
+                apkIntentInstall(str);
+                Log.d("sysService", String.valueOf(str) + ":InstallApk安装成功！");
             }
-            return;
         }
-        for (int i2 = 10; i2 < 10; i2++) {
-            this.imageViews[i2].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
-            this.imageViews[i2].setVisibility(0);
-            this.textViews[i2].setText(getResources().getString(R.string.add_app));
-            this.textViews[i2].setTextColor(getResources().getColor(R.color.addcolor));
-            this.textViews[i2].setVisibility(0);
+    }
+
+    private void apkinstall_samsung(String str) {
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.SILENCE_INSTALL");
+        if (Build.DISPLAY.contains("M1016Pro")) {
+            intent.putExtra("uri", str);
+        } else {
+            intent.setDataAndType(Uri.fromFile(new File(str)), "application/vnd.android.package-archive");
         }
+        sendBroadcast(intent);
     }
 
     private void assignment() {
@@ -3377,47 +1830,2160 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                 this.textViews[11].setTextColor(ViewCompat.MEASURED_STATE_MASK);
             }
         }
-        if (this.mAllApps != null && this.mAllApps.size() > 0) {
-            for (int i = 12; i < 10; i++) {
-                if (this.mAllApps.size() + 12 > i && this.mAllApps.get(i - 12) != null) {
-                    this.imageViews[i].setImageDrawable(this.mAllApps.get(i - 12).loadIcon(this.mPackageManager));
-                    this.imageViews[i].setVisibility(0);
-                    this.textViews[i].setText(this.mAllApps.get(i - 12).loadLabel(this.mPackageManager).toString());
-                    this.textViews[i].setTextColor(getResources().getColor(R.color.showcolor));
-                    this.textViews[i].setVisibility(0);
-                } else {
-                    this.imageViews[i].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
-                    this.imageViews[i].setVisibility(0);
-                    this.textViews[i].setText(getResources().getString(R.string.add_app));
-                    this.textViews[i].setTextColor(getResources().getColor(R.color.addcolor));
-                    this.textViews[i].setVisibility(0);
-                }
+        if (this.mAllApps == null || this.mAllApps.size() <= 0) {
+            for (int i = 12; i < 12; i++) {
+                this.imageViews[i].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
+                this.imageViews[i].setVisibility(0);
+                this.textViews[i].setText(getResources().getString(R.string.add_app));
+                this.textViews[i].setTextColor(getResources().getColor(R.color.addcolor));
+                this.textViews[i].setVisibility(0);
             }
             return;
         }
-        for (int i2 = 12; i2 < 12; i2++) {
-            this.imageViews[i2].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
-            this.imageViews[i2].setVisibility(0);
-            this.textViews[i2].setText(getResources().getString(R.string.add_app));
-            this.textViews[i2].setTextColor(getResources().getColor(R.color.addcolor));
-            this.textViews[i2].setVisibility(0);
+        for (int i2 = 12; i2 < 10; i2++) {
+            if (this.mAllApps.size() + 12 <= i2 || this.mAllApps.get(i2 - 12) == null) {
+                this.imageViews[i2].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
+                this.imageViews[i2].setVisibility(0);
+                this.textViews[i2].setText(getResources().getString(R.string.add_app));
+                this.textViews[i2].setTextColor(getResources().getColor(R.color.addcolor));
+                this.textViews[i2].setVisibility(0);
+            } else {
+                this.imageViews[i2].setImageDrawable(this.mAllApps.get(i2 - 12).loadIcon(this.mPackageManager));
+                this.imageViews[i2].setVisibility(0);
+                this.textViews[i2].setText(this.mAllApps.get(i2 - 12).loadLabel(this.mPackageManager).toString());
+                this.textViews[i2].setTextColor(getResources().getColor(R.color.showcolor));
+                this.textViews[i2].setVisibility(0);
+            }
         }
     }
 
-    @Override // android.view.View.OnClickListener
-    public void onClick(View v) {
+    private void assignmentSuining() {
+        this.imageViews[0].setImageResource(R.drawable.afd_mybook);
+        this.imageViews[0].setImageResource(R.drawable.mybook);
+        this.imageViews[0].setVisibility(0);
+        this.textViews[0].setTextColor(-1);
+        this.textViews[0].setText(getResources().getString(R.string.app_name_mybook));
+        this.textViews[0].setVisibility(0);
+        this.imageViews[1].setImageResource(R.drawable.dxb);
+        this.imageViews[1].setImageResource(R.drawable.dxb_suining);
+        this.textViews[1].setTextColor(-1);
+        this.imageViews[1].setVisibility(0);
+        this.textViews[1].setText(getResources().getString(R.string.dxb_name));
+        this.textViews[1].setVisibility(0);
+        this.imageViews[2].setImageResource(R.drawable.zyfd);
+        this.imageViews[2].setImageResource(R.drawable.zyfd_suining);
+        this.textViews[2].setTextColor(-1);
+        this.imageViews[2].setVisibility(0);
+        this.textViews[2].setText(getResources().getString(R.string.zyfd_name));
+        this.textViews[2].setVisibility(0);
+        this.imageViews[3].setImageResource(R.drawable.ctj);
+        this.imageViews[3].setImageResource(R.drawable.ctj_suining);
+        this.textViews[3].setTextColor(-1);
+        this.imageViews[3].setVisibility(0);
+        this.textViews[3].setText(getResources().getString(R.string.cuotiji_name));
+        this.textViews[3].setVisibility(0);
+        this.imageViews[4].setImageResource(R.drawable.happ_class);
+        this.imageViews[4].setImageResource(R.drawable.zhkt);
+        this.textViews[4].setTextColor(-1);
+        this.imageViews[4].setVisibility(0);
+        this.textViews[4].setText(getResources().getString(R.string.app_name_happ_class));
+        this.textViews[4].setVisibility(0);
+        this.imageViews[5].setImageResource(R.drawable.my_homework);
+        this.imageViews[5].setImageResource(R.drawable.zysf);
+        this.textViews[5].setTextColor(-1);
+        this.imageViews[5].setVisibility(0);
+        this.textViews[5].setText(getResources().getString(R.string.homework_name));
+        this.textViews[5].setVisibility(0);
+        this.imageViews[6].setImageResource(R.drawable.my_app);
+        this.imageViews[6].setImageResource(R.drawable.mhzx);
+        this.textViews[6].setTextColor(-1);
+        this.imageViews[6].setVisibility(0);
+        this.textViews[6].setText(getResources().getString(R.string.app_name_appmanage));
+        this.textViews[6].setVisibility(0);
+        this.imageViews[7].setImageResource(R.drawable.myfiles);
+        this.imageViews[7].setImageResource(R.drawable.bdc_suining);
+        this.textViews[7].setTextColor(-1);
+        this.imageViews[7].setVisibility(0);
+        this.textViews[7].setText(getResources().getString(R.string.eword));
+        this.textViews[7].setVisibility(0);
+        this.imageViews[8].setImageResource(R.drawable.my_camera);
+        this.imageViews[8].setImageResource(R.drawable.suining_xj);
+        this.textViews[8].setTextColor(-1);
+        this.imageViews[8].setVisibility(0);
+        this.textViews[8].setText(getResources().getString(R.string.app_name_mycamera));
+        this.textViews[8].setVisibility(0);
+        this.imageViews[9].setImageResource(R.drawable.myfiles);
+        this.imageViews[9].setImageResource(R.drawable.myfile);
+        this.textViews[9].setTextColor(-1);
+        this.imageViews[9].setVisibility(0);
+        this.textViews[9].setText(getResources().getString(R.string.app_name_myfile));
+        this.textViews[9].setVisibility(0);
+        if (this.mAllApps == null || this.mAllApps.size() <= 0) {
+            for (int i = 10; i < 10; i++) {
+                this.imageViews[i].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
+                this.imageViews[i].setVisibility(0);
+                this.textViews[i].setText(getResources().getString(R.string.add_app));
+                this.textViews[i].setTextColor(getResources().getColor(R.color.addcolor));
+                this.textViews[i].setVisibility(0);
+            }
+            return;
+        }
+        for (int i2 = 10; i2 < 10; i2++) {
+            if (this.mAllApps.size() + 10 <= i2 || this.mAllApps.get(i2 - 10) == null) {
+                this.imageViews[i2].setImageDrawable(getResources().getDrawable(R.drawable.app_add));
+                this.imageViews[i2].setVisibility(0);
+                this.textViews[i2].setText(getResources().getString(R.string.add_app));
+                this.textViews[i2].setTextColor(getResources().getColor(R.color.addcolor));
+                this.textViews[i2].setVisibility(0);
+            } else {
+                this.imageViews[i2].setImageDrawable(this.mAllApps.get(i2 - 10).loadIcon(this.mPackageManager));
+                this.imageViews[i2].setVisibility(0);
+                this.textViews[i2].setText(this.mAllApps.get(i2 - 10).loadLabel(this.mPackageManager).toString());
+                this.textViews[i2].setTextColor(getResources().getColor(R.color.showcolor));
+                this.textViews[i2].setVisibility(0);
+            }
+        }
+    }
+
+    private void autoUpdateApks() {
+        List<String> failedEbagUpdated;
+        long currentTimeMillis = System.currentTimeMillis();
+        long j = getSharedPreferences("resumeconfig", 0).getLong("updateapks", 0L);
+        if (currentTimeMillis - j > 86400000 || j == 0) {
+            this.hasUpdated = false;
+            apkUpdate();
+        } else if (currentTimeMillis - j <= 3600000 || (failedEbagUpdated = Utils.getFailedEbagUpdated(this, getSharedPreferences("privatekey", 0).getString("apihost", ""))) == null || failedEbagUpdated.size() <= 0) {
+        } else {
+            this.hasUpdated = false;
+            apkUpdate();
+        }
+    }
+
+    private void autoUpdateDesigns() {
+        long currentTimeMillis = System.currentTimeMillis();
+        long j = getSharedPreferences("resumeconfig", 0).getLong("updatedesign", 0L);
+        if (currentTimeMillis - j > 86400000 || j == 0) {
+            this.hasGeted = false;
+            getDesignView();
+        }
+    }
+
+    public void broadEyeProc(Context context, boolean z) {
+        Intent intent = new Intent();
+        intent.setAction("com.android.eyeprotection");
+        intent.putExtra("ep_mode", z);
+        context.sendBroadcast(intent);
+    }
+
+    private void changeIcons(ArrayList<AppBean> arrayList) {
+        if (arrayList != null) {
+            try {
+                if (arrayList.size() <= 0) {
+                    return;
+                }
+                getDataFromLocal(AppEnvironment.icon, arrayList);
+            } catch (Exception e) {
+                getSharedPreferences("privatekey", 0).edit().putString("updatetime", "0").commit();
+            }
+        }
+    }
+
+    public static void cleanApplicationData(Context context) {
+        cleanCacheFile(TEMP);
+    }
+
+    private static void cleanCacheFile(String str) {
+        File[] listFiles;
+        File file = new File(str);
+        if (!file.isDirectory() || (listFiles = file.listFiles()) == null) {
+            return;
+        }
+        for (File file2 : listFiles) {
+            file2.delete();
+        }
+    }
+
+    public static void cleanExternalCache(Context context) {
+        if (Environment.getExternalStorageState().equals("mounted")) {
+            deleteFilesByDirectory(context.getExternalCacheDir());
+        }
+    }
+
+    public static void cleanFiles(Context context) {
+        deleteFilesByDirectory(context.getFilesDir());
+    }
+
+    public static void cleanInternalCache(Context context) {
+        Log.e(TAG, context.getCacheDir().getAbsolutePath());
+        deleteFilesByDirectory(context.getCacheDir());
+    }
+
+    public static void cleanSharedPreference(Context context) {
+        deleteFilesByDirectory(new File("/data/data/" + context.getPackageName() + "/shared_prefs"));
+    }
+
+    public void deleteCameraFiles() {
+        File[] listFiles;
+        File[] listFiles2;
+        String file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+        if (file == null || file.equals("")) {
+            return;
+        }
+        File file2 = new File(String.valueOf(file) + "/Camera/");
+        File file3 = new File(String.valueOf(file) + "/Screenshots/");
+        if (file2.exists() && file2.isDirectory()) {
+            for (File file4 : file2.listFiles()) {
+                if (file4.exists()) {
+                    file4.delete();
+                }
+            }
+        }
+        if (file3.exists() && file3.isDirectory()) {
+            for (File file5 : file3.listFiles()) {
+                if (file5.exists()) {
+                    file5.delete();
+                }
+            }
+        }
+        this.deletingFiles = false;
+    }
+
+    private static void deleteFilesByDirectory(File file) {
+        if (file == null || !file.exists() || !file.isDirectory() || file.listFiles() == null) {
+            return;
+        }
+        for (File file2 : file.listFiles()) {
+            file2.delete();
+        }
+    }
+
+    private void enableButtons(ArrayList<AppBean> arrayList) {
+        if (arrayList == null || arrayList.size() <= 0) {
+            return;
+        }
+        AppEnvironment.ONE_IMG = false;
+        AppEnvironment.TWO_IMG = false;
+        AppEnvironment.THREE_IMG = false;
+        AppEnvironment.FOUR_IMG = false;
+        AppEnvironment.FIVE_IMG = false;
+        AppEnvironment.SIX_IMG = false;
+        AppEnvironment.SEVEN_IMG = false;
+        AppEnvironment.EIGHT_IMG = false;
+        AppEnvironment.NINE_IMG = false;
+        AppEnvironment.TEN_IMG = false;
+        AppEnvironment.ELEVEN_IMG = false;
+        AppEnvironment.TWELVE_IMG = false;
+        for (int i = 0; i < arrayList.size(); i++) {
+            AppBean appBean = arrayList.get(i);
+            judgeApp(appBean.getCode(), appBean.getEnable());
+        }
+    }
+
+    @SuppressLint({"NewApi"})
+    private void getDataFromLocal(String str, ArrayList<AppBean> arrayList) {
+        for (int i = 0; i < arrayList.size(); i++) {
+            try {
+                String code = arrayList.get(i).getCode();
+                if ("wifi".equals(code) || "large".equals(code) || SQLExec.DelimiterType.NORMAL.equals(code) || "small".equals(code)) {
+                    String str2 = String.valueOf(AppEnvironment.icon) + arrayList.get(i).getIcon().substring(arrayList.get(i).getIcon().lastIndexOf("/") + 1);
+                    if (str2 != null && "large".equals(code)) {
+                        if (new File(str2).exists()) {
+                            this.mainbackground.setBackground(new BitmapDrawable(BitmapFactory.decodeFile(String.valueOf(AppEnvironment.icon) + arrayList.get(i).getIcon().substring(arrayList.get(i).getIcon().lastIndexOf("/") + 1))));
+                        } else {
+                            getSharedPreferences("privatekey", 0).edit().putString("updatetime", "0").commit();
+                        }
+                    }
+                } else {
+                    judgeIcon(arrayList.get(i));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("liu", "Exception:" + e);
+                getSharedPreferences("privatekey", 0).edit().putString("updatetime", "0").commit();
+                return;
+            }
+        }
+    }
+
+    public void getDesignView() {
+        if (!this.hasGeted && !this.isGetLauncher) {
+            Log.e("design", "design");
+            new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.15
+                @Override // java.lang.Runnable
+                public void run() {
+                    CloudClientActivity.this.isGetLauncher = true;
+                    try {
+                        Thread.sleep(3000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    CloudClientActivity.this.getSpecialLauncher();
+                }
+            }).start();
+        }
+    }
+
+    public String getJsonStringFromGZIP(HttpResponse httpResponse) {
+        String str;
+        try {
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(httpResponse.getEntity().getContent());
+                bufferedInputStream.mark(2);
+                byte[] bArr = new byte[2];
+                int read = bufferedInputStream.read(bArr);
+                bufferedInputStream.reset();
+                InputStreamReader inputStreamReader = new InputStreamReader((read == -1 || getShort(bArr) != 8075) ? bufferedInputStream : new GZIPInputStream(bufferedInputStream), "utf-8");
+                char[] cArr = new char[100];
+                StringBuffer stringBuffer = new StringBuffer();
+                while (true) {
+                    int read2 = inputStreamReader.read(cArr);
+                    if (read2 <= 0) {
+                        break;
+                    }
+                    stringBuffer.append(cArr, 0, read2);
+                }
+                str = stringBuffer.toString();
+                bufferedInputStream.close();
+                inputStreamReader.close();
+            } else {
+                Log.e(TAG, "与服务端连接失败。。。");
+                str = "";
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString(), e);
+            str = "";
+        }
+        return str;
+    }
+
+    private void getLanguage() {
+        int read;
+        File file = new File(this.LANGUAGEPATH);
+        if (!file.exists()) {
+            return;
+        }
+        byte[] bArr = new byte[512];
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (fileInputStream == null) {
+            return;
+        }
+        String str = "";
+        while (true) {
+            try {
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
+            if (fileInputStream.read(bArr) <= 0) {
+                break;
+            }
+            str = String.valueOf(str) + new String(bArr, 0, read);
+        }
+        if (str.contains("english")) {
+            SharedPreferences sharedPreferences = getSharedPreferences("language", 0);
+            LanguageUtils.SetLanguage(this, "en");
+            sharedPreferences.edit().putString("language", "en").commit();
+            this.language = "en";
+            return;
+        }
+        SharedPreferences sharedPreferences2 = getSharedPreferences("language", 0);
+        LanguageUtils.SetLanguage(this, "chinese");
+        sharedPreferences2.edit().putString("language", "chinese").commit();
+        this.language = "chinese";
+    }
+
+    public String getMonth(int i) {
+        String str = "";
+        switch (i) {
+            case 0:
+                str = "Jan";
+                break;
+            case 1:
+                str = "Feb";
+                break;
+            case 2:
+                str = "Mar";
+                break;
+            case 3:
+                str = "Apr";
+                break;
+            case 4:
+                str = "May";
+                break;
+            case 5:
+                str = "Jun";
+                break;
+            case 6:
+                str = "Jul";
+                break;
+            case 7:
+                str = "Aug";
+                break;
+            case 8:
+                str = "Sept";
+                break;
+            case 9:
+                str = "Oct";
+                break;
+            case 10:
+                str = "Nov";
+                break;
+            case 11:
+                str = "Dec";
+                break;
+        }
+        return str;
+    }
+
+    public void getMyApps(String str, String str2) {
+        String trim;
+        SharedPreferences sharedPreferences;
+        JSONArray jSONArray;
+        if (this.myappList == null) {
+            this.myappList = new ArrayList();
+        }
+        if (str == null || str.equals("") || (trim = str.trim()) == null || trim.equals("")) {
+            return;
+        }
+        try {
+            sharedPreferences = getSharedPreferences(trim, 0);
+        } catch (NullPointerException e) {
+            sharedPreferences = null;
+        } catch (Exception e2) {
+            sharedPreferences = null;
+        }
+        if (sharedPreferences == null) {
+            return;
+        }
+        long j = sharedPreferences.getLong("updatetime", 0L);
+        long currentTimeMillis = System.currentTimeMillis();
+        String string = sharedPreferences.getString("data", "");
+        String str3 = string;
+        if (Math.abs((currentTimeMillis - j) / 1000) >= 10800) {
+            try {
+                HttpResponse execute = new DefaultHttpClient().execute(httpGetInit("http://" + str + "/api/app/projectcode/myapp/os/android", str2, this.username));
+                str3 = string;
+                if (execute.getStatusLine().getStatusCode() == 200) {
+                    String entityUtils = EntityUtils.toString(execute.getEntity());
+                    System.out.println("strResult:" + entityUtils);
+                    str3 = string;
+                    if (entityUtils != null) {
+                        str3 = string;
+                        if (!entityUtils.equals("")) {
+                            JSONObject jSONObject = new JSONObject(entityUtils);
+                            boolean z = jSONObject.getBoolean("status");
+                            jSONObject.getString("errorInfo");
+                            str3 = string;
+                            if (z) {
+                                sharedPreferences.edit().putLong("updatetime", System.currentTimeMillis()).commit();
+                                sharedPreferences.edit().putString("data", entityUtils).commit();
+                                str3 = entityUtils;
+                            }
+                        }
+                    }
+                }
+            } catch (ClientProtocolException e3) {
+                e3.printStackTrace();
+                str3 = string;
+            } catch (IOException e4) {
+                e4.printStackTrace();
+                str3 = string;
+            } catch (Exception e5) {
+                e5.printStackTrace();
+                str3 = string;
+            }
+        }
+        if (str3 != null) {
+            try {
+                if (!str3.equals("")) {
+                    JSONObject jSONObject2 = new JSONObject(str3);
+                    boolean z2 = jSONObject2.getBoolean("status");
+                    jSONObject2.getString("errorInfo");
+                    if (z2 && (jSONArray = jSONObject2.getJSONObject("data").getJSONArray("app")) != null && jSONArray.length() > 0) {
+                        this.myappList.clear();
+                        int i = 0;
+                        while (true) {
+                            if (i >= jSONArray.length()) {
+                                break;
+                            }
+                            String string2 = jSONArray.getJSONObject(i).getString("packagename");
+                            if (LogHelp.TYPE_GUIDANCE.equals(jSONArray.getJSONObject(i).getString("apptype"))) {
+                                this.myappList.add(string2);
+                            }
+                            i++;
+                        }
+                    }
+                }
+            } catch (NullPointerException e6) {
+                e6.printStackTrace();
+            } catch (JSONException e7) {
+                e7.printStackTrace();
+            } catch (Exception e8) {
+                e8.printStackTrace();
+            }
+        }
+        getOtherApps();
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:9:0x004c, code lost:
+        if (r0.equals("") != false) goto L10;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    public void getMyWorkNotification() {
+        String str;
+        JSONArray jSONArray;
+        SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
+        String string = sharedPreferences.getString("apihost", "");
+        String string2 = sharedPreferences.getString("name", "");
+        String string3 = sharedPreferences.getString("key", "");
+        if (string != null && !string.equals("") && string2 != null) {
+            str = string2;
+        }
+        HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
+        if (loadXml == null) {
+            return;
+        }
+        string = loadXml.get("ip");
+        str = loadXml.get("usercode");
+        string3 = loadXml.get("privatekey");
+        String str2 = "http://" + string + "/api/notification/";
+        if (str == null || str.equals("")) {
+            return;
+        }
+        this.noticeNum = 0;
+        this.noticeMessages = new ArrayList();
+        Log.e("notification", "url:" + str2);
+        String notification = HttpUtils.getNotification(str2, str, string3);
+        Log.e("notification", "json:" + notification);
+        if (notification != null && !"".equals(notification)) {
+            try {
+                JSONObject jSONObject = new JSONObject(notification);
+                boolean z = jSONObject.getBoolean("status");
+                JSONObject jSONObject2 = jSONObject.getJSONObject("data");
+                if (z && jSONObject2 != null) {
+                    int i = jSONObject2.getInt(KeyEnvironment.COUNT);
+                    this.noticeNum = i;
+                    if (jSONObject2.has("Message") && (jSONArray = jSONObject2.getJSONArray("Message")) != null && jSONArray.length() > 0) {
+                        for (int i2 = 0; i2 < jSONArray.length(); i2++) {
+                            Noticebean noticebean = new Noticebean();
+                            JSONObject jSONObject3 = jSONArray.getJSONObject(i2);
+                            noticebean.setActionid(jSONObject3.getString("ActionID"));
+                            noticebean.setCreattime(jSONObject3.getString("create"));
+                            noticebean.setMessage(jSONObject3.getString("message"));
+                            noticebean.setMessageid(jSONObject3.getString("messageid"));
+                            this.noticeMessages.add(noticebean);
+                        }
+                    }
+                    Message obtainMessage = this.noticeHandler.obtainMessage();
+                    obtainMessage.arg1 = i;
+                    obtainMessage.what = 1;
+                    obtainMessage.sendToTarget();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (Exception e2) {
+            }
+        }
+        if (notification == null || notification.equals("")) {
+        }
+    }
+
+    public void getNetworkTime(final int i) {
+        new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.23
+            @Override // java.lang.Runnable
+            public void run() {
+                try {
+                    URLConnection openConnection = new URL("http://www.ntsc.ac.cn").openConnection();
+                    openConnection.connect();
+                    Date date = new Date(openConnection.getDate());
+                    date.getHours();
+                    date.getMinutes();
+                    Message obtainMessage = CloudClientActivity.this.callHandler.obtainMessage();
+                    obtainMessage.what = i;
+                    obtainMessage.sendToTarget();
+                    CloudClientActivity.this.getSharedPreferences("allowcall", 4).edit().putBoolean("cancall", true).commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Message obtainMessage2 = CloudClientActivity.this.callHandler.obtainMessage();
+                    obtainMessage2.what = 2;
+                    obtainMessage2.sendToTarget();
+                    CloudClientActivity.this.getSharedPreferences("allowcall", 4).edit().putBoolean("cancall", false).commit();
+                }
+            }
+        }).start();
+    }
+
+    private void getOtherApps() {
+        new ArrayList();
+        ArrayList arrayList = new ArrayList();
+        ArrayList arrayList2 = new ArrayList();
+        arrayList2.add("com.launcher.activity");
+        arrayList2.add("dolphin.video.players");
+        arrayList2.add("com.onlinesys.student");
+        arrayList2.add("com.google.android.inputmethod.pinyin");
+        arrayList2.add("com.akson.timeep");
+        arrayList2.add("com.akson.timeepstudent");
+        arrayList2.add("com.webgenie.swf.play");
+        arrayList2.add("com.ashleytech.falswf");
+        if (AppEnvironment.isDEMO) {
+            arrayList2.add("com.lejent.zuoyeshenqi.afanti");
+            arrayList2.add("com.A17zuoye.mobile.homework");
+            arrayList2.add("com.jinxin.namibox");
+            arrayList2.add("com.haojiazhang.activity");
+            arrayList2.add(AppEnvironment.YOUDAO_PACKNAME);
+            arrayList2.add("org.hisand.zidian.zhs");
+            arrayList2.add("com.record.ing");
+            arrayList2.add("com.xueersi.parentsmeeting");
+            arrayList2.add("com.hjwordgames");
+        }
+        try {
+            List<PackageInfo> installedPackages = getPackageManager().getInstalledPackages(0);
+            if (installedPackages != null && installedPackages.size() > 0) {
+                for (int i = 0; i < installedPackages.size(); i++) {
+                    PackageInfo packageInfo = installedPackages.get(i);
+                    String str = packageInfo.packageName;
+                    if ((packageInfo.applicationInfo.flags & 1) <= 0 && !arrayList2.contains(str) && !str.contains("com.edutech") && !str.contains("cn.wps.moffice_eng") && (packageInfo.applicationInfo.flags & 1) <= 0 && (this.myappList == null || !this.myappList.contains(str))) {
+                        arrayList.add(str);
+                    }
+                }
+            }
+            if (arrayList == null) {
+                return;
+            }
+            if (arrayList.size() <= 0) {
+                return;
+            }
+            int i2 = 0;
+            while (true) {
+                try {
+                    if (i2 >= arrayList.size()) {
+                        return;
+                    }
+                    String str2 = (String) arrayList.get(i2);
+                    Intent intent = new Intent(sysProtectService.UNSTALLAPK);
+                    intent.putExtra("packagename", str2);
+                    sendBroadcast(intent);
+                    Thread.sleep(100L);
+                    i2++;
+                } catch (Exception e) {
+                    return;
+                }
+            }
+        } catch (NullPointerException e2) {
+        } catch (Exception e3) {
+        }
+    }
+
+    private int getShort(byte[] bArr) {
+        return (bArr[0] << 8) | (bArr[1] & 255);
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:9:0x0043, code lost:
+        if (r0.equals("") != false) goto L10;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    public void getSpecialLauncher() {
+        String str;
+        this.isGetLauncher = true;
+        SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
+        String string = sharedPreferences.getString("apihost", "");
+        String string2 = sharedPreferences.getString("name", "");
+        if (string != null && !string.equals("") && string2 != null) {
+            str = string2;
+        }
+        HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
+        if (loadXml == null) {
+            return;
+        }
+        string = loadXml.get("ip");
+        str = loadXml.get("usercode");
+        String str2 = "http://" + string + "/api/config/";
+        if (str == null || str.equals("")) {
+            this.isGetLauncher = false;
+            return;
+        }
+        String configData = HttpUtils.getConfigData(str2, str);
+        this.isGetLauncher = false;
+        getSharedPreferences("resumeconfig", 0).edit().putLong("updatedesign", System.currentTimeMillis()).commit();
+        if (configData != null && configData.equals("")) {
+            return;
+        }
+        if (XmlUtils.saveLauncher(configData, this) == 1) {
+            this.hasGeted = true;
+        }
+        getSharedPreferences("splauncher", 0).edit().putLong("refreshtime", System.currentTimeMillis()).commit();
+        runOnUiThread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.18
+            @Override // java.lang.Runnable
+            public void run() {
+                CloudClientActivity.this.setDesignView();
+            }
+        });
+    }
+
+    public String getWeekDay(int i) {
+        String str = "";
+        switch (i) {
+            case 1:
+                str = getResources().getString(R.string.sunday);
+                break;
+            case 2:
+                str = getResources().getString(R.string.monday);
+                break;
+            case 3:
+                str = getResources().getString(R.string.tuesday);
+                break;
+            case 4:
+                str = getResources().getString(R.string.wednesday);
+                break;
+            case 5:
+                str = getResources().getString(R.string.thursday);
+                break;
+            case 6:
+                str = getResources().getString(R.string.friday);
+                break;
+            case 7:
+                str = getResources().getString(R.string.saturday);
+                break;
+        }
+        return str;
+    }
+
+    public static HttpGet httpGetInit(String str, String str2, String str3) {
+        HttpGet httpGet = new HttpGet(str);
+        httpGet.addHeader("X-Edutech-Entity", String.valueOf(str3) + "+" + str2);
+        long currentTimeMillis = System.currentTimeMillis();
+        httpGet.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str3 + str2));
+        return httpGet;
+    }
+
+    public static HttpPost httpPostInit(String str, String str2, String str3) {
+        HttpPost httpPost = new HttpPost(str);
+        httpPost.addHeader("X-Edutech-Entity", String.valueOf(str3) + "+" + str2);
+        long currentTimeMillis = System.currentTimeMillis();
+        httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str3 + str2));
+        return httpPost;
+    }
+
+    private void initBroadReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.wifi.STATE_CHANGE");
+        intentFilter.addAction(sysProtectService.SERVICE_START);
+        intentFilter.addAction("edm.intent.action.license.status");
+        intentFilter.addAction("com.edutech.getadmin");
+        this.wifiReceiver = new WifiReceiver();
+        registerReceiver(this.wifiReceiver, intentFilter);
+        IntentFilter intentFilter2 = new IntentFilter();
+        intentFilter2.addAction("android.intent.action.PACKAGE_ADDED");
+        intentFilter2.addAction("android.intent.action.PACKAGE_REMOVED");
+        intentFilter2.addDataScheme("package");
+        registerReceiver(this.apkInstallReceiver, intentFilter2);
+        if (AppEnvironment.openBMD) {
+            Intent intent = new Intent();
+            intent.setAction("com.edutech.intent.TrafficStatsService");
+            intent.setClassName("com.edutech.firewall", "eu.faircode.netguard.TrafficStatsService");
+            intent.putExtra("ip", this.send_ip);
+            intent.putExtra("privatekey", this.send_privatekey);
+            intent.putExtra("name", this.send_name);
+            intent.putExtra("schoolid", this.send_schoolid);
+            startService(intent);
+        }
+    }
+
+    private void initListener() {
+        if (!AppEnvironment.isMAINNEW && !AppEnvironment.isDEMO) {
+            for (int i = 0; i < 12; i++) {
+                this.imageViews[i].setOnClickListener(this);
+            }
+        }
+        this.imageViewSetting.setOnClickListener(this);
+        this.wifi_btn.setOnClickListener(this);
+    }
+
+    private void initNewLayout() {
+        this.ll_one = (LinearLayout) findViewById(R.id.ll_one);
+        this.ll_two = (LinearLayout) findViewById(R.id.ll_two);
+        this.ll_three = (LinearLayout) findViewById(R.id.ll_three);
+        this.ll_four = (LinearLayout) findViewById(R.id.ll_four);
+        this.ll_five = (LinearLayout) findViewById(R.id.ll_five);
+        this.ll_six = (LinearLayout) findViewById(R.id.ll_six);
+        this.ll_seven = (LinearLayout) findViewById(R.id.ll_seven);
+        this.ll_eight = (LinearLayout) findViewById(R.id.ll_eight);
+        this.ll_nine = (LinearLayout) findViewById(R.id.ll_nine);
+        this.ll_ten = (LinearLayout) findViewById(R.id.ll_ten);
+        this.ll_eleven = (LinearLayout) findViewById(R.id.ll_eleven);
+        this.ll_twelve = (LinearLayout) findViewById(R.id.ll_twelve);
+        if (AppEnvironment.isDEMO) {
+            this.ll_sms = (LinearLayout) findViewById(R.id.ll_sms);
+            this.ll_sms.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.16
+                @Override // android.view.View.OnClickListener
+                public void onClick(View view) {
+                    Intent launchIntentForPackage = CloudClientActivity.this.getPackageManager().getLaunchIntentForPackage("com.hjwordgames");
+                    launchIntentForPackage.addFlags(335544320);
+                    if (launchIntentForPackage != null) {
+                        CloudClientActivity.this.startActivity(launchIntentForPackage);
+                    }
+                }
+            });
+        }
+        this.ll_one.setOnClickListener(this);
+        this.ll_two.setOnClickListener(this);
+        this.ll_three.setOnClickListener(this);
+        this.ll_four.setOnClickListener(this);
+        this.ll_five.setOnClickListener(this);
+        this.ll_six.setOnClickListener(this);
+        this.ll_seven.setOnClickListener(this);
+        this.ll_eight.setOnClickListener(this);
+        this.ll_nine.setOnClickListener(this);
+        this.ll_ten.setOnClickListener(this);
+        this.ll_eleven.setOnClickListener(this);
+        this.ll_twelve.setOnClickListener(this);
+    }
+
+    private void initSuiningListener() {
+        for (int i = 0; i < 10; i++) {
+            this.imageViews[i].setOnClickListener(this);
+        }
+        this.imageViewSetting.setOnClickListener(this);
+        this.wifi_btn.setOnClickListener(this);
+    }
+
+    private void initSuiningView() {
+        this.imageViews[0] = (ImageView) findViewById(R.id.five_img);
+        this.imageViews[1] = (ImageView) findViewById(R.id.one_img);
+        this.imageViews[2] = (ImageView) findViewById(R.id.two_img);
+        this.imageViews[3] = (ImageView) findViewById(R.id.four_img);
+        this.imageViews[4] = (ImageView) findViewById(R.id.twelve_img);
+        this.imageViews[5] = (ImageView) findViewById(R.id.three_img);
+        this.imageViews[6] = (ImageView) findViewById(R.id.six_img);
+        this.imageViews[7] = (ImageView) findViewById(R.id.thirteen_img);
+        this.imageViews[8] = (ImageView) findViewById(R.id.seven_img);
+        this.imageViews[9] = (ImageView) findViewById(R.id.eight_img);
+        this.textViews[0] = (TextView) findViewById(R.id.five_txt);
+        this.textViews[1] = (TextView) findViewById(R.id.one_txt);
+        this.textViews[2] = (TextView) findViewById(R.id.two_txt);
+        this.textViews[3] = (TextView) findViewById(R.id.four_txt);
+        this.textViews[4] = (TextView) findViewById(R.id.twelve_txt);
+        this.textViews[5] = (TextView) findViewById(R.id.three_txt);
+        this.textViews[6] = (TextView) findViewById(R.id.six_txt);
+        this.textViews[7] = (TextView) findViewById(R.id.thirteen_txt);
+        this.textViews[8] = (TextView) findViewById(R.id.seven_txt);
+        this.textViews[9] = (TextView) findViewById(R.id.eight_txt);
+        this.imageViewSetting = (TextView) findViewById(R.id.setting_img);
+        this.wifi_btn = (TextView) findViewById(R.id.wifi_btn);
+        this.tv_wifi = (TextView) findViewById(R.id.tv_wifi);
+        this.tv_battery = (TextView) findViewById(R.id.tv_battery);
+        this.tv_msg = (TextView) findViewById(R.id.tv_sms);
+        this.tv_tel = (TextView) findViewById(R.id.tv_tel);
+        this.tv_msg.setVisibility(8);
+        this.tv_tel.setVisibility(8);
+        this.tv_msg.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.19
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                CloudClientActivity.this.getNetworkTime(0);
+            }
+        });
+        this.tv_tel.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.20
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                CloudClientActivity.this.getNetworkTime(1);
+            }
+        });
+        for (int i = 0; i < 10 && i < 10; i++) {
+            isShowView(this.imageViews[i], true);
+            isShowView(this.textViews[i], true);
+        }
+    }
+
+    private void initVariable() {
+        this.mPackageManager = getPackageManager();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        mWidth = displayMetrics.widthPixels;
+        mHight = displayMetrics.heightPixels;
+    }
+
+    private void initView() {
+        this.imageViews[0] = (ImageView) findViewById(R.id.one_img);
+        this.imageViews[1] = (ImageView) findViewById(R.id.two_img);
+        this.imageViews[2] = (ImageView) findViewById(R.id.three_img);
+        this.imageViews[3] = (ImageView) findViewById(R.id.four_img);
+        this.imageViews[4] = (ImageView) findViewById(R.id.five_img);
+        this.imageViews[5] = (ImageView) findViewById(R.id.six_img);
+        this.imageViews[6] = (ImageView) findViewById(R.id.seven_img);
+        this.imageViews[7] = (ImageView) findViewById(R.id.eight_img);
+        this.imageViews[8] = (ImageView) findViewById(R.id.nine_img);
+        this.imageViews[9] = (ImageView) findViewById(R.id.ten_img);
+        this.imageViews[10] = (ImageView) findViewById(R.id.eleven_img);
+        this.imageViews[11] = (ImageView) findViewById(R.id.twelve_img);
+        this.textViews[0] = (TextView) findViewById(R.id.one_txt);
+        this.textViews[1] = (TextView) findViewById(R.id.two_txt);
+        this.textViews[2] = (TextView) findViewById(R.id.three_txt);
+        this.textViews[3] = (TextView) findViewById(R.id.four_txt);
+        this.textViews[4] = (TextView) findViewById(R.id.five_txt);
+        this.textViews[5] = (TextView) findViewById(R.id.six_txt);
+        this.textViews[6] = (TextView) findViewById(R.id.seven_txt);
+        this.textViews[7] = (TextView) findViewById(R.id.eight_txt);
+        this.textViews[8] = (TextView) findViewById(R.id.nine_txt);
+        this.textViews[9] = (TextView) findViewById(R.id.ten_txt);
+        this.textViews[10] = (TextView) findViewById(R.id.eleven_txt);
+        this.textViews[11] = (TextView) findViewById(R.id.twelve_txt);
+        this.mainbackground = (LinearLayout) findViewById(R.id.mainbackground);
+        this.imageViewSetting = (TextView) findViewById(R.id.setting_img);
+        this.wifi_btn = (TextView) findViewById(R.id.wifi_btn);
+        this.tv_wifi = (TextView) findViewById(R.id.tv_wifi);
+        this.tv_battery = (TextView) findViewById(R.id.tv_battery);
+        this.tv_msg = (TextView) findViewById(R.id.tv_sms);
+        this.tv_tel = (TextView) findViewById(R.id.tv_tel);
+        this.tv_msg.setVisibility(8);
+        this.tv_tel.setVisibility(8);
+        this.tv_msg.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.21
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                CloudClientActivity.this.getNetworkTime(0);
+            }
+        });
+        this.tv_tel.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.22
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                CloudClientActivity.this.getNetworkTime(1);
+            }
+        });
+        for (int i = 0; i < this.imageViews.length && i < this.textViews.length; i++) {
+            isShowView(this.imageViews[i], true);
+            isShowView(this.textViews[i], true);
+        }
+    }
+
+    private void initWidget() {
+        this.tv_line = (TextView) findViewById(R.id.tv_line);
+        this.tv_main_eryproc = (Switch) findViewById(R.id.tv_main_eryproc);
+        this.tv_stuname = (TextView) findViewById(R.id.tv_main_stuname);
+        this.sdyb_time = (TextView) findViewById(R.id.sdyb_timedetails);
+        this.sdyb_time = (TextView) findViewById(R.id.sdyb_timedetails);
+        this.tv_updatemsg = (TextView) findViewById(R.id.tv_updatemsg);
+        this.showTime = true;
+        if (this.tv_stuname != null) {
+            if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
+                this.tv_stuname.setText("");
+            } else {
+                this.tv_stuname.setText("学生: ");
+            }
+        }
+        if (AppEnvironment.isSNZT) {
+            initSuiningView();
+        } else {
+            initView();
+        }
+        if (AppEnvironment.isSDYB) {
+            this.sdyb_btn1 = (ImageButton) findViewById(R.id.sdyb_btn1);
+            this.sdyb_btn2 = (ImageButton) findViewById(R.id.sdyb_btn2);
+            this.sdyb_btn3 = (ImageButton) findViewById(R.id.sdyb_btn3);
+            this.sdyb_btn4 = (ImageButton) findViewById(R.id.sdyb_btn4);
+            this.sdyb_btn5 = (ImageButton) findViewById(R.id.sdyb_btn5);
+            this.sdyb_myapp = (TextView) findViewById(R.id.sdyb_myapp);
+            this.sdyb_btn1.setOnClickListener(this);
+            this.sdyb_btn2.setOnClickListener(this);
+            this.sdyb_btn3.setOnClickListener(this);
+            this.sdyb_btn4.setOnClickListener(this);
+            this.sdyb_btn5.setOnClickListener(this);
+            this.sdyb_myapp.setOnClickListener(this);
+        }
+        initVariable();
+        if (AppEnvironment.isSNZT) {
+            initSuiningListener();
+        } else {
+            initListener();
+        }
+        if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
+            initNewLayout();
+        }
+        this.three_noticetv = (TextView) findViewById(R.id.three_noticetv);
+        this.three_noticetv.setVisibility(8);
+        if (AppEnvironment.isSNZT) {
+            assignmentSuining();
+        } else {
+            assignment();
+        }
+        boolean z = getSharedPreferences("eyeproc", 0).getBoolean("state", false);
+        if (this.tv_main_eryproc != null) {
+            this.tv_main_eryproc.setChecked(z);
+            broadEyeProc(this, z);
+        }
+        this.tv_main_eryproc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.13
+            @Override // android.widget.CompoundButton.OnCheckedChangeListener
+            public void onCheckedChanged(CompoundButton compoundButton, boolean z2) {
+                SharedPreferences sharedPreferences = CloudClientActivity.this.getSharedPreferences("eyeproc", 0);
+                CloudClientActivity.this.broadEyeProc(CloudClientActivity.this, z2);
+                sharedPreferences.edit().putBoolean("state", z2).commit();
+            }
+        });
+        try {
+            if (Build.DISPLAY.contains("M1016Pro") || Build.DISPLAY.contains("P990S.V") || Build.DISPLAY.contains("S1016") || Build.DISPLAY.contains("M856.V")) {
+                this.tv_line.setVisibility(0);
+                this.tv_main_eryproc.setVisibility(0);
+            } else {
+                this.tv_line.setVisibility(4);
+                this.tv_main_eryproc.setVisibility(4);
+                this.tv_main_eryproc.setWidth(1);
+                this.tv_main_eryproc.setHeight(1);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    private void init_public_infor() {
+        this.hashmap = XmlLoadHelper.loadXml();
+        if (this.hashmap == null) {
+            return;
+        }
+        this.username = this.hashmap.get("username");
+        if (this.hashmap.containsKey("stuname")) {
+        }
+        String str = this.hashmap.get("stuname");
+        if (str != null && this.tv_stuname != null) {
+            if (AppEnvironment.isMAINNEW || AppEnvironment.isDEMO) {
+                this.tv_stuname.setText(str);
+            } else {
+                this.tv_stuname.setText(String.valueOf(getResources().getString(R.string.student)) + " " + str);
+            }
+        }
+        My_Application.LoginName = this.username;
+    }
+
+    public void installNewApk() {
+        if (this.apkList == null || this.apkList.size() <= 0) {
+            return;
+        }
+        this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
+        boolean z = false;
+        try {
+            z = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < this.apkList.size(); i++) {
+            if (this.apkList.get(i).lastIndexOf(".apk") != -1) {
+                if (z) {
+                    try {
+                        this.mHwPDM.installPackage(this.cn, this.apkList.get(i));
+                    } catch (Exception e2) {
+                    }
+                } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
+                    this.mMiaMdmPolicyManager.silentInstall(this.apkList.get(i));
+                } else if (this != null) {
+                    try {
+                        if (Build.DISPLAY.indexOf("P990S.V") >= 0 || Build.DISPLAY.indexOf("M1016Pro") >= 0 || Build.DISPLAY.indexOf("S1016PRO") >= 0 || Build.DISPLAY.indexOf("D13B") >= 0 || Build.DISPLAY.indexOf("QC80A") >= 0 || Build.DISPLAY.indexOf("N5110ZB") >= 0 || Build.DISPLAY.indexOf(".T360Z") >= 0 || Build.DISPLAY.indexOf("P583") >= 0 || Build.DISPLAY.indexOf("P350") >= 0 || Build.DISPLAY.indexOf("P550") >= 0 || Build.DISPLAY.indexOf("M856.V") >= 0 || Build.DISPLAY.indexOf("S1016.V1") >= 0 || Build.DISPLAY.indexOf("S106.V1") >= 0 || Build.DISPLAY.indexOf("S1016E") >= 0) {
+                            apkinstall_samsung(this.apkList.get(i));
+                        } else {
+                            Intent intent = new Intent();
+                            intent.setAction(sysProtectService.INSTALL);
+                            sendBroadcast(intent);
+                            apkinstall(this.apkList.get(i));
+                        }
+                    } catch (Exception e3) {
+                    }
+                }
+            }
+        }
+        finish();
+    }
+
+    public void installSingleApk(String str) {
+        if (TextUtils.isEmpty(str) || str.lastIndexOf(".apk") == -1) {
+            return;
+        }
+        boolean z = false;
+        this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
+        try {
+            z = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (z) {
+            try {
+                this.mHwPDM.installPackage(this.cn, str);
+            } catch (Exception e2) {
+            }
+        } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
+            this.mMiaMdmPolicyManager.silentInstall(str);
+        } else {
+            try {
+                if (Build.DISPLAY.indexOf("M1016Pro") >= 0 || Build.DISPLAY.indexOf("P990S.V") >= 0 || Build.DISPLAY.indexOf("S1016PRO") >= 0 || Build.DISPLAY.indexOf("D13B") >= 0 || Build.DISPLAY.indexOf("QC80A") >= 0 || Build.DISPLAY.indexOf("N5110ZB") >= 0 || Build.DISPLAY.indexOf(".T360Z") >= 0 || Build.DISPLAY.indexOf("P350") >= 0 || Build.DISPLAY.indexOf("P550") >= 0 || Build.DISPLAY.indexOf("M856.V") >= 0 || Build.DISPLAY.indexOf("S1016.V1") >= 0 || Build.DISPLAY.indexOf("S106.V1") >= 0 || Build.DISPLAY.indexOf("S1016E") >= 0 || Build.DISPLAY.indexOf("P583") >= 0) {
+                    apkinstall_samsung(str);
+                } else {
+                    Intent intent = new Intent();
+                    intent.setAction(sysProtectService.INSTALL);
+                    sendBroadcast(intent);
+                    apkinstall(str);
+                }
+            } catch (Exception e3) {
+            }
+        }
+    }
+
+    private boolean isApkUpdating(String str) {
+        boolean z = true;
+        long currentTimeMillis = System.currentTimeMillis();
+        long j = getSharedPreferences("resumeconfig", 0).getLong("updateapks", 0L);
+        if (currentTimeMillis - j > 480000 && j != 0) {
+            this.apkUpdatePkgList = null;
+        }
+        if (this.apkUpdatePkgList != null && this.apkUpdatePkgList.size() > 0 && !TextUtils.isEmpty(str)) {
+            int i = 0;
+            while (true) {
+                if (i >= this.apkUpdatePkgList.size()) {
+                    break;
+                } else if (str.equals(this.apkUpdatePkgList.get(i))) {
+                    z = false;
+                    break;
+                } else {
+                    i++;
+                }
+            }
+        } else {
+            z = true;
+        }
+        return z;
+    }
+
+    public static boolean isServiceExisted(Context context, String str) {
+        boolean z;
+        List<ActivityManager.RunningServiceInfo> runningServices = ((ActivityManager) context.getSystemService("activity")).getRunningServices(Execute.INVALID);
+        if (runningServices.size() <= 0) {
+            z = false;
+        } else {
+            int i = 0;
+            while (true) {
+                z = false;
+                if (i >= runningServices.size()) {
+                    break;
+                } else if (runningServices.get(i).service.getClassName().equals(str)) {
+                    z = true;
+                    break;
+                } else {
+                    i++;
+                }
+            }
+        }
+        return z;
+    }
+
+    private void isShowView(View view, boolean z) {
+        view.setVisibility(z ? 0 : 8);
+    }
+
+    private void judgeApp(String str, int i) {
+        if (str.equals("daoxueben")) {
+            if (i == 1) {
+                AppEnvironment.ONE_IMG = true;
+            } else {
+                AppEnvironment.ONE_IMG = false;
+            }
+        } else if (str.equals("zuoyefudao")) {
+            if (i == 1) {
+                AppEnvironment.TWO_IMG = true;
+            } else {
+                AppEnvironment.TWO_IMG = false;
+            }
+        } else if (str.equals("myhomework")) {
+            if (i == 1) {
+                AppEnvironment.THREE_IMG = true;
+            } else {
+                AppEnvironment.THREE_IMG = false;
+            }
+        } else if (str.equals("cuotiji")) {
+            if (i == 1) {
+                AppEnvironment.FOUR_IMG = true;
+            } else {
+                AppEnvironment.FOUR_IMG = false;
+            }
+        } else if (str.equals("afd_mybook")) {
+            if (i == 1) {
+                AppEnvironment.FIVE_IMG = true;
+            } else {
+                AppEnvironment.FIVE_IMG = false;
+            }
+        } else if (str.equals("my_app")) {
+            if (i == 1) {
+                AppEnvironment.SIX_IMG = true;
+            } else {
+                AppEnvironment.SIX_IMG = false;
+            }
+        } else if (str.equals("my_camera")) {
+            if (i == 1) {
+                AppEnvironment.SEVEN_IMG = true;
+            } else {
+                AppEnvironment.SEVEN_IMG = false;
+            }
+        } else if (str.equals("myfiles")) {
+            if (i == 1) {
+                AppEnvironment.EIGHT_IMG = true;
+            } else {
+                AppEnvironment.EIGHT_IMG = false;
+            }
+        } else if (str.equals("home_school")) {
+            if (i == 1) {
+                AppEnvironment.NINE_IMG = true;
+            } else {
+                AppEnvironment.NINE_IMG = false;
+            }
+        } else if (str.equals("hudongtaolun")) {
+            if (i == 1) {
+                AppEnvironment.TEN_IMG = true;
+            } else {
+                AppEnvironment.TEN_IMG = false;
+            }
+        } else if (str.equals("study_store")) {
+            if (i == 1) {
+                AppEnvironment.ELEVEN_IMG = true;
+            } else {
+                AppEnvironment.ELEVEN_IMG = false;
+            }
+        } else if (!str.equals("happ_class")) {
+        } else {
+            if (i == 1) {
+                AppEnvironment.TWELVE_IMG = true;
+            } else {
+                AppEnvironment.TWELVE_IMG = false;
+            }
+        }
+    }
+
+    private void judgeIcon(AppBean appBean) {
+        String code = appBean.getCode();
+        if (code.equals("daoxueben")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[0].setText(appBean.getName());
+            }
+            this.textViews[0].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile == null) {
+                return;
+            }
+            this.imageViews[0].setImageBitmap(decodeFile);
+        } else if (code.equals("zuoyefudao")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[1].setText(appBean.getName());
+            }
+            this.textViews[1].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile2 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile2 == null) {
+                return;
+            }
+            this.imageViews[1].setImageBitmap(decodeFile2);
+        } else if (code.equals("myhomework")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[2].setText(appBean.getName());
+            }
+            this.textViews[2].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile3 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile3 == null) {
+                return;
+            }
+            this.imageViews[2].setImageBitmap(decodeFile3);
+        } else if (code.equals("cuotiji")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[3].setText(appBean.getName());
+            }
+            this.textViews[3].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile4 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile4 == null) {
+                return;
+            }
+            this.imageViews[3].setImageBitmap(decodeFile4);
+        } else if (code.equals("afd_mybook")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[4].setText(appBean.getName());
+            }
+            this.textViews[4].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile5 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile5 == null) {
+                return;
+            }
+            this.imageViews[4].setImageBitmap(decodeFile5);
+        } else if (code.equals("my_app")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[5].setText(appBean.getName());
+            }
+            this.textViews[5].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile6 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile6 == null) {
+                return;
+            }
+            this.imageViews[5].setImageBitmap(decodeFile6);
+        } else if (code.equals("my_camera")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[6].setText(appBean.getName());
+            }
+            this.textViews[6].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile7 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile7 == null) {
+                return;
+            }
+            this.imageViews[6].setImageBitmap(decodeFile7);
+        } else if (code.equals("myfiles")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[7].setText(appBean.getName());
+            }
+            this.textViews[7].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile8 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile8 == null) {
+                return;
+            }
+            this.imageViews[7].setImageBitmap(decodeFile8);
+        } else if (code.equals("home_school")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[8].setText(appBean.getName());
+            }
+            this.textViews[8].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile9 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile9 == null) {
+                return;
+            }
+            this.imageViews[8].setImageBitmap(decodeFile9);
+        } else if (code.equals("hudongtaolun")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[9].setText(appBean.getName());
+            }
+            this.textViews[9].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile10 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile10 == null) {
+                return;
+            }
+            this.imageViews[9].setImageBitmap(decodeFile10);
+        } else if (code.equals("study_store")) {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[10].setText(appBean.getName());
+            }
+            this.textViews[10].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile11 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile11 == null) {
+                return;
+            }
+            this.imageViews[10].setImageBitmap(decodeFile11);
+        } else if (!code.equals("happ_class")) {
+        } else {
+            if (!TextUtils.isEmpty(appBean.getName())) {
+                this.textViews[11].setText(appBean.getName());
+            }
+            this.textViews[11].setTextColor(Color.parseColor(appBean.getColor()));
+            Bitmap decodeFile12 = BitmapFactory.decodeFile(appBean.getIconLocal());
+            if (decodeFile12 == null) {
+                return;
+            }
+            this.imageViews[11].setImageBitmap(decodeFile12);
+        }
+    }
+
+    private void judgePadType() {
+        PackageInfo packageInfo;
+        try {
+            packageInfo = getPackageManager().getPackageInfo("com.android.mms", 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            packageInfo = null;
+            e.printStackTrace();
+        }
+        if (packageInfo == null) {
+            System.out.println("非3G");
+            this.is3G = false;
+        } else {
+            System.out.println("3G");
+            this.is3G = true;
+        }
+        if (Build.MODEL.equals("Lenovo B8000-H")) {
+            this.isLenovo = true;
+            this.is3G = true;
+        } else {
+            this.isLenovo = false;
+        }
+        try {
+            getPackageManager().getPackageInfo(AppEnvironment.MHZX_PACKNAME, 0);
+        } catch (PackageManager.NameNotFoundException e2) {
+            e2.printStackTrace();
+        }
+    }
+
+    private void loadUserInfo() {
+        SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
+        HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
+        if (loadXml != null) {
+            this.send_ip = loadXml.get("ip");
+            this.send_name = loadXml.get("username");
+            this.send_usercode = loadXml.get("usercode");
+            this.send_privatekey = loadXml.get("privatekey");
+            this.send_pwd = loadXml.get("pwd");
+            this.send_schoolid = loadXml.get("schoolid");
+            String str = loadXml.get("stuid");
+            sharedPreferences.edit().putString("key", this.send_privatekey).commit();
+            sharedPreferences.edit().putString("apihost", this.send_ip).commit();
+            sharedPreferences.edit().putString("name", this.send_usercode).commit();
+            sharedPreferences.edit().putString("pwd", this.send_pwd).commit();
+            sharedPreferences.edit().putString("userid", str).commit();
+            sharedPreferences.edit().putString("schoolid", this.send_schoolid).commit();
+        }
+    }
+
+    public void lockPad() {
+        SharedPreferences sharedPreferences = getSharedPreferences("lockscreen", 4);
+        boolean z = sharedPreferences.getBoolean("locked", false);
+        long j = sharedPreferences.getLong("lockstartTime", 0L);
+        long j2 = sharedPreferences.getLong("tmplockedtime", 0L);
+        int i = sharedPreferences.getInt("tmplocked", 0);
+        if (z && j != 0) {
+            Intent intent = new Intent(AppEnvironment.Intent_LOCKWINDOW);
+            intent.putExtra("state", LogHelp.TYPE_MYWORK);
+            sendBroadcast(intent);
+        } else if (i != 1 || j2 == 0) {
+            sendBroadcast(new Intent(AppEnvironment.Intent_UNLOCKWINDOW));
+        } else {
+            Intent intent2 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
+            intent2.putExtra("state", LogHelp.TYPE_GUIDANCE);
+            sendBroadcast(intent2);
+        }
+    }
+
+    private void openCamera() {
+        try {
+            if (getPackageManager().getPackageInfo("com.edutech.mycamera", 0) != null) {
+                ComponentName componentName = new ComponentName("com.edutech.mycamera", "com.edutech.mycamera.gallery.PhotoPickerActivity");
+                Intent intent = new Intent();
+                intent.addCategory("android.intent.category.LAUNCHER");
+                intent.setComponent(componentName);
+                intent.setAction("android.intent.action.MAIN");
+                intent.setFlags(268435456);
+                startActivity(intent);
+                return;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e2) {
+        }
+        if (AppEnvironment.isZBYZ) {
+            Toast.makeText(this, "该功能暂不开放！", 0).show();
+            return;
+        }
+        try {
+            ResolveInfo resolveActivity = getPackageManager().resolveActivity(new Intent("android.media.action.IMAGE_CAPTURE"), 0);
+            String str = resolveActivity.activityInfo.packageName;
+            String str2 = resolveActivity.activityInfo.name;
+            Intent intent2 = new Intent();
+            intent2.setComponent(new ComponentName(str, str2));
+            intent2.setAction("android.intent.action.MAIN");
+            startActivity(intent2);
+        } catch (Exception e3) {
+            e3.printStackTrace();
+            startActivity(new Intent("android.media.action.IMAGE_CAPTURE"));
+        }
+    }
+
+    private void openLockScreen() {
+        PackageInfo packageInfo;
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("screenshot", 0);
+            sharedPreferences.getBoolean("locked", false);
+            Intent intent = new Intent("android.intent.action.MAIN");
+            intent.addFlags(268435456);
+            intent.setComponent(new ComponentName("com.edutech.lockscreen", "com.edutech.lockscreen.MainActivity"));
+            try {
+                packageInfo = getPackageManager().getPackageInfo("com.edutech.lockscreen", 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                packageInfo = null;
+                e.printStackTrace();
+            }
+            if (packageInfo != null) {
+                startActivity(intent);
+            }
+            sharedPreferences.edit().putBoolean("locked", true).commit();
+        } catch (Exception e2) {
+        }
+    }
+
+    private void openScreenShot() {
+        PackageInfo packageInfo;
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("screenshot", 0);
+            Log.e(TAG, "open screenshot:" + sharedPreferences.getBoolean("opened", false));
+            Intent intent = new Intent("android.intent.action.MAIN");
+            intent.addFlags(268435456);
+            intent.setComponent(new ComponentName("com.edutech.screenshot", "com.edutech.screenshot.ScreenShotActivity"));
+            try {
+                packageInfo = getPackageManager().getPackageInfo("com.edutech.screenshot", 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                packageInfo = null;
+                e.printStackTrace();
+            }
+            if (packageInfo != null) {
+                startActivity(intent);
+            }
+            Log.e(TAG, "open screenshot.....");
+            sharedPreferences.edit().putBoolean("opened", true).commit();
+        } catch (Exception e2) {
+        }
+    }
+
+    private void openSetting() {
+        try {
+            if (getPackageManager().getPackageInfo("com.edutech.settingapp", 0) != null) {
+                ComponentName componentName = new ComponentName("com.edutech.settingapp", "com.edutech.settingapp.CloudClientSetActivity");
+                Intent intent = new Intent();
+                intent.addCategory("android.intent.category.LAUNCHER");
+                intent.setComponent(componentName);
+                intent.setAction("android.intent.action.MAIN");
+                intent.setFlags(268435456);
+                startActivity(intent);
+                return;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        openActivity(CloudClientSetActivity.class);
+    }
+
+    public List<String> parseDownload(List<String> list, List<ApkUpdateBean> list2) {
+        HttpURLConnection httpURLConnection;
+        for (int i = 0; i < list2.size(); i++) {
+            ApkUpdateBean apkUpdateBean = list2.get(i);
+            String packagename = apkUpdateBean.getPackagename();
+            String apkUrl = apkUpdateBean.getApkUrl();
+            String appName = apkUpdateBean.getAppName();
+            long apkSize = apkUpdateBean.getApkSize();
+            File file = new File(AppEnvironment.ASSETS_APKS);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            if (file.isDirectory()) {
+                File file2 = new File(String.valueOf(AppEnvironment.ASSETS_DIR) + appName);
+                if (file2.exists()) {
+                    file2.delete();
+                }
+                byte[] bArr = new byte[10240];
+                long j = 0;
+                try {
+                    httpURLConnection = (HttpURLConnection) new URL(apkUrl).openConnection();
+                    httpURLConnection.connect();
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    FileOutputStream fileOutputStream = new FileOutputStream(file2);
+                    int i2 = 0;
+                    while (j < apkSize) {
+                        int read = inputStream.read(bArr);
+                        if (read == -1) {
+                            break;
+                        }
+                        long j2 = j + read;
+                        this.currentCachePosition += read;
+                        fileOutputStream.write(bArr, 0, read);
+                        int i3 = i2 + 1;
+                        j = j2;
+                        i2 = i3;
+                        if (i3 % 10 == 0) {
+                            sendInstallMessage(i, Long.valueOf(j2), UPDATE_PROGRESS);
+                            j = j2;
+                            i2 = i3;
+                        }
+                    }
+                    sendInstallMessage(i, Long.valueOf(j), UPDATE_PROGRESS);
+                    long j3 = j;
+                    fileOutputStream.close();
+                    long j4 = j;
+                    inputStream.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    j = 0;
+                    httpURLConnection = null;
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                    j = 0;
+                    httpURLConnection = null;
+                } catch (Exception e3) {
+                    j = 0;
+                    httpURLConnection = null;
+                }
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+                if (j != apkSize) {
+                    sendInstallMessage(i, -2, UPDATE_INSTALLSTATE);
+                } else if (!packagename.equals("com.launcher.activity")) {
+                    list.add(String.valueOf(AppEnvironment.ASSETS_DIR) + appName);
+                    sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + appName, UPDATE_INSTALLSINGLE);
+                    sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
+                    this.addApksList.add(packagename);
+                } else {
+                    try {
+                        ApkUpdateBean apkUpdateBean2 = this.apkUpdateList.get(i);
+                        apkUpdateBean2.setApkLocalPath(String.valueOf(AppEnvironment.ASSETS_DIR) + appName);
+                        this.apkUpdateList.set(i, apkUpdateBean2);
+                    } catch (Exception e4) {
+                    }
+                    if (list2.size() == 1) {
+                        sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + appName, UPDATE_INSTALLSINGLE);
+                        sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
+                    }
+                    this.launcherPath = String.valueOf(AppEnvironment.ASSETS_DIR) + appName;
+                }
+            }
+        }
+        return list;
+    }
+
+    public void refreshDownloadPB() {
+        if (this.canRefresh && this.tv_updatemsg != null) {
+            DecimalFormat decimalFormat = new DecimalFormat("##0.00");
+            this.tv_updatemsg.setText(String.valueOf(getResources().getString(R.string.updateapks)) + (String.valueOf(decimalFormat.format(((this.currentCachePosition * 1.0d) / 1024.0d) / 1024.0d)) + "MB/" + decimalFormat.format(((this.currentCacheLength * 1.0d) / 1024.0d) / 1024.0d) + "MB"));
+        }
+    }
+
+    private void removeIllegalApks() {
+        new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.24
+            /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:47:0x00f9 -> B:3:0x0006). Please submit an issue!!! */
+            @Override // java.lang.Runnable
+            public void run() {
+                try {
+                    Thread.sleep(3000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC") || Build.DISPLAY.indexOf("S1016PRO") >= 0 || Build.DISPLAY.indexOf("M1016Pro") >= 0 || Build.DISPLAY.indexOf("P990S.V") >= 0 || Build.DISPLAY.indexOf("D13B") >= 0 || Build.DISPLAY.indexOf("QC80A") >= 0 || Build.DISPLAY.indexOf("N5110ZB") >= 0 || Build.DISPLAY.indexOf(".T360Z") >= 0 || Build.DISPLAY.indexOf("P583") >= 0 || Build.DISPLAY.indexOf("P350") >= 0 || Build.DISPLAY.indexOf("P550") >= 0 || Build.DISPLAY.indexOf("M856.V") >= 0 || Build.DISPLAY.indexOf("S1016.V1") >= 0 || Build.DISPLAY.indexOf("S106.V1") >= 0 || Build.DISPLAY.indexOf("S1016E") >= 0) {
+                    try {
+                        CloudClientActivity.this.getMyApps(CloudClientActivity.this.send_ip, CloudClientActivity.this.send_privatekey);
+                    } catch (Exception e2) {
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void resetAutoSp() {
+        SharedPreferences sharedPreferences = getSharedPreferences("resumeconfig", 0);
+        sharedPreferences.edit().putLong("updateapks", 0L).commit();
+        sharedPreferences.edit().putLong("updatedesign", 0L).commit();
+        getSharedPreferences("noticemessage", 0).edit().putLong("noticetime", 0L).commit();
+    }
+
+    public void sendInstallMessage(int i, Object obj, int i2) {
+        Message message = new Message();
+        message.arg1 = i;
+        message.what = i2;
+        message.obj = obj;
+        this.installHandler.sendMessage(message);
+    }
+
+    private void setDefaultSetting() {
+        this.cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+        this.mHwPDM = new HwDevicePolicyManager(this);
+        this.mHwPDM.setCustomLauncher(this.cn, "com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+        if (Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
+            MiaMdmPolicyManager miaMdmPolicyManager = new MiaMdmPolicyManager(getApplicationContext());
+            miaMdmPolicyManager.setCustomLauncher("com.launcher.activity");
+            miaMdmPolicyManager.controlBluetooth(false);
+        }
+        this.mDPM = (DevicePolicyManager) getSystemService("device_policy");
+        this.mDeviceAdmin = new ComponentName(this, SampleAdmin.class);
+        PgyCrashManager.register(this, AppEnvironment.My_APPID);
+        if (AppEnvironment.isNL || AppEnvironment.isNLEZ) {
+            try {
+                if (this.deletingFiles) {
+                    return;
+                }
+                new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.14
+                    @Override // java.lang.Runnable
+                    public void run() {
+                        CloudClientActivity.this.deletingFiles = true;
+                        CloudClientActivity.this.deleteCameraFiles();
+                    }
+                }).start();
+            } catch (NullPointerException e) {
+            } catch (Exception e2) {
+            }
+        }
+    }
+
+    public void setDesignView() {
+        try {
+            if (this.isGetLauncher) {
+                return;
+            }
+            new ArrayList();
+            ArrayList<AppBean> loadXml2 = XmlLoadHelper.loadXml2();
+            enableButtons(loadXml2);
+            changeIcons(loadXml2);
+        } catch (Exception e) {
+        }
+    }
+
+    private void setMainView() {
+        if (AppEnvironment.isSNZT) {
+            setContentView(R.layout.main_suining);
+        } else if (AppEnvironment.isSDYB) {
+            setContentView(R.layout.main_sdyb);
+        } else if (AppEnvironment.isQZEZ) {
+            setContentView(R.layout.main_qzez);
+        } else if (AppEnvironment.isPDSSZ) {
+            setContentView(R.layout.main_pds);
+        } else if (AppEnvironment.isNL) {
+            setContentView(R.layout.main_nnxm);
+        } else if (AppEnvironment.isNLEZ) {
+            setContentView(R.layout.main_nnez);
+        } else if (AppEnvironment.isDEMO) {
+            setContentView(R.layout.main_demo);
+        } else if (AppEnvironment.isMAINNEW) {
+            setContentView(R.layout.main_news);
+        } else if (AppEnvironment.isYWYT) {
+            setContentView(R.layout.main_ywyt);
+        } else if (AppEnvironment.isYWJD) {
+            setContentView(R.layout.main_ywjd);
+        } else if (AppEnvironment.isXF) {
+            setContentView(R.layout.main_xf);
+        } else if (AppEnvironment.isCH) {
+            setContentView(R.layout.main_ch);
+        } else if (AppEnvironment.isXH) {
+            setContentView(R.layout.main_xh);
+        } else if (AppEnvironment.isYWHZ) {
+            setContentView(R.layout.main_ywhz);
+        } else if (AppEnvironment.isPHNS) {
+            setContentView(R.layout.main_phns);
+        } else if (AppEnvironment.isCJLY) {
+            setContentView(R.layout.main_cjly);
+        } else {
+            setContentView(R.layout.main);
+        }
+    }
+
+    public void showFailedApkInfo() {
+        if (!this.canRefresh) {
+            return;
+        }
+        if (!AppEnvironment.isNewUpdate) {
+            if (this.tv_updatemsg == null) {
+                return;
+            }
+            this.tv_updatemsg.setVisibility(4);
+            return;
+        }
+        try {
+            if (this.tv_updatemsg == null) {
+                return;
+            }
+            List<String> failedEbagUpdated = Utils.getFailedEbagUpdated(this, getSharedPreferences("privatekey", 0).getString("apihost", ""));
+            if (failedEbagUpdated == null || failedEbagUpdated.size() <= 0) {
+                this.tv_updatemsg.setVisibility(8);
+                return;
+            }
+            String string = getResources().getString(R.string.uninstallapks);
+            for (int i = 0; i < failedEbagUpdated.size(); i++) {
+                string = String.valueOf(string) + failedEbagUpdated.get(i) + "  ";
+            }
+            this.tv_updatemsg.setVisibility(0);
+            this.tv_updatemsg.setText(string);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showNoticeDetails() {
+        if (!this.canRefresh) {
+            return;
+        }
+        if (this.noticeDialog == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View inflate = LayoutInflater.from(this).inflate(R.layout.dialog_noticemessage, (ViewGroup) null);
+            this.dialog_noticemessage_listview = (ListView) inflate.findViewById(R.id.dialog_noticemessage_listview);
+            this.dialog_noticemessage_tvnotice = (TextView) inflate.findViewById(R.id.dialog_noticemessage_tvnotice);
+            this.dialog_noticemessage_tvok = (TextView) inflate.findViewById(R.id.dialog_noticemessage_tvok);
+            this.noticeAdapter = new NoticeAdapter();
+            this.dialog_noticemessage_listview.setAdapter((ListAdapter) this.noticeAdapter);
+            this.dialog_noticemessage_tvok.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.28
+                @Override // android.view.View.OnClickListener
+                public void onClick(View view) {
+                    if (CloudClientActivity.this.noticeDialog != null) {
+                        CloudClientActivity.this.noticeDialog.dismiss();
+                    }
+                }
+            });
+            builder.setView(inflate);
+            this.noticeDialog = builder.create();
+        }
+        if (this.noticeNum <= 0) {
+            return;
+        }
+        SharedPreferences sharedPreferences = getSharedPreferences("noticemessage", 0);
+        long j = sharedPreferences.getLong("noticetime", 0L);
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis - j < 3600000) {
+            return;
+        }
+        sharedPreferences.edit().putLong("noticetime", currentTimeMillis).commit();
+        if (this.dialog_noticemessage_listview != null && this.noticeMessages != null && this.noticeAdapter != null) {
+            this.noticeAdapter.setDatas(this.noticeMessages);
+        }
+        if (this.dialog_noticemessage_tvnotice != null) {
+            this.dialog_noticemessage_tvnotice.setText("未查看作业：" + this.noticeNum + "份");
+        }
+        this.noticeDialog.show();
+    }
+
+    private void showNoticeDialog(String str, String str2) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (!TextUtils.isEmpty(str)) {
+            builder.setTitle(str);
+        }
+        if (!TextUtils.isEmpty(str2)) {
+            builder.setMessage(str2);
+        }
+        builder.setPositiveButton(getResources().getString(R.string.dialog_noticebutton), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.25
+            @Override // android.content.DialogInterface.OnClickListener
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+    private void showPackageMain() {
+        Intent intent = new Intent("android.intent.action.MAIN");
+        intent.addCategory("android.intent.category.HOME");
+        getPackageManager().resolveActivity(intent, 0);
+    }
+
+    private void startActivity(Intent intent, String str) {
+        if (isApkUpdating(str)) {
+            startActivity(intent);
+        } else {
+            showNoticeDialog(getResources().getString(R.string.dialog_noticetitle), getResources().getString(R.string.dialog_noticemessage));
+        }
+    }
+
+    private void startWifiActivity() {
+        PackageInfo packageInfo;
         PackageInfo packageInfo2;
-        PackageInfo packageInfo_taolun;
-        PackageInfo packageInfo_wodewenjian;
-        if ((v.getId() == R.id.one_img || v.getId() == R.id.two_img || v.getId() == R.id.three_img || v.getId() == R.id.four_img || v.getId() == R.id.five_img || v.getId() == R.id.six_img || v.getId() == R.id.seven_img || v.getId() == R.id.eight_img || v.getId() == R.id.nine_img || v.getId() == R.id.ten_img || v.getId() == R.id.eleven_img || v.getId() == R.id.twelve_img || v.getId() == R.id.thirteen_img || v.getId() == R.id.ll_one || v.getId() == R.id.ll_two || v.getId() == R.id.ll_three || v.getId() == R.id.ll_four || v.getId() == R.id.ll_five || v.getId() == R.id.ll_twelve) && !My_Application.Allow_Flag) {
+        if (!Build.DISPLAY.contains("YOGATablet2-1050LC") || !Build.DISPLAY.contains("YiJiao")) {
+            String str = "com.edutech.wificonn";
+            String str2 = "com.edutech.wificonn.WifiConnActivity";
+            try {
+                packageInfo = getPackageManager().getPackageInfo("com.edutech.wificonn", 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                packageInfo = null;
+                str = AppEnvironment.WIFI_PACKNAME;
+                str2 = "zte.com.wilink.wifi.WifiSettingActivity";
+                e.printStackTrace();
+            }
+            try {
+                packageInfo = getPackageManager().getPackageInfo(str, 0);
+            } catch (PackageManager.NameNotFoundException e2) {
+                packageInfo = null;
+                e2.printStackTrace();
+            } catch (Exception e3) {
+            }
+            if (packageInfo == null) {
+                return;
+            }
+            ComponentName componentName = new ComponentName(str, str2);
+            Intent intent = new Intent();
+            intent.setComponent(componentName);
+            intent.addFlags(268435456);
+            intent.setAction("android.intent.action.MAIN");
+            intent.addCategory("android.intent.category.LAUNCHER");
+            startActivity(intent, str);
+            return;
+        }
+        String str3 = AppEnvironment.WIFI_PACKNAME;
+        String str4 = "zte.com.wilink.wifi.WifiSettingActivity";
+        try {
+            packageInfo2 = getPackageManager().getPackageInfo(AppEnvironment.WIFI_PACKNAME, 0);
+        } catch (PackageManager.NameNotFoundException e4) {
+            packageInfo2 = null;
+            str3 = "com.edutech.wificonn";
+            str4 = "com.edutech.wificonn.WifiConnActivity";
+            e4.printStackTrace();
+        }
+        try {
+            packageInfo2 = getPackageManager().getPackageInfo(str3, 0);
+        } catch (PackageManager.NameNotFoundException e5) {
+            packageInfo2 = null;
+            e5.printStackTrace();
+        } catch (Exception e6) {
+        }
+        if (packageInfo2 == null) {
+            return;
+        }
+        Log.i("qwe", "packageInfo != null");
+        ComponentName componentName2 = new ComponentName(str3, str4);
+        Intent intent2 = new Intent();
+        intent2.setComponent(componentName2);
+        intent2.addFlags(268435456);
+        intent2.setAction("android.intent.action.MAIN");
+        intent2.addCategory("android.intent.category.LAUNCHER");
+        startActivity(intent2, str3);
+    }
+
+    private void uploadLogs() {
+        final File file = new File(AppEnvironment.LOG_PATH);
+        if (!file.exists()) {
+            return;
+        }
+        if (Math.abs(System.currentTimeMillis() - file.lastModified()) <= 3600000 || this.send_ip == null || this.send_ip.equals("")) {
+            return;
+        }
+        new Thread(new Runnable() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.17
+            @Override // java.lang.Runnable
+            public void run() {
+                String str = "http://" + CloudClientActivity.this.send_ip + "/api/padlog/";
+                String str2 = "";
+                try {
+                    str2 = FileUtils.readFileToString(file, "UTF-8");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (str == null || str2 == null || "".equals(str) || "".equals(str2)) {
+                    return;
+                }
+                HttpPost httpPostInit = CloudClientActivity.httpPostInit(str, CloudClientActivity.this.send_privatekey, CloudClientActivity.this.send_name);
+                ArrayList arrayList = new ArrayList();
+                arrayList.add(new BasicNameValuePair("data", str2));
+                try {
+                    try {
+                        httpPostInit.setEntity(new UrlEncodedFormEntity(arrayList, "UTF-8"));
+                        HttpResponse execute = new DefaultHttpClient().execute(httpPostInit);
+                        if (execute.getStatusLine().getStatusCode() == 200) {
+                            try {
+                                if (new JSONObject(EntityUtils.toString(execute.getEntity())).getBoolean("status")) {
+                                    file.delete();
+                                }
+                            } catch (NullPointerException e2) {
+                            } catch (JSONException e3) {
+                                e3.printStackTrace();
+                            } catch (Exception e4) {
+                            }
+                        } else {
+                            System.out.println("Error Response: " + execute.getStatusLine().toString());
+                        }
+                    } catch (Exception e5) {
+                        e5.printStackTrace();
+                    }
+                } catch (ClientProtocolException e6) {
+                    e6.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void SamSungInCharge() {
+        try {
+            try {
+                if (!this.LicenseOK) {
+                    try {
+                        EnterpriseLicenseManager enterpriseLicenseManager = EnterpriseLicenseManager.getInstance(this);
+                        if (isWifiConn()) {
+                            enterpriseLicenseManager.activateLicense(SKEY);
+                        } else {
+                            startWifiActivity();
+                        }
+                    } catch (NoClassDefFoundError e) {
+                    }
+                } else if (!this.mDPM.isAdminActive(this.mDeviceAdmin)) {
+                } else {
+                    try {
+                        if (MultiUserManager.getInstance(this).isUserCreationAllowed()) {
+                            MultiUserManager.getInstance(this).allowUserCreation(false);
+                        }
+                    } catch (Exception e2) {
+                    }
+                    try {
+                        if (MultiUserManager.getInstance(this).multipleUsersAllowed()) {
+                            MultiUserManager.getInstance(this).allowMultipleUsers(false);
+                        }
+                    } catch (Exception e3) {
+                    }
+                    try {
+                        KioskMode kioskMode = KioskMode.getInstance(this);
+                        kioskMode.allowMultiWindowMode(true);
+                        kioskMode.allowMultiWindowMode(false);
+                    } catch (Exception e4) {
+                    }
+                    RestrictionPolicy restrictionPolicy = ((EnterpriseDeviceManager) getSystemService("enterprise_policy")).getRestrictionPolicy();
+                    try {
+                        restrictionPolicy.allowStatusBarExpansion(false);
+                    } catch (SecurityException e5) {
+                        Log.w(TAG, "SecurityException: " + e5);
+                    }
+                    try {
+                        if (restrictionPolicy.allowBluetooth(false)) {
+                            Log.w(TAG, "Bluetooth is disabled and cannot be enabled by user ");
+                        }
+                    } catch (SecurityException e6) {
+                        Log.w(TAG, "SecurityException: " + e6);
+                    }
+                    try {
+                        if (restrictionPolicy.setUsbMediaPlayerAvailability(false)) {
+                            Log.e("mainactivity", "set MTP disallow true");
+                        } else {
+                            Log.e("mainactivity", "set MTP disallow false");
+                        }
+                    } catch (SecurityException e7) {
+                        Log.e("mainactivity", "SecurityException: " + e7);
+                        try {
+                            EnterpriseLicenseManager enterpriseLicenseManager2 = EnterpriseLicenseManager.getInstance(this);
+                            if (isWifiConn()) {
+                                enterpriseLicenseManager2.activateLicense(SKEY);
+                            } else {
+                                startWifiActivity();
+                            }
+                        } catch (NoClassDefFoundError e8) {
+                        }
+                    }
+                    try {
+                        ((EnterpriseDeviceManager) getSystemService("enterprise_policy")).getDateTimePolicy().setAutomaticTime(true);
+                    } catch (SecurityException e9) {
+                        Log.w(TAG, "SecurityException: " + e9);
+                    }
+                }
+            } catch (Exception e10) {
+                e10.printStackTrace();
+                try {
+                    EnterpriseLicenseManager enterpriseLicenseManager3 = EnterpriseLicenseManager.getInstance(this);
+                    if (isWifiConn()) {
+                        enterpriseLicenseManager3.activateLicense(SKEY);
+                    } else {
+                        startWifiActivity();
+                    }
+                } catch (NoClassDefFoundError e11) {
+                }
+            }
+        } catch (NoClassDefFoundError e12) {
+            e12.printStackTrace();
+        }
+    }
+
+    public void apkUpdate() {
+        if (this.hasUpdated || this.isGetApks) {
+            return;
+        }
+        if (this.updateThread != null) {
+            this.updateThread = null;
+            return;
+        }
+        if (this.tv_updatemsg != null) {
+            this.tv_updatemsg.setVisibility(0);
+        }
+        this.updateThread = new UpdateThread();
+        this.updateThread.start();
+    }
+
+    @Override // android.app.Activity, android.view.ContextThemeWrapper, android.content.ContextWrapper
+    protected void attachBaseContext(Context context) {
+        try {
+            super.attachBaseContext(LanguageUtils.attachBaseContext(context, context.getSharedPreferences("language", 0).getString("language", "chinese")));
+        } catch (Exception e) {
+        }
+    }
+
+    public String getDataFromAssets(String str) {
+        Throwable th;
+        BufferedReader bufferedReader;
+        String readLine;
+        StringBuffer stringBuffer = new StringBuffer();
+        BufferedReader bufferedReader2 = null;
+        try {
+            try {
+                BufferedReader bufferedReader3 = new BufferedReader(new InputStreamReader(getAssets().open(str)));
+                while (true) {
+                    try {
+                        if (bufferedReader3.readLine() == null) {
+                            try {
+                                break;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            stringBuffer.append(String.valueOf(readLine) + "\n");
+                        }
+                    } catch (IOException e2) {
+                        bufferedReader = bufferedReader3;
+                        e = e2;
+                        bufferedReader2 = bufferedReader;
+                        e.printStackTrace();
+                        try {
+                            bufferedReader.close();
+                        } catch (IOException e3) {
+                            e3.printStackTrace();
+                        }
+                        return stringBuffer.toString();
+                    } catch (Throwable th2) {
+                        th = th2;
+                        bufferedReader2 = bufferedReader3;
+                        try {
+                            bufferedReader2.close();
+                        } catch (IOException e4) {
+                            e4.printStackTrace();
+                        }
+                        throw th;
+                    }
+                }
+                bufferedReader3.close();
+            } catch (IOException e5) {
+                e = e5;
+                bufferedReader = null;
+            }
+            return stringBuffer.toString();
+        } catch (Throwable th3) {
+            th = th3;
+        }
+    }
+
+    public String getWIFISSID(Activity activity) {
+        String ssid;
+        if (Build.VERSION.SDK_INT >= 26) {
+            String extraInfo = ((ConnectivityManager) getSystemService("connectivity")).getActiveNetworkInfo().getExtraInfo();
+            ssid = extraInfo;
+            if (extraInfo == null) {
+                String ssid2 = ((WifiManager) getSystemService("wifi")).getConnectionInfo().getSSID();
+                ssid = ssid2;
+                if (ssid2 == null) {
+                    ssid = "unknown ssid";
+                }
+            }
+        } else {
+            ssid = ((WifiManager) getSystemService("wifi")).getConnectionInfo().getSSID();
+        }
+        return ssid;
+    }
+
+    public boolean isWifiConn() {
+        boolean z = false;
+        WifiManager wifiManager = (WifiManager) getSystemService("wifi");
+        if (wifiManager != null && wifiManager.getWifiState() != 1) {
+            z = true;
+        }
+        return z;
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:347:0x0c18, code lost:
+        if (r0.equals("") != false) goto L348;
+     */
+    @Override // android.view.View.OnClickListener
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    public void onClick(View view) {
+        PackageInfo packageInfo;
+        PackageInfo packageInfo2;
+        String str;
+        PackageInfo packageInfo3;
+        if ((view.getId() == 2131362146 || view.getId() == 2131362148 || view.getId() == 2131362150 || view.getId() == 2131362153 || view.getId() == 2131362155 || view.getId() == 2131362157 || view.getId() == 2131362159 || view.getId() == 2131362161 || view.getId() == 2131362163 || view.getId() == 2131362165 || view.getId() == 2131362167 || view.getId() == 2131362169 || view.getId() == 2131362208 || view.getId() == 2131362175 || view.getId() == 2131362176 || view.getId() == 2131362189 || view.getId() == 2131362177 || view.getId() == 2131362178 || view.getId() == 2131362179) && !My_Application.Allow_Flag) {
             this.imageViewSetting.performClick();
             return;
         }
-        Log.i("RIO", new StringBuilder(String.valueOf(v.getId())).toString());
-        SharedPreferences sp = getSharedPreferences("language", 0);
-        String type = sp.getString("language", "chinese");
-        int id = v.getId();
-        switch (id) {
+        Log.i("RIO", new StringBuilder(String.valueOf(view.getId())).toString());
+        String string = getSharedPreferences("language", 0).getString("language", "chinese");
+        switch (view.getId()) {
             case R.id.wifi_btn /* 2131362141 */:
             case R.id.newwifi_img /* 2131362197 */:
                 startWifiActivity();
@@ -3429,340 +3995,340 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
             case R.id.one_img /* 2131362146 */:
             case R.id.ll_one /* 2131362175 */:
             case R.id.sdyb_btn5 /* 2131362207 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm = getPackageManager();
-                    Intent intent = pm.getLaunchIntentForPackage("com.lejent.zuoyeshenqi.afanti");
-                    intent.addFlags(335544320);
-                    if (intent != null) {
-                        startActivity(intent, "com.lejent.zuoyeshenqi.afanti");
-                        break;
-                    }
-                } else if (AppEnvironment.isSDYB) {
-                    try {
-                        PackageInfo pinfo = getPackageManager().getPackageInfo("com.akson.launch.eplauncher", 0);
-                        if (pinfo != null) {
-                            ComponentName component = new ComponentName("com.akson.launch.eplauncher", "com.akson.launch.eplauncher.SplashActivity");
-                            Intent intent_book = new Intent();
-                            intent_book.addCategory("android.intent.category.LAUNCHER");
-                            intent_book.setComponent(component);
-                            intent_book.setAction("android.intent.action.MAIN");
-                            intent_book.setFlags(335544320);
-                            startActivity(intent_book, "com.akson.launch.eplauncher");
+                if (!AppEnvironment.isDEMO) {
+                    if (!AppEnvironment.isSDYB) {
+                        if (!AppEnvironment.ONE_IMG) {
+                            Toast.makeText(this, "该功能暂不开放！", 0).show();
+                            break;
+                        } else {
+                            try {
+                                if (getPackageManager().getPackageInfo("com.edutech.guidance", 0) != null) {
+                                    ComponentName componentName = new ComponentName("com.edutech.guidance", "com.edutech.guidance.MainActivity");
+                                    Intent intent = new Intent();
+                                    intent.addCategory("android.intent.category.LAUNCHER");
+                                    intent.setComponent(componentName);
+                                    intent.setAction("android.intent.action.MAIN");
+                                    intent.setFlags(268435456);
+                                    startActivity(intent, "com.edutech.guidance");
+                                    break;
+                                }
+                            } catch (PackageManager.NameNotFoundException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "该应用未安装！", 0).show();
+                                break;
+                            }
+                        }
+                    } else {
+                        try {
+                            if (getPackageManager().getPackageInfo("com.akson.launch.eplauncher", 0) != null) {
+                                ComponentName componentName2 = new ComponentName("com.akson.launch.eplauncher", "com.akson.launch.eplauncher.SplashActivity");
+                                Intent intent2 = new Intent();
+                                intent2.addCategory("android.intent.category.LAUNCHER");
+                                intent2.setComponent(componentName2);
+                                intent2.setAction("android.intent.action.MAIN");
+                                intent2.setFlags(335544320);
+                                startActivity(intent2, "com.akson.launch.eplauncher");
+                                break;
+                            }
+                        } catch (PackageManager.NameNotFoundException e2) {
+                            e2.printStackTrace();
+                            break;
+                        } catch (Exception e3) {
                             break;
                         }
-                    } catch (PackageManager.NameNotFoundException e1) {
-                        e1.printStackTrace();
-                        break;
-                    } catch (Exception e) {
-                        break;
-                    }
-                } else if (AppEnvironment.ONE_IMG) {
-                    try {
-                        PackageInfo pinfo2 = getPackageManager().getPackageInfo("com.edutech.guidance", 0);
-                        if (pinfo2 != null) {
-                            ComponentName component2 = new ComponentName("com.edutech.guidance", "com.edutech.guidance.MainActivity");
-                            Intent intent_book2 = new Intent();
-                            intent_book2.addCategory("android.intent.category.LAUNCHER");
-                            intent_book2.setComponent(component2);
-                            intent_book2.setAction("android.intent.action.MAIN");
-                            intent_book2.setFlags(268435456);
-                            startActivity(intent_book2, "com.edutech.guidance");
-                            break;
-                        }
-                    } catch (PackageManager.NameNotFoundException e12) {
-                        e12.printStackTrace();
-                        Toast.makeText(this, "该应用未安装！", 0).show();
-                        break;
                     }
                 } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
+                    Intent launchIntentForPackage = getPackageManager().getLaunchIntentForPackage("com.lejent.zuoyeshenqi.afanti");
+                    launchIntentForPackage.addFlags(335544320);
+                    if (launchIntentForPackage != null) {
+                        startActivity(launchIntentForPackage, "com.lejent.zuoyeshenqi.afanti");
+                        break;
+                    }
                 }
                 break;
             case R.id.two_img /* 2131362148 */:
             case R.id.ll_two /* 2131362176 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm2 = getPackageManager();
-                    Intent intent2 = pm2.getLaunchIntentForPackage("com.A17zuoye.mobile.homework");
-                    intent2.addFlags(335544320);
-                    if (intent2 != null) {
-                        startActivity(intent2, "com.A17zuoye.mobile.homework");
-                        break;
-                    }
-                } else if (AppEnvironment.isSDYB) {
-                    try {
-                        PackageInfo pinfo3 = getPackageManager().getPackageInfo("com.akson.timeep", 0);
-                        if (pinfo3 != null) {
-                            ComponentName component3 = new ComponentName("com.akson.timeep", "com.akson.timeep.SplashActivity");
-                            Intent intent_book3 = new Intent();
-                            intent_book3.addCategory("android.intent.category.LAUNCHER");
-                            intent_book3.setComponent(component3);
-                            intent_book3.setAction("android.intent.action.MAIN");
-                            intent_book3.setFlags(268435456);
-                            startActivity(intent_book3, "com.akson.timeep");
+                if (!AppEnvironment.isDEMO) {
+                    if (!AppEnvironment.isSDYB) {
+                        if (!AppEnvironment.TWO_IMG) {
+                            Toast.makeText(this, "该功能暂不开放！", 0).show();
+                            break;
+                        } else {
+                            try {
+                                if (getPackageManager().getPackageInfo("com.edutech.zuoyefudao3", 0) != null) {
+                                    ComponentName componentName3 = new ComponentName("com.edutech.zuoyefudao3", AppEnvironment.ZUOYEFUDAO_APPNAME);
+                                    Intent intent3 = new Intent();
+                                    intent3.addCategory("android.intent.category.LAUNCHER");
+                                    intent3.setComponent(componentName3);
+                                    intent3.setAction("android.intent.action.MAIN");
+                                    intent3.setFlags(268435456);
+                                    startActivity(intent3, "com.edutech.zuoyefudao3");
+                                    break;
+                                }
+                            } catch (PackageManager.NameNotFoundException e4) {
+                                e4.printStackTrace();
+                                Toast.makeText(this, "该应用未安装！", 0).show();
+                                break;
+                            } catch (Exception e5) {
+                                e5.printStackTrace();
+                                break;
+                            }
+                        }
+                    } else {
+                        try {
+                            if (getPackageManager().getPackageInfo("com.akson.timeep", 0) != null) {
+                                ComponentName componentName4 = new ComponentName("com.akson.timeep", "com.akson.timeep.SplashActivity");
+                                Intent intent4 = new Intent();
+                                intent4.addCategory("android.intent.category.LAUNCHER");
+                                intent4.setComponent(componentName4);
+                                intent4.setAction("android.intent.action.MAIN");
+                                intent4.setFlags(268435456);
+                                startActivity(intent4, "com.akson.timeep");
+                                break;
+                            }
+                        } catch (PackageManager.NameNotFoundException e6) {
+                            e6.printStackTrace();
+                            break;
+                        } catch (Exception e7) {
                             break;
                         }
-                    } catch (PackageManager.NameNotFoundException e13) {
-                        e13.printStackTrace();
-                        break;
-                    } catch (Exception e2) {
-                        break;
-                    }
-                } else if (AppEnvironment.TWO_IMG) {
-                    try {
-                        PackageInfo pinfo4 = getPackageManager().getPackageInfo("com.edutech.zuoyefudao3", 0);
-                        if (pinfo4 != null) {
-                            ComponentName component4 = new ComponentName("com.edutech.zuoyefudao3", AppEnvironment.ZUOYEFUDAO_APPNAME);
-                            Intent intent_book4 = new Intent();
-                            intent_book4.addCategory("android.intent.category.LAUNCHER");
-                            intent_book4.setComponent(component4);
-                            intent_book4.setAction("android.intent.action.MAIN");
-                            intent_book4.setFlags(268435456);
-                            startActivity(intent_book4, "com.edutech.zuoyefudao3");
-                            break;
-                        }
-                    } catch (PackageManager.NameNotFoundException e14) {
-                        e14.printStackTrace();
-                        Toast.makeText(this, "该应用未安装！", 0).show();
-                        break;
-                    } catch (Exception e3) {
-                        e3.printStackTrace();
-                        break;
                     }
                 } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
+                    Intent launchIntentForPackage2 = getPackageManager().getLaunchIntentForPackage("com.A17zuoye.mobile.homework");
+                    launchIntentForPackage2.addFlags(335544320);
+                    if (launchIntentForPackage2 != null) {
+                        startActivity(launchIntentForPackage2, "com.A17zuoye.mobile.homework");
+                        break;
+                    }
                 }
                 break;
             case R.id.three_img /* 2131362150 */:
             case R.id.ll_three /* 2131362189 */:
-                if (AppEnvironment.THREE_IMG) {
-                    SharedPreferences sp2 = getSharedPreferences("notice", 0);
-                    sp2.edit().putLong("lasttime", 0L).commit();
+                if (!AppEnvironment.THREE_IMG) {
+                    Toast.makeText(this, "该功能暂不开放！", 0).show();
+                    break;
+                } else {
+                    getSharedPreferences("notice", 0).edit().putLong("lasttime", 0L).commit();
                     try {
-                        PackageInfo pinfo5 = getPackageManager().getPackageInfo("com.edutech.mywork", 0);
-                        if (pinfo5 != null) {
-                            ComponentName component5 = new ComponentName("com.edutech.mywork", "com.edutech.mywork.MainActivity");
-                            Intent intent_book5 = new Intent();
-                            intent_book5.addCategory("android.intent.category.LAUNCHER");
-                            intent_book5.setComponent(component5);
-                            intent_book5.setAction("android.intent.action.MAIN");
-                            intent_book5.setFlags(268435456);
-                            startActivity(intent_book5, "com.edutech.mywork");
+                        if (getPackageManager().getPackageInfo("com.edutech.mywork", 0) != null) {
+                            ComponentName componentName5 = new ComponentName("com.edutech.mywork", "com.edutech.mywork.MainActivity");
+                            Intent intent5 = new Intent();
+                            intent5.addCategory("android.intent.category.LAUNCHER");
+                            intent5.setComponent(componentName5);
+                            intent5.setAction("android.intent.action.MAIN");
+                            intent5.setFlags(268435456);
+                            startActivity(intent5, "com.edutech.mywork");
                             break;
                         }
-                    } catch (PackageManager.NameNotFoundException e15) {
-                        e15.printStackTrace();
+                    } catch (PackageManager.NameNotFoundException e8) {
+                        e8.printStackTrace();
                         Toast.makeText(this, "该应用未安装！", 0).show();
                         break;
                     }
-                } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
                 }
                 break;
             case R.id.four_img /* 2131362153 */:
             case R.id.ll_four /* 2131362177 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm3 = getPackageManager();
-                    Intent intent3 = pm3.getLaunchIntentForPackage("com.jinxin.namibox");
-                    intent3.addFlags(335544320);
-                    if (intent3 != null) {
-                        startActivity(intent3, "com.jinxin.namibox");
+                if (!AppEnvironment.isDEMO) {
+                    if (!AppEnvironment.FOUR_IMG) {
+                        Toast.makeText(this, "该功能暂不开放！", 0).show();
                         break;
-                    }
-                } else if (AppEnvironment.FOUR_IMG) {
-                    try {
-                        PackageInfo pinfo6 = getPackageManager().getPackageInfo("com.edutech.wrongcollection", 0);
-                        if (pinfo6 != null) {
-                            ComponentName component6 = new ComponentName("com.edutech.wrongcollection", "com.edutech.wrongcollection.MainActivity");
-                            Intent intent_book6 = new Intent();
-                            intent_book6.addCategory("android.intent.category.LAUNCHER");
-                            intent_book6.setComponent(component6);
-                            intent_book6.setAction("android.intent.action.MAIN");
-                            intent_book6.setFlags(268435456);
-                            startActivity(intent_book6, "com.edutech.wrongcollection");
+                    } else {
+                        try {
+                            if (getPackageManager().getPackageInfo("com.edutech.wrongcollection", 0) != null) {
+                                ComponentName componentName6 = new ComponentName("com.edutech.wrongcollection", "com.edutech.wrongcollection.MainActivity");
+                                Intent intent6 = new Intent();
+                                intent6.addCategory("android.intent.category.LAUNCHER");
+                                intent6.setComponent(componentName6);
+                                intent6.setAction("android.intent.action.MAIN");
+                                intent6.setFlags(268435456);
+                                startActivity(intent6, "com.edutech.wrongcollection");
+                                break;
+                            }
+                        } catch (PackageManager.NameNotFoundException e9) {
+                            e9.printStackTrace();
+                            Toast.makeText(this, "该应用未安装！", 0).show();
                             break;
                         }
-                    } catch (PackageManager.NameNotFoundException e16) {
-                        e16.printStackTrace();
-                        Toast.makeText(this, "该应用未安装！", 0).show();
-                        break;
                     }
                 } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
+                    Intent launchIntentForPackage3 = getPackageManager().getLaunchIntentForPackage("com.jinxin.namibox");
+                    launchIntentForPackage3.addFlags(335544320);
+                    if (launchIntentForPackage3 != null) {
+                        startActivity(launchIntentForPackage3, "com.jinxin.namibox");
+                        break;
+                    }
                 }
                 break;
             case R.id.five_img /* 2131362155 */:
             case R.id.ll_five /* 2131362178 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm4 = getPackageManager();
-                    Intent intent4 = pm4.getLaunchIntentForPackage("com.haojiazhang.activity");
-                    intent4.addFlags(335544320);
-                    if (intent4 != null) {
-                        startActivity(intent4, "com.haojiazhang.activity");
-                        break;
-                    }
-                } else if (AppEnvironment.isSNZT) {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
-                } else if (AppEnvironment.FIVE_IMG) {
-                    try {
-                        PackageInfo pinfo7 = getPackageManager().getPackageInfo("com.edutech.textbook", 0);
-                        if (pinfo7 != null) {
-                            ComponentName component7 = new ComponentName("com.edutech.textbook", AppEnvironment.MULTIMEDIAMATERIAL_APPNAME);
-                            Intent intent_book7 = new Intent();
-                            intent_book7.addCategory("android.intent.category.LAUNCHER");
-                            intent_book7.setComponent(component7);
-                            intent_book7.setAction("android.intent.action.MAIN");
-                            intent_book7.setFlags(268435456);
-                            intent_book7.putExtra("type", type);
-                            intent_book7.putExtra("ip", this.send_ip);
-                            intent_book7.putExtra("name", this.send_name);
-                            intent_book7.putExtra("privatekey", this.send_privatekey);
-                            intent_book7.putExtra("demo", this.send_demo);
-                            intent_book7.putExtra("pwd", this.send_pwd);
-                            intent_book7.putExtra("usercode", this.send_usercode);
-                            startActivity(intent_book7, "com.edutech.textbook");
+                if (!AppEnvironment.isDEMO) {
+                    if (!AppEnvironment.isSNZT) {
+                        if (!AppEnvironment.FIVE_IMG) {
+                            Toast.makeText(this, "该功能暂不开放！", 0).show();
                             break;
+                        } else {
+                            try {
+                                if (getPackageManager().getPackageInfo("com.edutech.textbook", 0) != null) {
+                                    ComponentName componentName7 = new ComponentName("com.edutech.textbook", AppEnvironment.MULTIMEDIAMATERIAL_APPNAME);
+                                    Intent intent7 = new Intent();
+                                    intent7.addCategory("android.intent.category.LAUNCHER");
+                                    intent7.setComponent(componentName7);
+                                    intent7.setAction("android.intent.action.MAIN");
+                                    intent7.setFlags(268435456);
+                                    intent7.putExtra("type", string);
+                                    intent7.putExtra("ip", this.send_ip);
+                                    intent7.putExtra("name", this.send_name);
+                                    intent7.putExtra("privatekey", this.send_privatekey);
+                                    intent7.putExtra("demo", this.send_demo);
+                                    intent7.putExtra("pwd", this.send_pwd);
+                                    intent7.putExtra("usercode", this.send_usercode);
+                                    startActivity(intent7, "com.edutech.textbook");
+                                    break;
+                                }
+                            } catch (PackageManager.NameNotFoundException e10) {
+                                e10.printStackTrace();
+                                Toast.makeText(this, "该应用未安装！", 0).show();
+                                break;
+                            }
                         }
-                    } catch (PackageManager.NameNotFoundException e17) {
-                        e17.printStackTrace();
-                        Toast.makeText(this, "该应用未安装！", 0).show();
+                    } else {
+                        Toast.makeText(this, "该功能暂不开放！", 0).show();
                         break;
                     }
                 } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
+                    Intent launchIntentForPackage4 = getPackageManager().getLaunchIntentForPackage("com.haojiazhang.activity");
+                    launchIntentForPackage4.addFlags(335544320);
+                    if (launchIntentForPackage4 != null) {
+                        startActivity(launchIntentForPackage4, "com.haojiazhang.activity");
+                        break;
+                    }
                 }
                 break;
             case R.id.six_img /* 2131362157 */:
             case R.id.ll_six /* 2131362185 */:
             case R.id.sdyb_myapp /* 2131362202 */:
-                if (AppEnvironment.SIX_IMG) {
+                if (!AppEnvironment.SIX_IMG) {
+                    Toast.makeText(this, "该功能暂不开放！", 0).show();
+                    break;
+                } else {
                     try {
-                        PackageInfo pinfo8 = getPackageManager().getPackageInfo("com.edutech.myapps", 0);
-                        if (pinfo8 != null) {
-                            ComponentName component8 = new ComponentName("com.edutech.myapps", "com.edutech.myapps.activity.MainActivity");
-                            Intent intent_book8 = new Intent();
-                            intent_book8.addCategory("android.intent.category.LAUNCHER");
-                            intent_book8.setComponent(component8);
-                            intent_book8.setAction("android.intent.action.MAIN");
-                            intent_book8.setFlags(268435456);
-                            startActivity(intent_book8, "com.edutech.myapps");
+                        if (getPackageManager().getPackageInfo("com.edutech.myapps", 0) != null) {
+                            ComponentName componentName8 = new ComponentName("com.edutech.myapps", "com.edutech.myapps.activity.MainActivity");
+                            Intent intent8 = new Intent();
+                            intent8.addCategory("android.intent.category.LAUNCHER");
+                            intent8.setComponent(componentName8);
+                            intent8.setAction("android.intent.action.MAIN");
+                            intent8.setFlags(268435456);
+                            startActivity(intent8, "com.edutech.myapps");
                             break;
                         }
-                    } catch (PackageManager.NameNotFoundException e18) {
-                        e18.printStackTrace();
+                    } catch (PackageManager.NameNotFoundException e11) {
+                        e11.printStackTrace();
                         Toast.makeText(this, "该应用未安装！", 0).show();
                         break;
                     }
-                } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
                 }
                 break;
             case R.id.seven_img /* 2131362159 */:
             case R.id.ll_seven /* 2131362183 */:
-                if (AppEnvironment.isCJLY || AppEnvironment.isHT || AppEnvironment.isSPYZ || AppEnvironment.isYWHZ || AppEnvironment.isPDSSZ || AppEnvironment.isCH || AppEnvironment.isXF || AppEnvironment.isYWJD || AppEnvironment.isYWYT || AppEnvironment.isDISABLE4 || AppEnvironment.isLJLD || AppEnvironment.isTHZX || AppEnvironment.isPDS || AppEnvironment.isXFJD || AppEnvironment.isBS || AppEnvironment.isSMX || AppEnvironment.isXXJ || AppEnvironment.isNLEZ || AppEnvironment.isNL || !AppEnvironment.SEVEN_IMG || AppEnvironment.isSNZT) {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
-                } else if (AppEnvironment.isNJLZ || AppEnvironment.isSDYB) {
-                    try {
-                        Intent infoIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-                        ResolveInfo res = getPackageManager().resolveActivity(infoIntent, 0);
-                        if (res != null) {
-                            Log.e(TAG, "ACTION_IMAGE_CAPTURE--->" + res.activityInfo.packageName);
-                            Log.e(TAG, "activityInfo.name--->" + res.activityInfo.name);
+                if (!AppEnvironment.isCJLY && !AppEnvironment.isHT && !AppEnvironment.isSPYZ && !AppEnvironment.isYWHZ && !AppEnvironment.isPDSSZ && !AppEnvironment.isCH && !AppEnvironment.isXF && !AppEnvironment.isYWJD && !AppEnvironment.isYWYT && !AppEnvironment.isDISABLE4 && !AppEnvironment.isLJLD && !AppEnvironment.isTHZX && !AppEnvironment.isPDS && !AppEnvironment.isXFJD && !AppEnvironment.isBS && !AppEnvironment.isSMX && !AppEnvironment.isXXJ && !AppEnvironment.isNLEZ && !AppEnvironment.isNL && AppEnvironment.SEVEN_IMG && !AppEnvironment.isSNZT) {
+                    if (!AppEnvironment.isNJLZ && !AppEnvironment.isSDYB) {
+                        openCamera();
+                        break;
+                    } else {
+                        try {
+                            ResolveInfo resolveActivity = getPackageManager().resolveActivity(new Intent("android.media.action.IMAGE_CAPTURE"), 0);
+                            if (resolveActivity != null) {
+                                Log.e(TAG, "ACTION_IMAGE_CAPTURE--->" + resolveActivity.activityInfo.packageName);
+                                Log.e(TAG, "activityInfo.name--->" + resolveActivity.activityInfo.name);
+                            }
+                            String str2 = resolveActivity.activityInfo.packageName;
+                            String str3 = resolveActivity.activityInfo.name;
+                            Log.e(TAG, "ACTION_IMAGE_CAPTURE--->" + resolveActivity.activityInfo.packageName);
+                            Log.e(TAG, "activityInfo.name--->" + resolveActivity.activityInfo.name);
+                            Intent intent9 = new Intent();
+                            intent9.setComponent(new ComponentName(str2, str3));
+                            intent9.setAction("android.intent.action.MAIN");
+                            startActivity(intent9);
+                            break;
+                        } catch (Exception e12) {
+                            e12.printStackTrace();
+                            startActivity(new Intent("android.media.action.IMAGE_CAPTURE"));
+                            break;
                         }
-                        String packageName = res.activityInfo.packageName;
-                        String classname = res.activityInfo.name;
-                        Log.e(TAG, "ACTION_IMAGE_CAPTURE--->" + res.activityInfo.packageName);
-                        Log.e(TAG, "activityInfo.name--->" + res.activityInfo.name);
-                        Intent mIntent = new Intent();
-                        ComponentName comp = new ComponentName(packageName, classname);
-                        mIntent.setComponent(comp);
-                        mIntent.setAction("android.intent.action.MAIN");
-                        startActivity(mIntent);
-                        break;
-                    } catch (Exception e4) {
-                        e4.printStackTrace();
-                        Intent intentP = new Intent("android.media.action.IMAGE_CAPTURE");
-                        startActivity(intentP);
-                        break;
                     }
                 } else {
-                    openCamera();
+                    Toast.makeText(this, "该功能暂不开放！", 0).show();
                     break;
                 }
                 break;
             case R.id.eight_img /* 2131362161 */:
             case R.id.ll_eight /* 2131362184 */:
-                if (AppEnvironment.isXF || AppEnvironment.isCJLY || AppEnvironment.isHT || AppEnvironment.isPDSSZ || AppEnvironment.isSPYZ || AppEnvironment.isDISABLE4 || AppEnvironment.isBS || AppEnvironment.isTHZX || AppEnvironment.isSMX || AppEnvironment.isXXJ || AppEnvironment.isNL || AppEnvironment.isNLEZ || AppEnvironment.isYYYB || !AppEnvironment.EIGHT_IMG || AppEnvironment.isSNZT) {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
-                } else {
+                if (!AppEnvironment.isXF && !AppEnvironment.isCJLY && !AppEnvironment.isHT && !AppEnvironment.isPDSSZ && !AppEnvironment.isSPYZ && !AppEnvironment.isDISABLE4 && !AppEnvironment.isBS && !AppEnvironment.isTHZX && !AppEnvironment.isSMX && !AppEnvironment.isXXJ && !AppEnvironment.isNL && !AppEnvironment.isNLEZ && !AppEnvironment.isYYYB && AppEnvironment.EIGHT_IMG && !AppEnvironment.isSNZT) {
                     try {
-                        packageInfo_wodewenjian = getPackageManager().getPackageInfo("com.edutech.myfiles", 0);
-                    } catch (PackageManager.NameNotFoundException e5) {
-                        packageInfo_wodewenjian = null;
-                        e5.printStackTrace();
+                        packageInfo3 = getPackageManager().getPackageInfo("com.edutech.myfiles", 0);
+                    } catch (PackageManager.NameNotFoundException e13) {
+                        packageInfo3 = null;
+                        e13.printStackTrace();
                         Toast.makeText(this, "该应用未安装！", 0).show();
                     }
-                    if (packageInfo_wodewenjian != null) {
-                        ComponentName componet = new ComponentName("com.edutech.myfiles", "src.com.edutech.wodewenjian.activitie.GugleFileActivity");
-                        Intent intent5 = new Intent();
-                        intent5.setComponent(componet);
-                        intent5.addFlags(268435456);
-                        intent5.setAction("android.intent.action.MAIN");
-                        intent5.addCategory("android.intent.category.LAUNCHER");
-                        intent5.putExtra("language", type);
-                        intent5.putExtra("OPEN_FILE", AppEnvironment.HOMEPATH);
+                    if (packageInfo3 != null) {
+                        ComponentName componentName9 = new ComponentName("com.edutech.myfiles", "src.com.edutech.wodewenjian.activitie.GugleFileActivity");
+                        Intent intent10 = new Intent();
+                        intent10.setComponent(componentName9);
+                        intent10.addFlags(268435456);
+                        intent10.setAction("android.intent.action.MAIN");
+                        intent10.addCategory("android.intent.category.LAUNCHER");
+                        intent10.putExtra("language", string);
+                        intent10.putExtra("OPEN_FILE", AppEnvironment.HOMEPATH);
                         try {
-                            String OPEN_DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
-                            Log.i(TAG, "OPEN_DCIM==" + OPEN_DCIM);
-                            intent5.putExtra("OPEN_DCIM", OPEN_DCIM);
-                        } catch (Exception e6) {
-                            e6.printStackTrace();
+                            String file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+                            Log.i(TAG, "OPEN_DCIM==" + file);
+                            intent10.putExtra("OPEN_DCIM", file);
+                        } catch (Exception e14) {
+                            e14.printStackTrace();
                         }
-                        startActivity(intent5, "com.edutech.myfiles");
+                        startActivity(intent10, "com.edutech.myfiles");
                         break;
                     }
+                } else {
+                    Toast.makeText(this, "该功能暂不开放！", 0).show();
+                    break;
                 }
                 break;
             case R.id.nine_img /* 2131362163 */:
             case R.id.ll_nine /* 2131362180 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm5 = getPackageManager();
-                    Intent intent6 = pm5.getLaunchIntentForPackage(AppEnvironment.YOUDAO_PACKNAME);
-                    intent6.addFlags(335544320);
-                    if (intent6 != null) {
-                        startActivity(intent6, AppEnvironment.YOUDAO_PACKNAME);
-                        break;
-                    }
-                } else if (AppEnvironment.isCJLY || AppEnvironment.isHT || AppEnvironment.isYWYT || AppEnvironment.isYWJD || AppEnvironment.isCH || AppEnvironment.isXH || AppEnvironment.isXF || AppEnvironment.isYWHZ || AppEnvironment.isSPYZ || AppEnvironment.isLJNLDN || AppEnvironment.isPDSSZ || AppEnvironment.isPDS || AppEnvironment.isDISABLE4 || AppEnvironment.isLJLD || AppEnvironment.isSMX || AppEnvironment.isXXJ || AppEnvironment.isZBYZ || AppEnvironment.isNJLZ || AppEnvironment.isNLEZ || AppEnvironment.isNL || !AppEnvironment.NINE_IMG || AppEnvironment.isSNZT) {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
-                } else {
-                    try {
-                        PackageInfo pinfo9 = getPackageManager().getPackageInfo("com.edutech.jxhd", 0);
-                        if (pinfo9 != null) {
-                            ComponentName component9 = new ComponentName("com.edutech.jxhd", "com.edutech.jxhd.MainActivity");
-                            Intent intent_book9 = new Intent();
-                            intent_book9.addCategory("android.intent.category.LAUNCHER");
-                            intent_book9.setComponent(component9);
-                            intent_book9.setAction("android.intent.action.MAIN");
-                            intent_book9.setFlags(268435456);
-                            startActivity(intent_book9, "com.edutech.jxhd");
+                if (!AppEnvironment.isDEMO) {
+                    if (!AppEnvironment.isCJLY && !AppEnvironment.isHT && !AppEnvironment.isYWYT && !AppEnvironment.isYWJD && !AppEnvironment.isCH && !AppEnvironment.isXH && !AppEnvironment.isXF && !AppEnvironment.isYWHZ && !AppEnvironment.isSPYZ && !AppEnvironment.isLJNLDN && !AppEnvironment.isPDSSZ && !AppEnvironment.isPDS && !AppEnvironment.isDISABLE4 && !AppEnvironment.isLJLD && !AppEnvironment.isSMX && !AppEnvironment.isXXJ && !AppEnvironment.isZBYZ && !AppEnvironment.isNJLZ && !AppEnvironment.isNLEZ && !AppEnvironment.isNL && AppEnvironment.NINE_IMG && !AppEnvironment.isSNZT) {
+                        try {
+                            if (getPackageManager().getPackageInfo("com.edutech.jxhd", 0) != null) {
+                                ComponentName componentName10 = new ComponentName("com.edutech.jxhd", "com.edutech.jxhd.MainActivity");
+                                Intent intent11 = new Intent();
+                                intent11.addCategory("android.intent.category.LAUNCHER");
+                                intent11.setComponent(componentName10);
+                                intent11.setAction("android.intent.action.MAIN");
+                                intent11.setFlags(268435456);
+                                startActivity(intent11, "com.edutech.jxhd");
+                                break;
+                            }
+                        } catch (PackageManager.NameNotFoundException e15) {
+                            e15.printStackTrace();
+                            Toast.makeText(this, "请安装指定应用！", 0).show();
+                            break;
+                        } catch (Exception e16) {
+                            Toast.makeText(this, "请安装指定应用！", 0).show();
                             break;
                         }
-                    } catch (PackageManager.NameNotFoundException e19) {
-                        e19.printStackTrace();
-                        Toast.makeText(this, "请安装指定应用！", 0).show();
+                    } else {
+                        Toast.makeText(this, "该功能暂不开放！", 0).show();
                         break;
-                    } catch (Exception e7) {
-                        Toast.makeText(this, "请安装指定应用！", 0).show();
+                    }
+                } else {
+                    Intent launchIntentForPackage5 = getPackageManager().getLaunchIntentForPackage(AppEnvironment.YOUDAO_PACKNAME);
+                    launchIntentForPackage5.addFlags(335544320);
+                    if (launchIntentForPackage5 != null) {
+                        startActivity(launchIntentForPackage5, AppEnvironment.YOUDAO_PACKNAME);
                         break;
                     }
                 }
@@ -3770,11 +4336,10 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
             case R.id.ten_img /* 2131362165 */:
             case R.id.ll_ten /* 2131362181 */:
                 if (AppEnvironment.isDEMO) {
-                    PackageManager pm6 = getPackageManager();
-                    Intent intent7 = pm6.getLaunchIntentForPackage("org.hisand.zidian.zhs");
-                    intent7.addFlags(335544320);
-                    if (intent7 != null) {
-                        startActivity(intent7, "org.hisand.zidian.zhs");
+                    Intent launchIntentForPackage6 = getPackageManager().getLaunchIntentForPackage("org.hisand.zidian.zhs");
+                    launchIntentForPackage6.addFlags(335544320);
+                    if (launchIntentForPackage6 != null) {
+                        startActivity(launchIntentForPackage6, "org.hisand.zidian.zhs");
                         break;
                     }
                 } else if (AppEnvironment.isCJLY || AppEnvironment.isHT || AppEnvironment.isPDSSZ || AppEnvironment.isYWYT || AppEnvironment.isYWJD || AppEnvironment.isCH || AppEnvironment.isXH || AppEnvironment.isXF || AppEnvironment.isSPYZ || AppEnvironment.isDISABLE4 || AppEnvironment.isSMX || AppEnvironment.isXXJ || AppEnvironment.isZBYZ || AppEnvironment.isNJLZ || !AppEnvironment.TEN_IMG || AppEnvironment.isSNZT || AppEnvironment.isSNZT) {
@@ -3782,818 +4347,309 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                     break;
                 } else {
                     try {
-                        packageInfo_taolun = getPackageManager().getPackageInfo("com.edutech.hudongtaolun", 0);
-                    } catch (PackageManager.NameNotFoundException e8) {
-                        packageInfo_taolun = null;
-                        e8.printStackTrace();
+                        packageInfo2 = getPackageManager().getPackageInfo("com.edutech.hudongtaolun", 0);
+                    } catch (PackageManager.NameNotFoundException e17) {
+                        packageInfo2 = null;
+                        e17.printStackTrace();
                         Toast.makeText(this, "该应用未安装！", 0).show();
                     }
-                    if (packageInfo_taolun != null) {
-                        ComponentName componet2 = new ComponentName("com.edutech.hudongtaolun", "com.edutech.hudongtaolun.MainActivity");
-                        Intent intent22 = new Intent();
-                        intent22.setComponent(componet2);
-                        intent22.addFlags(268435456);
-                        intent22.setAction("android.intent.action.MAIN");
-                        intent22.addCategory("android.intent.category.LAUNCHER");
-                        SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-                        String privatekey = sharePre.getString("key", "");
-                        String ip = sharePre.getString("apihost", "");
-                        String username = sharePre.getString("name", "");
-                        if (ip == null || ip.equals("") || username == null || username.equals("") || privatekey == null || privatekey.equals("")) {
-                            HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
-                            if (hashmap != null) {
-                                ip = hashmap.get("ip");
-                                username = hashmap.get("usercode");
-                                privatekey = hashmap.get("privatekey");
-                            } else {
-                                return;
-                            }
+                    if (packageInfo2 != null) {
+                        ComponentName componentName11 = new ComponentName("com.edutech.hudongtaolun", "com.edutech.hudongtaolun.MainActivity");
+                        Intent intent12 = new Intent();
+                        intent12.setComponent(componentName11);
+                        intent12.addFlags(268435456);
+                        intent12.setAction("android.intent.action.MAIN");
+                        intent12.addCategory("android.intent.category.LAUNCHER");
+                        SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
+                        String string2 = sharedPreferences.getString("key", "");
+                        String string3 = sharedPreferences.getString("apihost", "");
+                        String string4 = sharedPreferences.getString("name", "");
+                        if (string3 != null && !string3.equals("") && string4 != null && !string4.equals("") && string2 != null) {
+                            str = string2;
+                            break;
                         }
-                        intent22.putExtra("ip", ip);
-                        intent22.putExtra("privatekey", privatekey);
-                        intent22.putExtra("name", username);
-                        intent22.putExtra("language", type);
-                        startActivity(intent22, "com.edutech.hudongtaolun");
+                        HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
+                        if (loadXml == null) {
+                            return;
+                        }
+                        string3 = loadXml.get("ip");
+                        string4 = loadXml.get("usercode");
+                        str = loadXml.get("privatekey");
+                        intent12.putExtra("ip", string3);
+                        intent12.putExtra("privatekey", str);
+                        intent12.putExtra("name", string4);
+                        intent12.putExtra("language", string);
+                        startActivity(intent12, "com.edutech.hudongtaolun");
                         break;
                     }
                 }
                 break;
             case R.id.eleven_img /* 2131362167 */:
             case R.id.ll_eleven /* 2131362182 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm7 = getPackageManager();
-                    Intent intent8 = pm7.getLaunchIntentForPackage("com.record.ing");
-                    intent8.addFlags(335544320);
-                    if (intent8 != null) {
-                        startActivity(intent8, "com.record.ing");
-                        break;
-                    }
-                } else {
+                if (!AppEnvironment.isDEMO) {
                     Toast.makeText(this, (int) R.string.app_name_building, 0).show();
                     break;
+                } else {
+                    Intent launchIntentForPackage7 = getPackageManager().getLaunchIntentForPackage("com.record.ing");
+                    launchIntentForPackage7.addFlags(335544320);
+                    if (launchIntentForPackage7 != null) {
+                        startActivity(launchIntentForPackage7, "com.record.ing");
+                        break;
+                    }
                 }
                 break;
             case R.id.twelve_img /* 2131362169 */:
             case R.id.ll_twelve /* 2131362179 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm8 = getPackageManager();
-                    Intent intent9 = pm8.getLaunchIntentForPackage("com.xueersi.parentsmeeting");
-                    intent9.addFlags(335544320);
-                    if (intent9 != null) {
-                        startActivity(intent9, "com.xueersi.parentsmeeting");
+                if (!AppEnvironment.isDEMO) {
+                    if (!AppEnvironment.TWELVE_IMG) {
+                        Toast.makeText(this, "该功能暂不开放！", 0).show();
                         break;
-                    }
-                } else if (AppEnvironment.TWELVE_IMG) {
-                    Intent intent23 = new Intent("android.intent.action.MAIN");
-                    intent23.addCategory("android.intent.category.LAUNCHER");
-                    intent23.addFlags(268435456);
-                    ComponentName cn = new ComponentName(AppEnvironment.INTERACTION_PACKNAME, AppEnvironment.INTERACTION_APPNAME);
-                    intent23.setComponent(cn);
-                    intent23.putExtra("language", type);
-                    try {
-                        packageInfo2 = getPackageManager().getPackageInfo(AppEnvironment.INTERACTION_PACKNAME, 0);
-                    } catch (PackageManager.NameNotFoundException e9) {
-                        packageInfo2 = null;
-                        e9.printStackTrace();
-                        Toast.makeText(this, "该应用未安装！", 0).show();
-                    }
-                    if (packageInfo2 != null) {
-                        startActivity(intent23, AppEnvironment.INTERACTION_PACKNAME);
-                        break;
+                    } else {
+                        Intent intent13 = new Intent("android.intent.action.MAIN");
+                        intent13.addCategory("android.intent.category.LAUNCHER");
+                        intent13.addFlags(268435456);
+                        intent13.setComponent(new ComponentName(AppEnvironment.INTERACTION_PACKNAME, AppEnvironment.INTERACTION_APPNAME));
+                        intent13.putExtra("language", string);
+                        try {
+                            packageInfo = getPackageManager().getPackageInfo(AppEnvironment.INTERACTION_PACKNAME, 0);
+                        } catch (PackageManager.NameNotFoundException e18) {
+                            packageInfo = null;
+                            e18.printStackTrace();
+                            Toast.makeText(this, "该应用未安装！", 0).show();
+                        }
+                        if (packageInfo != null) {
+                            startActivity(intent13, AppEnvironment.INTERACTION_PACKNAME);
+                            break;
+                        }
                     }
                 } else {
-                    Toast.makeText(this, "该功能暂不开放！", 0).show();
-                    break;
+                    Intent launchIntentForPackage8 = getPackageManager().getLaunchIntentForPackage("com.xueersi.parentsmeeting");
+                    launchIntentForPackage8.addFlags(335544320);
+                    if (launchIntentForPackage8 != null) {
+                        startActivity(launchIntentForPackage8, "com.xueersi.parentsmeeting");
+                        break;
+                    }
                 }
                 break;
             case R.id.thirteen_img /* 2131362208 */:
                 try {
-                    PackageInfo pinfo10 = getPackageManager().getPackageInfo("com.edutech.eword", 0);
-                    if (pinfo10 != null) {
-                        ComponentName component10 = new ComponentName("com.edutech.eword", "com.edutech.eword.HomePageActivity");
-                        Intent intent_book10 = new Intent();
-                        intent_book10.addCategory("android.intent.category.LAUNCHER");
-                        intent_book10.setComponent(component10);
-                        intent_book10.setAction("android.intent.action.MAIN");
-                        intent_book10.setFlags(268435456);
-                        startActivity(intent_book10, "com.edutech.eword");
+                    if (getPackageManager().getPackageInfo("com.edutech.eword", 0) != null) {
+                        ComponentName componentName12 = new ComponentName("com.edutech.eword", "com.edutech.eword.HomePageActivity");
+                        Intent intent14 = new Intent();
+                        intent14.addCategory("android.intent.category.LAUNCHER");
+                        intent14.setComponent(componentName12);
+                        intent14.setAction("android.intent.action.MAIN");
+                        intent14.setFlags(268435456);
+                        startActivity(intent14, "com.edutech.eword");
                         break;
                     }
-                } catch (PackageManager.NameNotFoundException e110) {
-                    e110.printStackTrace();
+                } catch (PackageManager.NameNotFoundException e19) {
+                    e19.printStackTrace();
                     break;
                 }
                 break;
         }
-        if ("".length() > 0 && "".length() > 0) {
-            ComponentName componet3 = new ComponentName("", "");
-            Intent intent10 = new Intent();
-            intent10.setComponent(componet3);
-            intent10.addFlags(268435456);
-            intent10.setAction("android.intent.action.MAIN");
-            intent10.addCategory("android.intent.category.LAUNCHER");
-            startActivity(intent10, "");
-        }
-    }
-
-    private void startActivity(Intent intent, String pkg) {
-        boolean canStart = isApkUpdating(pkg);
-        if (canStart) {
-            startActivity(intent);
-        } else {
-            showNoticeDialog(getResources().getString(R.string.dialog_noticetitle), getResources().getString(R.string.dialog_noticemessage));
-        }
-    }
-
-    private boolean isApkUpdating(String pkg) {
-        boolean canStart = true;
-        long time = System.currentTimeMillis();
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        long pretime = sp.getLong("updateapks", 0L);
-        if (time - pretime > 480000 && pretime != 0) {
-            this.apkUpdatePkgList = null;
-        }
-        if (this.apkUpdatePkgList == null || this.apkUpdatePkgList.size() <= 0 || TextUtils.isEmpty(pkg)) {
-            return true;
-        }
-        int i = 0;
-        while (true) {
-            if (i >= this.apkUpdatePkgList.size()) {
-                break;
-            }
-            String pkgName = this.apkUpdatePkgList.get(i);
-            if (!pkg.equals(pkgName)) {
-                i++;
-            } else {
-                canStart = false;
-                break;
-            }
-        }
-        return canStart;
-    }
-
-    private void showNoticeDialog(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if (!TextUtils.isEmpty(title)) {
-            builder.setTitle(title);
-        }
-        if (!TextUtils.isEmpty(message)) {
-            builder.setMessage(message);
-        }
-        builder.setPositiveButton(getResources().getString(R.string.dialog_noticebutton), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.25
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void openSetting() {
-        try {
-            PackageInfo pinfo = getPackageManager().getPackageInfo("com.edutech.settingapp", 0);
-            if (pinfo != null) {
-                ComponentName component = new ComponentName("com.edutech.settingapp", "com.edutech.settingapp.CloudClientSetActivity");
-                Intent intent_book = new Intent();
-                intent_book.addCategory("android.intent.category.LAUNCHER");
-                intent_book.setComponent(component);
-                intent_book.setAction("android.intent.action.MAIN");
-                intent_book.setFlags(268435456);
-                startActivity(intent_book);
-                return;
-            }
-        } catch (PackageManager.NameNotFoundException e1) {
-            e1.printStackTrace();
-        }
-        openActivity(CloudClientSetActivity.class);
-    }
-
-    private void openCamera() {
-        try {
-            PackageInfo pinfo = getPackageManager().getPackageInfo("com.edutech.mycamera", 0);
-            if (pinfo != null) {
-                ComponentName component = new ComponentName("com.edutech.mycamera", "com.edutech.mycamera.gallery.PhotoPickerActivity");
-                Intent intent_book = new Intent();
-                intent_book.addCategory("android.intent.category.LAUNCHER");
-                intent_book.setComponent(component);
-                intent_book.setAction("android.intent.action.MAIN");
-                intent_book.setFlags(268435456);
-                startActivity(intent_book);
-                return;
-            }
-        } catch (PackageManager.NameNotFoundException e1) {
-            e1.printStackTrace();
-        } catch (Exception e) {
-        }
-        if (AppEnvironment.isZBYZ) {
-            Toast.makeText(this, "该功能暂不开放！", 0).show();
+        if ("".length() <= 0 || "".length() <= 0) {
             return;
         }
+        ComponentName componentName13 = new ComponentName("", "");
+        Intent intent15 = new Intent();
+        intent15.setComponent(componentName13);
+        intent15.addFlags(268435456);
+        intent15.setAction("android.intent.action.MAIN");
+        intent15.addCategory("android.intent.category.LAUNCHER");
+        startActivity(intent15, "");
+    }
+
+    @Override // android.app.Activity, android.content.ComponentCallbacks
+    public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        this.onconfigureChange = true;
+    }
+
+    @Override // android.app.Activity
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+        this.agreement_sp = getSharedPreferences("myAgreement", 0);
+        if (!this.agreement_sp.getBoolean("agreement_key", false)) {
+        }
         try {
-            Intent infoIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-            ResolveInfo res = getPackageManager().resolveActivity(infoIntent, 0);
-            String packageName = res.activityInfo.packageName;
-            String classname = res.activityInfo.name;
-            Intent mIntent = new Intent();
-            ComponentName comp = new ComponentName(packageName, classname);
-            mIntent.setComponent(comp);
-            mIntent.setAction("android.intent.action.MAIN");
-            startActivity(mIntent);
-        } catch (Exception e2) {
-            e2.printStackTrace();
-            Intent intentP = new Intent("android.media.action.IMAGE_CAPTURE");
-            startActivity(intentP);
+            cleanApplicationData(this);
+            getLanguage();
+            setMainView();
+            openScreenShot();
+            openLockScreen();
+            Log.e(TAG, BROADCASTER_LOCKSCREEN);
+            try {
+                setDefaultSetting();
+            } catch (Exception e) {
+            }
+            initWidget();
+            startService(new Intent(this, sysProtectService.class));
+            lockPad();
+            loadUserInfo();
+            new HostPwd().start();
+            showPackageMain();
+            resetAutoSp();
+            initBroadReceiver();
+            removeIllegalApks();
+            setDesignView();
+        } catch (NullPointerException e2) {
+        } catch (Exception e3) {
         }
     }
 
-    public static boolean isServiceExisted(Context context, String className) {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService("activity");
-        List<ActivityManager.RunningServiceInfo> serviceList = activityManager.getRunningServices(Execute.INVALID);
-        if (serviceList.size() <= 0) {
-            return false;
-        }
-        for (int i = 0; i < serviceList.size(); i++) {
-            ActivityManager.RunningServiceInfo serviceInfo = serviceList.get(i);
-            ComponentName serviceName = serviceInfo.service;
-            if (serviceName.getClassName().equals(className)) {
-                return true;
-            }
-        }
-        return false;
+    @Override // android.app.Activity
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(this.wifiReceiver);
+        unregisterReceiver(this.apkInstallReceiver);
+        this.showTime = false;
+        this.timeThread = null;
+        this.isnotice = false;
+        this.noticeThread = null;
     }
 
     @Override // android.app.Activity, android.view.KeyEvent.Callback
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == 4) {
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
+    public boolean onKeyDown(int i, KeyEvent keyEvent) {
+        return i == 4 ? true : super.onKeyDown(i, keyEvent);
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public void installNewApk() {
-        if (this.apkList != null && this.apkList.size() > 0) {
-            this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
-            boolean boo = false;
+    @Override // android.app.Activity
+    protected void onPause() {
+        super.onPause();
+        try {
+            unregisterReceiver(this.batteryReceiver);
+            unregisterReceiver(this.InteractionReceiver);
+        } catch (Exception e) {
+        }
+        this.showTime = false;
+        this.timeThread = null;
+        this.isnotice = false;
+        this.noticeThread = null;
+        this.canRefresh = false;
+        Log.e(TAG, "on pause:norefresh");
+    }
+
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:34:0x0197 -> B:7:0x00cc). Please submit an issue!!! */
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:39:0x01ae -> B:54:0x0160). Please submit an issue!!! */
+    @Override // android.app.Activity
+    protected void onResume() {
+        super.onResume();
+        try {
+            this.canRefresh = true;
+            Log.e(TAG, "on resume:canrefresh");
+            init_public_infor();
+            sendBroadcast(new Intent("ENTERPASS"));
+            getSharedPreferences("allowcall", 4).edit().putBoolean("cancall", false).commit();
+            lockPad();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("android.intent.action.BATTERY_CHANGED");
+            this.batteryReceiver = new BatteryReceiver();
+            registerReceiver(this.batteryReceiver, intentFilter);
+            this.mActivityManager = (ActivityManager) getSystemService("activity");
+            IntentFilter intentFilter2 = new IntentFilter();
+            intentFilter2.addAction("PASSWDPASS");
+            intentFilter2.addAction("android.intent.action.mdm");
+            intentFilter2.addAction(this.UPDATEAPK);
+            IntentFilter intentFilter3 = new IntentFilter();
+            intentFilter3.addAction("android.intent.action.STATUSBAR_INVISIBILITY");
+            intentFilter3.addAction("android.intent.action.STATUSBAR_VISIBILITY");
+            registerReceiver(this.InteractionReceiver, intentFilter3);
             try {
-                boo = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
+                if (!My_Application.Allow_Flag) {
+                    new Thread(this.checkIdThread).start();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            for (int i = 0; i < this.apkList.size(); i++) {
-                String path = this.apkList.get(i);
-                if (path.lastIndexOf(".apk") != -1) {
-                    if (boo) {
-                        try {
-                            this.mHwPDM.installPackage(this.cn, this.apkList.get(i));
-                        } catch (Exception e2) {
-                        }
-                    } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
-                        this.mMiaMdmPolicyManager.silentInstall(this.apkList.get(i));
-                    } else if (this != null) {
-                        try {
-                            if (Build.DISPLAY.indexOf("P990S.V") < 0 && Build.DISPLAY.indexOf("M1016Pro") < 0 && Build.DISPLAY.indexOf("S1016PRO") < 0 && Build.DISPLAY.indexOf("D13B") < 0 && Build.DISPLAY.indexOf("QC80A") < 0 && Build.DISPLAY.indexOf("N5110ZB") < 0 && Build.DISPLAY.indexOf(".T360Z") < 0 && Build.DISPLAY.indexOf("P583") < 0 && Build.DISPLAY.indexOf("P350") < 0 && Build.DISPLAY.indexOf("P550") < 0 && Build.DISPLAY.indexOf("M856.V") < 0 && Build.DISPLAY.indexOf("S1016.V1") < 0 && Build.DISPLAY.indexOf("S106.V1") < 0 && Build.DISPLAY.indexOf("S1016E") < 0) {
-                                Intent intent = new Intent();
-                                intent.setAction(sysProtectService.INSTALL);
-                                sendBroadcast(intent);
-                                apkinstall(this.apkList.get(i));
-                            } else {
-                                apkinstall_samsung(this.apkList.get(i));
-                            }
-                        } catch (Exception e3) {
-                        }
-                    }
-                }
-            }
-            finish();
-        }
-    }
-
-    private void apkinstall_samsung(String apkpath) {
-        Intent intent = new Intent();
-        intent.setAction("android.intent.action.SILENCE_INSTALL");
-        if (Build.DISPLAY.contains("M1016Pro")) {
-            intent.putExtra("uri", apkpath);
-        } else {
-            intent.setDataAndType(Uri.fromFile(new File(apkpath)), "application/vnd.android.package-archive");
-        }
-        sendBroadcast(intent);
-    }
-
-    private void apkinstall(String apkpath) {
-        try {
-            if (!InstallApkUtil.SlientInstall(apkpath)) {
-                if (!InstallApkUtil.SuSlientInstall(apkpath)) {
-                    apkIntentInstall(apkpath);
-                } else {
-                    Log.d("sysService", String.valueOf(apkpath) + ":SuSlientInstall安装成功！");
-                }
-            } else {
-                Log.d("sysService", String.valueOf(apkpath) + ":SlientInstall安装成功！");
-            }
-        } catch (Exception e) {
-            try {
-                if (!InstallApkUtil.SuSlientInstall(apkpath)) {
-                    apkIntentInstall(apkpath);
-                } else {
-                    Log.d("sysService", String.valueOf(apkpath) + ":SuSlientInstall安装成功！");
-                }
-            } catch (Exception e2) {
-                apkIntentInstall(apkpath);
-                Log.d("sysService", String.valueOf(apkpath) + ":InstallApk安装成功！");
-            }
-        }
-    }
-
-    private void apkIntentInstall(String apkpath) {
-        Intent installIntent = new Intent("android.intent.action.VIEW");
-        installIntent.setDataAndType(Uri.fromFile(new File(apkpath)), "application/vnd.android.package-archive");
-        installIntent.setFlags(268435456);
-        startActivity(installIntent);
-    }
-
-    public static boolean SlientInstall(String apkPath) throws IOException {
-        Runtime runtime = Runtime.getRuntime();
-        Process proc = runtime.exec("pm install -r " + apkPath);
-        InputStream inputstream = proc.getInputStream();
-        InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-        BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
-        StringBuilder sb = new StringBuilder("");
-        while (true) {
-            String line = bufferedreader.readLine();
-            if (line != null) {
-                sb.append(line);
-            } else {
+            if (Build.DISPLAY.contains("T355") || Build.DISPLAY.contains("P550") || Build.DISPLAY.contains("P350") || Build.DISPLAY.contains("P583")) {
                 try {
-                    break;
-                } catch (InterruptedException e) {
-                    System.err.println(e);
+                    this.LicenseOK = getSharedPreferences("license", 0).getBoolean("licenseok", false);
+                    if (!this.mDPM.isAdminActive(this.mDeviceAdmin)) {
+                        startActivity(new Intent(this, AddAdminActivity.class));
+                    }
+                } catch (Exception e2) {
+                    e2.printStackTrace();
                 }
+                SamSungInCharge();
             }
+            this.showTime = true;
+            this.timeThread = null;
+            this.timeThread = new Thread(this.timeRunnable);
+            this.timeThread.start();
+            showFailedApkInfo();
+        } catch (NullPointerException e3) {
+        } catch (Exception e4) {
         }
-        if (proc.waitFor() != 0) {
-            System.err.println("exit value = " + proc.exitValue());
+        try {
+            uploadLogs();
+        } catch (Exception e5) {
         }
-        String result = sb.toString();
-        if (result.equals("Success")) {
-            Log.d("InstallApkUtil", "SlientInstall success");
-            return true;
+        try {
+            if (!AppEnvironment.isSDYB) {
+                this.noticeThread = null;
+                this.isnotice = true;
+                this.noticeThread = new Thread(this.noticeRunnable);
+                this.noticeThread.start();
+            }
+        } catch (NullPointerException e6) {
+        } catch (Exception e7) {
         }
-        Log.d("InstallApkUtil", "SlientInstall failed");
-        return false;
+        try {
+            autoUpdateApks();
+            autoUpdateDesigns();
+        } catch (Exception e8) {
+        }
+        try {
+            DensityUtil.isMyLauncherDefault(this);
+        } catch (Exception e9) {
+        }
     }
 
-    /* loaded from: classes.dex */
-    class BatteryReceiver extends BroadcastReceiver {
-        BatteryReceiver() {
-        }
-
-        @Override // android.content.BroadcastReceiver
-        public void onReceive(Context context, Intent intent) {
-            if ("android.intent.action.BATTERY_CHANGED".equals(intent.getAction())) {
-                int level = intent.getIntExtra("level", 0);
-                int scale = intent.getIntExtra("scale", 100);
-                int status = intent.getIntExtra("status", -1);
-                Message msg = CloudClientActivity.this.batteryChangedHandler.obtainMessage();
-                msg.arg1 = (level * 100) / scale;
-                msg.arg2 = status;
-                msg.sendToTarget();
-            }
-        }
-    }
-
-    public void userLicenseAgreementDialog() {
-        View view = View.inflate(this, R.layout.layout_userlicense_new, null);
-        this.btnYes = (Button) view.findViewById(R.id.btnYes);
-        TextView tvUserLiceseContent = (TextView) view.findViewById(R.id.tvUserLiceseContent);
-        this.scrollView = (ScrollView) view.findViewById(R.id.ScrollView);
-        tvUserLiceseContent.setText(getDataFromAssets("UserLicenseAgreement.txt"));
-        final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).setOnKeyListener(this.keylistener).setCancelable(false).show();
-        this.scrollView.setOnTouchListener(new TouchListenerImpl(this, null));
-        this.btnYes.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.26
-            @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
-                CloudClientActivity.this.agreement_sp = CloudClientActivity.this.getSharedPreferences("myAgreement", 0);
-                CloudClientActivity.this.agreement_sp.edit().putBoolean("agreement_key", true).commit();
-                dialog.dismiss();
-            }
-        });
+    @Override // android.app.Activity
+    protected void onStop() {
+        super.onStop();
+        this.showTime = false;
+        this.timeThread = null;
+        this.isnotice = false;
+        this.noticeThread = null;
     }
 
     public void userBeiAnDialog() {
-        View view = View.inflate(this, R.layout.layout_userlicense_new, null);
-        this.btnYes = (Button) view.findViewById(R.id.btnYes);
-        TextView tvUserLiceseContent = (TextView) view.findViewById(R.id.tvUserLiceseContent);
-        this.scrollView = (ScrollView) view.findViewById(R.id.ScrollView);
-        tvUserLiceseContent.setText(getDataFromAssets("beianlicense.txt"));
-        this.cb = (CheckBox) view.findViewById(R.id.cbnoshow);
-        final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).setOnKeyListener(this.keylistener).setCancelable(false).show();
+        View inflate = View.inflate(this, R.layout.layout_userlicense_new, null);
+        this.btnYes = (Button) inflate.findViewById(2131362133);
+        this.scrollView = (ScrollView) inflate.findViewById(2131362130);
+        ((TextView) inflate.findViewById(2131362131)).setText(getDataFromAssets("beianlicense.txt"));
+        this.cb = (CheckBox) inflate.findViewById(R.id.cbnoshow);
+        final AlertDialog show = new AlertDialog.Builder(this).setView(inflate).setOnKeyListener(this.keylistener).setCancelable(false).show();
         this.btnYes.setEnabled(true);
         this.btnYes.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.27
             @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (CloudClientActivity.this.cb != null && CloudClientActivity.this.cb.isChecked()) {
                     CloudClientActivity.this.agreement_sp = CloudClientActivity.this.getSharedPreferences("myAgreement", 0);
                     CloudClientActivity.this.agreement_sp.edit().putBoolean("agreement_key", true).commit();
                 }
-                dialog.dismiss();
+                show.dismiss();
             }
         });
     }
 
-    public String getDataFromAssets(String filePath) {
-        Throwable th;
-        BufferedReader br = null;
-        StringBuffer sb = new StringBuffer();
-        try {
-            try {
-                BufferedReader br2 = new BufferedReader(new InputStreamReader(getAssets().open(filePath)));
-                while (true) {
-                    try {
-                        String line = br2.readLine();
-                        if (line != null) {
-                            sb.append(String.valueOf(line) + "\n");
-                        } else {
-                            try {
-                                break;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } catch (IOException e2) {
-                        e = e2;
-                        br = br2;
-                        e.printStackTrace();
-                        try {
-                            br.close();
-                        } catch (IOException e3) {
-                            e3.printStackTrace();
-                        }
-                        return sb.toString();
-                    } catch (Throwable th2) {
-                        th = th2;
-                        br = br2;
-                        try {
-                            br.close();
-                        } catch (IOException e4) {
-                            e4.printStackTrace();
-                        }
-                        throw th;
-                    }
-                }
-                br2.close();
-            } catch (IOException e5) {
-                e = e5;
+    public void userLicenseAgreementDialog() {
+        View inflate = View.inflate(this, R.layout.layout_userlicense_new, null);
+        this.btnYes = (Button) inflate.findViewById(2131362133);
+        this.scrollView = (ScrollView) inflate.findViewById(2131362130);
+        ((TextView) inflate.findViewById(2131362131)).setText(getDataFromAssets("UserLicenseAgreement.txt"));
+        final AlertDialog show = new AlertDialog.Builder(this).setView(inflate).setOnKeyListener(this.keylistener).setCancelable(false).show();
+        this.scrollView.setOnTouchListener(new TouchListenerImpl(this, null));
+        this.btnYes.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.26
+            @Override // android.view.View.OnClickListener
+            public void onClick(View view) {
+                CloudClientActivity.this.agreement_sp = CloudClientActivity.this.getSharedPreferences("myAgreement", 0);
+                CloudClientActivity.this.agreement_sp.edit().putBoolean("agreement_key", true).commit();
+                show.dismiss();
             }
-            return sb.toString();
-        } catch (Throwable th3) {
-            th = th3;
-        }
-    }
-
-    /* loaded from: classes.dex */
-    private class TouchListenerImpl implements View.OnTouchListener {
-        private TouchListenerImpl() {
-        }
-
-        /* synthetic */ TouchListenerImpl(CloudClientActivity cloudClientActivity, TouchListenerImpl touchListenerImpl) {
-            this();
-        }
-
-        @Override // android.view.View.OnTouchListener
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-                case 2:
-                    int scrollY = view.getScrollY();
-                    int height = view.getHeight();
-                    int scrollViewMeasuredHeight = CloudClientActivity.this.scrollView.getChildAt(0).getMeasuredHeight();
-                    if (scrollViewMeasuredHeight > 20) {
-                        scrollViewMeasuredHeight -= 20;
-                    }
-                    if (scrollY + height > scrollViewMeasuredHeight) {
-                        CloudClientActivity.this.btnYes.setEnabled(true);
-                        break;
-                    }
-                    break;
-            }
-            return false;
-        }
-    }
-
-    public String getWIFISSID(Activity activity) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            ConnectivityManager ctm = (ConnectivityManager) getSystemService("connectivity");
-            NetworkInfo networkInfo = ctm.getActiveNetworkInfo();
-            String ssid = networkInfo.getExtraInfo();
-            if (ssid == null) {
-                WifiManager wifiManager = (WifiManager) getSystemService("wifi");
-                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                String ssid2 = wifiInfo.getSSID();
-                if (ssid2 == null) {
-                    return "unknown ssid";
-                }
-                return ssid2;
-            }
-            return ssid;
-        }
-        WifiManager wifiManager2 = (WifiManager) getSystemService("wifi");
-        WifiInfo wifiInfo2 = wifiManager2.getConnectionInfo();
-        return wifiInfo2.getSSID();
-    }
-
-    /* loaded from: classes.dex */
-    class WifiReceiver extends BroadcastReceiver {
-        WifiReceiver() {
-        }
-
-        @Override // android.content.BroadcastReceiver
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.equals("android.net.wifi.STATE_CHANGE")) {
-                NetworkInfo info = (NetworkInfo) intent.getParcelableExtra("networkInfo");
-                if (info.getState().equals(NetworkInfo.State.DISCONNECTED)) {
-                    CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + CloudClientActivity.this.getString(R.string.disconnected));
-                } else if (info.getState().equals(NetworkInfo.State.CONNECTED)) {
-                    try {
-                        CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + CloudClientActivity.this.getWIFISSID(CloudClientActivity.this));
-                    } catch (Exception e) {
-                        WifiManager wifiManager = (WifiManager) context.getSystemService("wifi");
-                        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                        CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + wifiInfo.getSSID());
-                    }
-                    CloudClientActivity.this.getDesignView();
-                    CloudClientActivity.this.apkUpdate();
-                }
-            } else if (action.equals(sysProtectService.SERVICE_START)) {
-                CloudClientActivity.this.lockPad();
-            } else if (action.equals("edm.intent.action.license.status")) {
-                int errorcode = intent.getIntExtra("edm.intent.extra.license.errorcode", -1);
-                if (errorcode == 601 || intent.getIntExtra("edm.intent.extra.license.result_type", -1) != 800) {
-                    CloudClientActivity.this.LicenseOK = false;
-                    Log.e("license", "license fail");
-                    SharedPreferences sp = CloudClientActivity.this.getSharedPreferences("license", 0);
-                    sp.edit().putBoolean("licenseok", false).commit();
-                    return;
-                }
-                CloudClientActivity.this.LicenseOK = true;
-                SharedPreferences sp2 = CloudClientActivity.this.getSharedPreferences("license", 0);
-                sp2.edit().putBoolean("licenseok", true).commit();
-                Log.e("license", "license ok");
-            } else {
-                action.equals("com.edutech.getadmin");
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showFailedApkInfo() {
-        if (this.canRefresh) {
-            if (!AppEnvironment.isNewUpdate) {
-                if (this.tv_updatemsg != null) {
-                    this.tv_updatemsg.setVisibility(4);
-                    return;
-                }
-                return;
-            }
-            try {
-                if (this.tv_updatemsg != null) {
-                    SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-                    String ip = sharePre.getString("apihost", "");
-                    List<String> failedApks = Utils.getFailedEbagUpdated(this, ip);
-                    if (failedApks == null || failedApks.size() <= 0) {
-                        this.tv_updatemsg.setVisibility(8);
-                        return;
-                    }
-                    String failedStr = getResources().getString(R.string.uninstallapks);
-                    for (int i = 0; i < failedApks.size(); i++) {
-                        failedStr = String.valueOf(failedStr) + failedApks.get(i) + "  ";
-                    }
-                    this.tv_updatemsg.setVisibility(0);
-                    this.tv_updatemsg.setText(failedStr);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public String getWeekDay(int index) {
-        switch (index) {
-            case 1:
-                String weekday = getResources().getString(R.string.sunday);
-                return weekday;
-            case 2:
-                String weekday2 = getResources().getString(R.string.monday);
-                return weekday2;
-            case 3:
-                String weekday3 = getResources().getString(R.string.tuesday);
-                return weekday3;
-            case 4:
-                String weekday4 = getResources().getString(R.string.wednesday);
-                return weekday4;
-            case 5:
-                String weekday5 = getResources().getString(R.string.thursday);
-                return weekday5;
-            case 6:
-                String weekday6 = getResources().getString(R.string.friday);
-                return weekday6;
-            case 7:
-                String weekday7 = getResources().getString(R.string.saturday);
-                return weekday7;
-            default:
-                return "";
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public String getMonth(int index) {
-        switch (index) {
-            case 0:
-                return "Jan";
-            case 1:
-                return "Feb";
-            case 2:
-                return "Mar";
-            case 3:
-                return "Apr";
-            case 4:
-                return "May";
-            case 5:
-                return "Jun";
-            case 6:
-                return "Jul";
-            case 7:
-                return "Aug";
-            case 8:
-                return "Sept";
-            case 9:
-                return "Oct";
-            case 10:
-                return "Nov";
-            case 11:
-                return "Dec";
-            default:
-                return "";
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void getMyWorkNotification() {
-        JSONArray jarray;
-        SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-        String ip = sharePre.getString("apihost", "");
-        String username = sharePre.getString("name", "");
-        String privatekey = sharePre.getString("key", "");
-        if (ip == null || ip.equals("") || username == null || username.equals("")) {
-            HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
-            if (hashmap != null) {
-                ip = hashmap.get("ip");
-                username = hashmap.get("usercode");
-                String privatekey2 = hashmap.get("privatekey");
-                privatekey = privatekey2;
-            } else {
-                return;
-            }
-        }
-        String url = "http://" + ip + "/api/notification/";
-        if (username != null && !username.equals("")) {
-            this.noticeNum = 0;
-            this.noticeMessages = new ArrayList();
-            Log.e("notification", "url:" + url);
-            String json = HttpUtils.getNotification(url, username, privatekey);
-            Log.e("notification", "json:" + json);
-            if (json != null && !"".equals(json)) {
-                try {
-                    JSONObject jobj = new JSONObject(json);
-                    boolean status = jobj.getBoolean("status");
-                    JSONObject jdata = jobj.getJSONObject("data");
-                    if (status && jdata != null) {
-                        int count = jdata.getInt(KeyEnvironment.COUNT);
-                        this.noticeNum = count;
-                        if (jdata.has("Message") && (jarray = jdata.getJSONArray("Message")) != null && jarray.length() > 0) {
-                            for (int i = 0; i < jarray.length(); i++) {
-                                Noticebean bean = new Noticebean();
-                                JSONObject ob = jarray.getJSONObject(i);
-                                bean.setActionid(ob.getString("ActionID"));
-                                bean.setCreattime(ob.getString("create"));
-                                bean.setMessage(ob.getString("message"));
-                                bean.setMessageid(ob.getString("messageid"));
-                                this.noticeMessages.add(bean);
-                            }
-                        }
-                        Message msg = this.noticeHandler.obtainMessage();
-                        msg.arg1 = count;
-                        msg.what = 1;
-                        msg.sendToTarget();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (Exception e2) {
-                }
-            }
-            if (json == null || json.equals("")) {
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showNoticeDetails() {
-        if (this.canRefresh) {
-            if (this.noticeDialog == null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                View view = LayoutInflater.from(this).inflate(R.layout.dialog_noticemessage, (ViewGroup) null);
-                this.dialog_noticemessage_listview = (ListView) view.findViewById(R.id.dialog_noticemessage_listview);
-                this.dialog_noticemessage_tvnotice = (TextView) view.findViewById(R.id.dialog_noticemessage_tvnotice);
-                this.dialog_noticemessage_tvok = (TextView) view.findViewById(R.id.dialog_noticemessage_tvok);
-                this.noticeAdapter = new NoticeAdapter();
-                this.dialog_noticemessage_listview.setAdapter((ListAdapter) this.noticeAdapter);
-                this.dialog_noticemessage_tvok.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.28
-                    @Override // android.view.View.OnClickListener
-                    public void onClick(View v) {
-                        if (CloudClientActivity.this.noticeDialog != null) {
-                            CloudClientActivity.this.noticeDialog.dismiss();
-                        }
-                    }
-                });
-                builder.setView(view);
-                this.noticeDialog = builder.create();
-            }
-            if (this.noticeNum > 0) {
-                SharedPreferences callSp = getSharedPreferences("noticemessage", 0);
-                long time = callSp.getLong("noticetime", 0L);
-                long current = System.currentTimeMillis();
-                if (current - time >= 3600000) {
-                    callSp.edit().putLong("noticetime", current).commit();
-                    if (this.dialog_noticemessage_listview != null && this.noticeMessages != null && this.noticeAdapter != null) {
-                        this.noticeAdapter.setDatas(this.noticeMessages);
-                    }
-                    if (this.dialog_noticemessage_tvnotice != null) {
-                        this.dialog_noticemessage_tvnotice.setText("未查看作业：" + this.noticeNum + "份");
-                    }
-                    this.noticeDialog.show();
-                }
-            }
-        }
-    }
-
-    /* loaded from: classes.dex */
-    class NoticeAdapter extends BaseAdapter {
-        private List<Noticebean> noticeMsgs = new ArrayList();
-
-        NoticeAdapter() {
-        }
-
-        public void setDatas(List<Noticebean> datas) {
-            this.noticeMsgs = datas;
-        }
-
-        @Override // android.widget.Adapter
-        public int getCount() {
-            return this.noticeMsgs.size();
-        }
-
-        @Override // android.widget.Adapter
-        public Object getItem(int arg0) {
-            return this.noticeMsgs.get(arg0);
-        }
-
-        @Override // android.widget.Adapter
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override // android.widget.Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Holder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(CloudClientActivity.this).inflate(R.layout.discuss_adapter, (ViewGroup) null);
-                holder = new Holder();
-                holder.discuss_adapter_web = (TextView) convertView.findViewById(R.id.discuss_adapter_web);
-                convertView.setTag(holder);
-            } else {
-                holder = (Holder) convertView.getTag();
-            }
-            holder.discuss_adapter_web.setText("作业: " + this.noticeMsgs.get(position).getMessage());
-            holder.discuss_adapter_web.setTextColor(CloudClientActivity.this.getResources().getColor(R.color.gray_color));
-            return convertView;
-        }
-
-        /* loaded from: classes.dex */
-        class Holder {
-            TextView discuss_adapter_web;
-
-            Holder() {
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void broadEyeProc(Context mContext, boolean boo) {
-        Intent intent1 = new Intent();
-        intent1.setAction("com.android.eyeprotection");
-        intent1.putExtra("ep_mode", boo);
-        mContext.sendBroadcast(intent1);
+        });
     }
 }

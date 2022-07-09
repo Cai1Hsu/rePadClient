@@ -2,35 +2,45 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/AddressBookDoCoMoResultParser.class */
 public final class AddressBookDoCoMoResultParser extends AbstractDoCoMoResultParser {
-    @Override // com.google.zxing.client.result.ResultParser
-    public AddressBookParsedResult parse(Result result) {
-        String[] rawName;
-        String rawText = result.getText();
-        if (!rawText.startsWith("MECARD:") || (rawName = matchDoCoMoPrefixedField("N:", rawText, true)) == null) {
-            return null;
+    private static String parseName(String str) {
+        int indexOf;
+        String str2 = str;
+        if (str.indexOf(44) >= 0) {
+            str2 = str.substring(indexOf + 1) + ' ' + str.substring(0, indexOf);
         }
-        String name = parseName(rawName[0]);
-        String pronunciation = matchSingleDoCoMoPrefixedField("SOUND:", rawText, true);
-        String[] phoneNumbers = matchDoCoMoPrefixedField("TEL:", rawText, true);
-        String[] emails = matchDoCoMoPrefixedField("EMAIL:", rawText, true);
-        String note = matchSingleDoCoMoPrefixedField("NOTE:", rawText, false);
-        String[] addresses = matchDoCoMoPrefixedField("ADR:", rawText, true);
-        String birthday = matchSingleDoCoMoPrefixedField("BDAY:", rawText, true);
-        if (birthday != null && !isStringOfDigits(birthday, 8)) {
-            birthday = null;
-        }
-        String url = matchSingleDoCoMoPrefixedField("URL:", rawText, true);
-        String org2 = matchSingleDoCoMoPrefixedField("ORG:", rawText, true);
-        return new AddressBookParsedResult(maybeWrap(name), pronunciation, phoneNumbers, null, emails, null, null, note, addresses, null, org2, birthday, null, url);
+        return str2;
     }
 
-    private static String parseName(String name) {
-        int comma = name.indexOf(44);
-        if (comma >= 0) {
-            return name.substring(comma + 1) + ' ' + name.substring(0, comma);
+    @Override // com.google.zxing.client.result.ResultParser
+    public AddressBookParsedResult parse(Result result) {
+        AddressBookParsedResult addressBookParsedResult;
+        String text = result.getText();
+        if (!text.startsWith("MECARD:")) {
+            addressBookParsedResult = null;
+        } else {
+            String[] matchDoCoMoPrefixedField = matchDoCoMoPrefixedField("N:", text, true);
+            if (matchDoCoMoPrefixedField == null) {
+                addressBookParsedResult = null;
+            } else {
+                String parseName = parseName(matchDoCoMoPrefixedField[0]);
+                String matchSingleDoCoMoPrefixedField = matchSingleDoCoMoPrefixedField("SOUND:", text, true);
+                String[] matchDoCoMoPrefixedField2 = matchDoCoMoPrefixedField("TEL:", text, true);
+                String[] matchDoCoMoPrefixedField3 = matchDoCoMoPrefixedField("EMAIL:", text, true);
+                String matchSingleDoCoMoPrefixedField2 = matchSingleDoCoMoPrefixedField("NOTE:", text, false);
+                String[] matchDoCoMoPrefixedField4 = matchDoCoMoPrefixedField("ADR:", text, true);
+                String matchSingleDoCoMoPrefixedField3 = matchSingleDoCoMoPrefixedField("BDAY:", text, true);
+                String str = matchSingleDoCoMoPrefixedField3;
+                if (matchSingleDoCoMoPrefixedField3 != null) {
+                    str = matchSingleDoCoMoPrefixedField3;
+                    if (!isStringOfDigits(matchSingleDoCoMoPrefixedField3, 8)) {
+                        str = null;
+                    }
+                }
+                addressBookParsedResult = new AddressBookParsedResult(maybeWrap(parseName), matchSingleDoCoMoPrefixedField, matchDoCoMoPrefixedField2, null, matchDoCoMoPrefixedField3, null, null, matchSingleDoCoMoPrefixedField2, matchDoCoMoPrefixedField4, null, matchSingleDoCoMoPrefixedField("ORG:", text, true), str, null, matchSingleDoCoMoPrefixedField("URL:", text, true));
+            }
         }
-        return name;
+        return addressBookParsedResult;
     }
 }

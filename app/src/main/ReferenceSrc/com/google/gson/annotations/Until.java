@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/annotations/Until.class */
 public @interface Until {
     double value();
 }

@@ -2,398 +2,429 @@ package com.google.zxing.oned.rss.expanded.decoders;
 
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.telnet.TelnetCommand;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/GeneralAppIdDecoder.class */
 final class GeneralAppIdDecoder {
     private final BitArray information;
     private final CurrentParsingState current = new CurrentParsingState();
     private final StringBuilder buffer = new StringBuilder();
 
-    GeneralAppIdDecoder(BitArray information) {
-        this.information = information;
+    GeneralAppIdDecoder(BitArray bitArray) {
+        this.information = bitArray;
     }
 
-    String decodeAllCodes(StringBuilder buff, int initialPosition) throws NotFoundException {
-        int currentPosition = initialPosition;
-        String remaining = null;
-        while (true) {
-            DecodedInformation info = decodeGeneralPurposeField(currentPosition, remaining);
-            String parsedFields = FieldParser.parseFieldsInGeneralPurpose(info.getNewString());
-            if (parsedFields != null) {
-                buff.append(parsedFields);
-            }
-            if (info.isRemaining()) {
-                remaining = String.valueOf(info.getRemainingValue());
+    private DecodedChar decodeAlphanumeric(int i) {
+        char c;
+        DecodedChar decodedChar;
+        int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 5);
+        if (extractNumericValueFromBitArray == 15) {
+            decodedChar = new DecodedChar(i + 5, '$');
+        } else if (extractNumericValueFromBitArray < 5 || extractNumericValueFromBitArray >= 15) {
+            int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 6);
+            if (extractNumericValueFromBitArray2 < 32 || extractNumericValueFromBitArray2 >= 58) {
+                switch (extractNumericValueFromBitArray2) {
+                    case 58:
+                        c = '*';
+                        break;
+                    case 59:
+                        c = ',';
+                        break;
+                    case 60:
+                        c = '-';
+                        break;
+                    case 61:
+                        c = '.';
+                        break;
+                    case 62:
+                        c = '/';
+                        break;
+                    default:
+                        throw new IllegalStateException("Decoding invalid alphanumeric value: " + extractNumericValueFromBitArray2);
+                }
+                decodedChar = new DecodedChar(i + 6, c);
             } else {
-                remaining = null;
+                decodedChar = new DecodedChar(i + 6, (char) (extractNumericValueFromBitArray2 + 33));
             }
-            if (currentPosition != info.getNewPosition()) {
-                currentPosition = info.getNewPosition();
+        } else {
+            decodedChar = new DecodedChar(i + 5, (char) ((extractNumericValueFromBitArray + 48) - 5));
+        }
+        return decodedChar;
+    }
+
+    private DecodedChar decodeIsoIec646(int i) {
+        char c;
+        DecodedChar decodedChar;
+        int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 5);
+        if (extractNumericValueFromBitArray == 15) {
+            decodedChar = new DecodedChar(i + 5, '$');
+        } else if (extractNumericValueFromBitArray < 5 || extractNumericValueFromBitArray >= 15) {
+            int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 7);
+            if (extractNumericValueFromBitArray2 >= 64 && extractNumericValueFromBitArray2 < 90) {
+                decodedChar = new DecodedChar(i + 7, (char) (extractNumericValueFromBitArray2 + 1));
+            } else if (extractNumericValueFromBitArray2 < 90 || extractNumericValueFromBitArray2 >= 116) {
+                int extractNumericValueFromBitArray3 = extractNumericValueFromBitArray(i, 8);
+                switch (extractNumericValueFromBitArray3) {
+                    case 232:
+                        c = '!';
+                        break;
+                    case 233:
+                        c = '\"';
+                        break;
+                    case FTPReply.SECURITY_DATA_EXCHANGE_COMPLETE /* 234 */:
+                        c = '%';
+                        break;
+                    case 235:
+                        c = '&';
+                        break;
+                    case TelnetCommand.EOF /* 236 */:
+                        c = '\'';
+                        break;
+                    case TelnetCommand.SUSP /* 237 */:
+                        c = '(';
+                        break;
+                    case TelnetCommand.ABORT /* 238 */:
+                        c = ')';
+                        break;
+                    case TelnetCommand.EOR /* 239 */:
+                        c = '*';
+                        break;
+                    case 240:
+                        c = '+';
+                        break;
+                    case TelnetCommand.NOP /* 241 */:
+                        c = ',';
+                        break;
+                    case 242:
+                        c = '-';
+                        break;
+                    case TelnetCommand.BREAK /* 243 */:
+                        c = '.';
+                        break;
+                    case TelnetCommand.IP /* 244 */:
+                        c = '/';
+                        break;
+                    case TelnetCommand.AO /* 245 */:
+                        c = ':';
+                        break;
+                    case TelnetCommand.AYT /* 246 */:
+                        c = ';';
+                        break;
+                    case TelnetCommand.EC /* 247 */:
+                        c = '<';
+                        break;
+                    case TelnetCommand.EL /* 248 */:
+                        c = '=';
+                        break;
+                    case TelnetCommand.GA /* 249 */:
+                        c = '>';
+                        break;
+                    case 250:
+                        c = '?';
+                        break;
+                    case 251:
+                        c = '_';
+                        break;
+                    case TelnetCommand.WONT /* 252 */:
+                        c = ' ';
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Decoding invalid ISO/IEC 646 value: " + extractNumericValueFromBitArray3);
+                }
+                decodedChar = new DecodedChar(i + 8, c);
             } else {
-                return buff.toString();
+                decodedChar = new DecodedChar(i + 7, (char) (extractNumericValueFromBitArray2 + 7));
             }
+        } else {
+            decodedChar = new DecodedChar(i + 5, (char) ((extractNumericValueFromBitArray + 48) - 5));
         }
+        return decodedChar;
     }
 
-    private boolean isStillNumeric(int pos) {
-        if (pos + 7 > this.information.getSize()) {
-            return pos + 4 <= this.information.getSize();
+    private DecodedNumeric decodeNumeric(int i) {
+        DecodedNumeric decodedNumeric;
+        if (i + 7 > this.information.getSize()) {
+            int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 4);
+            decodedNumeric = extractNumericValueFromBitArray == 0 ? new DecodedNumeric(this.information.getSize(), 10, 10) : new DecodedNumeric(this.information.getSize(), extractNumericValueFromBitArray - 1, 10);
+        } else {
+            int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 7);
+            decodedNumeric = new DecodedNumeric(i + 7, (extractNumericValueFromBitArray2 - 8) / 11, (extractNumericValueFromBitArray2 - 8) % 11);
         }
-        for (int i = pos; i < pos + 3; i++) {
-            if (this.information.get(i)) {
-                return true;
-            }
-        }
-        return this.information.get(pos + 3);
+        return decodedNumeric;
     }
 
-    private DecodedNumeric decodeNumeric(int pos) {
-        if (pos + 7 > this.information.getSize()) {
-            int numeric = extractNumericValueFromBitArray(pos, 4);
-            if (numeric == 0) {
-                return new DecodedNumeric(this.information.getSize(), 10, 10);
-            }
-            return new DecodedNumeric(this.information.getSize(), numeric - 1, 10);
-        }
-        int numeric2 = extractNumericValueFromBitArray(pos, 7);
-        int digit1 = (numeric2 - 8) / 11;
-        int digit2 = (numeric2 - 8) % 11;
-        return new DecodedNumeric(pos + 7, digit1, digit2);
-    }
-
-    int extractNumericValueFromBitArray(int pos, int bits) {
-        return extractNumericValueFromBitArray(this.information, pos, bits);
-    }
-
-    static int extractNumericValueFromBitArray(BitArray information, int pos, int bits) {
-        if (bits > 32) {
+    static int extractNumericValueFromBitArray(BitArray bitArray, int i, int i2) {
+        if (i2 > 32) {
             throw new IllegalArgumentException("extractNumberValueFromBitArray can't handle more than 32 bits");
         }
-        int value = 0;
-        for (int i = 0; i < bits; i++) {
-            if (information.get(pos + i)) {
-                value |= 1 << ((bits - i) - 1);
+        int i3 = 0;
+        int i4 = 0;
+        while (i4 < i2) {
+            int i5 = i3;
+            if (bitArray.get(i + i4)) {
+                i5 = i3 | (1 << ((i2 - i4) - 1));
             }
+            i4++;
+            i3 = i5;
         }
-        return value;
+        return i3;
     }
 
-    DecodedInformation decodeGeneralPurposeField(int pos, String remaining) {
-        this.buffer.setLength(0);
-        if (remaining != null) {
-            this.buffer.append(remaining);
-        }
-        this.current.setPosition(pos);
-        DecodedInformation lastDecoded = parseBlocks();
-        return (lastDecoded == null || !lastDecoded.isRemaining()) ? new DecodedInformation(this.current.getPosition(), this.buffer.toString()) : new DecodedInformation(this.current.getPosition(), this.buffer.toString(), lastDecoded.getRemainingValue());
-    }
-
-    private DecodedInformation parseBlocks() {
-        BlockParsedResult result;
-        boolean isFinished;
-        do {
-            int initialPosition = this.current.getPosition();
-            if (this.current.isAlpha()) {
-                result = parseAlphaBlock();
-                isFinished = result.isFinished();
-            } else if (this.current.isIsoIec646()) {
-                result = parseIsoIec646Block();
-                isFinished = result.isFinished();
-            } else {
-                result = parseNumericBlock();
-                isFinished = result.isFinished();
-            }
-            boolean positionChanged = initialPosition != this.current.getPosition();
-            if (!positionChanged && !isFinished) {
-                break;
-            }
-        } while (!isFinished);
-        return result.getDecodedInformation();
-    }
-
-    private BlockParsedResult parseNumericBlock() {
-        DecodedInformation information;
-        while (isStillNumeric(this.current.getPosition())) {
-            DecodedNumeric numeric = decodeNumeric(this.current.getPosition());
-            this.current.setPosition(numeric.getNewPosition());
-            if (numeric.isFirstDigitFNC1()) {
-                if (numeric.isSecondDigitFNC1()) {
-                    information = new DecodedInformation(this.current.getPosition(), this.buffer.toString());
-                } else {
-                    information = new DecodedInformation(this.current.getPosition(), this.buffer.toString(), numeric.getSecondDigit());
+    private boolean isAlphaOr646ToNumericLatch(int i) {
+        boolean z;
+        if (i + 3 <= this.information.getSize()) {
+            int i2 = i;
+            while (true) {
+                if (i2 >= i + 3) {
+                    z = true;
+                    break;
                 }
-                return new BlockParsedResult(information, true);
+                z = false;
+                if (this.information.get(i2)) {
+                    break;
+                }
+                i2++;
             }
-            this.buffer.append(numeric.getFirstDigit());
-            if (numeric.isSecondDigitFNC1()) {
-                DecodedInformation information2 = new DecodedInformation(this.current.getPosition(), this.buffer.toString());
-                return new BlockParsedResult(information2, true);
-            }
-            this.buffer.append(numeric.getSecondDigit());
+        } else {
+            z = false;
         }
-        if (isNumericToAlphaNumericLatch(this.current.getPosition())) {
-            this.current.setAlpha();
-            this.current.incrementPosition(4);
-        }
-        return new BlockParsedResult(false);
+        return z;
     }
 
-    private BlockParsedResult parseIsoIec646Block() {
-        while (isStillIsoIec646(this.current.getPosition())) {
-            DecodedChar iso = decodeIsoIec646(this.current.getPosition());
-            this.current.setPosition(iso.getNewPosition());
-            if (iso.isFNC1()) {
-                DecodedInformation information = new DecodedInformation(this.current.getPosition(), this.buffer.toString());
-                return new BlockParsedResult(information, true);
+    private boolean isAlphaTo646ToAlphaLatch(int i) {
+        boolean z;
+        if (i + 1 > this.information.getSize()) {
+            z = false;
+        } else {
+            for (int i2 = 0; i2 < 5 && i2 + i < this.information.getSize(); i2++) {
+                if (i2 == 2) {
+                    z = false;
+                    if (!this.information.get(i + 2)) {
+                        break;
+                    }
+                } else if (this.information.get(i + i2)) {
+                    z = false;
+                    break;
+                }
             }
-            this.buffer.append(iso.getValue());
+            z = true;
         }
-        if (isAlphaOr646ToNumericLatch(this.current.getPosition())) {
-            this.current.incrementPosition(3);
-            this.current.setNumeric();
-        } else if (isAlphaTo646ToAlphaLatch(this.current.getPosition())) {
-            if (this.current.getPosition() + 5 < this.information.getSize()) {
-                this.current.incrementPosition(5);
+        return z;
+    }
+
+    private boolean isNumericToAlphaNumericLatch(int i) {
+        boolean z;
+        if (i + 1 > this.information.getSize()) {
+            z = false;
+        } else {
+            for (int i2 = 0; i2 < 4 && i2 + i < this.information.getSize(); i2++) {
+                z = false;
+                if (this.information.get(i + i2)) {
+                    break;
+                }
+            }
+            z = true;
+        }
+        return z;
+    }
+
+    private boolean isStillAlpha(int i) {
+        boolean z = false;
+        if (i + 5 <= this.information.getSize()) {
+            int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 5);
+            if (extractNumericValueFromBitArray >= 5 && extractNumericValueFromBitArray < 16) {
+                z = true;
+            } else if (i + 6 <= this.information.getSize()) {
+                int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 6);
+                z = extractNumericValueFromBitArray2 >= 16 && extractNumericValueFromBitArray2 < 63;
+            }
+        }
+        return z;
+    }
+
+    private boolean isStillIsoIec646(int i) {
+        boolean z;
+        if (i + 5 > this.information.getSize()) {
+            z = false;
+        } else {
+            int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 5);
+            if (extractNumericValueFromBitArray < 5 || extractNumericValueFromBitArray >= 16) {
+                z = false;
+                if (i + 7 <= this.information.getSize()) {
+                    int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 7);
+                    if (extractNumericValueFromBitArray2 < 64 || extractNumericValueFromBitArray2 >= 116) {
+                        z = false;
+                        if (i + 8 <= this.information.getSize()) {
+                            int extractNumericValueFromBitArray3 = extractNumericValueFromBitArray(i, 8);
+                            z = extractNumericValueFromBitArray3 >= 232 && extractNumericValueFromBitArray3 < 253;
+                        }
+                    } else {
+                        z = true;
+                    }
+                }
             } else {
-                this.current.setPosition(this.information.getSize());
+                z = true;
             }
-            this.current.setAlpha();
         }
-        return new BlockParsedResult(false);
+        return z;
+    }
+
+    private boolean isStillNumeric(int i) {
+        boolean z;
+        if (i + 7 <= this.information.getSize()) {
+            int i2 = i;
+            while (true) {
+                if (i2 >= i + 3) {
+                    z = this.information.get(i + 3);
+                    break;
+                }
+                z = true;
+                if (this.information.get(i2)) {
+                    break;
+                }
+                i2++;
+            }
+        } else {
+            z = i + 4 <= this.information.getSize();
+        }
+        return z;
     }
 
     private BlockParsedResult parseAlphaBlock() {
-        while (isStillAlpha(this.current.getPosition())) {
-            DecodedChar alpha = decodeAlphanumeric(this.current.getPosition());
-            this.current.setPosition(alpha.getNewPosition());
-            if (alpha.isFNC1()) {
-                DecodedInformation information = new DecodedInformation(this.current.getPosition(), this.buffer.toString());
-                return new BlockParsedResult(information, true);
-            }
-            this.buffer.append(alpha.getValue());
-        }
-        if (isAlphaOr646ToNumericLatch(this.current.getPosition())) {
-            this.current.incrementPosition(3);
-            this.current.setNumeric();
-        } else if (isAlphaTo646ToAlphaLatch(this.current.getPosition())) {
-            if (this.current.getPosition() + 5 < this.information.getSize()) {
-                this.current.incrementPosition(5);
-            } else {
-                this.current.setPosition(this.information.getSize());
-            }
-            this.current.setIsoIec646();
-        }
-        return new BlockParsedResult(false);
-    }
-
-    private boolean isStillIsoIec646(int pos) {
-        boolean z = true;
-        if (pos + 5 > this.information.getSize()) {
-            return false;
-        }
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue >= 5 && fiveBitValue < 16) {
-            return true;
-        }
-        if (pos + 7 > this.information.getSize()) {
-            return false;
-        }
-        int sevenBitValue = extractNumericValueFromBitArray(pos, 7);
-        if (sevenBitValue >= 64 && sevenBitValue < 116) {
-            return true;
-        }
-        if (pos + 8 > this.information.getSize()) {
-            return false;
-        }
-        int eightBitValue = extractNumericValueFromBitArray(pos, 8);
-        if (eightBitValue < 232 || eightBitValue >= 253) {
-            z = false;
-        }
-        return z;
-    }
-
-    private DecodedChar decodeIsoIec646(int pos) {
-        char c;
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue == 15) {
-            return new DecodedChar(pos + 5, '$');
-        }
-        if (fiveBitValue >= 5 && fiveBitValue < 15) {
-            return new DecodedChar(pos + 5, (char) ((fiveBitValue + 48) - 5));
-        }
-        int sevenBitValue = extractNumericValueFromBitArray(pos, 7);
-        if (sevenBitValue >= 64 && sevenBitValue < 90) {
-            return new DecodedChar(pos + 7, (char) (sevenBitValue + 1));
-        }
-        if (sevenBitValue >= 90 && sevenBitValue < 116) {
-            return new DecodedChar(pos + 7, (char) (sevenBitValue + 7));
-        }
-        int eightBitValue = extractNumericValueFromBitArray(pos, 8);
-        switch (eightBitValue) {
-            case 232:
-                c = '!';
-                break;
-            case 233:
-                c = '\"';
-                break;
-            case FTPReply.SECURITY_DATA_EXCHANGE_COMPLETE /* 234 */:
-                c = '%';
-                break;
-            case 235:
-                c = '&';
-                break;
-            case TelnetCommand.EOF /* 236 */:
-                c = '\'';
-                break;
-            case TelnetCommand.SUSP /* 237 */:
-                c = '(';
-                break;
-            case TelnetCommand.ABORT /* 238 */:
-                c = ')';
-                break;
-            case TelnetCommand.EOR /* 239 */:
-                c = '*';
-                break;
-            case 240:
-                c = '+';
-                break;
-            case TelnetCommand.NOP /* 241 */:
-                c = ',';
-                break;
-            case 242:
-                c = '-';
-                break;
-            case TelnetCommand.BREAK /* 243 */:
-                c = FilenameUtils.EXTENSION_SEPARATOR;
-                break;
-            case TelnetCommand.IP /* 244 */:
-                c = IOUtils.DIR_SEPARATOR_UNIX;
-                break;
-            case TelnetCommand.AO /* 245 */:
-                c = ':';
-                break;
-            case TelnetCommand.AYT /* 246 */:
-                c = ';';
-                break;
-            case TelnetCommand.EC /* 247 */:
-                c = '<';
-                break;
-            case TelnetCommand.EL /* 248 */:
-                c = '=';
-                break;
-            case TelnetCommand.GA /* 249 */:
-                c = '>';
-                break;
-            case 250:
-                c = '?';
-                break;
-            case 251:
-                c = '_';
-                break;
-            case TelnetCommand.WONT /* 252 */:
-                c = ' ';
-                break;
-            default:
-                throw new IllegalArgumentException("Decoding invalid ISO/IEC 646 value: " + eightBitValue);
-        }
-        return new DecodedChar(pos + 8, c);
-    }
-
-    private boolean isStillAlpha(int pos) {
-        boolean z = true;
-        if (pos + 5 > this.information.getSize()) {
-            return false;
-        }
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue >= 5 && fiveBitValue < 16) {
-            return true;
-        }
-        if (pos + 6 > this.information.getSize()) {
-            return false;
-        }
-        int sixBitValue = extractNumericValueFromBitArray(pos, 6);
-        if (sixBitValue < 16 || sixBitValue >= 63) {
-            z = false;
-        }
-        return z;
-    }
-
-    private DecodedChar decodeAlphanumeric(int pos) {
-        char c;
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue == 15) {
-            return new DecodedChar(pos + 5, '$');
-        }
-        if (fiveBitValue >= 5 && fiveBitValue < 15) {
-            return new DecodedChar(pos + 5, (char) ((fiveBitValue + 48) - 5));
-        }
-        int sixBitValue = extractNumericValueFromBitArray(pos, 6);
-        if (sixBitValue >= 32 && sixBitValue < 58) {
-            return new DecodedChar(pos + 6, (char) (sixBitValue + 33));
-        }
-        switch (sixBitValue) {
-            case 58:
-                c = '*';
-                break;
-            case 59:
-                c = ',';
-                break;
-            case 60:
-                c = '-';
-                break;
-            case 61:
-                c = FilenameUtils.EXTENSION_SEPARATOR;
-                break;
-            case 62:
-                c = IOUtils.DIR_SEPARATOR_UNIX;
-                break;
-            default:
-                throw new IllegalStateException("Decoding invalid alphanumeric value: " + sixBitValue);
-        }
-        return new DecodedChar(pos + 6, c);
-    }
-
-    private boolean isAlphaTo646ToAlphaLatch(int pos) {
-        if (pos + 1 > this.information.getSize()) {
-            return false;
-        }
-        for (int i = 0; i < 5 && i + pos < this.information.getSize(); i++) {
-            if (i == 2) {
-                if (!this.information.get(pos + 2)) {
-                    return false;
+        BlockParsedResult blockParsedResult;
+        while (true) {
+            if (isStillAlpha(this.current.getPosition())) {
+                DecodedChar decodeAlphanumeric = decodeAlphanumeric(this.current.getPosition());
+                this.current.setPosition(decodeAlphanumeric.getNewPosition());
+                if (decodeAlphanumeric.isFNC1()) {
+                    blockParsedResult = new BlockParsedResult(new DecodedInformation(this.current.getPosition(), this.buffer.toString()), true);
+                    break;
                 }
-            } else if (this.information.get(pos + i)) {
-                return false;
+                this.buffer.append(decodeAlphanumeric.getValue());
+            } else {
+                if (isAlphaOr646ToNumericLatch(this.current.getPosition())) {
+                    this.current.incrementPosition(3);
+                    this.current.setNumeric();
+                } else if (isAlphaTo646ToAlphaLatch(this.current.getPosition())) {
+                    if (this.current.getPosition() + 5 < this.information.getSize()) {
+                        this.current.incrementPosition(5);
+                    } else {
+                        this.current.setPosition(this.information.getSize());
+                    }
+                    this.current.setIsoIec646();
+                }
+                blockParsedResult = new BlockParsedResult(false);
             }
         }
-        return true;
+        return blockParsedResult;
     }
 
-    private boolean isAlphaOr646ToNumericLatch(int pos) {
-        if (pos + 3 > this.information.getSize()) {
-            return false;
-        }
-        for (int i = pos; i < pos + 3; i++) {
-            if (this.information.get(i)) {
-                return false;
+    private DecodedInformation parseBlocks() {
+        BlockParsedResult parseNumericBlock;
+        boolean isFinished;
+        do {
+            int position = this.current.getPosition();
+            if (this.current.isAlpha()) {
+                parseNumericBlock = parseAlphaBlock();
+                isFinished = parseNumericBlock.isFinished();
+            } else if (this.current.isIsoIec646()) {
+                parseNumericBlock = parseIsoIec646Block();
+                isFinished = parseNumericBlock.isFinished();
+            } else {
+                parseNumericBlock = parseNumericBlock();
+                isFinished = parseNumericBlock.isFinished();
             }
-        }
-        return true;
+            if (!(position != this.current.getPosition()) && !isFinished) {
+                break;
+            }
+        } while (!isFinished);
+        return parseNumericBlock.getDecodedInformation();
     }
 
-    private boolean isNumericToAlphaNumericLatch(int pos) {
-        if (pos + 1 > this.information.getSize()) {
-            return false;
-        }
-        for (int i = 0; i < 4 && i + pos < this.information.getSize(); i++) {
-            if (this.information.get(pos + i)) {
-                return false;
+    private BlockParsedResult parseIsoIec646Block() {
+        BlockParsedResult blockParsedResult;
+        while (true) {
+            if (isStillIsoIec646(this.current.getPosition())) {
+                DecodedChar decodeIsoIec646 = decodeIsoIec646(this.current.getPosition());
+                this.current.setPosition(decodeIsoIec646.getNewPosition());
+                if (decodeIsoIec646.isFNC1()) {
+                    blockParsedResult = new BlockParsedResult(new DecodedInformation(this.current.getPosition(), this.buffer.toString()), true);
+                    break;
+                }
+                this.buffer.append(decodeIsoIec646.getValue());
+            } else {
+                if (isAlphaOr646ToNumericLatch(this.current.getPosition())) {
+                    this.current.incrementPosition(3);
+                    this.current.setNumeric();
+                } else if (isAlphaTo646ToAlphaLatch(this.current.getPosition())) {
+                    if (this.current.getPosition() + 5 < this.information.getSize()) {
+                        this.current.incrementPosition(5);
+                    } else {
+                        this.current.setPosition(this.information.getSize());
+                    }
+                    this.current.setAlpha();
+                }
+                blockParsedResult = new BlockParsedResult(false);
             }
         }
-        return true;
+        return blockParsedResult;
+    }
+
+    private BlockParsedResult parseNumericBlock() {
+        BlockParsedResult blockParsedResult;
+        while (true) {
+            if (isStillNumeric(this.current.getPosition())) {
+                DecodedNumeric decodeNumeric = decodeNumeric(this.current.getPosition());
+                this.current.setPosition(decodeNumeric.getNewPosition());
+                if (decodeNumeric.isFirstDigitFNC1()) {
+                    blockParsedResult = new BlockParsedResult(decodeNumeric.isSecondDigitFNC1() ? new DecodedInformation(this.current.getPosition(), this.buffer.toString()) : new DecodedInformation(this.current.getPosition(), this.buffer.toString(), decodeNumeric.getSecondDigit()), true);
+                } else {
+                    this.buffer.append(decodeNumeric.getFirstDigit());
+                    if (decodeNumeric.isSecondDigitFNC1()) {
+                        blockParsedResult = new BlockParsedResult(new DecodedInformation(this.current.getPosition(), this.buffer.toString()), true);
+                        break;
+                    }
+                    this.buffer.append(decodeNumeric.getSecondDigit());
+                }
+            } else {
+                if (isNumericToAlphaNumericLatch(this.current.getPosition())) {
+                    this.current.setAlpha();
+                    this.current.incrementPosition(4);
+                }
+                blockParsedResult = new BlockParsedResult(false);
+            }
+        }
+        return blockParsedResult;
+    }
+
+    String decodeAllCodes(StringBuilder sb, int i) throws NotFoundException {
+        String str = null;
+        while (true) {
+            DecodedInformation decodeGeneralPurposeField = decodeGeneralPurposeField(i, str);
+            String parseFieldsInGeneralPurpose = FieldParser.parseFieldsInGeneralPurpose(decodeGeneralPurposeField.getNewString());
+            if (parseFieldsInGeneralPurpose != null) {
+                sb.append(parseFieldsInGeneralPurpose);
+            }
+            str = decodeGeneralPurposeField.isRemaining() ? String.valueOf(decodeGeneralPurposeField.getRemainingValue()) : null;
+            if (i == decodeGeneralPurposeField.getNewPosition()) {
+                return sb.toString();
+            }
+            i = decodeGeneralPurposeField.getNewPosition();
+        }
+    }
+
+    DecodedInformation decodeGeneralPurposeField(int i, String str) {
+        this.buffer.setLength(0);
+        if (str != null) {
+            this.buffer.append(str);
+        }
+        this.current.setPosition(i);
+        DecodedInformation parseBlocks = parseBlocks();
+        return (parseBlocks == null || !parseBlocks.isRemaining()) ? new DecodedInformation(this.current.getPosition(), this.buffer.toString()) : new DecodedInformation(this.current.getPosition(), this.buffer.toString(), parseBlocks.getRemainingValue());
+    }
+
+    int extractNumericValueFromBitArray(int i, int i2) {
+        return extractNumericValueFromBitArray(this.information, i, i2);
     }
 }

@@ -8,22 +8,55 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshHorizontalScrollView.class */
 public class PullToRefreshHorizontalScrollView extends PullToRefreshBase<HorizontalScrollView> {
+
+    @TargetApi(9)
+    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshHorizontalScrollView$InternalHorizontalScrollViewSDK9.class */
+    final class InternalHorizontalScrollViewSDK9 extends HorizontalScrollView {
+        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+        public InternalHorizontalScrollViewSDK9(Context context, AttributeSet attributeSet) {
+            super(context, attributeSet);
+            PullToRefreshHorizontalScrollView.this = r5;
+        }
+
+        private int getScrollRange() {
+            int i = 0;
+            if (getChildCount() > 0) {
+                i = Math.max(0, getChildAt(0).getWidth() - ((getWidth() - getPaddingLeft()) - getPaddingRight()));
+            }
+            return i;
+        }
+
+        @Override // android.view.View
+        protected boolean overScrollBy(int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, boolean z) {
+            boolean overScrollBy = super.overScrollBy(i, i2, i3, i4, i5, i6, i7, i8, z);
+            OverscrollHelper.overScrollBy(PullToRefreshHorizontalScrollView.this, i, i3, i2, i4, getScrollRange(), z);
+            return overScrollBy;
+        }
+    }
+
     public PullToRefreshHorizontalScrollView(Context context) {
         super(context);
     }
 
-    public PullToRefreshHorizontalScrollView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public PullToRefreshHorizontalScrollView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
     }
 
     public PullToRefreshHorizontalScrollView(Context context, PullToRefreshBase.Mode mode) {
         super(context, mode);
     }
 
-    public PullToRefreshHorizontalScrollView(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.AnimationStyle style) {
-        super(context, mode, style);
+    public PullToRefreshHorizontalScrollView(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.AnimationStyle animationStyle) {
+        super(context, mode, animationStyle);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
+    public HorizontalScrollView createRefreshableView(Context context, AttributeSet attributeSet) {
+        InternalHorizontalScrollViewSDK9 internalHorizontalScrollViewSDK9 = Build.VERSION.SDK_INT >= 9 ? new InternalHorizontalScrollViewSDK9(context, attributeSet) : new HorizontalScrollView(context, attributeSet);
+        internalHorizontalScrollViewSDK9.setId(R.id.scrollview);
+        return internalHorizontalScrollViewSDK9;
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
@@ -32,51 +65,13 @@ public class PullToRefreshHorizontalScrollView extends PullToRefreshBase<Horizon
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    public HorizontalScrollView createRefreshableView(Context context, AttributeSet attrs) {
-        HorizontalScrollView scrollView;
-        if (Build.VERSION.SDK_INT >= 9) {
-            scrollView = new InternalHorizontalScrollViewSDK9(context, attrs);
-        } else {
-            scrollView = new HorizontalScrollView(context, attrs);
-        }
-        scrollView.setId(R.id.scrollview);
-        return scrollView;
+    protected boolean isReadyForPullEnd() {
+        View childAt = ((HorizontalScrollView) this.mRefreshableView).getChildAt(0);
+        return childAt != null ? ((HorizontalScrollView) this.mRefreshableView).getScrollX() >= childAt.getWidth() - getWidth() : false;
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
     protected boolean isReadyForPullStart() {
         return ((HorizontalScrollView) this.mRefreshableView).getScrollX() == 0;
-    }
-
-    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected boolean isReadyForPullEnd() {
-        View scrollViewChild = ((HorizontalScrollView) this.mRefreshableView).getChildAt(0);
-        return scrollViewChild != null && ((HorizontalScrollView) this.mRefreshableView).getScrollX() >= scrollViewChild.getWidth() - getWidth();
-    }
-
-    @TargetApi(9)
-    /* loaded from: classes.dex */
-    final class InternalHorizontalScrollViewSDK9 extends HorizontalScrollView {
-        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
-        public InternalHorizontalScrollViewSDK9(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            PullToRefreshHorizontalScrollView.this = r1;
-        }
-
-        @Override // android.view.View
-        protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
-            boolean returnValue = super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
-            OverscrollHelper.overScrollBy(PullToRefreshHorizontalScrollView.this, deltaX, scrollX, deltaY, scrollY, getScrollRange(), isTouchEvent);
-            return returnValue;
-        }
-
-        private int getScrollRange() {
-            if (getChildCount() <= 0) {
-                return 0;
-            }
-            View child = getChildAt(0);
-            int scrollRange = Math.max(0, child.getWidth() - ((getWidth() - getPaddingLeft()) - getPaddingRight()));
-            return scrollRange;
-        }
     }
 }

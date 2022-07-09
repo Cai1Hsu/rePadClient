@@ -16,9 +16,8 @@ import com.edutech.appmanage.utils.ShellUtils;
 import java.io.File;
 import java.security.MessageDigest;
 import java.util.UUID;
-import org.bson.BSON;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/a/a.class */
 public final class a {
     public static String a = null;
     public static String b = null;
@@ -34,32 +33,35 @@ public final class a {
     private static int l = -1;
 
     private static int a(Context context, PackageManager packageManager) {
+        int i2;
         try {
             Bundle bundle = packageManager.getApplicationInfo(context.getPackageName(), 128).metaData;
-            if (bundle == null) {
-                return 0;
+            i2 = 0;
+            if (bundle != null) {
+                i2 = bundle.getInt("buildNumber", 0);
             }
-            return bundle.getInt("buildNumber", 0);
         } catch (Exception e2) {
             Log.e("PgyerSDK", "Exception thrown when accessing the application info:");
             e2.printStackTrace();
-            return 0;
+            i2 = 0;
         }
+        return i2;
     }
 
     private static String a(byte[] bArr) {
         char[] charArray = "0123456789ABCDEF".toCharArray();
         char[] cArr = new char[bArr.length * 2];
         for (int i2 = 0; i2 < bArr.length; i2++) {
-            int i3 = bArr[i2] & BSON.MINKEY;
+            int i3 = bArr[i2] & 255;
             cArr[i2 * 2] = charArray[i3 >>> 4];
             cArr[(i2 * 2) + 1] = charArray[i3 & 15];
         }
         return new String(cArr).replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
     }
 
-    /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(r0v8 int)] */
-    /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x0032: IGET  (r3v0 int A[REMOVE]) = (r1v3 android.content.pm.PackageInfo) android.content.pm.PackageInfo.versionCode int)] */
+    /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(r0v30 int)] */
+    /* JADX DEBUG: TODO: convert one arg to string using `String.valueOf()`, args: [(wrap: int : 0x004a: IGET  (r1v5 int A[REMOVE]) = (r0v19 android.content.pm.PackageInfo) android.content.pm.PackageInfo.versionCode int)] */
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:32:0x01b9 -> B:46:0x015a). Please submit an issue!!! */
     public static void a(Context context) {
         DisplayMetrics displayMetrics;
         e = Build.VERSION.RELEASE;
@@ -103,58 +105,63 @@ public final class a {
             } catch (Throwable th) {
             }
         }
-        try {
-            if (context == null) {
-                return;
-            }
+        if (context != null) {
             try {
-                TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService("phone");
-                String str2 = telephonyManager.getDeviceId();
-                i = new UUID((Settings.Secure.getString(context.getContentResolver(), "android_id")).hashCode(), (telephonyManager.getSimSerialNumber()).hashCode() | (str2.hashCode() << 32)).toString();
-            } catch (Exception e4) {
-                i = "getting faild";
+                try {
+                    TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService("phone");
+                    String str2 = telephonyManager.getDeviceId();
+                    i = new UUID((Settings.Secure.getString(context.getContentResolver(), "android_id")).hashCode(), (telephonyManager.getSimSerialNumber()).hashCode() | (str2.hashCode() << 32)).toString();
+                } catch (Exception e4) {
+                    i = "getting faild";
+                }
+                try {
+                    ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(new DisplayMetrics());
+                    j = String.valueOf(displayMetrics.widthPixels) + " * " + displayMetrics.heightPixels;
+                } catch (Exception e5) {
+                    j = "resolution getting faild";
+                }
+            } catch (Exception e6) {
+                Log.e("PgyerSDK", "Exception thrown then accessing the device info:");
+                e6.printStackTrace();
             }
-            try {
-                ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(new DisplayMetrics());
-                j = String.valueOf(displayMetrics.widthPixels) + " * " + displayMetrics.heightPixels;
-            } catch (Exception e5) {
-                j = "resolution getting faild";
-            }
-        } catch (Exception e6) {
-            Log.e("PgyerSDK", "Exception thrown then accessing the device info:");
-            e6.printStackTrace();
         }
     }
 
     public static boolean a() {
-        if (l == 1) {
-            return true;
-        }
-        if (l == 0) {
-            return false;
-        }
-        String[] strArr = {"/system/bin/", "/system/xbin/", "/system/sbin/", "/sbin/", "/vendor/bin/"};
-        for (int i2 = 0; i2 < strArr.length; i2++) {
-            try {
-                if (new File(String.valueOf(strArr[i2]) + ShellUtils.COMMAND_SU).exists()) {
-                    l = 1;
-                    return true;
+        boolean z = true;
+        if (l != 1) {
+            if (l == 0) {
+                z = false;
+            } else {
+                String[] strArr = {"/system/bin/", "/system/xbin/", "/system/sbin/", "/sbin/", "/vendor/bin/"};
+                for (int i2 = 0; i2 < strArr.length; i2++) {
+                    try {
+                        if (new File(String.valueOf(strArr[i2]) + ShellUtils.COMMAND_SU).exists()) {
+                            l = 1;
+                            break;
+                        }
+                    } catch (Exception e2) {
+                    }
                 }
-            } catch (Exception e2) {
+                l = 0;
+                z = false;
             }
         }
-        l = 0;
-        return false;
+        return z;
     }
 
     public static int b() {
+        int i2;
         if (Environment.getExternalStorageState().equals("mounted")) {
             StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
-            return (int) (((statFs.getAvailableBlocks() * statFs.getBlockSize()) / 1024) / 1024);
+            i2 = (int) (((statFs.getAvailableBlocks() * statFs.getBlockSize()) / 1024) / 1024);
+        } else {
+            i2 = 1;
         }
-        return 1;
+        return i2;
     }
 
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:9:0x0074 -> B:5:0x005b). Please submit an issue!!! */
     private static String c() {
         String str = "HA" + (Build.BOARD.length() % 10) + (Build.BRAND.length() % 10) + (Build.CPU_ABI.length() % 10) + (Build.PRODUCT.length() % 10);
         String str2 = "";
@@ -162,6 +169,7 @@ public final class a {
             try {
                 str2 = Build.class.getField("SERIAL").get(null).toString();
             } catch (Throwable th) {
+                str2 = "";
             }
         }
         return String.valueOf(str) + ":" + str2;

@@ -9,85 +9,82 @@ import android.widget.TextView;
 import com.launcher.activity.R;
 import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/IPListAdapter.class */
 public class IPListAdapter extends BaseAdapter {
     IpInterface ipControl;
     List<String> ips;
     Context mcontext;
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/IPListAdapter$IpHolder.class */
+    class IpHolder {
+        TextView tv_delete;
+        TextView tv_ip;
+
+        IpHolder() {
+            IPListAdapter.this = r4;
+        }
+    }
+
+    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/IPListAdapter$IpInterface.class */
     public interface IpInterface {
         void deleteIp(String str);
 
         void okIp(String str);
     }
 
-    public IPListAdapter(List<String> ips, Context mcontext, IpInterface ipcontrol) {
-        this.ips = ips;
-        this.mcontext = mcontext;
-        this.ipControl = ipcontrol;
+    public IPListAdapter(List<String> list, Context context, IpInterface ipInterface) {
+        this.ips = list;
+        this.mcontext = context;
+        this.ipControl = ipInterface;
     }
 
     @Override // android.widget.Adapter
     public int getCount() {
-        if (this.ips == null) {
-            return 0;
-        }
-        return this.ips.size();
+        return this.ips == null ? 0 : this.ips.size();
     }
 
     @Override // android.widget.Adapter
-    public Object getItem(int position) {
-        return (this.ips == null || this.ips.size() <= position) ? "" : this.ips.get(position);
+    public Object getItem(int i) {
+        return (this.ips == null || this.ips.size() <= i) ? "" : this.ips.get(i);
     }
 
     @Override // android.widget.Adapter
-    public long getItemId(int position) {
-        return position;
+    public long getItemId(int i) {
+        return i;
     }
 
     @Override // android.widget.Adapter
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        IpHolder holder = new IpHolder();
-        if (convertView == null) {
-            convertView = LayoutInflater.from(this.mcontext).inflate(R.layout.adapter_iplist, (ViewGroup) null);
-            holder.tv_ip = (TextView) convertView.findViewById(R.id.adapter_tv_ip);
-            holder.tv_delete = (TextView) convertView.findViewById(R.id.adapter_tv_delete);
-            convertView.setTag(holder);
+    public View getView(final int i, View view, ViewGroup viewGroup) {
+        IpHolder ipHolder = new IpHolder();
+        if (view == null) {
+            view = LayoutInflater.from(this.mcontext).inflate(R.layout.adapter_iplist, (ViewGroup) null);
+            ipHolder.tv_ip = (TextView) view.findViewById(R.id.adapter_tv_ip);
+            ipHolder.tv_delete = (TextView) view.findViewById(R.id.adapter_tv_delete);
+            view.setTag(ipHolder);
         } else {
-            holder = (IpHolder) convertView.getTag();
+            ipHolder = (IpHolder) view.getTag();
         }
-        holder.tv_ip.setText(this.ips.get(position));
-        holder.tv_delete.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.IPListAdapter.1
+        ipHolder.tv_ip.setText(this.ips.get(i));
+        ipHolder.tv_delete.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.IPListAdapter.1
             @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
+            public void onClick(View view2) {
                 if (IPListAdapter.this.ipControl != null) {
-                    IPListAdapter.this.ipControl.deleteIp(IPListAdapter.this.ips.get(position));
+                    IPListAdapter.this.ipControl.deleteIp(IPListAdapter.this.ips.get(i));
                 }
             }
         });
-        holder.tv_ip.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.IPListAdapter.2
+        ipHolder.tv_ip.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.IPListAdapter.2
             @Override // android.view.View.OnClickListener
-            public void onClick(View v) {
+            public void onClick(View view2) {
                 if (IPListAdapter.this.ipControl != null) {
-                    IPListAdapter.this.ipControl.okIp(IPListAdapter.this.ips.get(position));
+                    IPListAdapter.this.ipControl.okIp(IPListAdapter.this.ips.get(i));
                 }
             }
         });
-        return convertView;
+        return view;
     }
 
-    public void setIps(List<String> ips) {
-        this.ips = ips;
-    }
-
-    /* loaded from: classes.dex */
-    class IpHolder {
-        TextView tv_delete;
-        TextView tv_ip;
-
-        IpHolder() {
-            IPListAdapter.this = r1;
-        }
+    public void setIps(List<String> list) {
+        this.ips = list;
     }
 }

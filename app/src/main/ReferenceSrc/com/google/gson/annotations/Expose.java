@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/annotations/Expose.class */
 public @interface Expose {
     boolean deserialize() default true;
 

@@ -4,28 +4,24 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/idauthentication/SystemTimeHelper.class */
 public class SystemTimeHelper {
-    public static String getTheSystemTime() {
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = sDateFormat.format(new Date());
-        return date;
-    }
-
-    public static long compareTime(String begin, String end) {
-        SimpleDateFormat dateFormate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static long compareTime(String str, String str2) {
+        long j;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            Date date1 = dateFormate.parse(begin);
-            Date date2 = dateFormate.parse(end);
-            long diff = date2.getTime() - date1.getTime();
-            long seconds = diff / 1000;
-            if (seconds >= 0) {
-                return seconds;
+            j = (simpleDateFormat.parse(str2).getTime() - simpleDateFormat.parse(str).getTime()) / 1000;
+            if (j < 0) {
+                j = 0;
             }
-            return 0L;
         } catch (ParseException e) {
             e.printStackTrace();
-            return 0L;
+            j = 0;
         }
+        return j;
+    }
+
+    public static String getTheSystemTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 }

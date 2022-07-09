@@ -11,66 +11,72 @@ import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/qrcode/QRCodeWriter.class */
 public final class QRCodeWriter implements Writer {
     private static final int QUIET_ZONE_SIZE = 4;
 
-    @Override // com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height) throws WriterException {
-        return encode(contents, format, width, height, null);
-    }
-
-    @Override // com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        ErrorCorrectionLevel requestedECLevel;
-        if (contents.length() == 0) {
-            throw new IllegalArgumentException("Found empty contents");
-        }
-        if (format != BarcodeFormat.QR_CODE) {
-            throw new IllegalArgumentException("Can only encode QR_CODE, but got " + format);
-        }
-        if (width < 0 || height < 0) {
-            throw new IllegalArgumentException("Requested dimensions are too small: " + width + 'x' + height);
-        }
-        ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.L;
-        if (hints != null && (requestedECLevel = (ErrorCorrectionLevel) hints.get(EncodeHintType.ERROR_CORRECTION)) != null) {
-            errorCorrectionLevel = requestedECLevel;
-        }
-        QRCode code = new QRCode();
-        Encoder.encode(contents, errorCorrectionLevel, hints, code);
-        return renderResult(code, width, height);
-    }
-
-    private static BitMatrix renderResult(QRCode code, int width, int height) {
-        ByteMatrix input = code.getMatrix();
-        if (input == null) {
+    private static BitMatrix renderResult(QRCode qRCode, int i, int i2) {
+        ByteMatrix matrix = qRCode.getMatrix();
+        if (matrix == null) {
             throw new IllegalStateException();
         }
-        int inputWidth = input.getWidth();
-        int inputHeight = input.getHeight();
-        int qrWidth = inputWidth + 8;
-        int qrHeight = inputHeight + 8;
-        int outputWidth = Math.max(width, qrWidth);
-        int outputHeight = Math.max(height, qrHeight);
-        int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
-        int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
-        int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
-        BitMatrix output = new BitMatrix(outputWidth, outputHeight);
-        int inputY = 0;
-        int outputY = topPadding;
-        while (inputY < inputHeight) {
-            int inputX = 0;
-            int outputX = leftPadding;
-            while (inputX < inputWidth) {
-                if (input.get(inputX, inputY) == 1) {
-                    output.setRegion(outputX, outputY, multiple, multiple);
+        int width = matrix.getWidth();
+        int height = matrix.getHeight();
+        int i3 = width + 8;
+        int i4 = height + 8;
+        int max = Math.max(i, i3);
+        int max2 = Math.max(i2, i4);
+        int min = Math.min(max / i3, max2 / i4);
+        int i5 = (max - (width * min)) / 2;
+        int i6 = (max2 - (height * min)) / 2;
+        BitMatrix bitMatrix = new BitMatrix(max, max2);
+        int i7 = 0;
+        while (i7 < height) {
+            int i8 = 0;
+            int i9 = i5;
+            while (true) {
+                int i10 = i9;
+                if (i8 < width) {
+                    if (matrix.get(i8, i7) == 1) {
+                        bitMatrix.setRegion(i10, i6, min, min);
+                    }
+                    i8++;
+                    i9 = i10 + min;
                 }
-                inputX++;
-                outputX += multiple;
             }
-            inputY++;
-            outputY += multiple;
+            i7++;
+            i6 += min;
         }
-        return output;
+        return bitMatrix;
+    }
+
+    @Override // com.google.zxing.Writer
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2) throws WriterException {
+        return encode(str, barcodeFormat, i, i2, null);
+    }
+
+    @Override // com.google.zxing.Writer
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (str.length() == 0) {
+            throw new IllegalArgumentException("Found empty contents");
+        }
+        if (barcodeFormat != BarcodeFormat.QR_CODE) {
+            throw new IllegalArgumentException("Can only encode QR_CODE, but got " + barcodeFormat);
+        }
+        if (i < 0 || i2 < 0) {
+            throw new IllegalArgumentException("Requested dimensions are too small: " + i + 'x' + i2);
+        }
+        ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.L;
+        ErrorCorrectionLevel errorCorrectionLevel2 = errorCorrectionLevel;
+        if (map != null) {
+            ErrorCorrectionLevel errorCorrectionLevel3 = (ErrorCorrectionLevel) map.get(EncodeHintType.ERROR_CORRECTION);
+            errorCorrectionLevel2 = errorCorrectionLevel;
+            if (errorCorrectionLevel3 != null) {
+                errorCorrectionLevel2 = errorCorrectionLevel3;
+            }
+        }
+        QRCode qRCode = new QRCode();
+        Encoder.encode(str, errorCorrectionLevel2, map, qRCode);
+        return renderResult(qRCode, i, i2);
     }
 }

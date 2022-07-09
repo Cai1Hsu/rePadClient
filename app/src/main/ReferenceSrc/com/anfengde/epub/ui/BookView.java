@@ -4,11 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -44,7 +42,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -57,7 +54,7 @@ import org.apache.commons.net.tftp.TFTP;
 import org.apache.http.HttpHost;
 
 @SuppressLint({"NewApi"})
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/anfengde/epub/ui/BookView.class */
 public class BookView extends LinearLayout implements TextToSpeech.OnInitListener {
     private static final String LOGTAG = "BookView";
     private static final Boolean allowToModifyAd = false;
@@ -91,90 +88,428 @@ public class BookView extends LinearLayout implements TextToSpeech.OnInitListene
     private boolean downloadCancel = false;
     private boolean isDownloading = false;
 
-    public BookView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    /* loaded from: classes.jar:com/anfengde/epub/ui/BookView$DownloadFilesTask.class */
+    private class DownloadFilesTask extends AsyncTask<String, Integer, String> {
+        private DownloadFilesTask() {
+            BookView.this = r4;
+        }
+
+        /* synthetic */ DownloadFilesTask(BookView bookView, DownloadFilesTask downloadFilesTask) {
+            this();
+        }
+
+        public String doInBackground(String... strArr) {
+            String str;
+            if (BookView.this.isDownloading) {
+                str = "Downloading!";
+            } else {
+                BookView.this.isDownloading = true;
+                String str2 = BookView.this.afd_cachePath;
+                if (!BookView.this.isOnline()) {
+                    str = "Download Error!";
+                } else {
+                    String str3 = strArr[0];
+                    if (!str3.contains("/") || !str3.substring(0, 4).equals(HttpHost.DEFAULT_SCHEME_NAME)) {
+                        str = "Download Error!";
+                    } else {
+                        String[] split = str3.split("/");
+                        String str4 = split[split.length - 1];
+                        int length = str4.length();
+                        try {
+                            Log.v("ContentLength", "ContentLength:fileLength");
+                            URL url = new URL(String.valueOf(str3.substring(0, str3.length() - length)) + URLEncoder.encode(str4, "UTF-8").replace("+", "%20"));
+                            HttpURLConnection.setFollowRedirects(false);
+                            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                            httpURLConnection.setConnectTimeout(TFTP.DEFAULT_TIMEOUT);
+                            int contentLength = httpURLConnection.getContentLength();
+                            Log.v("ContentLength", "ContentLength:" + contentLength);
+                            if (httpURLConnection.getResponseCode() != 200 || contentLength < 1000) {
+                                str = "Download Error!";
+                            } else {
+                                str = String.valueOf(str2) + "/" + str4;
+                                File file = new File(str);
+                                if (file.exists()) {
+                                    file.delete();
+                                }
+                                BookView.this.downloadCancel = false;
+                                BufferedInputStream bufferedInputStream = new BufferedInputStream(url.openStream());
+                                new File(str2).mkdir();
+                                file.createNewFile();
+                                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                                try {
+                                    byte[] bArr = new byte[4096];
+                                    long j = 0;
+                                    while (true) {
+                                        int read = bufferedInputStream.read(bArr);
+                                        if (read != -1) {
+                                            j += read;
+                                            publishProgress(Integer.valueOf((int) ((100 * j) / contentLength)));
+                                            fileOutputStream.write(bArr, 0, read);
+                                            if (BookView.this.downloadCancel) {
+                                                publishProgress(0);
+                                                fileOutputStream.flush();
+                                                fileOutputStream.close();
+                                                bufferedInputStream.close();
+                                                file.delete();
+                                                str = "Cancel Download!";
+                                                break;
+                                            }
+                                        } else {
+                                            fileOutputStream.flush();
+                                            fileOutputStream.close();
+                                            bufferedInputStream.close();
+                                            break;
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    str = "Download Error!";
+                                    return str;
+                                }
+                            }
+                        } catch (Exception e2) {
+                        }
+                    }
+                }
+            }
+            return str;
+        }
+
+        public void onPostExecute(String str) {
+            BookView.this.afd_webView.loadUrl("javascript:setLoadingButtonStatus(0)");
+            if (str.equals("Cancel Download!")) {
+                BookView.this.isDownloading = false;
+            } else if (str.equals("Downloading!")) {
+            } else {
+                if (str.equals("Download Error!")) {
+                    BookView.this.isDownloading = false;
+                    Toast.makeText(BookView.this.afd_curContext, str, 0).show();
+                } else if (!BookView.this.importBook(str)) {
+                } else {
+                    BookView.this.isDownloading = false;
+                    BookView.this.createBookshelf();
+                    Toast.makeText(BookView.this.afd_curContext, "Download Success!", 0).show();
+                }
+            }
+        }
+
+        public void onProgressUpdate(Integer... numArr) {
+            BookView.this.afd_webView.loadUrl("javascript:downloadProgress(" + numArr[0] + ")");
+        }
+    }
+
+    /* loaded from: classes.jar:com/anfengde/epub/ui/BookView$JavaScriptInterface.class */
+    public class JavaScriptInterface {
+        public JavaScriptInterface() {
+            BookView.this = r4;
+        }
+
+        public void addBooks() {
+            BookView.this.showAddbooksWindow();
+        }
+
+        public void back() {
+            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
+        }
+
+        public void bkOpenChapter(int i, int i2, int i3) {
+            BookView.this.current_chapter = i;
+            BookView.this.pIndex = i2;
+            BookView.this.sIndex = i3;
+            BookView.this.clickBk = "clickBk";
+            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
+        }
+
+        public void copySelectionText(String str) {
+            ((ClipboardManager) BookView.this.afd_curContext.getSystemService("clipboard")).setText(str);
+            Toast.makeText(BookView.this.afd_curContext, "Text copied to clipboard", 50).show();
+        }
+
+        public void currentReadingData(int i, int i2) {
+            BookView.this.currentPageNum = i;
+            BookView.this.totalPages = i2;
+            BookView.this.current_percent = (BookView.this.currentPageNum * 10000) / BookView.this.totalPages;
+        }
+
+        public void deleteBooks(String str) {
+            DBDriver dBDriver = new DBDriver(BookView.this.afd_curContext);
+            List<DBBooks> allBooks = dBDriver.getAllBooks();
+            for (String str2 : str.split("afd")) {
+                DBBooks dBBooks = allBooks.get(Integer.valueOf(str2).intValue());
+                dBDriver.deleteBook(dBBooks);
+                int openEPubBook = BookView.this.afd_epubDriver.clsEPub.openEPubBook(dBBooks.getBookpath());
+                if (openEPubBook == 0) {
+                    BookView.this.afd_epubDriver.clsEPub.cleanEPubBookCache(openEPubBook);
+                }
+            }
+            dBDriver.close();
+            BookView.this.createBookshelf();
+            BookView.this.afd_webView.loadUrl("javascript:$('.afd_selectBg').show()");
+        }
+
+        public void downloadBook(String str) {
+            new DownloadFilesTask(BookView.this, null).execute(str);
+        }
+
+        public void downloadCancel() {
+            BookView.this.downloadCancel = true;
+        }
+
+        public void exit() {
+            BookView.this.exitApp();
+        }
+
+        public void getAllBooks() {
+            BookView.this.createBookshelf();
+        }
+
+        public void getChapter() {
+            int size = BookView.this.afd_epubDriver.mToc.getChapterList().size();
+            for (int i = 0; i < size; i++) {
+                BookView.this.afd_webView.loadUrl("javascript:getChapter('" + BookView.this.jsStringEscape(BookView.this.afd_epubDriver.mToc.getChapterList().get(i).title) + "'," + BookView.this.afd_epubDriver.mToc.getChapterList().get(i).level + "," + i + "," + BookView.this.current_chapter + ")");
+            }
+        }
+
+        public void jsImportBook(String str) {
+            Toast.makeText(BookView.this.afd_curContext, "Importing...", 1).show();
+            if (!BookView.this.importBook(str)) {
+                return;
+            }
+            BookView.this.createBookshelf();
+        }
+
+        public void jsOpenChapter(int i, String str) {
+            if (str.equals("preceding")) {
+                BookView.this.current_percent = 10000;
+            } else {
+                BookView.this.current_percent = 0;
+            }
+            BookView.this.current_chapter = i;
+            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
+        }
+
+        public void message(String str) {
+            Toast.makeText(BookView.this.afd_curContext, str, 50).show();
+        }
+
+        public void openBook(String str) {
+            Toast.makeText(BookView.this.afd_curContext, "Opening book...", 1).show();
+            BookView.this.afd_epubDriver.mToc.clearChapter();
+            BookView.this.bookPath = str;
+            if (BookView.this.errorMessage(BookView.this.afd_epubDriver.openBook(BookView.this.bookPath))) {
+                return;
+            }
+            BookView.this.readReadingStatus();
+            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
+        }
+
+        public void openBookshelf() {
+            BookView.this.saveStatusData();
+            BookView.this.openShelf();
+        }
+
+        public void resizePage() {
+            BookView.this.afd_webView.loadUrl("javascript:getAndroidVersion(" + BookView.this.androidVersion + ");");
+            BookView.this.afd_webView.loadUrl("javascript:getBookData(" + BookView.this.size + "," + BookView.this.chapterSize + "," + BookView.this.bookSize + "," + BookView.this.current_chapter + "," + BookView.this.afd_epubDriver.mToc.getTotalSize() + ",'" + BookView.this.jsStringEscape(BookView.this.afd_epubDriver.mBook.metadata.identifier) + "','" + BookView.this.afd_cachePath + "','" + BookView.this.jsStringEscape(BookView.this.afd_epubDriver.mBook.metadata.title) + "');");
+            BookView.this.afd_webView.loadUrl("javascript:resizePage(" + BookView.this.current_percent + "," + BookView.this.pIndex + "," + BookView.this.sIndex + ",'" + BookView.this.clickBk + "');");
+            BookView.this.clickBk = "";
+        }
+
+        public void shareText(String str) {
+            Intent intent = new Intent();
+            intent.setAction("android.intent.action.SEND");
+            intent.putExtra("android.intent.extra.TEXT", str);
+            intent.setType("text/plain");
+            BookView.this.afd_curContext.startActivity(Intent.createChooser(intent, BookView.this.getResources().getText(R.string.send_to)));
+        }
+
+        public void sliderBarListener(float f) {
+            int i = 0;
+            int i2 = 0;
+            int i3 = 0;
+            while (true) {
+                if (i3 >= BookView.this.afd_epubDriver.mToc.getTotalSize()) {
+                    break;
+                }
+                i2 = (int) ((BookView.this.bookSize * f) - i);
+                i += BookView.this.afd_epubDriver.mToc.getChapter(i3).csize;
+                if (((int) ((BookView.this.bookSize * f) - i)) < 0) {
+                    BookView.this.current_chapter = i3;
+                    break;
+                }
+                i3++;
+            }
+            BookView.this.current_percent = (int) (((i2 * 1.0d) / BookView.this.afd_epubDriver.mToc.getChapter(BookView.this.current_chapter).csize) * 10000.0d);
+            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
+        }
+
+        public void textToSpeak(String str) {
+            BookView.this.speaking(str);
+        }
+
+        public void ttsSetting() {
+            Intent intent = new Intent();
+            intent.setAction("com.android.settings.TTS_SETTINGS");
+            intent.setFlags(268435456);
+            BookView.this.afd_curContext.startActivity(intent);
+        }
+    }
+
+    public BookView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
         setOrientation(1);
         this.afd_curContext = context;
         this.tts = new TextToSpeech(context, this);
         this.afd_webView = new EPubWebView(context);
-        DisplayMetrics metrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService("layout_inflater");
-        inflater.inflate(R.layout.afd_bookview, this);
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(new DisplayMetrics());
+        ((LayoutInflater) context.getSystemService("layout_inflater")).inflate(R.layout.afd_bookview, this);
         init();
-    }
-
-    public void customizeAdMob(Boolean display, String id) {
-        if (allowToModifyAd.booleanValue()) {
-            this.displayAd = display;
-            this.adUnitId = id;
-            return;
-        }
-        Toast.makeText(this.afd_curContext, "The free version doesn't support to customize the AdMob!", 1).show();
-    }
-
-    public void doAdMob() {
-        this.adView = new AdView((Activity) this.afd_curContext, AdSize.BANNER, this.adUnitId);
-        addView((View) this.adView, 0, (ViewGroup.LayoutParams) new LinearLayout.LayoutParams(-1, -2));
-        AdRequest adRequest = new AdRequest();
-        this.adView.loadAd(adRequest);
-    }
-
-    public void setPath(String argCachePath) {
-        this.afd_cachePath = argCachePath;
-    }
-
-    public void initBook() {
-        if (this.displayAd.booleanValue()) {
-            this.handler.postDelayed(new Runnable() { // from class: com.anfengde.epub.ui.BookView.1
-                @Override // java.lang.Runnable
-                public void run() {
-                    BookView.this.doAdMob();
-                }
-            }, 10000L);
-        }
-        this.afd_epubDriver = new EPubDriver(this.afd_cachePath);
-        int ret = this.afd_epubDriver.initEPubJNI();
-        if (ret == -2) {
-            this.afd_epubDriver.cleanUp();
-            this.afd_epubDriver = null;
-            this.afd_epubDriver = new EPubDriver(this.afd_cachePath);
-            ret = this.afd_epubDriver.initEPubJNI();
-        }
-        if (ret <= 0 && ret != -2) {
-            Toast.makeText(this.afd_curContext, "Init Error!", 50).show();
-            closeBook();
-            ((Activity) this.afd_curContext).finish();
-        }
-        this.androidVersion = Build.VERSION.SDK_INT;
-        ResourceFiles.copyResourceFiles(this.afd_cachePath, this.afd_curContext);
-        getInnerBooks();
-    }
-
-    public void openShelf() {
-        this.afd_webView.loadDataWithURL(String.valueOf(this.afd_cachePath) + "/html/index.html");
-        this.afd_webView.onBookshelf = true;
-    }
-
-    public void openBookFromFileExplorer(Intent intent) {
-        String event = intent.getAction();
-        if ("android.intent.action.VIEW".equals(event)) {
-            Uri uri = intent.getData();
-            String filePath = uri.getPath();
-            if (importBook(filePath)) {
-                this.current_percent = 0;
-                this.current_chapter = 0;
-                this.afd_epubDriver.mToc.clearChapter();
-                this.afd_epubDriver.getToc(this.afd_epubDriver.handle);
-                this.bookSize = 0;
-                openChapter(this.current_chapter, this.afd_webView);
-            }
-        }
     }
 
     private void closeBook() {
         this.afd_epubDriver.closeBook();
         this.afd_epubDriver.cleanUp();
+    }
+
+    private void copyBooksToSdcard(String str) {
+        String str2 = "/mnt/sdcard/epub/" + str;
+        File file = new File("/mnt/sdcard/epub");
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        File file2 = new File(str2);
+        if (!file2.exists()) {
+            try {
+                file2.createNewFile();
+                InputStream open = this.afd_curContext.getAssets().open("books/" + str);
+                byte[] bArr = new byte[open.available()];
+                open.read(bArr);
+                open.close();
+                FileOutputStream fileOutputStream = new FileOutputStream(file2);
+                fileOutputStream.write(bArr);
+                fileOutputStream.close();
+                importBook(str2);
+            } catch (Exception e) {
+                Log.e("copy error", "can not copy the book to sdcard!");
+            }
+        }
+    }
+
+    public void createBookshelf() {
+        this.afd_webView.loadUrl("javascript:$('#afd_books').empty();");
+        DBDriver dBDriver = new DBDriver(this.afd_curContext);
+        List<DBBooks> allBooks = dBDriver.getAllBooks();
+        dBDriver.close();
+        for (int i = 0; i < allBooks.size(); i++) {
+            String jsStringEscape = jsStringEscape(allBooks.get(i).getName());
+            String jsStringEscape2 = jsStringEscape(allBooks.get(i).getCoverimage());
+            String str = jsStringEscape2;
+            String str2 = jsStringEscape;
+            if (!jsStringEscape(allBooks.get(i).getCoverimage()).equals(Constants.COVERIMG_PATH)) {
+                if (!new File(jsStringEscape(allBooks.get(i).getCoverimage())).exists()) {
+                    str = Constants.COVERIMG_PATH;
+                    str2 = jsStringEscape;
+                } else {
+                    str2 = " ";
+                    str = jsStringEscape2;
+                }
+            }
+            this.afd_webView.loadUrl("javascript:creatBookShelf('" + jsStringEscape(allBooks.get(i).getIdentifier()) + "','" + str2 + "','" + jsStringEscape(allBooks.get(i).getAuthor()) + "','" + str + "','" + jsStringEscape(allBooks.get(i).getBookpath()) + "');");
+        }
+    }
+
+    public void doAdMob() {
+        this.adView = new AdView((Activity) this.afd_curContext, AdSize.BANNER, this.adUnitId);
+        addView((View) this.adView, 0, (ViewGroup.LayoutParams) new LinearLayout.LayoutParams(-1, -2));
+        this.adView.loadAd(new AdRequest());
+    }
+
+    public boolean errorMessage(int i) {
+        boolean z;
+        if (i <= 0) {
+            String errorMessage = this.afd_epubDriver.getErrorMessage(i);
+            String str = errorMessage;
+            if (errorMessage == null) {
+                str = "Unknown error";
+            }
+            Toast.makeText(this.afd_curContext, str, 50).show();
+            z = true;
+        } else {
+            z = false;
+        }
+        return z;
+    }
+
+    public void exitApp() {
+        this.afd_epubDriver.cleanUp();
+        this.tts.shutdown();
+        this.afd_webView.destroy();
+        closeBook();
+        ((Activity) this.afd_curContext).finish();
+    }
+
+    public List<Map<String, Object>> getData() {
+        ArrayList arrayList = new ArrayList();
+        File file = new File(this.mDir);
+        File[] listFiles = file.listFiles();
+        if (!this.mDir.equals("/")) {
+            HashMap hashMap = new HashMap();
+            hashMap.put("title", "Back to ../");
+            hashMap.put("info", file.getParent());
+            hashMap.put("img", Integer.valueOf(R.drawable.ex_folder));
+            arrayList.add(hashMap);
+        }
+        if (listFiles != null) {
+            for (int i = 0; i < listFiles.length; i++) {
+                HashMap hashMap2 = new HashMap();
+                hashMap2.put("title", listFiles[i].getName());
+                hashMap2.put("info", listFiles[i].getPath());
+                if (listFiles[i].isDirectory()) {
+                    hashMap2.put("img", Integer.valueOf(R.drawable.ex_folder));
+                } else {
+                    String path = listFiles[i].getPath();
+                    int length = path.length();
+                    if (length > 4 && path.substring(length - 4, length).equals("epub")) {
+                        hashMap2.put("img", Integer.valueOf(R.drawable.ex_doc));
+                    }
+                }
+                arrayList.add(hashMap2);
+            }
+        }
+        return arrayList;
+    }
+
+    private void getInnerBooks() {
+        try {
+            String[] list = this.afd_curContext.getAssets().list("books");
+            for (int i = 0; i < list.length; i++) {
+                String str = list[i];
+                if (str.length() > 5 && str.substring(str.length() - 5).equals(".epub")) {
+                    copyBooksToSdcard(list[i]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean importBook(String str) {
+        boolean z;
+        if (this.afd_epubDriver.openBook(str) == 0) {
+            Toast.makeText(this.afd_curContext, "Import book error!", 50).show();
+            z = false;
+        } else {
+            DBBooks dBBooks = new DBBooks();
+            dBBooks.setIdentifier(this.afd_epubDriver.mBook.metadata.identifier);
+            dBBooks.setAuthor(this.afd_epubDriver.mBook.metadata.creator);
+            dBBooks.setCoverimage(this.afd_epubDriver.getCoverImg());
+            dBBooks.setName(this.afd_epubDriver.mBook.metadata.title);
+            dBBooks.setBookpath(str);
+            DBDriver dBDriver = new DBDriver(this.afd_curContext);
+            dBDriver.addBook(dBBooks);
+            dBDriver.close();
+            z = true;
+        }
+        return z;
     }
 
     private void init() {
@@ -185,9 +520,14 @@ public class BookView extends LinearLayout implements TextToSpeech.OnInitListene
         this.afd_webView.addJavascriptInterface(new JavaScriptInterface(), "Android");
     }
 
-    public void openChapter(int chapNo, WebView webView) {
+    public boolean isOnline() {
+        NetworkInfo activeNetworkInfo = ((ConnectivityManager) this.afd_curContext.getSystemService("connectivity")).getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    public void openChapter(int i, WebView webView) {
         this.afd_webView.backReadingPage = false;
-        EPubChapter chapter = this.afd_epubDriver.mToc.getChapter(chapNo);
+        EPubChapter chapter = this.afd_epubDriver.mToc.getChapter(i);
         this.bookSize = this.afd_epubDriver.getBookSize();
         while (true) {
             if (this.bookSize != 0 && chapter.csize != 0) {
@@ -200,513 +540,164 @@ public class BookView extends LinearLayout implements TextToSpeech.OnInitListene
             }
             this.afd_epubDriver.mToc.clearChapter();
             this.afd_epubDriver.getToc(this.afd_epubDriver.handle);
-            chapter = this.afd_epubDriver.mToc.getChapter(chapNo);
+            chapter = this.afd_epubDriver.mToc.getChapter(i);
             this.bookSize = this.afd_epubDriver.getBookSize();
         }
-        String subChapterPath = chapter.href;
-        String abChapterPath = String.valueOf(this.afd_epubDriver.mBook.getPath()) + "/" + subChapterPath;
+        String str = String.valueOf(this.afd_epubDriver.mBook.getPath()) + "/" + chapter.href;
         this.size = 0;
-        for (int i = 0; i < chapNo; i++) {
-            this.size += this.afd_epubDriver.mToc.getChapter(i).csize;
+        for (int i2 = 0; i2 < i; i2++) {
+            this.size += this.afd_epubDriver.mToc.getChapter(i2).csize;
         }
         this.chapterSize = chapter.csize;
-        this.afd_webView.loadDataWithString(abChapterPath);
+        this.afd_webView.loadDataWithString(str);
         this.afd_webView.onBookshelf = false;
     }
 
-    @Override // android.view.ViewGroup, android.view.View
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == 0 && event.getKeyCode() == 4) {
-            if (this.afd_webView.inCustomView()) {
-                this.afd_webView.hideCustomView();
-                return true;
-            } else if (this.afd_webView.touchOnUrl) {
-                openChapter(this.current_chapter, this.afd_webView);
-                return true;
-            } else if (!this.afd_webView.touchOnUrl && !this.afd_webView.onBookshelf) {
-                if (this.afd_webView.isInSelectionMode()) {
-                    return true;
-                }
-                saveStatusData();
-                openShelf();
-                return true;
-            } else {
-                exitApp();
-                return true;
-            }
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
-    public void exitApp() {
-        this.afd_epubDriver.cleanUp();
-        this.tts.shutdown();
-        this.afd_webView.destroy();
-        closeBook();
-        ((Activity) this.afd_curContext).finish();
-    }
-
-    public void viewDestroy() {
-        this.tts.shutdown();
-        ((Activity) this.afd_curContext).finish();
-    }
-
-    /* loaded from: classes.dex */
-    public class JavaScriptInterface {
-        public JavaScriptInterface() {
-            BookView.this = r1;
-        }
-
-        public void exit() {
-            BookView.this.exitApp();
-        }
-
-        public void openBookshelf() {
-            BookView.this.saveStatusData();
-            BookView.this.openShelf();
-        }
-
-        public void jsOpenChapter(int i, String order) {
-            if (order.equals("preceding")) {
-                BookView.this.current_percent = 10000;
-            } else {
-                BookView.this.current_percent = 0;
-            }
-            BookView.this.current_chapter = i;
-            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
-        }
-
-        public void bkOpenChapter(int chapterIndex, int pIndexTemp, int sIndexTemp) {
-            BookView.this.current_chapter = chapterIndex;
-            BookView.this.pIndex = pIndexTemp;
-            BookView.this.sIndex = sIndexTemp;
-            BookView.this.clickBk = "clickBk";
-            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
-        }
-
-        public void getChapter() {
-            int num = BookView.this.afd_epubDriver.mToc.getChapterList().size();
-            for (int i = 0; i < num; i++) {
-                BookView.this.afd_webView.loadUrl("javascript:getChapter('" + BookView.this.jsStringEscape(BookView.this.afd_epubDriver.mToc.getChapterList().get(i).title) + "'," + BookView.this.afd_epubDriver.mToc.getChapterList().get(i).level + "," + i + "," + BookView.this.current_chapter + ")");
-            }
-        }
-
-        public void currentReadingData(int num, int pages) {
-            BookView.this.currentPageNum = num;
-            BookView.this.totalPages = pages;
-            BookView.this.current_percent = (BookView.this.currentPageNum * 10000) / BookView.this.totalPages;
-        }
-
-        public void back() {
-            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
-        }
-
-        public void sliderBarListener(float percent) {
-            int tSize = 0;
-            int tempSize = 0;
-            int i = 0;
-            while (true) {
-                if (i >= BookView.this.afd_epubDriver.mToc.getTotalSize()) {
-                    break;
-                }
-                tempSize = (int) ((BookView.this.bookSize * percent) - tSize);
-                tSize += BookView.this.afd_epubDriver.mToc.getChapter(i).csize;
-                if (((int) ((BookView.this.bookSize * percent) - tSize)) < 0) {
-                    BookView.this.current_chapter = i;
-                    break;
-                }
-                i++;
-            }
-            BookView.this.current_percent = (int) (((tempSize * 1.0d) / BookView.this.afd_epubDriver.mToc.getChapter(BookView.this.current_chapter).csize) * 10000.0d);
-            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
-        }
-
-        public void resizePage() {
-            BookView.this.afd_webView.loadUrl("javascript:getAndroidVersion(" + BookView.this.androidVersion + ");");
-            BookView.this.afd_webView.loadUrl("javascript:getBookData(" + BookView.this.size + "," + BookView.this.chapterSize + "," + BookView.this.bookSize + "," + BookView.this.current_chapter + "," + BookView.this.afd_epubDriver.mToc.getTotalSize() + ",'" + BookView.this.jsStringEscape(BookView.this.afd_epubDriver.mBook.metadata.identifier) + "','" + BookView.this.afd_cachePath + "','" + BookView.this.jsStringEscape(BookView.this.afd_epubDriver.mBook.metadata.title) + "');");
-            BookView.this.afd_webView.loadUrl("javascript:resizePage(" + BookView.this.current_percent + "," + BookView.this.pIndex + "," + BookView.this.sIndex + ",'" + BookView.this.clickBk + "');");
-            BookView.this.clickBk = "";
-        }
-
-        public void deleteBooks(String bookString) {
-            DBDriver dbdriver = new DBDriver(BookView.this.afd_curContext);
-            List<DBBooks> bookArray = dbdriver.getAllBooks();
-            String[] index = bookString.split("afd");
-            for (String str : index) {
-                DBBooks book = bookArray.get(Integer.valueOf(str).intValue());
-                dbdriver.deleteBook(book);
-                int handle = BookView.this.afd_epubDriver.clsEPub.openEPubBook(book.getBookpath());
-                if (handle == 0) {
-                    BookView.this.afd_epubDriver.clsEPub.cleanEPubBookCache(handle);
-                }
-            }
-            dbdriver.close();
-            BookView.this.createBookshelf();
-            BookView.this.afd_webView.loadUrl("javascript:$('.afd_selectBg').show()");
-        }
-
-        public void addBooks() {
-            BookView.this.showAddbooksWindow();
-        }
-
-        public void jsImportBook(String epubBookPath) {
-            Toast.makeText(BookView.this.afd_curContext, "Importing...", 1).show();
-            if (!BookView.this.importBook(epubBookPath)) {
-                return;
-            }
-            BookView.this.createBookshelf();
-        }
-
-        public void getAllBooks() {
-            BookView.this.createBookshelf();
-        }
-
-        public void openBook(String epubBookPath) {
-            Toast.makeText(BookView.this.afd_curContext, "Opening book...", 1).show();
-            BookView.this.afd_epubDriver.mToc.clearChapter();
-            BookView.this.bookPath = epubBookPath;
-            int ret = BookView.this.afd_epubDriver.openBook(BookView.this.bookPath);
-            if (BookView.this.errorMessage(ret)) {
-                return;
-            }
-            BookView.this.readReadingStatus();
-            BookView.this.openChapter(BookView.this.current_chapter, BookView.this.afd_webView);
-        }
-
-        public void downloadBook(String fileUrl) {
-            new DownloadFilesTask(BookView.this, null).execute(fileUrl);
-        }
-
-        public void copySelectionText(String text) {
-            ClipboardManager cm = (ClipboardManager) BookView.this.afd_curContext.getSystemService("clipboard");
-            cm.setText(text);
-            Toast.makeText(BookView.this.afd_curContext, "Text copied to clipboard", 50).show();
-        }
-
-        public void shareText(String text) {
-            Intent sendIntent = new Intent();
-            sendIntent.setAction("android.intent.action.SEND");
-            sendIntent.putExtra("android.intent.extra.TEXT", text);
-            sendIntent.setType("text/plain");
-            BookView.this.afd_curContext.startActivity(Intent.createChooser(sendIntent, BookView.this.getResources().getText(R.string.send_to)));
-        }
-
-        public void message(String text) {
-            Toast.makeText(BookView.this.afd_curContext, text, 50).show();
-        }
-
-        public void textToSpeak(String text) {
-            BookView.this.speaking(text);
-        }
-
-        public void downloadCancel() {
-            BookView.this.downloadCancel = true;
-        }
-
-        public void ttsSetting() {
-            Intent intent = new Intent();
-            intent.setAction("com.android.settings.TTS_SETTINGS");
-            intent.setFlags(268435456);
-            BookView.this.afd_curContext.startActivity(intent);
-        }
-    }
-
-    public boolean importBook(String epubBookPath) {
-        int ret = this.afd_epubDriver.openBook(epubBookPath);
-        if (ret == 0) {
-            Toast.makeText(this.afd_curContext, "Import book error!", 50).show();
-            return false;
-        }
-        DBBooks testBook = new DBBooks();
-        testBook.setIdentifier(this.afd_epubDriver.mBook.metadata.identifier);
-        testBook.setAuthor(this.afd_epubDriver.mBook.metadata.creator);
-        testBook.setCoverimage(this.afd_epubDriver.getCoverImg());
-        testBook.setName(this.afd_epubDriver.mBook.metadata.title);
-        testBook.setBookpath(epubBookPath);
-        DBDriver dbdriver = new DBDriver(this.afd_curContext);
-        dbdriver.addBook(testBook);
-        dbdriver.close();
-        return true;
-    }
-
     public void readReadingStatus() {
-        EPubReadingStatus status = new EPubReadingStatus();
-        this.afd_epubDriver.clsEPub.getEPubReadingStatus(status, this.afd_epubDriver.handle);
-        this.current_chapter = status.current_chapter;
-        this.current_percent = status.current_percent;
+        EPubReadingStatus ePubReadingStatus = new EPubReadingStatus();
+        this.afd_epubDriver.clsEPub.getEPubReadingStatus(ePubReadingStatus, this.afd_epubDriver.handle);
+        this.current_chapter = ePubReadingStatus.current_chapter;
+        this.current_percent = ePubReadingStatus.current_percent;
     }
 
     public void saveStatusData() {
-        EPubReadingStatus status = new EPubReadingStatus();
-        status.current_chapter = this.current_chapter;
-        status.current_percent = this.current_percent;
-        this.afd_epubDriver.clsEPub.updateEPubReadingStatus(status, this.afd_epubDriver.handle);
-    }
-
-    public void createBookshelf() {
-        this.afd_webView.loadUrl("javascript:$('#afd_books').empty();");
-        DBDriver dbdriver = new DBDriver(this.afd_curContext);
-        List<DBBooks> bookArray = dbdriver.getAllBooks();
-        dbdriver.close();
-        for (int i = 0; i < bookArray.size(); i++) {
-            String title = jsStringEscape(bookArray.get(i).getName());
-            String image = jsStringEscape(bookArray.get(i).getCoverimage());
-            if (!jsStringEscape(bookArray.get(i).getCoverimage()).equals(Constants.COVERIMG_PATH)) {
-                File file = new File(jsStringEscape(bookArray.get(i).getCoverimage()));
-                if (!file.exists()) {
-                    image = Constants.COVERIMG_PATH;
-                } else {
-                    title = " ";
-                }
-            }
-            this.afd_webView.loadUrl("javascript:creatBookShelf('" + jsStringEscape(bookArray.get(i).getIdentifier()) + "','" + title + "','" + jsStringEscape(bookArray.get(i).getAuthor()) + "','" + image + "','" + jsStringEscape(bookArray.get(i).getBookpath()) + "');");
-        }
-    }
-
-    public boolean errorMessage(int ret) {
-        if (ret <= 0) {
-            String errorMsg = this.afd_epubDriver.getErrorMessage(ret);
-            if (errorMsg == null) {
-                errorMsg = "Unknown error";
-            }
-            Toast.makeText(this.afd_curContext, errorMsg, 50).show();
-            return true;
-        }
-        return false;
+        EPubReadingStatus ePubReadingStatus = new EPubReadingStatus();
+        ePubReadingStatus.current_chapter = this.current_chapter;
+        ePubReadingStatus.current_percent = this.current_percent;
+        this.afd_epubDriver.clsEPub.updateEPubReadingStatus(ePubReadingStatus, this.afd_epubDriver.handle);
     }
 
     public void showAddbooksWindow() {
         this.mDataList = getData();
-        LayoutInflater mLayoutInflater = LayoutInflater.from(this.afd_curContext);
-        View booksWindow = mLayoutInflater.inflate(R.layout.afd_books_list, (ViewGroup) null);
-        this.bookListView = (ListView) booksWindow.findViewById(R.id.afd_book_list);
-        BookListAdapter adapter = new BookListAdapter(this.afd_curContext, this.mDataList);
-        this.bookListView.setAdapter((ListAdapter) adapter);
-        this.mBooksWindow = new PopupWindow(booksWindow, -1, -1, true);
+        View inflate = LayoutInflater.from(this.afd_curContext).inflate(R.layout.afd_books_list, (ViewGroup) null);
+        this.bookListView = (ListView) inflate.findViewById(R.id.afd_book_list);
+        this.bookListView.setAdapter((ListAdapter) new BookListAdapter(this.afd_curContext, this.mDataList));
+        this.mBooksWindow = new PopupWindow(inflate, -1, -1, true);
         this.mBooksWindow.setOutsideTouchable(true);
         this.mBooksWindow.setBackgroundDrawable(new BitmapDrawable());
         this.mBooksWindow.showAtLocation(this, 17, 0, 0);
         this.bookListView.requestFocus();
         this.bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // from class: com.anfengde.epub.ui.BookView.2
             @Override // android.widget.AdapterView.OnItemClickListener
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                if (((Integer) ((Map) BookView.this.mDataList.get(position)).get("img")).intValue() != R.drawable.ex_folder) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
+                if (((Integer) ((Map) BookView.this.mDataList.get(i)).get("img")).intValue() != R.drawable.ex_folder) {
                     BookView.this.mBooksWindow.dismiss();
-                    BookView.this.afd_webView.loadUrl("javascript:$('#filepath').attr('value','" + ((String) ((Map) BookView.this.mDataList.get(position)).get("info")) + "')");
+                    BookView.this.afd_webView.loadUrl("javascript:$('#filepath').attr('value','" + ((String) ((Map) BookView.this.mDataList.get(i)).get("info")) + "')");
                     return;
                 }
-                BookView.this.mDir = (String) ((Map) BookView.this.mDataList.get(position)).get("info");
+                BookView.this.mDir = (String) ((Map) BookView.this.mDataList.get(i)).get("info");
                 BookView.this.mDataList = BookView.this.getData();
-                BookListAdapter adapter2 = new BookListAdapter(BookView.this.afd_curContext, BookView.this.mDataList);
-                BookView.this.bookListView.setAdapter((ListAdapter) adapter2);
+                BookView.this.bookListView.setAdapter((ListAdapter) new BookListAdapter(BookView.this.afd_curContext, BookView.this.mDataList));
             }
         });
     }
 
-    public List<Map<String, Object>> getData() {
-        List<Map<String, Object>> list = new ArrayList<>();
-        File f = new File(this.mDir);
-        File[] files = f.listFiles();
-        if (!this.mDir.equals("/")) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("title", "Back to ../");
-            map.put("info", f.getParent());
-            map.put("img", Integer.valueOf(R.drawable.ex_folder));
-            list.add(map);
+    public void speaking(String str) {
+        this.tts.speak(str, 0, null);
+    }
+
+    public void customizeAdMob(Boolean bool, String str) {
+        if (!allowToModifyAd.booleanValue()) {
+            Toast.makeText(this.afd_curContext, "The free version doesn't support to customize the AdMob!", 1).show();
+            return;
         }
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                Map<String, Object> map2 = new HashMap<>();
-                map2.put("title", files[i].getName());
-                map2.put("info", files[i].getPath());
-                if (files[i].isDirectory()) {
-                    map2.put("img", Integer.valueOf(R.drawable.ex_folder));
-                } else {
-                    String tempPath = files[i].getPath();
-                    int size = tempPath.length();
-                    if (size > 4) {
-                        String epub = tempPath.substring(size - 4, size);
-                        if (epub.equals("epub")) {
-                            map2.put("img", Integer.valueOf(R.drawable.ex_doc));
-                        }
-                    }
-                }
-                list.add(map2);
+        this.displayAd = bool;
+        this.adUnitId = str;
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        boolean dispatchKeyEvent;
+        if (keyEvent.getAction() != 0 || keyEvent.getKeyCode() != 4) {
+            dispatchKeyEvent = super.dispatchKeyEvent(keyEvent);
+        } else if (this.afd_webView.inCustomView()) {
+            this.afd_webView.hideCustomView();
+            dispatchKeyEvent = true;
+        } else if (this.afd_webView.touchOnUrl) {
+            openChapter(this.current_chapter, this.afd_webView);
+            dispatchKeyEvent = true;
+        } else if (this.afd_webView.touchOnUrl || this.afd_webView.onBookshelf) {
+            exitApp();
+            dispatchKeyEvent = true;
+        } else {
+            dispatchKeyEvent = true;
+            if (!this.afd_webView.isInSelectionMode()) {
+                saveStatusData();
+                openShelf();
+                dispatchKeyEvent = true;
             }
         }
-        return list;
+        return dispatchKeyEvent;
     }
 
-    /* loaded from: classes.dex */
-    private class DownloadFilesTask extends AsyncTask<String, Integer, String> {
-        private DownloadFilesTask() {
-            BookView.this = r1;
-        }
-
-        /* synthetic */ DownloadFilesTask(BookView bookView, DownloadFilesTask downloadFilesTask) {
-            this();
-        }
-
-        public String doInBackground(String... urls) {
-            String filePath;
-            if (!BookView.this.isDownloading) {
-                BookView.this.isDownloading = true;
-                String dir = BookView.this.afd_cachePath;
-                if (!BookView.this.isOnline()) {
-                    return "Download Error!";
+    public void initBook() {
+        if (this.displayAd.booleanValue()) {
+            this.handler.postDelayed(new Runnable() { // from class: com.anfengde.epub.ui.BookView.1
+                @Override // java.lang.Runnable
+                public void run() {
+                    BookView.this.doAdMob();
                 }
-                String urlPath = urls[0];
-                if (!urlPath.contains("/") || !urlPath.substring(0, 4).equals(HttpHost.DEFAULT_SCHEME_NAME)) {
-                    return "Download Error!";
-                }
-                String[] paths = urlPath.split("/");
-                String fileName = paths[paths.length - 1];
-                int size = fileName.length();
-                try {
-                    Log.v("ContentLength", "ContentLength:fileLength");
-                    String temp = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
-                    String tempUrl = String.valueOf(urlPath.substring(0, urlPath.length() - size)) + temp;
-                    URL url = new URL(tempUrl);
-                    HttpURLConnection.setFollowRedirects(false);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setConnectTimeout(TFTP.DEFAULT_TIMEOUT);
-                    int fileLength = conn.getContentLength();
-                    Log.v("ContentLength", "ContentLength:" + fileLength);
-                    if (conn.getResponseCode() != 200 || fileLength < 1000) {
-                        return "Download Error!";
-                    }
-                    String pathName = String.valueOf(dir) + "/" + fileName;
-                    File file = new File(pathName);
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                    BookView.this.downloadCancel = false;
-                    InputStream input = new BufferedInputStream(url.openStream());
-                    new File(dir).mkdir();
-                    file.createNewFile();
-                    OutputStream output = new FileOutputStream(file);
-                    try {
-                        byte[] buffer = new byte[4096];
-                        long recivedLength = 0;
-                        while (true) {
-                            int len = input.read(buffer);
-                            if (len != -1) {
-                                recivedLength += len;
-                                publishProgress(Integer.valueOf((int) ((100 * recivedLength) / fileLength)));
-                                output.write(buffer, 0, len);
-                                if (BookView.this.downloadCancel) {
-                                    publishProgress(0);
-                                    output.flush();
-                                    output.close();
-                                    input.close();
-                                    file.delete();
-                                    filePath = "Cancel Download!";
-                                    break;
-                                }
-                            } else {
-                                output.flush();
-                                output.close();
-                                input.close();
-                                filePath = pathName;
-                                break;
-                            }
-                        }
-                        return filePath;
-                    } catch (Exception e) {
-                        return "Download Error!";
-                    }
-                } catch (Exception e2) {
-                }
-            } else {
-                return "Downloading!";
-            }
+            }, 10000L);
         }
-
-        public void onProgressUpdate(Integer... progress) {
-            BookView.this.afd_webView.loadUrl("javascript:downloadProgress(" + progress[0] + ")");
+        this.afd_epubDriver = new EPubDriver(this.afd_cachePath);
+        int initEPubJNI = this.afd_epubDriver.initEPubJNI();
+        int i = initEPubJNI;
+        if (initEPubJNI == -2) {
+            this.afd_epubDriver.cleanUp();
+            this.afd_epubDriver = null;
+            this.afd_epubDriver = new EPubDriver(this.afd_cachePath);
+            i = this.afd_epubDriver.initEPubJNI();
         }
-
-        public void onPostExecute(String result) {
-            BookView.this.afd_webView.loadUrl("javascript:setLoadingButtonStatus(0)");
-            if (result.equals("Cancel Download!")) {
-                BookView.this.isDownloading = false;
-            } else if (!result.equals("Downloading!")) {
-                if (result.equals("Download Error!")) {
-                    BookView.this.isDownloading = false;
-                    Toast.makeText(BookView.this.afd_curContext, result, 0).show();
-                } else if (BookView.this.importBook(result)) {
-                    BookView.this.isDownloading = false;
-                    BookView.this.createBookshelf();
-                    Toast.makeText(BookView.this.afd_curContext, "Download Success!", 0).show();
-                }
-            }
+        if (i <= 0 && i != -2) {
+            Toast.makeText(this.afd_curContext, "Init Error!", 50).show();
+            closeBook();
+            ((Activity) this.afd_curContext).finish();
         }
+        this.androidVersion = Build.VERSION.SDK_INT;
+        ResourceFiles.copyResourceFiles(this.afd_cachePath, this.afd_curContext);
+        getInnerBooks();
     }
 
-    public void speaking(String text) {
-        this.tts.speak(text, 0, null);
-    }
-
-    public String jsStringEscape(String src) {
-        return src.replace("''", "'").replace("'", "\\'");
-    }
-
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) this.afd_curContext.getSystemService("connectivity");
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
+    public String jsStringEscape(String str) {
+        return str.replace("''", "'").replace("'", "\\'");
     }
 
     @Override // android.speech.tts.TextToSpeech.OnInitListener
-    public void onInit(int status) {
-        if (status == 0) {
-            int result = this.tts.setLanguage(Locale.US);
-            if (result == -1 || result == -2) {
-                Log.e("TTS", "Language is not supported");
-                return;
-            }
+    public void onInit(int i) {
+        if (i != 0) {
+            Log.e("TTS", "Initilization Failed");
             return;
         }
-        Log.e("TTS", "Initilization Failed");
+        int language = this.tts.setLanguage(Locale.US);
+        if (language != -1 && language != -2) {
+            return;
+        }
+        Log.e("TTS", "Language is not supported");
     }
 
-    private void getInnerBooks() {
-        AssetManager assetManager = this.afd_curContext.getAssets();
-        try {
-            String[] files = assetManager.list("books");
-            for (int i = 0; i < files.length; i++) {
-                String temp = files[i];
-                if (temp.length() > 5 && temp.substring(temp.length() - 5).equals(".epub")) {
-                    copyBooksToSdcard(files[i]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void openBookFromFileExplorer(Intent intent) {
+        if (!"android.intent.action.VIEW".equals(intent.getAction()) || !importBook(intent.getData().getPath())) {
+            return;
         }
+        this.current_percent = 0;
+        this.current_chapter = 0;
+        this.afd_epubDriver.mToc.clearChapter();
+        this.afd_epubDriver.getToc(this.afd_epubDriver.handle);
+        this.bookSize = 0;
+        openChapter(this.current_chapter, this.afd_webView);
     }
 
-    private void copyBooksToSdcard(String bookname) {
-        String tempPath = "/mnt/sdcard/epub/" + bookname;
-        File dir = new File("/mnt/sdcard/epub");
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
-        File f = new File(tempPath);
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-                InputStream is = this.afd_curContext.getAssets().open("books/" + bookname);
-                int size = is.available();
-                byte[] buffer = new byte[size];
-                is.read(buffer);
-                is.close();
-                FileOutputStream fos = new FileOutputStream(f);
-                fos.write(buffer);
-                fos.close();
-                importBook(tempPath);
-            } catch (Exception e) {
-                Log.e("copy error", "can not copy the book to sdcard!");
-            }
-        }
+    public void openShelf() {
+        this.afd_webView.loadDataWithURL(String.valueOf(this.afd_cachePath) + "/html/index.html");
+        this.afd_webView.onBookshelf = true;
+    }
+
+    public void setPath(String str) {
+        this.afd_cachePath = str;
+    }
+
+    public void viewDestroy() {
+        this.tts.shutdown();
+        ((Activity) this.afd_curContext).finish();
     }
 }

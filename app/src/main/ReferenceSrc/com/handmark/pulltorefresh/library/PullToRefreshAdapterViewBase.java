@@ -17,7 +17,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.internal.EmptyViewMethodAccessor;
 import com.handmark.pulltorefresh.library.internal.IndicatorLayout;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshAdapterViewBase.class */
 public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extends PullToRefreshBase<T> implements AbsListView.OnScrollListener {
     private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode;
     private View mEmptyView;
@@ -58,26 +58,13 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
         return iArr;
     }
 
-    private static FrameLayout.LayoutParams convertEmptyViewLayoutParams(ViewGroup.LayoutParams lp) {
-        FrameLayout.LayoutParams newLp = null;
-        if (lp != null) {
-            newLp = new FrameLayout.LayoutParams(lp);
-            if (lp instanceof LinearLayout.LayoutParams) {
-                newLp.gravity = ((LinearLayout.LayoutParams) lp).gravity;
-            } else {
-                newLp.gravity = 17;
-            }
-        }
-        return newLp;
-    }
-
     public PullToRefreshAdapterViewBase(Context context) {
         super(context);
         ((AbsListView) this.mRefreshableView).setOnScrollListener(this);
     }
 
-    public PullToRefreshAdapterViewBase(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public PullToRefreshAdapterViewBase(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
         ((AbsListView) this.mRefreshableView).setOnScrollListener(this);
     }
 
@@ -86,89 +73,141 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
         ((AbsListView) this.mRefreshableView).setOnScrollListener(this);
     }
 
-    public PullToRefreshAdapterViewBase(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.AnimationStyle animStyle) {
-        super(context, mode, animStyle);
+    public PullToRefreshAdapterViewBase(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.AnimationStyle animationStyle) {
+        super(context, mode, animationStyle);
         ((AbsListView) this.mRefreshableView).setOnScrollListener(this);
+    }
+
+    private void addIndicatorViews() {
+        PullToRefreshBase.Mode mode = getMode();
+        FrameLayout refreshableViewWrapper = getRefreshableViewWrapper();
+        if (mode.showHeaderLoadingLayout() && this.mIndicatorIvTop == null) {
+            this.mIndicatorIvTop = new IndicatorLayout(getContext(), PullToRefreshBase.Mode.PULL_FROM_START);
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2, -2);
+            layoutParams.rightMargin = getResources().getDimensionPixelSize(R.dimen.indicator_right_padding);
+            layoutParams.gravity = 53;
+            refreshableViewWrapper.addView(this.mIndicatorIvTop, layoutParams);
+        } else if (!mode.showHeaderLoadingLayout() && this.mIndicatorIvTop != null) {
+            refreshableViewWrapper.removeView(this.mIndicatorIvTop);
+            this.mIndicatorIvTop = null;
+        }
+        if (!mode.showFooterLoadingLayout() || this.mIndicatorIvBottom != null) {
+            if (mode.showFooterLoadingLayout() || this.mIndicatorIvBottom == null) {
+                return;
+            }
+            refreshableViewWrapper.removeView(this.mIndicatorIvBottom);
+            this.mIndicatorIvBottom = null;
+            return;
+        }
+        this.mIndicatorIvBottom = new IndicatorLayout(getContext(), PullToRefreshBase.Mode.PULL_FROM_END);
+        FrameLayout.LayoutParams layoutParams2 = new FrameLayout.LayoutParams(-2, -2);
+        layoutParams2.rightMargin = getResources().getDimensionPixelSize(R.dimen.indicator_right_padding);
+        layoutParams2.gravity = 85;
+        refreshableViewWrapper.addView(this.mIndicatorIvBottom, layoutParams2);
+    }
+
+    private static FrameLayout.LayoutParams convertEmptyViewLayoutParams(ViewGroup.LayoutParams layoutParams) {
+        FrameLayout.LayoutParams layoutParams2 = null;
+        if (layoutParams != null) {
+            layoutParams2 = new FrameLayout.LayoutParams(layoutParams);
+            if (layoutParams instanceof LinearLayout.LayoutParams) {
+                layoutParams2.gravity = ((LinearLayout.LayoutParams) layoutParams).gravity;
+            } else {
+                layoutParams2.gravity = 17;
+            }
+        }
+        return layoutParams2;
+    }
+
+    private boolean getShowIndicatorInternal() {
+        return this.mShowIndicator && isPullToRefreshEnabled();
+    }
+
+    private boolean isFirstItemVisible() {
+        boolean z;
+        View childAt;
+        Adapter adapter = ((AbsListView) this.mRefreshableView).getAdapter();
+        if (adapter == null || adapter.isEmpty()) {
+            Log.d("PullToRefresh", "isFirstItemVisible. Empty View.");
+            z = true;
+        } else {
+            z = (((AbsListView) this.mRefreshableView).getFirstVisiblePosition() > 1 || (childAt = ((AbsListView) this.mRefreshableView).getChildAt(0)) == null) ? false : childAt.getTop() >= ((AbsListView) this.mRefreshableView).getTop();
+        }
+        return z;
+    }
+
+    private boolean isLastItemVisible() {
+        boolean z;
+        Adapter adapter = ((AbsListView) this.mRefreshableView).getAdapter();
+        if (adapter == null || adapter.isEmpty()) {
+            Log.d("PullToRefresh", "isLastItemVisible. Empty View.");
+            z = true;
+        } else {
+            int count = ((AbsListView) this.mRefreshableView).getCount() - 1;
+            int lastVisiblePosition = ((AbsListView) this.mRefreshableView).getLastVisiblePosition();
+            Log.d("PullToRefresh", "isLastItemVisible. Last Item Position: " + count + " Last Visible Pos: " + lastVisiblePosition);
+            if (lastVisiblePosition >= count - 1) {
+                View childAt = ((AbsListView) this.mRefreshableView).getChildAt(lastVisiblePosition - ((AbsListView) this.mRefreshableView).getFirstVisiblePosition());
+                if (childAt != null) {
+                    z = childAt.getBottom() <= ((AbsListView) this.mRefreshableView).getBottom();
+                }
+            }
+            z = false;
+        }
+        return z;
+    }
+
+    private void removeIndicatorViews() {
+        if (this.mIndicatorIvTop != null) {
+            getRefreshableViewWrapper().removeView(this.mIndicatorIvTop);
+            this.mIndicatorIvTop = null;
+        }
+        if (this.mIndicatorIvBottom != null) {
+            getRefreshableViewWrapper().removeView(this.mIndicatorIvBottom);
+            this.mIndicatorIvBottom = null;
+        }
+    }
+
+    private void updateIndicatorViewsVisibility() {
+        if (this.mIndicatorIvTop != null) {
+            if (isRefreshing() || !isReadyForPullStart()) {
+                if (this.mIndicatorIvTop.isVisible()) {
+                    this.mIndicatorIvTop.hide();
+                }
+            } else if (!this.mIndicatorIvTop.isVisible()) {
+                this.mIndicatorIvTop.show();
+            }
+        }
+        if (this.mIndicatorIvBottom != null) {
+            if (isRefreshing() || !isReadyForPullEnd()) {
+                if (!this.mIndicatorIvBottom.isVisible()) {
+                    return;
+                }
+                this.mIndicatorIvBottom.hide();
+            } else if (this.mIndicatorIvBottom.isVisible()) {
+            } else {
+                this.mIndicatorIvBottom.show();
+            }
+        }
     }
 
     public boolean getShowIndicator() {
         return this.mShowIndicator;
     }
 
-    @Override // android.widget.AbsListView.OnScrollListener
-    public final void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        Log.d("PullToRefresh", "First Visible: " + firstVisibleItem + ". Visible Count: " + visibleItemCount + ". Total Items:" + totalItemCount);
-        if (this.mOnLastItemVisibleListener != null) {
-            this.mLastItemVisible = totalItemCount > 0 && firstVisibleItem + visibleItemCount >= totalItemCount + (-1);
-        }
-        if (getShowIndicatorInternal()) {
-            updateIndicatorViewsVisibility();
-        }
-        if (this.mOnScrollListener != null) {
-            this.mOnScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
-        }
+    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
+    protected void handleStyledAttributes(TypedArray typedArray) {
+        this.mShowIndicator = typedArray.getBoolean(R.styleable.PullToRefresh_ptrShowIndicator, !isPullToRefreshOverScrollEnabled());
     }
 
-    @Override // android.widget.AbsListView.OnScrollListener
-    public final void onScrollStateChanged(AbsListView view, int state) {
-        if (state == 0 && this.mOnLastItemVisibleListener != null && this.mLastItemVisible) {
-            this.mOnLastItemVisibleListener.onLastItemVisible();
-        }
-        if (this.mOnScrollListener != null) {
-            this.mOnScrollListener.onScrollStateChanged(view, state);
-        }
+    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
+    protected boolean isReadyForPullEnd() {
+        return isLastItemVisible();
     }
 
-    public void setAdapter(ListAdapter adapter) {
-        ((AdapterView) this.mRefreshableView).setAdapter(adapter);
-    }
-
-    public final void setEmptyView(View newEmptyView) {
-        FrameLayout refreshableViewWrapper = getRefreshableViewWrapper();
-        if (newEmptyView != null) {
-            newEmptyView.setClickable(true);
-            ViewParent newEmptyViewParent = newEmptyView.getParent();
-            if (newEmptyViewParent != null && (newEmptyViewParent instanceof ViewGroup)) {
-                ((ViewGroup) newEmptyViewParent).removeView(newEmptyView);
-            }
-            FrameLayout.LayoutParams lp = convertEmptyViewLayoutParams(newEmptyView.getLayoutParams());
-            if (lp != null) {
-                refreshableViewWrapper.addView(newEmptyView, lp);
-            } else {
-                refreshableViewWrapper.addView(newEmptyView);
-            }
-        }
-        if (this.mRefreshableView instanceof EmptyViewMethodAccessor) {
-            ((EmptyViewMethodAccessor) this.mRefreshableView).setEmptyViewInternal(newEmptyView);
-        } else {
-            ((AbsListView) this.mRefreshableView).setEmptyView(newEmptyView);
-        }
-        this.mEmptyView = newEmptyView;
-    }
-
-    public void setOnItemClickListener(AdapterView.OnItemClickListener listener) {
-        ((AbsListView) this.mRefreshableView).setOnItemClickListener(listener);
-    }
-
-    public final void setOnLastItemVisibleListener(PullToRefreshBase.OnLastItemVisibleListener listener) {
-        this.mOnLastItemVisibleListener = listener;
-    }
-
-    public final void setOnScrollListener(AbsListView.OnScrollListener listener) {
-        this.mOnScrollListener = listener;
-    }
-
-    public final void setScrollEmptyView(boolean doScroll) {
-        this.mScrollEmptyView = doScroll;
-    }
-
-    public void setShowIndicator(boolean showIndicator) {
-        this.mShowIndicator = showIndicator;
-        if (getShowIndicatorInternal()) {
-            addIndicatorViews();
-        } else {
-            removeIndicatorViews();
-        }
+    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
+    protected boolean isReadyForPullStart() {
+        return isFirstItemVisible();
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
@@ -189,8 +228,8 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
     }
 
     @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected void onRefreshing(boolean doScroll) {
-        super.onRefreshing(doScroll);
+    protected void onRefreshing(boolean z) {
+        super.onRefreshing(z);
         if (getShowIndicatorInternal()) {
             updateIndicatorViewsVisibility();
         }
@@ -221,26 +260,88 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
         }
     }
 
-    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected void handleStyledAttributes(TypedArray a) {
-        this.mShowIndicator = a.getBoolean(R.styleable.PullToRefresh_ptrShowIndicator, !isPullToRefreshOverScrollEnabled());
-    }
-
-    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected boolean isReadyForPullStart() {
-        return isFirstItemVisible();
-    }
-
-    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase
-    protected boolean isReadyForPullEnd() {
-        return isLastItemVisible();
+    @Override // android.widget.AbsListView.OnScrollListener
+    public final void onScroll(AbsListView absListView, int i, int i2, int i3) {
+        Log.d("PullToRefresh", "First Visible: " + i + ". Visible Count: " + i2 + ". Total Items:" + i3);
+        if (this.mOnLastItemVisibleListener != null) {
+            this.mLastItemVisible = i3 > 0 && i + i2 >= i3 - 1;
+        }
+        if (getShowIndicatorInternal()) {
+            updateIndicatorViewsVisibility();
+        }
+        if (this.mOnScrollListener != null) {
+            this.mOnScrollListener.onScroll(absListView, i, i2, i3);
+        }
     }
 
     @Override // android.view.View
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        if (this.mEmptyView != null && !this.mScrollEmptyView) {
-            this.mEmptyView.scrollTo(-l, -t);
+    protected void onScrollChanged(int i, int i2, int i3, int i4) {
+        super.onScrollChanged(i, i2, i3, i4);
+        if (this.mEmptyView == null || this.mScrollEmptyView) {
+            return;
+        }
+        this.mEmptyView.scrollTo(-i, -i2);
+    }
+
+    @Override // android.widget.AbsListView.OnScrollListener
+    public final void onScrollStateChanged(AbsListView absListView, int i) {
+        if (i == 0 && this.mOnLastItemVisibleListener != null && this.mLastItemVisible) {
+            this.mOnLastItemVisibleListener.onLastItemVisible();
+        }
+        if (this.mOnScrollListener != null) {
+            this.mOnScrollListener.onScrollStateChanged(absListView, i);
+        }
+    }
+
+    public void setAdapter(ListAdapter listAdapter) {
+        ((AdapterView) this.mRefreshableView).setAdapter(listAdapter);
+    }
+
+    public final void setEmptyView(View view) {
+        FrameLayout refreshableViewWrapper = getRefreshableViewWrapper();
+        if (view != null) {
+            view.setClickable(true);
+            ViewParent parent = view.getParent();
+            if (parent != null && (parent instanceof ViewGroup)) {
+                ((ViewGroup) parent).removeView(view);
+            }
+            FrameLayout.LayoutParams convertEmptyViewLayoutParams = convertEmptyViewLayoutParams(view.getLayoutParams());
+            if (convertEmptyViewLayoutParams != null) {
+                refreshableViewWrapper.addView(view, convertEmptyViewLayoutParams);
+            } else {
+                refreshableViewWrapper.addView(view);
+            }
+        }
+        if (this.mRefreshableView instanceof EmptyViewMethodAccessor) {
+            ((EmptyViewMethodAccessor) this.mRefreshableView).setEmptyViewInternal(view);
+        } else {
+            ((AbsListView) this.mRefreshableView).setEmptyView(view);
+        }
+        this.mEmptyView = view;
+    }
+
+    public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+        ((AbsListView) this.mRefreshableView).setOnItemClickListener(onItemClickListener);
+    }
+
+    public final void setOnLastItemVisibleListener(PullToRefreshBase.OnLastItemVisibleListener onLastItemVisibleListener) {
+        this.mOnLastItemVisibleListener = onLastItemVisibleListener;
+    }
+
+    public final void setOnScrollListener(AbsListView.OnScrollListener onScrollListener) {
+        this.mOnScrollListener = onScrollListener;
+    }
+
+    public final void setScrollEmptyView(boolean z) {
+        this.mScrollEmptyView = z;
+    }
+
+    public void setShowIndicator(boolean z) {
+        this.mShowIndicator = z;
+        if (getShowIndicatorInternal()) {
+            addIndicatorViews();
+        } else {
+            removeIndicatorViews();
         }
     }
 
@@ -251,99 +352,6 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
             addIndicatorViews();
         } else {
             removeIndicatorViews();
-        }
-    }
-
-    private void addIndicatorViews() {
-        PullToRefreshBase.Mode mode = getMode();
-        FrameLayout refreshableViewWrapper = getRefreshableViewWrapper();
-        if (mode.showHeaderLoadingLayout() && this.mIndicatorIvTop == null) {
-            this.mIndicatorIvTop = new IndicatorLayout(getContext(), PullToRefreshBase.Mode.PULL_FROM_START);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(-2, -2);
-            params.rightMargin = getResources().getDimensionPixelSize(R.dimen.indicator_right_padding);
-            params.gravity = 53;
-            refreshableViewWrapper.addView(this.mIndicatorIvTop, params);
-        } else if (!mode.showHeaderLoadingLayout() && this.mIndicatorIvTop != null) {
-            refreshableViewWrapper.removeView(this.mIndicatorIvTop);
-            this.mIndicatorIvTop = null;
-        }
-        if (mode.showFooterLoadingLayout() && this.mIndicatorIvBottom == null) {
-            this.mIndicatorIvBottom = new IndicatorLayout(getContext(), PullToRefreshBase.Mode.PULL_FROM_END);
-            FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(-2, -2);
-            params2.rightMargin = getResources().getDimensionPixelSize(R.dimen.indicator_right_padding);
-            params2.gravity = 85;
-            refreshableViewWrapper.addView(this.mIndicatorIvBottom, params2);
-        } else if (!mode.showFooterLoadingLayout() && this.mIndicatorIvBottom != null) {
-            refreshableViewWrapper.removeView(this.mIndicatorIvBottom);
-            this.mIndicatorIvBottom = null;
-        }
-    }
-
-    private boolean getShowIndicatorInternal() {
-        return this.mShowIndicator && isPullToRefreshEnabled();
-    }
-
-    private boolean isFirstItemVisible() {
-        View firstVisibleChild;
-        Adapter adapter = ((AbsListView) this.mRefreshableView).getAdapter();
-        if (adapter == null || adapter.isEmpty()) {
-            Log.d("PullToRefresh", "isFirstItemVisible. Empty View.");
-            return true;
-        } else if (((AbsListView) this.mRefreshableView).getFirstVisiblePosition() > 1 || (firstVisibleChild = ((AbsListView) this.mRefreshableView).getChildAt(0)) == null) {
-            return false;
-        } else {
-            return firstVisibleChild.getTop() >= ((AbsListView) this.mRefreshableView).getTop();
-        }
-    }
-
-    private boolean isLastItemVisible() {
-        Adapter adapter = ((AbsListView) this.mRefreshableView).getAdapter();
-        if (adapter == null || adapter.isEmpty()) {
-            Log.d("PullToRefresh", "isLastItemVisible. Empty View.");
-            return true;
-        }
-        int lastItemPosition = ((AbsListView) this.mRefreshableView).getCount() - 1;
-        int lastVisiblePosition = ((AbsListView) this.mRefreshableView).getLastVisiblePosition();
-        Log.d("PullToRefresh", "isLastItemVisible. Last Item Position: " + lastItemPosition + " Last Visible Pos: " + lastVisiblePosition);
-        if (lastVisiblePosition >= lastItemPosition - 1) {
-            int childIndex = lastVisiblePosition - ((AbsListView) this.mRefreshableView).getFirstVisiblePosition();
-            View lastVisibleChild = ((AbsListView) this.mRefreshableView).getChildAt(childIndex);
-            if (lastVisibleChild != null) {
-                return lastVisibleChild.getBottom() <= ((AbsListView) this.mRefreshableView).getBottom();
-            }
-        }
-        return false;
-    }
-
-    private void removeIndicatorViews() {
-        if (this.mIndicatorIvTop != null) {
-            getRefreshableViewWrapper().removeView(this.mIndicatorIvTop);
-            this.mIndicatorIvTop = null;
-        }
-        if (this.mIndicatorIvBottom != null) {
-            getRefreshableViewWrapper().removeView(this.mIndicatorIvBottom);
-            this.mIndicatorIvBottom = null;
-        }
-    }
-
-    private void updateIndicatorViewsVisibility() {
-        if (this.mIndicatorIvTop != null) {
-            if (!isRefreshing() && isReadyForPullStart()) {
-                if (!this.mIndicatorIvTop.isVisible()) {
-                    this.mIndicatorIvTop.show();
-                }
-            } else if (this.mIndicatorIvTop.isVisible()) {
-                this.mIndicatorIvTop.hide();
-            }
-        }
-        if (this.mIndicatorIvBottom != null) {
-            if (!isRefreshing() && isReadyForPullEnd()) {
-                if (!this.mIndicatorIvBottom.isVisible()) {
-                    this.mIndicatorIvBottom.show();
-                }
-            } else if (this.mIndicatorIvBottom.isVisible()) {
-                this.mIndicatorIvBottom.hide();
-            }
         }
     }
 }

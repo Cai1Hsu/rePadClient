@@ -1,6 +1,6 @@
 package com.edutech.json;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/json/KeyEnvironment.class */
 public class KeyEnvironment {
     public static final String COUNT = "count";
     public static final String ISNEEDUPDATE = "isNeedUpdate";

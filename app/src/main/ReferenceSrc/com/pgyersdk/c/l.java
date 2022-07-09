@@ -10,7 +10,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicHeader;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/c/l.class */
 public final class l implements HttpEntity {
     private static final char[] a = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     private String e;
@@ -132,7 +132,7 @@ public final class l implements HttpEntity {
     }
 
     @Override // org.apache.http.HttpEntity
-    public final void writeTo(OutputStream outstream) {
-        outstream.write(this.d.toByteArray());
+    public final void writeTo(OutputStream outputStream) {
+        outputStream.write(this.d.toByteArray());
     }
 }

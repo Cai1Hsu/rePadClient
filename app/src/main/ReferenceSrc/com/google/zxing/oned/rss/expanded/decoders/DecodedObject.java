@@ -1,11 +1,11 @@
 package com.google.zxing.oned.rss.expanded.decoders;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/DecodedObject.class */
 abstract class DecodedObject {
     private final int newPosition;
 
-    DecodedObject(int newPosition) {
-        this.newPosition = newPosition;
+    DecodedObject(int i) {
+        this.newPosition = i;
     }
 
     int getNewPosition() {

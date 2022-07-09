@@ -2,7 +2,7 @@ package com.google.zxing.common.reedsolomon;
 
 import org.apache.http.HttpStatus;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/common/reedsolomon/GenericGF.class */
 public final class GenericGF {
     private static final int INITIALIZATION_THRESHOLD = 0;
     private int[] expTable;
@@ -21,31 +21,16 @@ public final class GenericGF {
     public static final GenericGF AZTEC_DATA_8 = DATA_MATRIX_FIELD_256;
     public static final GenericGF MAXICODE_FIELD_64 = AZTEC_DATA_6;
 
-    public GenericGF(int primitive, int size) {
-        this.primitive = primitive;
-        this.size = size;
-        if (size <= 0) {
+    public GenericGF(int i, int i2) {
+        this.primitive = i;
+        this.size = i2;
+        if (i2 <= 0) {
             initialize();
         }
     }
 
-    private void initialize() {
-        this.expTable = new int[this.size];
-        this.logTable = new int[this.size];
-        int x = 1;
-        for (int i = 0; i < this.size; i++) {
-            this.expTable[i] = x;
-            x <<= 1;
-            if (x >= this.size) {
-                x = (x ^ this.primitive) & (this.size - 1);
-            }
-        }
-        for (int i2 = 0; i2 < this.size - 1; i2++) {
-            this.logTable[this.expTable[i2]] = i2;
-        }
-        this.zero = new GenericGFPoly(this, new int[]{0});
-        this.one = new GenericGFPoly(this, new int[]{1});
-        this.initialized = true;
+    static int addOrSubtract(int i, int i2) {
+        return i ^ i2;
     }
 
     private void checkInit() {
@@ -54,9 +39,45 @@ public final class GenericGF {
         }
     }
 
-    GenericGFPoly getZero() {
+    private void initialize() {
+        this.expTable = new int[this.size];
+        this.logTable = new int[this.size];
+        int i = 1;
+        for (int i2 = 0; i2 < this.size; i2++) {
+            this.expTable[i2] = i;
+            int i3 = i << 1;
+            i = i3;
+            if (i3 >= this.size) {
+                i = (i3 ^ this.primitive) & (this.size - 1);
+            }
+        }
+        for (int i4 = 0; i4 < this.size - 1; i4++) {
+            this.logTable[this.expTable[i4]] = i4;
+        }
+        this.zero = new GenericGFPoly(this, new int[]{0});
+        this.one = new GenericGFPoly(this, new int[]{1});
+        this.initialized = true;
+    }
+
+    GenericGFPoly buildMonomial(int i, int i2) {
+        GenericGFPoly genericGFPoly;
         checkInit();
-        return this.zero;
+        if (i < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (i2 == 0) {
+            genericGFPoly = this.zero;
+        } else {
+            int[] iArr = new int[i + 1];
+            iArr[0] = i2;
+            genericGFPoly = new GenericGFPoly(this, iArr);
+        }
+        return genericGFPoly;
+    }
+
+    int exp(int i) {
+        checkInit();
+        return this.expTable[i];
     }
 
     GenericGFPoly getOne() {
@@ -64,57 +85,51 @@ public final class GenericGF {
         return this.one;
     }
 
-    GenericGFPoly buildMonomial(int degree, int coefficient) {
-        checkInit();
-        if (degree < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (coefficient == 0) {
-            return this.zero;
-        }
-        int[] coefficients = new int[degree + 1];
-        coefficients[0] = coefficient;
-        return new GenericGFPoly(this, coefficients);
-    }
-
-    static int addOrSubtract(int a, int b) {
-        return a ^ b;
-    }
-
-    int exp(int a) {
-        checkInit();
-        return this.expTable[a];
-    }
-
-    int log(int a) {
-        checkInit();
-        if (a == 0) {
-            throw new IllegalArgumentException();
-        }
-        return this.logTable[a];
-    }
-
-    int inverse(int a) {
-        checkInit();
-        if (a == 0) {
-            throw new ArithmeticException();
-        }
-        return this.expTable[(this.size - this.logTable[a]) - 1];
-    }
-
-    int multiply(int a, int b) {
-        checkInit();
-        if (a == 0 || b == 0) {
-            return 0;
-        }
-        if (a < 0 || b < 0 || a >= this.size || b >= this.size) {
-            a++;
-        }
-        int logSum = this.logTable[a] + this.logTable[b];
-        return this.expTable[(logSum % this.size) + (logSum / this.size)];
-    }
-
     public int getSize() {
         return this.size;
+    }
+
+    GenericGFPoly getZero() {
+        checkInit();
+        return this.zero;
+    }
+
+    int inverse(int i) {
+        checkInit();
+        if (i == 0) {
+            throw new ArithmeticException();
+        }
+        return this.expTable[(this.size - this.logTable[i]) - 1];
+    }
+
+    int log(int i) {
+        checkInit();
+        if (i == 0) {
+            throw new IllegalArgumentException();
+        }
+        return this.logTable[i];
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:16:0x0027, code lost:
+        if (r7 >= r5.size) goto L17;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    int multiply(int i, int i2) {
+        int i3;
+        int i4;
+        checkInit();
+        if (i == 0 || i2 == 0) {
+            i3 = 0;
+        } else {
+            if (i >= 0 && i2 >= 0 && i < this.size) {
+                i4 = i;
+            }
+            i4 = i + 1;
+            int i5 = this.logTable[i4] + this.logTable[i2];
+            i3 = this.expTable[(i5 % this.size) + (i5 / this.size)];
+        }
+        return i3;
     }
 }

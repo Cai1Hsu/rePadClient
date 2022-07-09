@@ -3,7 +3,7 @@ package com.pgyersdk.feedback;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/feedback/h.class */
 final class h extends AsyncTask {
     final /* synthetic */ c a;
     private final /* synthetic */ Bitmap b;

@@ -3,7 +3,7 @@ package com.google.zxing;
 import java.util.EnumMap;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/Result.class */
 public final class Result {
     private final BarcodeFormat format;
     private final byte[] rawBytes;
@@ -12,70 +12,71 @@ public final class Result {
     private final String text;
     private final long timestamp;
 
-    public Result(String text, byte[] rawBytes, ResultPoint[] resultPoints, BarcodeFormat format) {
-        this(text, rawBytes, resultPoints, format, System.currentTimeMillis());
+    public Result(String str, byte[] bArr, ResultPoint[] resultPointArr, BarcodeFormat barcodeFormat) {
+        this(str, bArr, resultPointArr, barcodeFormat, System.currentTimeMillis());
     }
 
-    public Result(String text, byte[] rawBytes, ResultPoint[] resultPoints, BarcodeFormat format, long timestamp) {
-        this.text = text;
-        this.rawBytes = rawBytes;
-        this.resultPoints = resultPoints;
-        this.format = format;
+    public Result(String str, byte[] bArr, ResultPoint[] resultPointArr, BarcodeFormat barcodeFormat, long j) {
+        this.text = str;
+        this.rawBytes = bArr;
+        this.resultPoints = resultPointArr;
+        this.format = barcodeFormat;
         this.resultMetadata = null;
-        this.timestamp = timestamp;
+        this.timestamp = j;
     }
 
-    public String getText() {
-        return this.text;
-    }
-
-    public byte[] getRawBytes() {
-        return this.rawBytes;
-    }
-
-    public ResultPoint[] getResultPoints() {
-        return this.resultPoints;
+    public void addResultPoints(ResultPoint[] resultPointArr) {
+        ResultPoint[] resultPointArr2 = this.resultPoints;
+        if (resultPointArr2 == null) {
+            this.resultPoints = resultPointArr;
+        } else if (resultPointArr == null || resultPointArr.length <= 0) {
+        } else {
+            ResultPoint[] resultPointArr3 = new ResultPoint[resultPointArr2.length + resultPointArr.length];
+            System.arraycopy(resultPointArr2, 0, resultPointArr3, 0, resultPointArr2.length);
+            System.arraycopy(resultPointArr, 0, resultPointArr3, resultPointArr2.length, resultPointArr.length);
+            this.resultPoints = resultPointArr3;
+        }
     }
 
     public BarcodeFormat getBarcodeFormat() {
         return this.format;
     }
 
+    public byte[] getRawBytes() {
+        return this.rawBytes;
+    }
+
     public Map<ResultMetadataType, Object> getResultMetadata() {
         return this.resultMetadata;
     }
 
-    public void putMetadata(ResultMetadataType type, Object value) {
-        if (this.resultMetadata == null) {
-            this.resultMetadata = new EnumMap(ResultMetadataType.class);
-        }
-        this.resultMetadata.put(type, value);
+    public ResultPoint[] getResultPoints() {
+        return this.resultPoints;
     }
 
-    public void putAllMetadata(Map<ResultMetadataType, Object> metadata) {
-        if (metadata != null) {
-            if (this.resultMetadata == null) {
-                this.resultMetadata = metadata;
-            } else {
-                this.resultMetadata.putAll(metadata);
-            }
-        }
-    }
-
-    public void addResultPoints(ResultPoint[] newPoints) {
-        ResultPoint[] oldPoints = this.resultPoints;
-        if (oldPoints == null) {
-            this.resultPoints = newPoints;
-        } else if (newPoints != null && newPoints.length > 0) {
-            ResultPoint[] allPoints = new ResultPoint[oldPoints.length + newPoints.length];
-            System.arraycopy(oldPoints, 0, allPoints, 0, oldPoints.length);
-            System.arraycopy(newPoints, 0, allPoints, oldPoints.length, newPoints.length);
-            this.resultPoints = allPoints;
-        }
+    public String getText() {
+        return this.text;
     }
 
     public long getTimestamp() {
         return this.timestamp;
+    }
+
+    public void putAllMetadata(Map<ResultMetadataType, Object> map) {
+        if (map != null) {
+            if (this.resultMetadata == null) {
+                this.resultMetadata = map;
+            } else {
+                this.resultMetadata.putAll(map);
+            }
+        }
+    }
+
+    public void putMetadata(ResultMetadataType resultMetadataType, Object obj) {
+        if (this.resultMetadata == null) {
+            this.resultMetadata = new EnumMap(ResultMetadataType.class);
+        }
+        this.resultMetadata.put(resultMetadataType, obj);
     }
 
     public String toString() {

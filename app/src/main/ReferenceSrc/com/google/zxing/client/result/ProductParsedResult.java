@@ -1,21 +1,22 @@
 package com.google.zxing.client.result;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/ProductParsedResult.class */
 public final class ProductParsedResult extends ParsedResult {
     private final String normalizedProductID;
     private final String productID;
 
-    ProductParsedResult(String productID) {
-        this(productID, productID);
+    ProductParsedResult(String str) {
+        this(str, str);
     }
 
-    ProductParsedResult(String productID, String normalizedProductID) {
+    ProductParsedResult(String str, String str2) {
         super(ParsedResultType.PRODUCT);
-        this.productID = productID;
-        this.normalizedProductID = normalizedProductID;
+        this.productID = str;
+        this.normalizedProductID = str2;
     }
 
-    public String getProductID() {
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
         return this.productID;
     }
 
@@ -23,8 +24,7 @@ public final class ProductParsedResult extends ParsedResult {
         return this.normalizedProductID;
     }
 
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
+    public String getProductID() {
         return this.productID;
     }
 }

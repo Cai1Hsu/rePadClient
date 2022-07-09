@@ -17,7 +17,7 @@ import org.apache.http.cookie.ClientCookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/crash/a.class */
 public final class a implements Thread.UncaughtExceptionHandler {
     private boolean a;
     private g b = null;
@@ -68,14 +68,7 @@ public final class a implements Thread.UncaughtExceptionHandler {
     private static void b(String str) {
         try {
             String str2 = String.valueOf(com.pgyersdk.a.a.a) + "/" + str;
-            String str3 = null;
-            if (str3.trim().length() <= 0) {
-                return;
-            }
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(str2));
-            bufferedWriter.write((String) null);
-            bufferedWriter.flush();
-            bufferedWriter.close();
+            throw new NullPointerException();
         } catch (Exception e) {
         }
     }
@@ -165,14 +158,14 @@ public final class a implements Thread.UncaughtExceptionHandler {
     }
 
     @Override // java.lang.Thread.UncaughtExceptionHandler
-    public final void uncaughtException(Thread thread, Throwable exception) {
+    public final void uncaughtException(Thread thread, Throwable th) {
         if (com.pgyersdk.a.a.a == null) {
-            this.c.uncaughtException(thread, exception);
+            this.c.uncaughtException(thread, th);
             return;
         }
-        new b(this, exception).start();
+        new b(this, th).start();
         if (!this.a) {
-            this.c.uncaughtException(thread, exception);
+            this.c.uncaughtException(thread, th);
             return;
         }
         Process.killProcess(Process.myPid());

@@ -2,41 +2,40 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 import java.util.ArrayList;
-import java.util.List;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/AddressBookAUResultParser.class */
 public final class AddressBookAUResultParser extends ResultParser {
-    @Override // com.google.zxing.client.result.ResultParser
-    public AddressBookParsedResult parse(Result result) {
-        String rawText = result.getText();
-        if (!rawText.contains("MEMORY") || !rawText.contains("\r\n")) {
-            return null;
+    private static String[] matchMultipleValuePrefix(String str, int i, String str2, boolean z) {
+        String matchSinglePrefixedField;
+        ArrayList arrayList = null;
+        int i2 = 1;
+        while (i2 <= i && (matchSinglePrefixedField = matchSinglePrefixedField(str + i2 + ':', str2, '\r', z)) != null) {
+            ArrayList arrayList2 = arrayList;
+            if (arrayList == null) {
+                arrayList2 = new ArrayList(i);
+            }
+            arrayList2.add(matchSinglePrefixedField);
+            i2++;
+            arrayList = arrayList2;
         }
-        String name = matchSinglePrefixedField("NAME1:", rawText, '\r', true);
-        String pronunciation = matchSinglePrefixedField("NAME2:", rawText, '\r', true);
-        String[] phoneNumbers = matchMultipleValuePrefix("TEL", 3, rawText, true);
-        String[] emails = matchMultipleValuePrefix("MAIL", 3, rawText, true);
-        String note = matchSinglePrefixedField("MEMORY:", rawText, '\r', false);
-        String address = matchSinglePrefixedField("ADD:", rawText, '\r', true);
-        String[] addresses = address == null ? null : new String[]{address};
-        return new AddressBookParsedResult(maybeWrap(name), pronunciation, phoneNumbers, null, emails, null, null, note, addresses, null, null, null, null, null);
+        return arrayList == null ? null : (String[]) arrayList.toArray(new String[arrayList.size()]);
     }
 
-    private static String[] matchMultipleValuePrefix(String prefix, int max, String rawText, boolean trim) {
-        List<String> values = null;
-        for (int i = 1; i <= max; i++) {
-            String value = matchSinglePrefixedField(prefix + i + ':', rawText, '\r', trim);
-            if (value == null) {
-                break;
-            }
-            if (values == null) {
-                values = new ArrayList<>(max);
-            }
-            values.add(value);
+    @Override // com.google.zxing.client.result.ResultParser
+    public AddressBookParsedResult parse(Result result) {
+        AddressBookParsedResult addressBookParsedResult;
+        String text = result.getText();
+        if (!text.contains("MEMORY") || !text.contains("\r\n")) {
+            addressBookParsedResult = null;
+        } else {
+            String matchSinglePrefixedField = matchSinglePrefixedField("NAME1:", text, '\r', true);
+            String matchSinglePrefixedField2 = matchSinglePrefixedField("NAME2:", text, '\r', true);
+            String[] matchMultipleValuePrefix = matchMultipleValuePrefix("TEL", 3, text, true);
+            String[] matchMultipleValuePrefix2 = matchMultipleValuePrefix("MAIL", 3, text, true);
+            String matchSinglePrefixedField3 = matchSinglePrefixedField("MEMORY:", text, '\r', false);
+            String matchSinglePrefixedField4 = matchSinglePrefixedField("ADD:", text, '\r', true);
+            addressBookParsedResult = new AddressBookParsedResult(maybeWrap(matchSinglePrefixedField), matchSinglePrefixedField2, matchMultipleValuePrefix, null, matchMultipleValuePrefix2, null, null, matchSinglePrefixedField3, matchSinglePrefixedField4 == null ? null : new String[]{matchSinglePrefixedField4}, null, null, null, null, null);
         }
-        if (values == null) {
-            return null;
-        }
-        return (String[]) values.toArray(new String[values.size()]);
+        return addressBookParsedResult;
     }
 }

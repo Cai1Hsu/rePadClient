@@ -2,36 +2,20 @@ package com.brandontate.androidwebviewselection;
 
 import android.content.Context;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/brandontate/androidwebviewselection/TextSelectionJavascriptInterface.class */
 public class TextSelectionJavascriptInterface {
     private static final String TAG = "TextSelectionJavascriptInterface";
     private final String interfaceName = "TextSelection";
     private TextSelectionJavascriptInterfaceListener listener;
     Context mContext;
 
-    public TextSelectionJavascriptInterface(Context c) {
-        this.mContext = c;
+    public TextSelectionJavascriptInterface(Context context) {
+        this.mContext = context;
     }
 
-    public TextSelectionJavascriptInterface(Context c, TextSelectionJavascriptInterfaceListener listener) {
-        this.mContext = c;
-        this.listener = listener;
-    }
-
-    public void jsError(String error) {
-        if (this.listener != null) {
-            this.listener.tsjiJSError(error);
-        }
-    }
-
-    public String getInterfaceName() {
-        return "TextSelection";
-    }
-
-    public void startSelectionMode() {
-        if (this.listener != null) {
-            this.listener.tsjiStartSelectionMode();
-        }
+    public TextSelectionJavascriptInterface(Context context, TextSelectionJavascriptInterfaceListener textSelectionJavascriptInterfaceListener) {
+        this.mContext = context;
+        this.listener = textSelectionJavascriptInterfaceListener;
     }
 
     public void endSelectionMode() {
@@ -40,15 +24,31 @@ public class TextSelectionJavascriptInterface {
         }
     }
 
-    public void selectionChanged(String range, String text, String handleBounds, String menuBounds) {
+    public String getInterfaceName() {
+        return "TextSelection";
+    }
+
+    public void jsError(String str) {
         if (this.listener != null) {
-            this.listener.tsjiSelectionChanged(range, text, handleBounds, menuBounds);
+            this.listener.tsjiJSError(str);
         }
     }
 
-    public void setContentWidth(float contentWidth) {
+    public void selectionChanged(String str, String str2, String str3, String str4) {
         if (this.listener != null) {
-            this.listener.tsjiSetContentWidth(contentWidth);
+            this.listener.tsjiSelectionChanged(str, str2, str3, str4);
+        }
+    }
+
+    public void setContentWidth(float f) {
+        if (this.listener != null) {
+            this.listener.tsjiSetContentWidth(f);
+        }
+    }
+
+    public void startSelectionMode() {
+        if (this.listener != null) {
+            this.listener.tsjiStartSelectionMode();
         }
     }
 }

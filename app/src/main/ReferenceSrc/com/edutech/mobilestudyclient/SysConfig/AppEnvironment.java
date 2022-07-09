@@ -3,7 +3,7 @@ package com.edutech.mobilestudyclient.SysConfig;
 import android.os.Environment;
 import java.io.File;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/SysConfig/AppEnvironment.class */
 public class AppEnvironment {
     public static final String APP_NAME = "appname";
     public static final String APP_WEBPATH = "appwebpath";

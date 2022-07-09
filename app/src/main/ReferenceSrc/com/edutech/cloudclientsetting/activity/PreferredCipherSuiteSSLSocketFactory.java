@@ -9,13 +9,62 @@ import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/PreferredCipherSuiteSSLSocketFactory.class */
 public class PreferredCipherSuiteSSLSocketFactory extends SSLSocketFactory {
     private static final String PREFERRED_CIPHER_SUITE = "SSL_RSA_WITH_RC4_128_MD5";
     private final SSLSocketFactory delegate;
 
-    public PreferredCipherSuiteSSLSocketFactory(SSLSocketFactory delegate) {
-        this.delegate = delegate;
+    public PreferredCipherSuiteSSLSocketFactory(SSLSocketFactory sSLSocketFactory) {
+        this.delegate = sSLSocketFactory;
+    }
+
+    private static String[] setupPreferredDefaultCipherSuites(SSLSocketFactory sSLSocketFactory) {
+        ArrayList arrayList = new ArrayList(Arrays.asList(sSLSocketFactory.getDefaultCipherSuites()));
+        arrayList.remove(PREFERRED_CIPHER_SUITE);
+        arrayList.add(0, PREFERRED_CIPHER_SUITE);
+        return (String[]) arrayList.toArray(new String[arrayList.size()]);
+    }
+
+    private static String[] setupPreferredSupportedCipherSuites(SSLSocketFactory sSLSocketFactory) {
+        ArrayList arrayList = new ArrayList(Arrays.asList(sSLSocketFactory.getSupportedCipherSuites()));
+        arrayList.remove(PREFERRED_CIPHER_SUITE);
+        arrayList.add(0, PREFERRED_CIPHER_SUITE);
+        return (String[]) arrayList.toArray(new String[arrayList.size()]);
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(String str, int i) throws IOException, UnknownHostException {
+        Socket createSocket = this.delegate.createSocket(str, i);
+        ((SSLSocket) createSocket).setEnabledCipherSuites(setupPreferredDefaultCipherSuites(this.delegate));
+        return createSocket;
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(String str, int i, InetAddress inetAddress, int i2) throws IOException, UnknownHostException {
+        Socket createSocket = this.delegate.createSocket(str, i, inetAddress, i2);
+        ((SSLSocket) createSocket).setEnabledCipherSuites(setupPreferredDefaultCipherSuites(this.delegate));
+        return createSocket;
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+        Socket createSocket = this.delegate.createSocket(inetAddress, i);
+        ((SSLSocket) createSocket).setEnabledCipherSuites(setupPreferredDefaultCipherSuites(this.delegate));
+        return createSocket;
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress2, int i2) throws IOException {
+        Socket createSocket = this.delegate.createSocket(inetAddress, i, inetAddress2, i2);
+        ((SSLSocket) createSocket).setEnabledCipherSuites(setupPreferredDefaultCipherSuites(this.delegate));
+        return createSocket;
+    }
+
+    @Override // javax.net.ssl.SSLSocketFactory
+    public Socket createSocket(Socket socket, String str, int i, boolean z) throws IOException {
+        Socket createSocket = this.delegate.createSocket(socket, str, i, z);
+        ((SSLSocket) createSocket).setEnabledCipherSuites(setupPreferredDefaultCipherSuites(this.delegate));
+        return createSocket;
     }
 
     @Override // javax.net.ssl.SSLSocketFactory
@@ -26,61 +75,5 @@ public class PreferredCipherSuiteSSLSocketFactory extends SSLSocketFactory {
     @Override // javax.net.ssl.SSLSocketFactory
     public String[] getSupportedCipherSuites() {
         return setupPreferredSupportedCipherSuites(this.delegate);
-    }
-
-    @Override // javax.net.SocketFactory
-    public Socket createSocket(String arg0, int arg1) throws IOException, UnknownHostException {
-        Socket socket = this.delegate.createSocket(arg0, arg1);
-        String[] cipherSuites = setupPreferredDefaultCipherSuites(this.delegate);
-        ((SSLSocket) socket).setEnabledCipherSuites(cipherSuites);
-        return socket;
-    }
-
-    @Override // javax.net.SocketFactory
-    public Socket createSocket(InetAddress arg0, int arg1) throws IOException {
-        Socket socket = this.delegate.createSocket(arg0, arg1);
-        String[] cipherSuites = setupPreferredDefaultCipherSuites(this.delegate);
-        ((SSLSocket) socket).setEnabledCipherSuites(cipherSuites);
-        return socket;
-    }
-
-    @Override // javax.net.ssl.SSLSocketFactory
-    public Socket createSocket(Socket arg0, String arg1, int arg2, boolean arg3) throws IOException {
-        Socket socket = this.delegate.createSocket(arg0, arg1, arg2, arg3);
-        String[] cipherSuites = setupPreferredDefaultCipherSuites(this.delegate);
-        ((SSLSocket) socket).setEnabledCipherSuites(cipherSuites);
-        return socket;
-    }
-
-    @Override // javax.net.SocketFactory
-    public Socket createSocket(String arg0, int arg1, InetAddress arg2, int arg3) throws IOException, UnknownHostException {
-        Socket socket = this.delegate.createSocket(arg0, arg1, arg2, arg3);
-        String[] cipherSuites = setupPreferredDefaultCipherSuites(this.delegate);
-        ((SSLSocket) socket).setEnabledCipherSuites(cipherSuites);
-        return socket;
-    }
-
-    @Override // javax.net.SocketFactory
-    public Socket createSocket(InetAddress arg0, int arg1, InetAddress arg2, int arg3) throws IOException {
-        Socket socket = this.delegate.createSocket(arg0, arg1, arg2, arg3);
-        String[] cipherSuites = setupPreferredDefaultCipherSuites(this.delegate);
-        ((SSLSocket) socket).setEnabledCipherSuites(cipherSuites);
-        return socket;
-    }
-
-    private static String[] setupPreferredDefaultCipherSuites(SSLSocketFactory sslSocketFactory) {
-        String[] defaultCipherSuites = sslSocketFactory.getDefaultCipherSuites();
-        ArrayList<String> suitesList = new ArrayList<>(Arrays.asList(defaultCipherSuites));
-        suitesList.remove(PREFERRED_CIPHER_SUITE);
-        suitesList.add(0, PREFERRED_CIPHER_SUITE);
-        return (String[]) suitesList.toArray(new String[suitesList.size()]);
-    }
-
-    private static String[] setupPreferredSupportedCipherSuites(SSLSocketFactory sslSocketFactory) {
-        String[] supportedCipherSuites = sslSocketFactory.getSupportedCipherSuites();
-        ArrayList<String> suitesList = new ArrayList<>(Arrays.asList(supportedCipherSuites));
-        suitesList.remove(PREFERRED_CIPHER_SUITE);
-        suitesList.add(0, PREFERRED_CIPHER_SUITE);
-        return (String[]) suitesList.toArray(new String[suitesList.size()]);
     }
 }

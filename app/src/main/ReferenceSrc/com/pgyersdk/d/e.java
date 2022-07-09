@@ -2,7 +2,7 @@ package com.pgyersdk.d;
 
 import android.widget.CompoundButton;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/d/e.class */
 final class e implements CompoundButton.OnCheckedChangeListener {
     final /* synthetic */ a a;
 

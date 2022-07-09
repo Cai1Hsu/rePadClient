@@ -1,6 +1,6 @@
 package com.google.zxing;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/NotFoundException.class */
 public final class NotFoundException extends ReaderException {
     private static final NotFoundException instance = new NotFoundException();
 

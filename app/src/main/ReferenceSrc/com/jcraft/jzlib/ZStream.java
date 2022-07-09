@@ -1,6 +1,6 @@
 package com.jcraft.jzlib;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/jcraft/jzlib/ZStream.class */
 public final class ZStream {
     private static final int DEF_WBITS = 15;
     private static final int MAX_MEM_LEVEL = 9;
@@ -34,146 +34,74 @@ public final class ZStream {
     public long total_in;
     public long total_out;
 
-    public int inflateInit() {
-        return inflateInit(15);
-    }
-
-    public int inflateInit(boolean nowrap) {
-        return inflateInit(15, nowrap);
-    }
-
-    public int inflateInit(int w) {
-        return inflateInit(w, false);
-    }
-
-    public int inflateInit(int w, boolean nowrap) {
-        this.istate = new Inflate();
-        Inflate inflate = this.istate;
-        if (nowrap) {
-            w = -w;
-        }
-        return inflate.inflateInit(this, w);
-    }
-
-    public int inflate(int f) {
-        if (this.istate == null) {
-            return -2;
-        }
-        return this.istate.inflate(this, f);
-    }
-
-    public int inflateEnd() {
-        if (this.istate == null) {
-            return -2;
-        }
-        int inflateEnd = this.istate.inflateEnd(this);
-        this.istate = null;
-        return inflateEnd;
-    }
-
-    public int inflateSync() {
-        if (this.istate == null) {
-            return -2;
-        }
-        return this.istate.inflateSync(this);
-    }
-
-    public int inflateSetDictionary(byte[] dictionary, int dictLength) {
-        if (this.istate == null) {
-            return -2;
-        }
-        return this.istate.inflateSetDictionary(this, dictionary, dictLength);
-    }
-
-    public int deflateInit(int level) {
-        return deflateInit(level, 15);
-    }
-
-    public int deflateInit(int level, boolean nowrap) {
-        return deflateInit(level, 15, nowrap);
-    }
-
-    public int deflateInit(int level, int bits) {
-        return deflateInit(level, bits, false);
-    }
-
-    public int deflateInit(int level, int bits, boolean nowrap) {
-        this.dstate = new Deflate();
-        Deflate deflate = this.dstate;
-        if (nowrap) {
-            bits = -bits;
-        }
-        return deflate.deflateInit(this, level, bits);
-    }
-
-    public int deflate(int flush) {
-        if (this.dstate == null) {
-            return -2;
-        }
-        return this.dstate.deflate(this, flush);
+    public int deflate(int i) {
+        return this.dstate == null ? -2 : this.dstate.deflate(this, i);
     }
 
     public int deflateEnd() {
+        int deflateEnd;
         if (this.dstate == null) {
-            return -2;
+            deflateEnd = -2;
+        } else {
+            deflateEnd = this.dstate.deflateEnd();
+            this.dstate = null;
         }
-        int deflateEnd = this.dstate.deflateEnd();
-        this.dstate = null;
         return deflateEnd;
     }
 
-    public int deflateParams(int level, int strategy) {
-        if (this.dstate == null) {
-            return -2;
-        }
-        return this.dstate.deflateParams(this, level, strategy);
+    public int deflateInit(int i) {
+        return deflateInit(i, 15);
     }
 
-    public int deflateSetDictionary(byte[] dictionary, int dictLength) {
-        if (this.dstate == null) {
-            return -2;
+    public int deflateInit(int i, int i2) {
+        return deflateInit(i, i2, false);
+    }
+
+    public int deflateInit(int i, int i2, boolean z) {
+        this.dstate = new Deflate();
+        Deflate deflate = this.dstate;
+        int i3 = i2;
+        if (z) {
+            i3 = -i2;
         }
-        return this.dstate.deflateSetDictionary(this, dictionary, dictLength);
+        return deflate.deflateInit(this, i, i3);
+    }
+
+    public int deflateInit(int i, boolean z) {
+        return deflateInit(i, 15, z);
+    }
+
+    public int deflateParams(int i, int i2) {
+        return this.dstate == null ? -2 : this.dstate.deflateParams(this, i, i2);
+    }
+
+    public int deflateSetDictionary(byte[] bArr, int i) {
+        return this.dstate == null ? -2 : this.dstate.deflateSetDictionary(this, bArr, i);
     }
 
     void flush_pending() {
-        int len = this.dstate.pending;
-        if (len > this.avail_out) {
-            len = this.avail_out;
+        int i = this.dstate.pending;
+        int i2 = i;
+        if (i > this.avail_out) {
+            i2 = this.avail_out;
         }
-        if (len != 0) {
-            if (this.dstate.pending_buf.length <= this.dstate.pending_out || this.next_out.length <= this.next_out_index || this.dstate.pending_buf.length < this.dstate.pending_out + len || this.next_out.length < this.next_out_index + len) {
-                System.out.println(new StringBuffer().append(this.dstate.pending_buf.length).append(", ").append(this.dstate.pending_out).append(", ").append(this.next_out.length).append(", ").append(this.next_out_index).append(", ").append(len).toString());
-                System.out.println(new StringBuffer().append("avail_out=").append(this.avail_out).toString());
-            }
-            System.arraycopy(this.dstate.pending_buf, this.dstate.pending_out, this.next_out, this.next_out_index, len);
-            this.next_out_index += len;
-            this.dstate.pending_out += len;
-            this.total_out += len;
-            this.avail_out -= len;
-            this.dstate.pending -= len;
-            if (this.dstate.pending == 0) {
-                this.dstate.pending_out = 0;
-            }
+        if (i2 == 0) {
+            return;
         }
-    }
-
-    int read_buf(byte[] buf, int start, int size) {
-        int len = this.avail_in;
-        if (len > size) {
-            len = size;
+        if (this.dstate.pending_buf.length <= this.dstate.pending_out || this.next_out.length <= this.next_out_index || this.dstate.pending_buf.length < this.dstate.pending_out + i2 || this.next_out.length < this.next_out_index + i2) {
+            System.out.println(new StringBuffer().append(this.dstate.pending_buf.length).append(", ").append(this.dstate.pending_out).append(", ").append(this.next_out.length).append(", ").append(this.next_out_index).append(", ").append(i2).toString());
+            System.out.println(new StringBuffer().append("avail_out=").append(this.avail_out).toString());
         }
-        if (len == 0) {
-            return 0;
+        System.arraycopy(this.dstate.pending_buf, this.dstate.pending_out, this.next_out, this.next_out_index, i2);
+        this.next_out_index += i2;
+        this.dstate.pending_out += i2;
+        this.total_out += i2;
+        this.avail_out -= i2;
+        this.dstate.pending -= i2;
+        if (this.dstate.pending != 0) {
+            return;
         }
-        this.avail_in -= len;
-        if (this.dstate.noheader == 0) {
-            this.adler = this._adler.adler32(this.adler, this.next_in, this.next_in_index, len);
-        }
-        System.arraycopy(this.next_in, this.next_in_index, buf, start, len);
-        this.next_in_index += len;
-        this.total_in += len;
-        return len;
+        this.dstate.pending_out = 0;
     }
 
     public void free() {
@@ -181,5 +109,70 @@ public final class ZStream {
         this.next_out = null;
         this.msg = null;
         this._adler = null;
+    }
+
+    public int inflate(int i) {
+        return this.istate == null ? -2 : this.istate.inflate(this, i);
+    }
+
+    public int inflateEnd() {
+        int inflateEnd;
+        if (this.istate == null) {
+            inflateEnd = -2;
+        } else {
+            inflateEnd = this.istate.inflateEnd(this);
+            this.istate = null;
+        }
+        return inflateEnd;
+    }
+
+    public int inflateInit() {
+        return inflateInit(15);
+    }
+
+    public int inflateInit(int i) {
+        return inflateInit(i, false);
+    }
+
+    public int inflateInit(int i, boolean z) {
+        this.istate = new Inflate();
+        Inflate inflate = this.istate;
+        int i2 = i;
+        if (z) {
+            i2 = -i;
+        }
+        return inflate.inflateInit(this, i2);
+    }
+
+    public int inflateInit(boolean z) {
+        return inflateInit(15, z);
+    }
+
+    public int inflateSetDictionary(byte[] bArr, int i) {
+        return this.istate == null ? -2 : this.istate.inflateSetDictionary(this, bArr, i);
+    }
+
+    public int inflateSync() {
+        return this.istate == null ? -2 : this.istate.inflateSync(this);
+    }
+
+    int read_buf(byte[] bArr, int i, int i2) {
+        int i3 = this.avail_in;
+        int i4 = i3;
+        if (i3 > i2) {
+            i4 = i2;
+        }
+        if (i4 == 0) {
+            i4 = 0;
+        } else {
+            this.avail_in -= i4;
+            if (this.dstate.noheader == 0) {
+                this.adler = this._adler.adler32(this.adler, this.next_in, this.next_in_index, i4);
+            }
+            System.arraycopy(this.next_in, this.next_in_index, bArr, i, i4);
+            this.next_in_index += i4;
+            this.total_in += i4;
+        }
+        return i4;
     }
 }

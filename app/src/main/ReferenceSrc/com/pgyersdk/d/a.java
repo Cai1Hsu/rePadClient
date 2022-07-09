@@ -22,7 +22,7 @@ import com.pgyersdk.c.f;
 import com.pgyersdk.c.i;
 import org.apache.commons.net.telnet.TelnetCommand;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/d/a.class */
 public final class a extends AlertDialog.Builder implements com.pgyersdk.feedback.b {
     private Context b;
     private Activity c;
@@ -211,9 +211,9 @@ public final class a extends AlertDialog.Builder implements com.pgyersdk.feedbac
     }
 
     @Override // android.app.AlertDialog.Builder
-    public final AlertDialog.Builder setTitle(CharSequence title) {
-        setCustomTitle(a(this.b, title));
-        return super.setTitle(title);
+    public final AlertDialog.Builder setTitle(CharSequence charSequence) {
+        setCustomTitle(a(this.b, charSequence));
+        return super.setTitle(charSequence);
     }
 
     @Override // android.app.AlertDialog.Builder

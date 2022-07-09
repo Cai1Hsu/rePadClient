@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.net.bsd.RCommandClient;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/a/b.class */
 public final class b {
     private static final Map a;
 
@@ -32,6 +32,10 @@ public final class b {
         if (hVar != null) {
             str = hVar.getStringForResource(i);
         }
-        return str == null ? (String) a.get(Integer.valueOf(i)) : str;
+        String str2 = str;
+        if (str == null) {
+            str2 = (String) a.get(Integer.valueOf(i));
+        }
+        return str2;
     }
 }

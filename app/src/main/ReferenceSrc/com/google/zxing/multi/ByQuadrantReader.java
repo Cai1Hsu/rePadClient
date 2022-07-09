@@ -9,49 +9,42 @@ import com.google.zxing.Reader;
 import com.google.zxing.Result;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/multi/ByQuadrantReader.class */
 public final class ByQuadrantReader implements Reader {
     private final Reader delegate;
 
-    public ByQuadrantReader(Reader delegate) {
-        this.delegate = delegate;
+    public ByQuadrantReader(Reader reader) {
+        this.delegate = reader;
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException, FormatException {
-        return decode(image, null);
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, ChecksumException, FormatException {
+        return decode(binaryBitmap, null);
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, ChecksumException, FormatException {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int halfWidth = width / 2;
-        int halfHeight = height / 2;
-        BinaryBitmap topLeft = image.crop(0, 0, halfWidth, halfHeight);
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, ChecksumException, FormatException {
+        Result decode;
+        int width = binaryBitmap.getWidth() / 2;
+        int height = binaryBitmap.getHeight() / 2;
         try {
-            return this.delegate.decode(topLeft, hints);
+            decode = this.delegate.decode(binaryBitmap.crop(0, 0, width, height), map);
         } catch (NotFoundException e) {
-            BinaryBitmap topRight = image.crop(halfWidth, 0, halfWidth, halfHeight);
             try {
-                return this.delegate.decode(topRight, hints);
+                decode = this.delegate.decode(binaryBitmap.crop(width, 0, width, height), map);
             } catch (NotFoundException e2) {
-                BinaryBitmap bottomLeft = image.crop(0, halfHeight, halfWidth, halfHeight);
                 try {
-                    return this.delegate.decode(bottomLeft, hints);
+                    decode = this.delegate.decode(binaryBitmap.crop(0, height, width, height), map);
                 } catch (NotFoundException e3) {
-                    BinaryBitmap bottomRight = image.crop(halfWidth, halfHeight, halfWidth, halfHeight);
                     try {
-                        return this.delegate.decode(bottomRight, hints);
+                        decode = this.delegate.decode(binaryBitmap.crop(width, height, width, height), map);
                     } catch (NotFoundException e4) {
-                        int quarterWidth = halfWidth / 2;
-                        int quarterHeight = halfHeight / 2;
-                        BinaryBitmap center = image.crop(quarterWidth, quarterHeight, halfWidth, halfHeight);
-                        return this.delegate.decode(center, hints);
+                        decode = this.delegate.decode(binaryBitmap.crop(width / 2, height / 2, width, height), map);
                     }
                 }
             }
         }
+        return decode;
     }
 
     @Override // com.google.zxing.Reader

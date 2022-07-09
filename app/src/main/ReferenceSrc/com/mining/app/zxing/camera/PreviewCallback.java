@@ -3,10 +3,9 @@ package com.mining.app.zxing.camera;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mining/app/zxing/camera/PreviewCallback.class */
 final class PreviewCallback implements Camera.PreviewCallback {
     private static final String TAG = PreviewCallback.class.getSimpleName();
     private final CameraConfigurationManager configManager;
@@ -14,28 +13,27 @@ final class PreviewCallback implements Camera.PreviewCallback {
     private int previewMessage;
     private final boolean useOneShotPreviewCallback;
 
-    PreviewCallback(CameraConfigurationManager configManager, boolean useOneShotPreviewCallback) {
-        this.configManager = configManager;
-        this.useOneShotPreviewCallback = useOneShotPreviewCallback;
-    }
-
-    void setHandler(Handler previewHandler, int previewMessage) {
-        this.previewHandler = previewHandler;
-        this.previewMessage = previewMessage;
+    PreviewCallback(CameraConfigurationManager cameraConfigurationManager, boolean z) {
+        this.configManager = cameraConfigurationManager;
+        this.useOneShotPreviewCallback = z;
     }
 
     @Override // android.hardware.Camera.PreviewCallback
-    public void onPreviewFrame(byte[] data, Camera camera) {
+    public void onPreviewFrame(byte[] bArr, Camera camera) {
         Point cameraResolution = this.configManager.getCameraResolution();
         if (!this.useOneShotPreviewCallback) {
             camera.setPreviewCallback(null);
         }
-        if (this.previewHandler != null) {
-            Message message = this.previewHandler.obtainMessage(this.previewMessage, cameraResolution.x, cameraResolution.y, data);
-            message.sendToTarget();
-            this.previewHandler = null;
+        if (this.previewHandler == null) {
+            Log.d(TAG, "Got preview callback, but no handler for it");
             return;
         }
-        Log.d(TAG, "Got preview callback, but no handler for it");
+        this.previewHandler.obtainMessage(this.previewMessage, cameraResolution.x, cameraResolution.y, bArr).sendToTarget();
+        this.previewHandler = null;
+    }
+
+    void setHandler(Handler handler, int i) {
+        this.previewHandler = handler;
+        this.previewMessage = i;
     }
 }

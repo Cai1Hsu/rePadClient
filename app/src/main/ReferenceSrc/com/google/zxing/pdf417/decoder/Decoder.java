@@ -4,66 +4,65 @@ import com.google.zxing.FormatException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.DecoderResult;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/pdf417/decoder/Decoder.class */
 public final class Decoder {
     private static final int MAX_EC_CODEWORDS = 512;
     private static final int MAX_ERRORS = 3;
 
-    public DecoderResult decode(boolean[][] image) throws FormatException {
-        int dimension = image.length;
-        BitMatrix bits = new BitMatrix(dimension);
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if (image[j][i]) {
-                    bits.set(j, i);
-                }
-            }
-        }
-        return decode(bits);
-    }
-
-    public DecoderResult decode(BitMatrix bits) throws FormatException {
-        BitMatrixParser parser = new BitMatrixParser(bits);
-        int[] codewords = parser.readCodewords();
-        if (codewords.length == 0) {
+    private static int correctErrors(int[] iArr, int[] iArr2, int i) throws FormatException {
+        if (iArr2.length > (i / 2) + 3 || i < 0 || i > 512) {
             throw FormatException.getFormatInstance();
         }
-        int ecLevel = parser.getECLevel();
-        int numECCodewords = 1 << (ecLevel + 1);
-        int[] erasures = parser.getErasures();
-        correctErrors(codewords, erasures, numECCodewords);
-        verifyCodewordCount(codewords, numECCodewords);
-        return DecodedBitStreamParser.decode(codewords);
-    }
-
-    private static void verifyCodewordCount(int[] codewords, int numECCodewords) throws FormatException {
-        if (codewords.length < 4) {
-            throw FormatException.getFormatInstance();
-        }
-        int numberOfCodewords = codewords[0];
-        if (numberOfCodewords > codewords.length) {
-            throw FormatException.getFormatInstance();
-        }
-        if (numberOfCodewords == 0) {
-            if (numECCodewords < codewords.length) {
-                codewords[0] = codewords.length - numECCodewords;
-                return;
-            }
-            throw FormatException.getFormatInstance();
-        }
-    }
-
-    private static int correctErrors(int[] codewords, int[] erasures, int numECCodewords) throws FormatException {
-        if (erasures.length > (numECCodewords / 2) + 3 || numECCodewords < 0 || numECCodewords > 512) {
-            throw FormatException.getFormatInstance();
-        }
-        int numErasures = erasures.length;
+        int length = iArr2.length;
+        int i2 = length;
         if (0 > 0) {
-            numErasures -= 0;
+            i2 = length - 0;
         }
-        if (numErasures <= 3) {
+        if (i2 <= 3) {
             return 0;
         }
         throw FormatException.getFormatInstance();
+    }
+
+    private static void verifyCodewordCount(int[] iArr, int i) throws FormatException {
+        if (iArr.length < 4) {
+            throw FormatException.getFormatInstance();
+        }
+        int i2 = iArr[0];
+        if (i2 > iArr.length) {
+            throw FormatException.getFormatInstance();
+        }
+        if (i2 != 0) {
+            return;
+        }
+        if (i >= iArr.length) {
+            throw FormatException.getFormatInstance();
+        }
+        iArr[0] = iArr.length - i;
+    }
+
+    public DecoderResult decode(BitMatrix bitMatrix) throws FormatException {
+        BitMatrixParser bitMatrixParser = new BitMatrixParser(bitMatrix);
+        int[] readCodewords = bitMatrixParser.readCodewords();
+        if (readCodewords.length == 0) {
+            throw FormatException.getFormatInstance();
+        }
+        int eCLevel = 1 << (bitMatrixParser.getECLevel() + 1);
+        correctErrors(readCodewords, bitMatrixParser.getErasures(), eCLevel);
+        verifyCodewordCount(readCodewords, eCLevel);
+        return DecodedBitStreamParser.decode(readCodewords);
+    }
+
+    public DecoderResult decode(boolean[][] zArr) throws FormatException {
+        int length = zArr.length;
+        BitMatrix bitMatrix = new BitMatrix(length);
+        for (int i = 0; i < length; i++) {
+            for (int i2 = 0; i2 < length; i2++) {
+                if (zArr[i2][i]) {
+                    bitMatrix.set(i2, i);
+                }
+            }
+        }
+        return decode(bitMatrix);
     }
 }

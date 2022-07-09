@@ -12,7 +12,7 @@ import org.apache.commons.net.bsd.RCommandClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/b/b.class */
 public final class b extends a {
     protected boolean d;
     private Activity f;
@@ -41,12 +41,14 @@ public final class b extends a {
 
     @Override // com.pgyersdk.b.a
     protected final void a(String str) {
+        String str2;
         if (m.a(str) || !this.d) {
             return;
         }
         String a = com.pgyersdk.a.b.a(this.c, RCommandClient.DEFAULT_PORT);
         try {
             JSONObject jSONObject = new JSONObject(str);
+            str2 = a;
             if ("0".equals(jSONObject.getString("code"))) {
                 JSONObject jSONObject2 = jSONObject.getJSONObject("data");
                 if (jSONObject2.has("lastBuild")) {
@@ -64,13 +66,16 @@ public final class b extends a {
                     this.c.onNoUpdateAvailable();
                     return;
                 }
-                a = jSONObject2.getString("releaseNote");
+                String string = jSONObject2.getString("releaseNote");
+                str2 = string;
                 if (jSONObject2.has("appUrl")) {
                     this.h = jSONObject2.getString("appUrl");
+                    str2 = string;
                 }
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            str2 = a;
         }
         if (this.f == null || this.f.isFinishing()) {
             return;
@@ -83,7 +88,7 @@ public final class b extends a {
         textView.setTextColor(Color.parseColor("#56bc94"));
         textView.setPadding(30, 20, 0, 20);
         textView.setBackgroundColor(Color.parseColor("#56bc94"));
-        builder.setMessage(a);
+        builder.setMessage(str2);
         builder.setNegativeButton(com.pgyersdk.a.b.a(this.c, 515), new c(this));
         builder.setPositiveButton(com.pgyersdk.a.b.a(this.c, 516), new d(this));
         this.g = builder.create();

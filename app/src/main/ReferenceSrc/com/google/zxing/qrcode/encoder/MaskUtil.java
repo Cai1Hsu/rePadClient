@@ -1,127 +1,247 @@
 package com.google.zxing.qrcode.encoder;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/qrcode/encoder/MaskUtil.class */
 final class MaskUtil {
     private MaskUtil() {
     }
 
-    static int applyMaskPenaltyRule1(ByteMatrix matrix) {
-        return applyMaskPenaltyRule1Internal(matrix, true) + applyMaskPenaltyRule1Internal(matrix, false);
+    static int applyMaskPenaltyRule1(ByteMatrix byteMatrix) {
+        return applyMaskPenaltyRule1Internal(byteMatrix, true) + applyMaskPenaltyRule1Internal(byteMatrix, false);
     }
 
-    static int applyMaskPenaltyRule2(ByteMatrix matrix) {
-        int penalty = 0;
-        byte[][] array = matrix.getArray();
-        int width = matrix.getWidth();
-        int height = matrix.getHeight();
-        for (int y = 0; y < height - 1; y++) {
-            for (int x = 0; x < width - 1; x++) {
-                int value = array[y][x];
-                if (value == array[y][x + 1] && value == array[y + 1][x] && value == array[y + 1][x + 1]) {
-                    penalty += 3;
+    private static int applyMaskPenaltyRule1Internal(ByteMatrix byteMatrix, boolean z) {
+        byte b;
+        int i;
+        int i2;
+        int i3 = 0;
+        byte b2 = -1;
+        int height = z ? byteMatrix.getHeight() : byteMatrix.getWidth();
+        int width = z ? byteMatrix.getWidth() : byteMatrix.getHeight();
+        byte[][] array = byteMatrix.getArray();
+        int i4 = 0;
+        while (true) {
+            int i5 = 0;
+            if (i4 < height) {
+                int i6 = 0;
+                while (i6 < width) {
+                    byte b3 = z ? array[i4][i6] : array[i6][i4];
+                    if (b3 == b2) {
+                        int i7 = i5 + 1;
+                        if (i7 == 5) {
+                            i2 = i3 + 3;
+                            b = b2;
+                            i = i7;
+                        } else {
+                            i = i7;
+                            i2 = i3;
+                            b = b2;
+                            if (i7 > 5) {
+                                i2 = i3 + 1;
+                                i = i7;
+                                b = b2;
+                            }
+                        }
+                    } else {
+                        b = b3;
+                        i = 1;
+                        i2 = i3;
+                    }
+                    i6++;
+                    i5 = i;
+                    i3 = i2;
+                    b2 = b;
                 }
+                i4++;
+            } else {
+                return i3;
             }
         }
-        return penalty;
     }
 
-    static int applyMaskPenaltyRule3(ByteMatrix matrix) {
-        int penalty = 0;
-        byte[][] array = matrix.getArray();
-        int width = matrix.getWidth();
-        int height = matrix.getHeight();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (x + 6 < width && array[y][x] == 1 && array[y][x + 1] == 0 && array[y][x + 2] == 1 && array[y][x + 3] == 1 && array[y][x + 4] == 1 && array[y][x + 5] == 0 && array[y][x + 6] == 1 && ((x + 10 < width && array[y][x + 7] == 0 && array[y][x + 8] == 0 && array[y][x + 9] == 0 && array[y][x + 10] == 0) || (x - 4 >= 0 && array[y][x - 1] == 0 && array[y][x - 2] == 0 && array[y][x - 3] == 0 && array[y][x - 4] == 0))) {
-                    penalty += 40;
+    static int applyMaskPenaltyRule2(ByteMatrix byteMatrix) {
+        int i = 0;
+        byte[][] array = byteMatrix.getArray();
+        int width = byteMatrix.getWidth();
+        int height = byteMatrix.getHeight();
+        for (int i2 = 0; i2 < height - 1; i2++) {
+            int i3 = 0;
+            while (i3 < width - 1) {
+                byte b = array[i2][i3];
+                int i4 = i;
+                if (b == array[i2][i3 + 1]) {
+                    i4 = i;
+                    if (b == array[i2 + 1][i3]) {
+                        i4 = i;
+                        if (b == array[i2 + 1][i3 + 1]) {
+                            i4 = i + 3;
+                        }
+                    }
                 }
-                if (y + 6 < height && array[y][x] == 1 && array[y + 1][x] == 0 && array[y + 2][x] == 1 && array[y + 3][x] == 1 && array[y + 4][x] == 1 && array[y + 5][x] == 0 && array[y + 6][x] == 1 && ((y + 10 < height && array[y + 7][x] == 0 && array[y + 8][x] == 0 && array[y + 9][x] == 0 && array[y + 10][x] == 0) || (y - 4 >= 0 && array[y - 1][x] == 0 && array[y - 2][x] == 0 && array[y - 3][x] == 0 && array[y - 4][x] == 0))) {
-                    penalty += 40;
-                }
+                i3++;
+                i = i4;
             }
         }
-        return penalty;
+        return i;
     }
 
-    static int applyMaskPenaltyRule4(ByteMatrix matrix) {
-        int numDarkCells = 0;
-        byte[][] array = matrix.getArray();
-        int width = matrix.getWidth();
-        int height = matrix.getHeight();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (array[y][x] == 1) {
-                    numDarkCells++;
+    /* JADX WARN: Code restructure failed: missing block: B:43:0x011e, code lost:
+        if (r0[r9][r10 - 4] == 0) goto L44;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    static int applyMaskPenaltyRule3(ByteMatrix byteMatrix) {
+        int i = 0;
+        byte[][] array = byteMatrix.getArray();
+        int width = byteMatrix.getWidth();
+        int height = byteMatrix.getHeight();
+        int i2 = 0;
+        while (i2 < height) {
+            int i3 = 0;
+            while (i3 < width) {
+                int i4 = i;
+                if (i3 + 6 < width) {
+                    i4 = i;
+                    if (array[i2][i3] == 1) {
+                        i4 = i;
+                        if (array[i2][i3 + 1] == 0) {
+                            i4 = i;
+                            if (array[i2][i3 + 2] == 1) {
+                                i4 = i;
+                                if (array[i2][i3 + 3] == 1) {
+                                    i4 = i;
+                                    if (array[i2][i3 + 4] == 1) {
+                                        i4 = i;
+                                        if (array[i2][i3 + 5] == 0) {
+                                            i4 = i;
+                                            if (array[i2][i3 + 6] == 1) {
+                                                if (i3 + 10 >= width || array[i2][i3 + 7] != 0 || array[i2][i3 + 8] != 0 || array[i2][i3 + 9] != 0 || array[i2][i3 + 10] != 0) {
+                                                    i4 = i;
+                                                    if (i3 - 4 >= 0) {
+                                                        i4 = i;
+                                                        if (array[i2][i3 - 1] == 0) {
+                                                            i4 = i;
+                                                            if (array[i2][i3 - 2] == 0) {
+                                                                i4 = i;
+                                                                if (array[i2][i3 - 3] == 0) {
+                                                                    i4 = i;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                i4 = i + 40;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+                i = i4;
+                if (i2 + 6 < height) {
+                    i = i4;
+                    if (array[i2][i3] == 1) {
+                        i = i4;
+                        if (array[i2 + 1][i3] == 0) {
+                            i = i4;
+                            if (array[i2 + 2][i3] == 1) {
+                                i = i4;
+                                if (array[i2 + 3][i3] == 1) {
+                                    i = i4;
+                                    if (array[i2 + 4][i3] == 1) {
+                                        i = i4;
+                                        if (array[i2 + 5][i3] == 0) {
+                                            i = i4;
+                                            if (array[i2 + 6][i3] == 1) {
+                                                if (i2 + 10 >= height || array[i2 + 7][i3] != 0 || array[i2 + 8][i3] != 0 || array[i2 + 9][i3] != 0 || array[i2 + 10][i3] != 0) {
+                                                    i = i4;
+                                                    if (i2 - 4 >= 0) {
+                                                        i = i4;
+                                                        if (array[i2 - 1][i3] == 0) {
+                                                            i = i4;
+                                                            if (array[i2 - 2][i3] == 0) {
+                                                                i = i4;
+                                                                if (array[i2 - 3][i3] == 0) {
+                                                                    i = i4;
+                                                                    if (array[i2 - 4][i3] != 0) {
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                i = i4 + 40;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                i3++;
+            }
+            i2++;
+        }
+        return i;
+    }
+
+    static int applyMaskPenaltyRule4(ByteMatrix byteMatrix) {
+        int i = 0;
+        byte[][] array = byteMatrix.getArray();
+        int width = byteMatrix.getWidth();
+        int height = byteMatrix.getHeight();
+        for (int i2 = 0; i2 < height; i2++) {
+            int i3 = 0;
+            while (i3 < width) {
+                int i4 = i;
+                if (array[i2][i3] == 1) {
+                    i4 = i + 1;
+                }
+                i3++;
+                i = i4;
             }
         }
-        int numTotalCells = matrix.getHeight() * matrix.getWidth();
-        double darkRatio = numDarkCells / numTotalCells;
-        return (Math.abs((int) ((100.0d * darkRatio) - 50.0d)) / 5) * 10;
+        return (Math.abs((int) ((100.0d * (i / (byteMatrix.getHeight() * byteMatrix.getWidth()))) - 50.0d)) / 5) * 10;
     }
 
-    static boolean getDataMaskBit(int maskPattern, int x, int y) {
-        int intermediate;
-        if (!QRCode.isValidMaskPattern(maskPattern)) {
+    static boolean getDataMaskBit(int i, int i2, int i3) {
+        int i4;
+        if (!QRCode.isValidMaskPattern(i)) {
             throw new IllegalArgumentException("Invalid mask pattern");
         }
-        switch (maskPattern) {
+        switch (i) {
             case 0:
-                intermediate = (y + x) & 1;
+                i4 = (i3 + i2) & 1;
                 break;
             case 1:
-                intermediate = y & 1;
+                i4 = i3 & 1;
                 break;
             case 2:
-                intermediate = x % 3;
+                i4 = i2 % 3;
                 break;
             case 3:
-                intermediate = (y + x) % 3;
+                i4 = (i3 + i2) % 3;
                 break;
             case 4:
-                intermediate = ((y >>> 1) + (x / 3)) & 1;
+                i4 = ((i3 >>> 1) + (i2 / 3)) & 1;
                 break;
             case 5:
-                int temp = y * x;
-                intermediate = (temp & 1) + (temp % 3);
+                int i5 = i3 * i2;
+                i4 = (i5 & 1) + (i5 % 3);
                 break;
             case 6:
-                int temp2 = y * x;
-                intermediate = ((temp2 & 1) + (temp2 % 3)) & 1;
+                int i6 = i3 * i2;
+                i4 = ((i6 & 1) + (i6 % 3)) & 1;
                 break;
             case 7:
-                intermediate = (((y * x) % 3) + ((y + x) & 1)) & 1;
+                i4 = (((i3 * i2) % 3) + ((i3 + i2) & 1)) & 1;
                 break;
             default:
-                throw new IllegalArgumentException("Invalid mask pattern: " + maskPattern);
+                throw new IllegalArgumentException("Invalid mask pattern: " + i);
         }
-        return intermediate == 0;
-    }
-
-    private static int applyMaskPenaltyRule1Internal(ByteMatrix matrix, boolean isHorizontal) {
-        int penalty = 0;
-        int numSameBitCells = 0;
-        int prevBit = -1;
-        int iLimit = isHorizontal ? matrix.getHeight() : matrix.getWidth();
-        int jLimit = isHorizontal ? matrix.getWidth() : matrix.getHeight();
-        byte[][] array = matrix.getArray();
-        for (int i = 0; i < iLimit; i++) {
-            for (int j = 0; j < jLimit; j++) {
-                int bit = isHorizontal ? array[i][j] : array[j][i];
-                if (bit == prevBit) {
-                    numSameBitCells++;
-                    if (numSameBitCells == 5) {
-                        penalty += 3;
-                    } else if (numSameBitCells > 5) {
-                        penalty++;
-                    }
-                } else {
-                    numSameBitCells = 1;
-                    prevBit = bit;
-                }
-            }
-            numSameBitCells = 0;
-        }
-        return penalty;
+        return i4 == 0;
     }
 }

@@ -2,28 +2,35 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/client/result/SMTPResultParser.class */
 public final class SMTPResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public EmailAddressParsedResult parse(Result result) {
-        String rawText = result.getText();
-        if (!rawText.startsWith("smtp:") && !rawText.startsWith("SMTP:")) {
-            return null;
-        }
-        String emailAddress = rawText.substring(5);
-        String subject = null;
-        String body = null;
-        int colon = emailAddress.indexOf(58);
-        if (colon >= 0) {
-            subject = emailAddress.substring(colon + 1);
-            emailAddress = emailAddress.substring(0, colon);
-            int colon2 = subject.indexOf(58);
-            if (colon2 >= 0) {
-                body = subject.substring(colon2 + 1);
-                subject = subject.substring(0, colon2);
+        EmailAddressParsedResult emailAddressParsedResult;
+        String text = result.getText();
+        if (text.startsWith("smtp:") || text.startsWith("SMTP:")) {
+            String substring = text.substring(5);
+            String str = null;
+            int indexOf = substring.indexOf(58);
+            String str2 = null;
+            String str3 = substring;
+            if (indexOf >= 0) {
+                String substring2 = substring.substring(indexOf + 1);
+                String substring3 = substring.substring(0, indexOf);
+                int indexOf2 = substring2.indexOf(58);
+                str2 = null;
+                str3 = substring3;
+                str = substring2;
+                if (indexOf2 >= 0) {
+                    str2 = substring2.substring(indexOf2 + 1);
+                    str = substring2.substring(0, indexOf2);
+                    str3 = substring3;
+                }
             }
+            emailAddressParsedResult = new EmailAddressParsedResult(str3, str, str2, "mailto:" + str3);
+        } else {
+            emailAddressParsedResult = null;
         }
-        String mailtoURI = "mailto:" + emailAddress;
-        return new EmailAddressParsedResult(emailAddress, subject, body, mailtoURI);
+        return emailAddressParsedResult;
     }
 }

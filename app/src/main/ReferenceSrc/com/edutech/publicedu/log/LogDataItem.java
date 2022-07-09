@@ -1,6 +1,6 @@
 package com.edutech.publicedu.log;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/publicedu/log/LogDataItem.class */
 public class LogDataItem {
     private String AssetsID;
     private String AssetsName;
@@ -14,92 +14,92 @@ public class LogDataItem {
     private String Type;
     private String VisitCount;
 
-    public String getType() {
-        return this.Type;
-    }
-
-    public void setType(String type) {
-        this.Type = type;
-    }
-
-    public String getSubjectID() {
-        return this.SubjectID;
-    }
-
-    public void setSubjectID(String subjectID) {
-        this.SubjectID = subjectID;
-    }
-
-    public String getBookID() {
-        return this.BookID;
-    }
-
-    public void setBookID(String bookID) {
-        this.BookID = bookID;
-    }
-
-    public String getBookName() {
-        return this.BookName;
-    }
-
-    public void setBookName(String bookName) {
-        this.BookName = bookName;
-    }
-
-    public String getSectionsID() {
-        return this.SectionsID;
-    }
-
-    public void setSectionsID(String sectionsID) {
-        this.SectionsID = sectionsID;
-    }
-
     public String getAssetsID() {
         return this.AssetsID;
-    }
-
-    public void setAssetsID(String assetsID) {
-        this.AssetsID = assetsID;
     }
 
     public String getAssetsName() {
         return this.AssetsName;
     }
 
-    public void setAssetsName(String assetsName) {
-        this.AssetsName = assetsName;
+    public String getBookID() {
+        return this.BookID;
+    }
+
+    public String getBookName() {
+        return this.BookName;
     }
 
     public String getFirstTime() {
         return this.FirstTime;
     }
 
-    public void setFirstTime(String firstTime) {
-        this.FirstTime = firstTime;
-    }
-
     public String getLastTime() {
         return this.LastTime;
     }
 
-    public void setLastTime(String lastTime) {
-        this.LastTime = lastTime;
+    public String getSectionsID() {
+        return this.SectionsID;
+    }
+
+    public String getSubjectID() {
+        return this.SubjectID;
     }
 
     public String getTotalTime() {
         return this.TotalTime;
     }
 
-    public void setTotalTime(String totalTime) {
-        this.TotalTime = totalTime;
+    public String getType() {
+        return this.Type;
     }
 
     public String getVisitCount() {
         return this.VisitCount;
     }
 
-    public void setVisitCount(String visitCount) {
-        this.VisitCount = visitCount;
+    public void setAssetsID(String str) {
+        this.AssetsID = str;
+    }
+
+    public void setAssetsName(String str) {
+        this.AssetsName = str;
+    }
+
+    public void setBookID(String str) {
+        this.BookID = str;
+    }
+
+    public void setBookName(String str) {
+        this.BookName = str;
+    }
+
+    public void setFirstTime(String str) {
+        this.FirstTime = str;
+    }
+
+    public void setLastTime(String str) {
+        this.LastTime = str;
+    }
+
+    public void setSectionsID(String str) {
+        this.SectionsID = str;
+    }
+
+    public void setSubjectID(String str) {
+        this.SubjectID = str;
+    }
+
+    public void setTotalTime(String str) {
+        this.TotalTime = str;
+    }
+
+    public void setType(String str) {
+        this.Type = str;
+    }
+
+    public void setVisitCount(String str) {
+        this.VisitCount = str;
     }
 
     public String toString() {

@@ -3,56 +3,78 @@ package com.edutech.daoxueben.until;
 import com.edutech.daoxueben.sysconfig.AppEnvironment;
 import java.io.File;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/daoxueben/until/DelFileOrFolder.class */
 public class DelFileOrFolder {
-    public static boolean DeleteFolder(String sPath) {
-        if (sPath.equals(AppEnvironment.FOLDER_MAIN)) {
-            return true;
+    public static boolean DeleteFolder(String str) {
+        boolean z;
+        if (str.equals(AppEnvironment.FOLDER_MAIN)) {
+            z = true;
+        } else {
+            z = false;
+            File file = new File(str);
+            if (file.exists()) {
+                z = file.isFile() ? deleteFile(str) : deleteDirectory(str);
+            }
         }
-        File file = new File(sPath);
-        if (!file.exists()) {
-            return false;
-        }
-        if (file.isFile()) {
-            boolean flag = deleteFile(sPath);
-            return flag;
-        }
-        boolean flag2 = deleteDirectory(sPath);
-        return flag2;
+        return z;
     }
 
-    public static boolean deleteFile(String sPath) {
-        File file = new File(sPath);
-        if (!file.isFile() || !file.exists()) {
-            return false;
+    public static boolean deleteDirectory(String str) {
+        String str2 = str;
+        if (!str.endsWith(File.separator)) {
+            str2 = String.valueOf(str) + File.separator;
         }
-        boolean flag = file.delete();
-        return flag;
-    }
-
-    public static boolean deleteDirectory(String sPath) {
-        if (!sPath.endsWith(File.separator)) {
-            sPath = String.valueOf(sPath) + File.separator;
-        }
-        File dirFile = new File(sPath);
-        if (!dirFile.exists() || !dirFile.isDirectory()) {
-            return false;
-        }
-        boolean flag = true;
-        File[] files = dirFile.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isFile()) {
-                flag = deleteFile(files[i].getAbsolutePath());
-                if (!flag) {
-                    break;
-                }
+        File file = new File(str2);
+        boolean z = false;
+        if (file.exists()) {
+            if (!file.isDirectory()) {
+                z = false;
             } else {
-                flag = deleteDirectory(files[i].getAbsolutePath());
-                if (!flag) {
-                    break;
+                boolean z2 = true;
+                File[] listFiles = file.listFiles();
+                int i = 0;
+                while (true) {
+                    if (i >= listFiles.length) {
+                        break;
+                    } else if (listFiles[i].isFile()) {
+                        boolean deleteFile = deleteFile(listFiles[i].getAbsolutePath());
+                        z2 = deleteFile;
+                        if (!deleteFile) {
+                            break;
+                        }
+                        z2 = deleteFile;
+                        i++;
+                    } else {
+                        boolean deleteDirectory = deleteDirectory(listFiles[i].getAbsolutePath());
+                        z2 = deleteDirectory;
+                        if (!deleteDirectory) {
+                            z2 = deleteDirectory;
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                z = false;
+                if (z2) {
+                    z = false;
+                    if (file.delete()) {
+                        z = true;
+                    }
                 }
             }
         }
-        return flag && dirFile.delete();
+        return z;
+    }
+
+    public static boolean deleteFile(String str) {
+        File file = new File(str);
+        boolean z = false;
+        if (file.isFile()) {
+            z = false;
+            if (file.exists()) {
+                z = file.delete();
+            }
+        }
+        return z;
     }
 }

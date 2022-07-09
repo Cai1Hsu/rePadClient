@@ -2,96 +2,73 @@ package com.google.zxing.datamatrix.decoder;
 
 import com.google.zxing.datamatrix.decoder.Version;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/datamatrix/decoder/DataBlock.class */
 final class DataBlock {
     private final byte[] codewords;
     private final int numDataCodewords;
 
-    private DataBlock(int numDataCodewords, byte[] codewords) {
-        this.numDataCodewords = numDataCodewords;
-        this.codewords = codewords;
+    private DataBlock(int i, byte[] bArr) {
+        this.numDataCodewords = i;
+        this.codewords = bArr;
     }
 
-    static DataBlock[] getDataBlocks(byte[] rawCodewords, Version version) {
-        int rawCodewordsOffset;
-        int rawCodewordsOffset2;
-        int rawCodewordsOffset3;
-        Version.ECBlocks ecBlocks = version.getECBlocks();
-        int totalBlocks = 0;
-        Version.ECB[] ecBlockArray = ecBlocks.getECBlocks();
-        for (Version.ECB ecBlock : ecBlockArray) {
-            totalBlocks += ecBlock.getCount();
+    static DataBlock[] getDataBlocks(byte[] bArr, Version version) {
+        Version.ECBlocks eCBlocks = version.getECBlocks();
+        int i = 0;
+        Version.ECB[] eCBlocks2 = eCBlocks.getECBlocks();
+        for (Version.ECB ecb : eCBlocks2) {
+            i += ecb.getCount();
         }
-        DataBlock[] result = new DataBlock[totalBlocks];
-        int numResultBlocks = 0;
-        for (Version.ECB ecBlock2 : ecBlockArray) {
-            int i = 0;
-            while (i < ecBlock2.getCount()) {
-                int numDataCodewords = ecBlock2.getDataCodewords();
-                int numBlockCodewords = ecBlocks.getECCodewords() + numDataCodewords;
-                result[numResultBlocks] = new DataBlock(numDataCodewords, new byte[numBlockCodewords]);
-                i++;
-                numResultBlocks++;
-            }
-        }
-        int longerBlocksTotalCodewords = result[0].codewords.length;
-        int longerBlocksNumDataCodewords = longerBlocksTotalCodewords - ecBlocks.getECCodewords();
-        int shorterBlocksNumDataCodewords = longerBlocksNumDataCodewords - 1;
-        int rawCodewordsOffset4 = 0;
+        DataBlock[] dataBlockArr = new DataBlock[i];
         int i2 = 0;
-        while (i2 < shorterBlocksNumDataCodewords) {
-            int j = 0;
-            while (true) {
-                rawCodewordsOffset3 = rawCodewordsOffset4;
-                if (j < numResultBlocks) {
-                    rawCodewordsOffset4 = rawCodewordsOffset3 + 1;
-                    result[j].codewords[i2] = rawCodewords[rawCodewordsOffset3];
-                    j++;
-                }
+        for (Version.ECB ecb2 : eCBlocks2) {
+            int i3 = 0;
+            while (i3 < ecb2.getCount()) {
+                int dataCodewords = ecb2.getDataCodewords();
+                dataBlockArr[i2] = new DataBlock(dataCodewords, new byte[eCBlocks.getECCodewords() + dataCodewords]);
+                i3++;
+                i2++;
             }
-            i2++;
-            rawCodewordsOffset4 = rawCodewordsOffset3;
         }
-        boolean specialVersion = version.getVersionNumber() == 24;
-        int numLongerBlocks = specialVersion ? 8 : numResultBlocks;
-        int j2 = 0;
-        while (true) {
-            rawCodewordsOffset = rawCodewordsOffset4;
-            if (j2 >= numLongerBlocks) {
-                break;
+        int length = dataBlockArr[0].codewords.length - eCBlocks.getECCodewords();
+        int i4 = 0;
+        for (int i5 = 0; i5 < length - 1; i5++) {
+            int i6 = 0;
+            while (i6 < i2) {
+                dataBlockArr[i6].codewords[i5] = bArr[i4];
+                i6++;
+                i4++;
             }
-            rawCodewordsOffset4 = rawCodewordsOffset + 1;
-            result[j2].codewords[longerBlocksNumDataCodewords - 1] = rawCodewords[rawCodewordsOffset];
-            j2++;
         }
-        int max = result[0].codewords.length;
-        int i3 = longerBlocksNumDataCodewords;
-        int rawCodewordsOffset5 = rawCodewordsOffset;
-        while (i3 < max) {
-            int j3 = 0;
-            while (true) {
-                rawCodewordsOffset2 = rawCodewordsOffset5;
-                if (j3 < numResultBlocks) {
-                    int iOffset = (!specialVersion || j3 <= 7) ? i3 : i3 - 1;
-                    rawCodewordsOffset5 = rawCodewordsOffset2 + 1;
-                    result[j3].codewords[iOffset] = rawCodewords[rawCodewordsOffset2];
-                    j3++;
-                }
+        boolean z = version.getVersionNumber() == 24;
+        int i7 = z ? 8 : i2;
+        int i8 = 0;
+        while (i8 < i7) {
+            dataBlockArr[i8].codewords[length - 1] = bArr[i4];
+            i8++;
+            i4++;
+        }
+        int length2 = dataBlockArr[0].codewords.length;
+        int i9 = i4;
+        for (int i10 = length; i10 < length2; i10++) {
+            int i11 = 0;
+            while (i11 < i2) {
+                dataBlockArr[i11].codewords[(!z || i11 <= 7) ? i10 : i10 - 1] = bArr[i9];
+                i11++;
+                i9++;
             }
-            i3++;
-            rawCodewordsOffset5 = rawCodewordsOffset2;
         }
-        if (rawCodewordsOffset5 != rawCodewords.length) {
+        if (i9 != bArr.length) {
             throw new IllegalArgumentException();
         }
-        return result;
-    }
-
-    int getNumDataCodewords() {
-        return this.numDataCodewords;
+        return dataBlockArr;
     }
 
     byte[] getCodewords() {
         return this.codewords;
+    }
+
+    int getNumDataCodewords() {
+        return this.numDataCodewords;
     }
 }

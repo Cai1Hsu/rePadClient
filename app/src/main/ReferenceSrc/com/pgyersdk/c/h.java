@@ -3,7 +3,7 @@ package com.pgyersdk.c;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/c/h.class */
 final class h implements HostnameVerifier {
     h() {
     }

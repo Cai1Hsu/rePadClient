@@ -1,11 +1,11 @@
 package com.google.zxing.oned.rss.expanded.decoders;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/CurrentParsingState.class */
 final class CurrentParsingState {
     private int position = 0;
     private State encoding = State.NUMERIC;
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/CurrentParsingState$State.class */
     private enum State {
         NUMERIC,
         ALPHA,
@@ -19,28 +19,20 @@ final class CurrentParsingState {
         return this.position;
     }
 
-    void setPosition(int position) {
-        this.position = position;
-    }
-
-    void incrementPosition(int delta) {
-        this.position += delta;
+    void incrementPosition(int i) {
+        this.position += i;
     }
 
     boolean isAlpha() {
         return this.encoding == State.ALPHA;
     }
 
-    boolean isNumeric() {
-        return this.encoding == State.NUMERIC;
-    }
-
     boolean isIsoIec646() {
         return this.encoding == State.ISO_IEC_646;
     }
 
-    void setNumeric() {
-        this.encoding = State.NUMERIC;
+    boolean isNumeric() {
+        return this.encoding == State.NUMERIC;
     }
 
     void setAlpha() {
@@ -49,5 +41,13 @@ final class CurrentParsingState {
 
     void setIsoIec646() {
         this.encoding = State.ISO_IEC_646;
+    }
+
+    void setNumeric() {
+        this.encoding = State.NUMERIC;
+    }
+
+    void setPosition(int i) {
+        this.position = i;
     }
 }

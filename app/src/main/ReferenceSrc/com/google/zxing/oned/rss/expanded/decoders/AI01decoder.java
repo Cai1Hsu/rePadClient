@@ -2,48 +2,50 @@ package com.google.zxing.oned.rss.expanded.decoders;
 
 import com.google.zxing.common.BitArray;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI01decoder.class */
 abstract class AI01decoder extends AbstractExpandedDecoder {
     protected static final int GTIN_SIZE = 40;
 
-    AI01decoder(BitArray information) {
-        super(information);
+    AI01decoder(BitArray bitArray) {
+        super(bitArray);
     }
 
-    protected void encodeCompressedGtin(StringBuilder buf, int currentPos) {
-        buf.append("(01)");
-        int initialPosition = buf.length();
-        buf.append('9');
-        encodeCompressedGtinWithoutAI(buf, currentPos, initialPosition);
+    private static void appendCheckDigit(StringBuilder sb, int i) {
+        int i2 = 0;
+        for (int i3 = 0; i3 < 13; i3++) {
+            int charAt = sb.charAt(i3 + i) - '0';
+            int i4 = charAt;
+            if ((i3 & 1) == 0) {
+                i4 = charAt * 3;
+            }
+            i2 += i4;
+        }
+        int i5 = 10 - (i2 % 10);
+        int i6 = i5;
+        if (i5 == 10) {
+            i6 = 0;
+        }
+        sb.append(i6);
     }
 
-    protected void encodeCompressedGtinWithoutAI(StringBuilder buf, int currentPos, int initialBufferPosition) {
-        for (int i = 0; i < 4; i++) {
-            int currentBlock = getGeneralDecoder().extractNumericValueFromBitArray((i * 10) + currentPos, 10);
-            if (currentBlock / 100 == 0) {
-                buf.append('0');
-            }
-            if (currentBlock / 10 == 0) {
-                buf.append('0');
-            }
-            buf.append(currentBlock);
-        }
-        appendCheckDigit(buf, initialBufferPosition);
+    protected void encodeCompressedGtin(StringBuilder sb, int i) {
+        sb.append("(01)");
+        int length = sb.length();
+        sb.append('9');
+        encodeCompressedGtinWithoutAI(sb, i, length);
     }
 
-    private static void appendCheckDigit(StringBuilder buf, int currentPos) {
-        int checkDigit = 0;
-        for (int i = 0; i < 13; i++) {
-            int digit = buf.charAt(i + currentPos) - '0';
-            if ((i & 1) == 0) {
-                digit *= 3;
+    protected void encodeCompressedGtinWithoutAI(StringBuilder sb, int i, int i2) {
+        for (int i3 = 0; i3 < 4; i3++) {
+            int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray((i3 * 10) + i, 10);
+            if (extractNumericValueFromBitArray / 100 == 0) {
+                sb.append('0');
             }
-            checkDigit += digit;
+            if (extractNumericValueFromBitArray / 10 == 0) {
+                sb.append('0');
+            }
+            sb.append(extractNumericValueFromBitArray);
         }
-        int checkDigit2 = 10 - (checkDigit % 10);
-        if (checkDigit2 == 10) {
-            checkDigit2 = 0;
-        }
-        buf.append(checkDigit2);
+        appendCheckDigit(sb, i2);
     }
 }

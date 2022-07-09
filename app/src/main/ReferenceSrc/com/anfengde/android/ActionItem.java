@@ -3,7 +3,7 @@ package com.anfengde.android;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/anfengde/android/ActionItem.class */
 public class ActionItem {
     private int actionId;
     private Drawable icon;
@@ -12,74 +12,74 @@ public class ActionItem {
     private Bitmap thumb;
     private String title;
 
-    public ActionItem(int actionId, String title, Drawable icon) {
-        this.actionId = -1;
-        this.title = title;
-        this.icon = icon;
-        this.actionId = actionId;
-    }
-
     public ActionItem() {
         this(-1, null, null);
     }
 
-    public ActionItem(int actionId, String title) {
-        this(actionId, title, null);
+    public ActionItem(int i, Drawable drawable) {
+        this(i, null, drawable);
     }
 
-    public ActionItem(Drawable icon) {
-        this(-1, null, icon);
+    public ActionItem(int i, String str) {
+        this(i, str, null);
     }
 
-    public ActionItem(int actionId, Drawable icon) {
-        this(actionId, null, icon);
+    public ActionItem(int i, String str, Drawable drawable) {
+        this.actionId = -1;
+        this.title = str;
+        this.icon = drawable;
+        this.actionId = i;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public void setIcon(Drawable icon) {
-        this.icon = icon;
-    }
-
-    public Drawable getIcon() {
-        return this.icon;
-    }
-
-    public void setActionId(int actionId) {
-        this.actionId = actionId;
+    public ActionItem(Drawable drawable) {
+        this(-1, null, drawable);
     }
 
     public int getActionId() {
         return this.actionId;
     }
 
-    public void setSticky(boolean sticky) {
-        this.sticky = sticky;
+    public Drawable getIcon() {
+        return this.icon;
     }
 
-    public boolean isSticky() {
-        return this.sticky;
+    public Bitmap getThumb() {
+        return this.thumb;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public String getTitle() {
+        return this.title;
     }
 
     public boolean isSelected() {
         return this.selected;
     }
 
-    public void setThumb(Bitmap thumb) {
-        this.thumb = thumb;
+    public boolean isSticky() {
+        return this.sticky;
     }
 
-    public Bitmap getThumb() {
-        return this.thumb;
+    public void setActionId(int i) {
+        this.actionId = i;
+    }
+
+    public void setIcon(Drawable drawable) {
+        this.icon = drawable;
+    }
+
+    public void setSelected(boolean z) {
+        this.selected = z;
+    }
+
+    public void setSticky(boolean z) {
+        this.sticky = z;
+    }
+
+    public void setThumb(Bitmap bitmap) {
+        this.thumb = bitmap;
+    }
+
+    public void setTitle(String str) {
+        this.title = str;
     }
 }

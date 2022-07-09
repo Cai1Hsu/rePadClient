@@ -10,101 +10,104 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/mobilestudyclient/download/HttpUtils.class */
 public class HttpUtils {
     static String TAG = "HttpUtils";
 
-    public static String getNotification(String url, String username, String privatekey) {
-        if (url.equals("") || url == null || username.equals("") || username == null) {
-            Log.e(TAG, "getConfigData 入参有问题");
-            return null;
-        }
+    private static HttpResponse Get_http_addheader(String str, String str2) throws IOException, ClientProtocolException {
+        HttpGet httpGet = new HttpGet(str);
+        httpGet.addHeader("X-Edutech-Entity", str2);
+        long currentTimeMillis = System.currentTimeMillis();
+        httpGet.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str2));
+        HttpResponse httpResponse = null;
         try {
-            HttpResponse httpResponse = Get_http_addheader(url, username, privatekey);
-            Log.e(TAG, "解析返回的内容...");
-            if (httpResponse == null) {
-                return "";
-            }
-            if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                StringBuilder builder = new StringBuilder();
-                BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8"));
-                for (String s = bufferedReader2.readLine(); s != null; s = bufferedReader2.readLine()) {
-                    builder.append(s);
-                }
-                String sb = builder.toString();
-                Log.e(TAG, "学校和用户个人信息获取完成。。。");
-                return sb;
-            }
-            Log.e(TAG, "连接状态码Status=" + httpResponse.getStatusLine().getStatusCode());
-            return null;
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e2) {
-            e2.printStackTrace();
-            return null;
-        }
-    }
-
-    public static String getConfigData(String url, String username) {
-        if (url.equals("") || url == null || username.equals("") || username == null) {
-            Log.e(TAG, "getConfigData 入参有问题");
-            return null;
-        }
-        try {
-            HttpResponse httpResponse = Get_http_addheader(url, username);
-            Log.e(TAG, "解析返回的内容...");
-            if (httpResponse == null) {
-                return "";
-            }
-            if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                StringBuilder builder = new StringBuilder();
-                BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8"));
-                for (String s = bufferedReader2.readLine(); s != null; s = bufferedReader2.readLine()) {
-                    builder.append(s);
-                }
-                return builder.toString();
-            }
-            Log.e(TAG, "连接状态码Status=" + httpResponse.getStatusLine().getStatusCode());
-            return null;
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e2) {
-            e2.printStackTrace();
-            return null;
-        }
-    }
-
-    private static HttpResponse Get_http_addheader(String url, String user_Name) throws IOException, ClientProtocolException {
-        HttpGet request = new HttpGet(url);
-        request.addHeader("X-Edutech-Entity", user_Name);
-        long imestamp = System.currentTimeMillis();
-        String sign = My_md5.Md5(String.valueOf(imestamp) + user_Name);
-        request.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        try {
-            HttpResponse httpResponse = httpClient.execute(request);
-            return httpResponse;
+            httpResponse = new DefaultHttpClient().execute(httpGet);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return httpResponse;
     }
 
-    private static HttpResponse Get_http_addheader(String url, String user_Name, String privatekey) throws IOException, ClientProtocolException {
-        HttpGet request = new HttpGet(url);
-        request.addHeader("X-Edutech-Entity", user_Name);
-        long imestamp = System.currentTimeMillis();
-        String sign = My_md5.Md5(String.valueOf(imestamp) + user_Name + privatekey);
-        request.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+    private static HttpResponse Get_http_addheader(String str, String str2, String str3) throws IOException, ClientProtocolException {
+        HttpGet httpGet = new HttpGet(str);
+        httpGet.addHeader("X-Edutech-Entity", str2);
+        long currentTimeMillis = System.currentTimeMillis();
+        httpGet.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str2 + str3));
+        HttpResponse httpResponse = null;
         try {
-            HttpResponse httpResponse = httpClient.execute(request);
-            return httpResponse;
+            httpResponse = new DefaultHttpClient().execute(httpGet);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return httpResponse;
+    }
+
+    public static String getConfigData(String str, String str2) {
+        String str3;
+        if (str.equals("") || str == null || str2.equals("") || str2 == null) {
+            Log.e(TAG, "getConfigData 入参有问题");
+            str3 = null;
+        } else {
+            try {
+                HttpResponse Get_http_addheader = Get_http_addheader(str, str2);
+                Log.e(TAG, "解析返回的内容...");
+                if (Get_http_addheader == null) {
+                    str3 = "";
+                } else if (Get_http_addheader.getStatusLine().getStatusCode() == 200) {
+                    StringBuilder sb = new StringBuilder();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Get_http_addheader.getEntity().getContent(), "UTF-8"));
+                    for (String readLine = bufferedReader.readLine(); readLine != null; readLine = bufferedReader.readLine()) {
+                        sb.append(readLine);
+                    }
+                    str3 = sb.toString();
+                } else {
+                    Log.e(TAG, "连接状态码Status=" + Get_http_addheader.getStatusLine().getStatusCode());
+                    str3 = null;
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+                str3 = null;
+            } catch (IOException e2) {
+                e2.printStackTrace();
+                str3 = null;
+            }
+        }
+        return str3;
+    }
+
+    public static String getNotification(String str, String str2, String str3) {
+        String str4;
+        if (str.equals("") || str == null || str2.equals("") || str2 == null) {
+            Log.e(TAG, "getConfigData 入参有问题");
+            str4 = null;
+        } else {
+            try {
+                HttpResponse Get_http_addheader = Get_http_addheader(str, str2, str3);
+                Log.e(TAG, "解析返回的内容...");
+                if (Get_http_addheader == null) {
+                    str4 = "";
+                } else if (Get_http_addheader.getStatusLine().getStatusCode() == 200) {
+                    StringBuilder sb = new StringBuilder();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Get_http_addheader.getEntity().getContent(), "UTF-8"));
+                    for (String readLine = bufferedReader.readLine(); readLine != null; readLine = bufferedReader.readLine()) {
+                        sb.append(readLine);
+                    }
+                    str4 = sb.toString();
+                    Log.e(TAG, "学校和用户个人信息获取完成。。。");
+                } else {
+                    Log.e(TAG, "连接状态码Status=" + Get_http_addheader.getStatusLine().getStatusCode());
+                    str4 = null;
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+                str4 = null;
+                return str4;
+            } catch (IOException e2) {
+                e2.printStackTrace();
+                str4 = null;
+                return str4;
+            }
+        }
+        return str4;
     }
 }

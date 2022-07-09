@@ -5,18 +5,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/android/internal/http/multipart/FilePartSource.class */
 public class FilePartSource implements PartSource {
     public FilePartSource(File file) throws FileNotFoundException {
         throw new RuntimeException("Stub!");
     }
 
-    public FilePartSource(String fileName, File file) throws FileNotFoundException {
+    public FilePartSource(String str, File file) throws FileNotFoundException {
         throw new RuntimeException("Stub!");
     }
 
     @Override // com.android.internal.http.multipart.PartSource
-    public long getLength() {
+    public InputStream createInputStream() throws IOException {
         throw new RuntimeException("Stub!");
     }
 
@@ -26,7 +26,7 @@ public class FilePartSource implements PartSource {
     }
 
     @Override // com.android.internal.http.multipart.PartSource
-    public InputStream createInputStream() throws IOException {
+    public long getLength() {
         throw new RuntimeException("Stub!");
     }
 }

@@ -2,7 +2,7 @@ package com.edutech.idauthentication;
 
 import java.util.ArrayList;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/edutech/idauthentication/LogInfo.class */
 public class LogInfo {
     private String AssetsID;
     private String AssetsName;
@@ -38,167 +38,167 @@ public class LogInfo {
         this.SectionsID = new ArrayList<>();
     }
 
-    public LogInfo(String MachineID, String Type, String UserID, String SubjectID, String BookID, String BookName, ArrayList<String> SectionsID, String ChapterID, String PartID, String AssetsID, String AssetsName, String FirstTime, String LastTime, long TotalTime, long VisitCount) {
-        this.MachineID = MachineID;
-        this.Type = Type;
-        this.UserID = UserID;
-        this.SubjectID = SubjectID;
-        this.BookID = BookID;
-        this.BookName = BookName;
-        this.ChapterID = ChapterID;
-        this.PartID = PartID;
-        this.AssetsID = AssetsID;
-        this.AssetsName = AssetsName;
-        this.FirstTime = FirstTime;
-        this.LastTime = LastTime;
-        this.TotalTime = TotalTime;
-        this.VisitCount = VisitCount;
-        this.SectionsID = SectionsID;
+    public LogInfo(LogInfo logInfo) {
+        this.MachineID = logInfo.MachineID;
+        this.Type = logInfo.Type;
+        this.UserID = logInfo.UserID;
+        this.SubjectID = logInfo.SubjectID;
+        this.BookID = logInfo.BookID;
+        this.BookName = logInfo.BookName;
+        this.ChapterID = logInfo.ChapterID;
+        this.PartID = logInfo.PartID;
+        this.AssetsID = logInfo.AssetsID;
+        this.AssetsName = logInfo.AssetsName;
+        this.FirstTime = logInfo.FirstTime;
+        this.LastTime = logInfo.LastTime;
+        this.TotalTime = logInfo.TotalTime;
+        this.VisitCount = logInfo.VisitCount;
+        this.SectionsID = logInfo.SectionsID;
     }
 
-    public LogInfo(LogInfo loginfo) {
-        this.MachineID = loginfo.MachineID;
-        this.Type = loginfo.Type;
-        this.UserID = loginfo.UserID;
-        this.SubjectID = loginfo.SubjectID;
-        this.BookID = loginfo.BookID;
-        this.BookName = loginfo.BookName;
-        this.ChapterID = loginfo.ChapterID;
-        this.PartID = loginfo.PartID;
-        this.AssetsID = loginfo.AssetsID;
-        this.AssetsName = loginfo.AssetsName;
-        this.FirstTime = loginfo.FirstTime;
-        this.LastTime = loginfo.LastTime;
-        this.TotalTime = loginfo.TotalTime;
-        this.VisitCount = loginfo.VisitCount;
-        this.SectionsID = loginfo.SectionsID;
-    }
-
-    public LogInfo getlogs() {
-        return this;
-    }
-
-    public void setType(String Type) {
-        this.Type = Type;
-    }
-
-    public String getType() {
-        return this.Type;
-    }
-
-    public void setUserID(String UserID) {
-        this.UserID = UserID;
-    }
-
-    public String getUserID() {
-        return this.UserID;
-    }
-
-    public void setChapterID(String ChapterID) {
-        this.ChapterID = ChapterID;
-    }
-
-    public String getChapterID() {
-        return this.ChapterID;
-    }
-
-    public String getPartID() {
-        return this.PartID;
-    }
-
-    public void setPartID(String partID) {
-        this.PartID = partID;
-    }
-
-    public long getTotalTime() {
-        return this.TotalTime;
-    }
-
-    public void setTotalTime(long totalTime) {
-        this.TotalTime = totalTime;
-    }
-
-    public String toString() {
-        return "bookinfo\nMachineID = " + this.MachineID + "\nType = " + this.Type + "\nUserID = " + this.UserID + "\nSubjectID = " + this.SubjectID + "\nBookID = " + this.BookID + "\nBookName = " + this.BookName + "\nChapterID = " + this.ChapterID + "\nPartID = " + this.PartID + "\nAssetsID = " + this.AssetsID + "\nAssetsName = " + this.AssetsName + "\nFirstTime = " + this.FirstTime + "\nLastTime = " + this.LastTime + "\nTotalTime = " + this.TotalTime + "\nVisitCount = " + this.VisitCount + "\n";
-    }
-
-    public String getSubjectID() {
-        return this.SubjectID;
-    }
-
-    public void setSubjectID(String subjectID) {
-        this.SubjectID = subjectID;
-    }
-
-    public String getBookID() {
-        return this.BookID;
-    }
-
-    public void setBookID(String bookID) {
-        this.BookID = bookID;
-    }
-
-    public String getBookName() {
-        return this.BookName;
-    }
-
-    public void setBookName(String bookName) {
-        this.BookName = bookName;
-    }
-
-    public String getAssetsName() {
-        return this.AssetsName;
-    }
-
-    public void setAssetsName(String assetsName) {
-        this.AssetsName = assetsName;
-    }
-
-    public String getFirstTime() {
-        return this.FirstTime;
-    }
-
-    public void setFirstTime(String firstTime) {
-        this.FirstTime = firstTime;
-    }
-
-    public String getLastTime() {
-        return this.LastTime;
-    }
-
-    public void setLastTime(String lastTime) {
-        this.LastTime = lastTime;
-    }
-
-    public long getVisitCount() {
-        return this.VisitCount;
-    }
-
-    public void setVisitCount(long visitCount) {
-        this.VisitCount = visitCount;
-    }
-
-    public String getMachineID() {
-        return this.MachineID;
-    }
-
-    public void setMachineID(String machineID) {
-        this.MachineID = machineID;
+    public LogInfo(String str, String str2, String str3, String str4, String str5, String str6, ArrayList<String> arrayList, String str7, String str8, String str9, String str10, String str11, String str12, long j, long j2) {
+        this.MachineID = str;
+        this.Type = str2;
+        this.UserID = str3;
+        this.SubjectID = str4;
+        this.BookID = str5;
+        this.BookName = str6;
+        this.ChapterID = str7;
+        this.PartID = str8;
+        this.AssetsID = str9;
+        this.AssetsName = str10;
+        this.FirstTime = str11;
+        this.LastTime = str12;
+        this.TotalTime = j;
+        this.VisitCount = j2;
+        this.SectionsID = arrayList;
     }
 
     public String getAssetsID() {
         return this.AssetsID;
     }
 
-    public void setAssetsID(String assetsID) {
-        this.AssetsID = assetsID;
+    public String getAssetsName() {
+        return this.AssetsName;
+    }
+
+    public String getBookID() {
+        return this.BookID;
+    }
+
+    public String getBookName() {
+        return this.BookName;
+    }
+
+    public String getChapterID() {
+        return this.ChapterID;
+    }
+
+    public String getFirstTime() {
+        return this.FirstTime;
+    }
+
+    public String getLastTime() {
+        return this.LastTime;
+    }
+
+    public String getMachineID() {
+        return this.MachineID;
+    }
+
+    public String getPartID() {
+        return this.PartID;
     }
 
     public ArrayList<String> getSectionsID() {
         return this.SectionsID;
     }
 
-    public void setSectionsID(ArrayList<String> sectionsID) {
-        this.SectionsID = sectionsID;
+    public String getSubjectID() {
+        return this.SubjectID;
+    }
+
+    public long getTotalTime() {
+        return this.TotalTime;
+    }
+
+    public String getType() {
+        return this.Type;
+    }
+
+    public String getUserID() {
+        return this.UserID;
+    }
+
+    public long getVisitCount() {
+        return this.VisitCount;
+    }
+
+    public LogInfo getlogs() {
+        return this;
+    }
+
+    public void setAssetsID(String str) {
+        this.AssetsID = str;
+    }
+
+    public void setAssetsName(String str) {
+        this.AssetsName = str;
+    }
+
+    public void setBookID(String str) {
+        this.BookID = str;
+    }
+
+    public void setBookName(String str) {
+        this.BookName = str;
+    }
+
+    public void setChapterID(String str) {
+        this.ChapterID = str;
+    }
+
+    public void setFirstTime(String str) {
+        this.FirstTime = str;
+    }
+
+    public void setLastTime(String str) {
+        this.LastTime = str;
+    }
+
+    public void setMachineID(String str) {
+        this.MachineID = str;
+    }
+
+    public void setPartID(String str) {
+        this.PartID = str;
+    }
+
+    public void setSectionsID(ArrayList<String> arrayList) {
+        this.SectionsID = arrayList;
+    }
+
+    public void setSubjectID(String str) {
+        this.SubjectID = str;
+    }
+
+    public void setTotalTime(long j) {
+        this.TotalTime = j;
+    }
+
+    public void setType(String str) {
+        this.Type = str;
+    }
+
+    public void setUserID(String str) {
+        this.UserID = str;
+    }
+
+    public void setVisitCount(long j) {
+        this.VisitCount = j;
+    }
+
+    public String toString() {
+        return "bookinfo\nMachineID = " + this.MachineID + "\nType = " + this.Type + "\nUserID = " + this.UserID + "\nSubjectID = " + this.SubjectID + "\nBookID = " + this.BookID + "\nBookName = " + this.BookName + "\nChapterID = " + this.ChapterID + "\nPartID = " + this.PartID + "\nAssetsID = " + this.AssetsID + "\nAssetsName = " + this.AssetsName + "\nFirstTime = " + this.FirstTime + "\nLastTime = " + this.LastTime + "\nTotalTime = " + this.TotalTime + "\nVisitCount = " + this.VisitCount + "\n";
     }
 }

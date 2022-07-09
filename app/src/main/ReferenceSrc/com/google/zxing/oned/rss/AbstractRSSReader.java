@@ -1,11 +1,9 @@
 package com.google.zxing.oned.rss;
 
-import android.support.v4.widget.ExploreByTouchHelper;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.oned.OneDReader;
-import org.apache.tools.ant.taskdefs.Execute;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/zxing/oned/rss/AbstractRSSReader.class */
 public abstract class AbstractRSSReader extends OneDReader {
     private static final int MAX_AVG_VARIANCE = 51;
     private static final float MAX_FINDER_PATTERN_RATIO = 0.89285713f;
@@ -21,16 +19,97 @@ public abstract class AbstractRSSReader extends OneDReader {
     protected AbstractRSSReader() {
     }
 
-    protected int[] getDecodeFinderCounters() {
-        return this.decodeFinderCounters;
+    protected static int count(int[] iArr) {
+        int i = 0;
+        for (int i2 : iArr) {
+            i += i2;
+        }
+        return i;
+    }
+
+    protected static void decrement(int[] iArr, float[] fArr) {
+        int i = 0;
+        float f = fArr[0];
+        int i2 = 1;
+        while (i2 < iArr.length) {
+            float f2 = f;
+            if (fArr[i2] < f) {
+                f2 = fArr[i2];
+                i = i2;
+            }
+            i2++;
+            f = f2;
+        }
+        iArr[i] = iArr[i] - 1;
+    }
+
+    protected static void increment(int[] iArr, float[] fArr) {
+        int i = 0;
+        float f = fArr[0];
+        int i2 = 1;
+        while (i2 < iArr.length) {
+            float f2 = f;
+            if (fArr[i2] > f) {
+                f2 = fArr[i2];
+                i = i2;
+            }
+            i2++;
+            f = f2;
+        }
+        iArr[i] = iArr[i] + 1;
+    }
+
+    protected static boolean isFinderPattern(int[] iArr) {
+        int i;
+        boolean z = true;
+        float f = (iArr[0] + iArr[1]) / ((iArr[2] + i) + iArr[3]);
+        if (f < MIN_FINDER_PATTERN_RATIO || f > MAX_FINDER_PATTERN_RATIO) {
+            z = false;
+        } else {
+            int i2 = Integer.MAX_VALUE;
+            int i3 = Integer.MIN_VALUE;
+            int length = iArr.length;
+            int i4 = 0;
+            while (i4 < length) {
+                int i5 = iArr[i4];
+                int i6 = i3;
+                if (i5 > i3) {
+                    i6 = i5;
+                }
+                int i7 = i2;
+                if (i5 < i2) {
+                    i7 = i5;
+                }
+                i4++;
+                i3 = i6;
+                i2 = i7;
+            }
+            if (i3 >= i2 * 10) {
+                z = false;
+            }
+        }
+        return z;
+    }
+
+    protected static int parseFinderValue(int[] iArr, int[][] iArr2) throws NotFoundException {
+        for (int i = 0; i < iArr2.length; i++) {
+            if (patternMatchVariance(iArr, iArr2[i], 102) < 51) {
+                return i;
+            }
+        }
+        throw NotFoundException.getNotFoundInstance();
     }
 
     protected int[] getDataCharacterCounters() {
         return this.dataCharacterCounters;
     }
 
-    protected float[] getOddRoundingErrors() {
-        return this.oddRoundingErrors;
+    protected int[] getDecodeFinderCounters() {
+        return this.decodeFinderCounters;
+    }
+
+    protected int[] getEvenCounts() {
+        return this.evenCounts;
     }
 
     protected float[] getEvenRoundingErrors() {
@@ -41,68 +120,7 @@ public abstract class AbstractRSSReader extends OneDReader {
         return this.oddCounts;
     }
 
-    protected int[] getEvenCounts() {
-        return this.evenCounts;
-    }
-
-    protected static int parseFinderValue(int[] counters, int[][] finderPatterns) throws NotFoundException {
-        for (int value = 0; value < finderPatterns.length; value++) {
-            if (patternMatchVariance(counters, finderPatterns[value], 102) < MAX_AVG_VARIANCE) {
-                return value;
-            }
-        }
-        throw NotFoundException.getNotFoundInstance();
-    }
-
-    protected static int count(int[] array) {
-        int count = 0;
-        for (int a : array) {
-            count += a;
-        }
-        return count;
-    }
-
-    protected static void increment(int[] array, float[] errors) {
-        int index = 0;
-        float biggestError = errors[0];
-        for (int i = 1; i < array.length; i++) {
-            if (errors[i] > biggestError) {
-                biggestError = errors[i];
-                index = i;
-            }
-        }
-        array[index] = array[index] + 1;
-    }
-
-    protected static void decrement(int[] array, float[] errors) {
-        int index = 0;
-        float biggestError = errors[0];
-        for (int i = 1; i < array.length; i++) {
-            if (errors[i] < biggestError) {
-                biggestError = errors[i];
-                index = i;
-            }
-        }
-        array[index] = array[index] - 1;
-    }
-
-    protected static boolean isFinderPattern(int[] counters) {
-        int firstTwoSum = counters[0] + counters[1];
-        int sum = counters[2] + firstTwoSum + counters[3];
-        float ratio = firstTwoSum / sum;
-        if (ratio < MIN_FINDER_PATTERN_RATIO || ratio > MAX_FINDER_PATTERN_RATIO) {
-            return false;
-        }
-        int minCounter = Execute.INVALID;
-        int maxCounter = ExploreByTouchHelper.INVALID_ID;
-        for (int counter : counters) {
-            if (counter > maxCounter) {
-                maxCounter = counter;
-            }
-            if (counter < minCounter) {
-                minCounter = counter;
-            }
-        }
-        return maxCounter < minCounter * 10;
+    protected float[] getOddRoundingErrors() {
+        return this.oddRoundingErrors;
     }
 }

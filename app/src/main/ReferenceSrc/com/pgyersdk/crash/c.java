@@ -2,7 +2,7 @@ package com.pgyersdk.crash;
 
 import java.lang.ref.WeakReference;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/pgyersdk/crash/c.class */
 final class c extends Thread {
     private final /* synthetic */ WeakReference a;
     private final /* synthetic */ g b = null;

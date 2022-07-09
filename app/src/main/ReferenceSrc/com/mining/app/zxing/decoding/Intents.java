@@ -1,11 +1,20 @@
 package com.mining.app.zxing.decoding;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/mining/app/zxing/decoding/Intents.class */
 public final class Intents {
-    private Intents() {
+
+    /* loaded from: classes.jar:com/mining/app/zxing/decoding/Intents$Encode.class */
+    public static final class Encode {
+        public static final String ACTION = "com.google.zxing.client.android.ENCODE";
+        public static final String DATA = "ENCODE_DATA";
+        public static final String FORMAT = "ENCODE_FORMAT";
+        public static final String TYPE = "ENCODE_TYPE";
+
+        private Encode() {
+        }
     }
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/mining/app/zxing/decoding/Intents$Scan.class */
     public static final class Scan {
         public static final String ACTION = "com.google.zxing.client.android.SCAN";
         public static final String CHARACTER_SET = "CHARACTER_SET";
@@ -23,18 +32,7 @@ public final class Intents {
         }
     }
 
-    /* loaded from: classes.dex */
-    public static final class Encode {
-        public static final String ACTION = "com.google.zxing.client.android.ENCODE";
-        public static final String DATA = "ENCODE_DATA";
-        public static final String FORMAT = "ENCODE_FORMAT";
-        public static final String TYPE = "ENCODE_TYPE";
-
-        private Encode() {
-        }
-    }
-
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/mining/app/zxing/decoding/Intents$SearchBookContents.class */
     public static final class SearchBookContents {
         public static final String ACTION = "com.google.zxing.client.android.SEARCH_BOOK_CONTENTS";
         public static final String ISBN = "ISBN";
@@ -44,7 +42,15 @@ public final class Intents {
         }
     }
 
-    /* loaded from: classes.dex */
+    /* loaded from: classes.jar:com/mining/app/zxing/decoding/Intents$Share.class */
+    public static final class Share {
+        public static final String ACTION = "com.google.zxing.client.android.SHARE";
+
+        private Share() {
+        }
+    }
+
+    /* loaded from: classes.jar:com/mining/app/zxing/decoding/Intents$WifiConnect.class */
     public static final class WifiConnect {
         public static final String ACTION = "com.google.zxing.client.android.WIFI_CONNECT";
         public static final String PASSWORD = "PASSWORD";
@@ -55,11 +61,6 @@ public final class Intents {
         }
     }
 
-    /* loaded from: classes.dex */
-    public static final class Share {
-        public static final String ACTION = "com.google.zxing.client.android.SHARE";
-
-        private Share() {
-        }
+    private Intents() {
     }
 }

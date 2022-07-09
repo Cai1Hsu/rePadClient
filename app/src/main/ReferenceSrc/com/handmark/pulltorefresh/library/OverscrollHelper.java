@@ -6,9 +6,9 @@ import android.view.View;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 
 @TargetApi(9)
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/OverscrollHelper.class */
 public final class OverscrollHelper {
-    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation = null;
+    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation;
     static final float DEFAULT_OVERSCROLL_SCALE = 1.0f;
     static final String LOG_TAG = "OverscrollHelper";
 
@@ -29,59 +29,66 @@ public final class OverscrollHelper {
         return iArr;
     }
 
-    public static void overScrollBy(PullToRefreshBase<?> view, int deltaX, int scrollX, int deltaY, int scrollY, boolean isTouchEvent) {
-        overScrollBy(view, deltaX, scrollX, deltaY, scrollY, 0, isTouchEvent);
-    }
-
-    public static void overScrollBy(PullToRefreshBase<?> view, int deltaX, int scrollX, int deltaY, int scrollY, int scrollRange, boolean isTouchEvent) {
-        overScrollBy(view, deltaX, scrollX, deltaY, scrollY, scrollRange, 0, DEFAULT_OVERSCROLL_SCALE, isTouchEvent);
-    }
-
-    public static void overScrollBy(PullToRefreshBase<?> view, int deltaX, int scrollX, int deltaY, int scrollY, int scrollRange, int fuzzyThreshold, float scaleFactor, boolean isTouchEvent) {
-        int deltaValue;
-        int scrollValue;
-        int currentScrollValue;
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[view.getPullToRefreshScrollDirection().ordinal()]) {
-            case 2:
-                deltaValue = deltaX;
-                scrollValue = scrollX;
-                currentScrollValue = view.getScrollX();
-                break;
-            default:
-                deltaValue = deltaY;
-                scrollValue = scrollY;
-                currentScrollValue = view.getScrollY();
-                break;
-        }
-        if (view.isPullToRefreshOverScrollEnabled() && !view.isRefreshing()) {
-            PullToRefreshBase.Mode mode = view.getMode();
-            if (mode.permitsPullToRefresh() && !isTouchEvent && deltaValue != 0) {
-                int newScrollValue = deltaValue + scrollValue;
-                Log.d(LOG_TAG, "OverScroll. DeltaX: " + deltaX + ", ScrollX: " + scrollX + ", DeltaY: " + deltaY + ", ScrollY: " + scrollY + ", NewY: " + newScrollValue + ", ScrollRange: " + scrollRange + ", CurrentScroll: " + currentScrollValue);
-                if (newScrollValue < 0 - fuzzyThreshold) {
-                    if (mode.showHeaderLoadingLayout()) {
-                        if (currentScrollValue == 0) {
-                            view.setState(PullToRefreshBase.State.OVERSCROLLING, new boolean[0]);
-                        }
-                        view.setHeaderScroll((int) ((currentScrollValue + newScrollValue) * scaleFactor));
-                    }
-                } else if (newScrollValue > scrollRange + fuzzyThreshold) {
-                    if (mode.showFooterLoadingLayout()) {
-                        if (currentScrollValue == 0) {
-                            view.setState(PullToRefreshBase.State.OVERSCROLLING, new boolean[0]);
-                        }
-                        view.setHeaderScroll((int) (((currentScrollValue + newScrollValue) - scrollRange) * scaleFactor));
-                    }
-                } else if (Math.abs(newScrollValue) <= fuzzyThreshold || Math.abs(newScrollValue - scrollRange) <= fuzzyThreshold) {
-                    view.setState(PullToRefreshBase.State.RESET, new boolean[0]);
-                }
-            } else if (isTouchEvent && PullToRefreshBase.State.OVERSCROLLING == view.getState()) {
-                view.setState(PullToRefreshBase.State.RESET, new boolean[0]);
-            }
-        }
-    }
-
     static boolean isAndroidOverScrollEnabled(View view) {
         return view.getOverScrollMode() != 2;
+    }
+
+    public static void overScrollBy(PullToRefreshBase<?> pullToRefreshBase, int i, int i2, int i3, int i4, int i5, int i6, float f, boolean z) {
+        int i7;
+        int i8;
+        int scrollX;
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[pullToRefreshBase.getPullToRefreshScrollDirection().ordinal()]) {
+            case 2:
+                i7 = i;
+                i8 = i2;
+                scrollX = pullToRefreshBase.getScrollX();
+                break;
+            default:
+                i7 = i3;
+                i8 = i4;
+                scrollX = pullToRefreshBase.getScrollY();
+                break;
+        }
+        if (!pullToRefreshBase.isPullToRefreshOverScrollEnabled() || pullToRefreshBase.isRefreshing()) {
+            return;
+        }
+        PullToRefreshBase.Mode mode = pullToRefreshBase.getMode();
+        if (!mode.permitsPullToRefresh() || z || i7 == 0) {
+            if (!z || PullToRefreshBase.State.OVERSCROLLING != pullToRefreshBase.getState()) {
+                return;
+            }
+            pullToRefreshBase.setState(PullToRefreshBase.State.RESET, new boolean[0]);
+            return;
+        }
+        int i9 = i7 + i8;
+        Log.d(LOG_TAG, "OverScroll. DeltaX: " + i + ", ScrollX: " + i2 + ", DeltaY: " + i3 + ", ScrollY: " + i4 + ", NewY: " + i9 + ", ScrollRange: " + i5 + ", CurrentScroll: " + scrollX);
+        if (i9 < 0 - i6) {
+            if (!mode.showHeaderLoadingLayout()) {
+                return;
+            }
+            if (scrollX == 0) {
+                pullToRefreshBase.setState(PullToRefreshBase.State.OVERSCROLLING, new boolean[0]);
+            }
+            pullToRefreshBase.setHeaderScroll((int) ((scrollX + i9) * f));
+        } else if (i9 <= i5 + i6) {
+            if (Math.abs(i9) > i6 && Math.abs(i9 - i5) > i6) {
+                return;
+            }
+            pullToRefreshBase.setState(PullToRefreshBase.State.RESET, new boolean[0]);
+        } else if (!mode.showFooterLoadingLayout()) {
+        } else {
+            if (scrollX == 0) {
+                pullToRefreshBase.setState(PullToRefreshBase.State.OVERSCROLLING, new boolean[0]);
+            }
+            pullToRefreshBase.setHeaderScroll((int) (((scrollX + i9) - i5) * f));
+        }
+    }
+
+    public static void overScrollBy(PullToRefreshBase<?> pullToRefreshBase, int i, int i2, int i3, int i4, int i5, boolean z) {
+        overScrollBy(pullToRefreshBase, i, i2, i3, i4, i5, 0, DEFAULT_OVERSCROLL_SCALE, z);
+    }
+
+    public static void overScrollBy(PullToRefreshBase<?> pullToRefreshBase, int i, int i2, int i3, int i4, boolean z) {
+        overScrollBy(pullToRefreshBase, i, i2, i3, i4, 0, z);
     }
 }

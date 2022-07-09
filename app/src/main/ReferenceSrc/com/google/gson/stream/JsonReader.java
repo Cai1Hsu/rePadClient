@@ -7,11 +7,12 @@ import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.tftp.TFTP;
 import org.apache.http.HttpStatus;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/google/gson/stream/JsonReader.class */
 public class JsonReader implements Closeable {
     private static final long MIN_INCOMPLETE_INTEGER = -922337203685477580L;
     private static final char[] NON_EXECUTE_PREFIX = ")]}'\n".toCharArray();
@@ -58,154 +59,146 @@ public class JsonReader implements Closeable {
     static {
         JsonReaderInternalAccess.INSTANCE = new JsonReaderInternalAccess() { // from class: com.google.gson.stream.JsonReader.1
             @Override // com.google.gson.internal.JsonReaderInternalAccess
-            public void promoteNameToValue(JsonReader reader) throws IOException {
-                if (!(reader instanceof JsonTreeReader)) {
-                    int p = reader.peeked;
-                    if (p == 0) {
-                        p = reader.doPeek();
-                    }
-                    if (p == 13) {
-                        reader.peeked = 9;
-                        return;
-                    } else if (p == 12) {
-                        reader.peeked = 8;
-                        return;
-                    } else if (p == 14) {
-                        reader.peeked = 10;
-                        return;
-                    } else {
-                        throw new IllegalStateException("Expected a name but was " + reader.peek() + "  at line " + reader.getLineNumber() + " column " + reader.getColumnNumber());
-                    }
+            public void promoteNameToValue(JsonReader jsonReader) throws IOException {
+                if (jsonReader instanceof JsonTreeReader) {
+                    ((JsonTreeReader) jsonReader).promoteNameToValue();
+                    return;
                 }
-                ((JsonTreeReader) reader).promoteNameToValue();
+                int i = jsonReader.peeked;
+                int i2 = i;
+                if (i == 0) {
+                    i2 = jsonReader.doPeek();
+                }
+                if (i2 == 13) {
+                    jsonReader.peeked = 9;
+                } else if (i2 == 12) {
+                    jsonReader.peeked = 8;
+                } else if (i2 != 14) {
+                    throw new IllegalStateException("Expected a name but was " + jsonReader.peek() + "  at line " + jsonReader.getLineNumber() + " column " + jsonReader.getColumnNumber());
+                } else {
+                    jsonReader.peeked = 10;
+                }
             }
         };
     }
 
-    public JsonReader(Reader in) {
+    public JsonReader(Reader reader) {
         this.stackSize = 0;
         int[] iArr = this.stack;
         int i = this.stackSize;
         this.stackSize = i + 1;
         iArr[i] = 6;
-        if (in == null) {
+        if (reader == null) {
             throw new NullPointerException("in == null");
         }
-        this.in = in;
+        this.in = reader;
     }
 
-    public final void setLenient(boolean lenient) {
-        this.lenient = lenient;
-    }
-
-    public final boolean isLenient() {
-        return this.lenient;
-    }
-
-    public void beginArray() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 3) {
-            push(1);
-            this.peeked = 0;
-            return;
-        }
-        throw new IllegalStateException("Expected BEGIN_ARRAY but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-    }
-
-    public void endArray() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 4) {
-            this.stackSize--;
-            this.peeked = 0;
-            return;
-        }
-        throw new IllegalStateException("Expected END_ARRAY but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-    }
-
-    public void beginObject() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 1) {
-            push(3);
-            this.peeked = 0;
-            return;
-        }
-        throw new IllegalStateException("Expected BEGIN_OBJECT but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-    }
-
-    public void endObject() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 2) {
-            this.stackSize--;
-            this.peeked = 0;
-            return;
-        }
-        throw new IllegalStateException("Expected END_OBJECT but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-    }
-
-    public boolean hasNext() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        return (p == 2 || p == 4) ? false : true;
-    }
-
-    public JsonToken peek() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        switch (p) {
-            case 1:
-                return JsonToken.BEGIN_OBJECT;
-            case 2:
-                return JsonToken.END_OBJECT;
-            case 3:
-                return JsonToken.BEGIN_ARRAY;
-            case 4:
-                return JsonToken.END_ARRAY;
-            case 5:
-            case 6:
-                return JsonToken.BOOLEAN;
-            case 7:
-                return JsonToken.NULL;
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-                return JsonToken.STRING;
-            case 12:
-            case 13:
-            case 14:
-                return JsonToken.NAME;
-            case 15:
-            case 16:
-                return JsonToken.NUMBER;
-            case 17:
-                return JsonToken.END_DOCUMENT;
-            default:
-                throw new AssertionError();
+    private void checkLenient() throws IOException {
+        if (!this.lenient) {
+            throw syntaxError("Use JsonReader.setLenient(true) to accept malformed JSON");
         }
     }
 
-    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    private void consumeNonExecutePrefix() throws IOException {
+        nextNonWhitespace(true);
+        this.pos--;
+        if (this.pos + NON_EXECUTE_PREFIX.length <= this.limit || fillBuffer(NON_EXECUTE_PREFIX.length)) {
+            for (int i = 0; i < NON_EXECUTE_PREFIX.length; i++) {
+                if (this.buffer[this.pos + i] != NON_EXECUTE_PREFIX[i]) {
+                    return;
+                }
+            }
+            this.pos += NON_EXECUTE_PREFIX.length;
+        }
+    }
+
     public int doPeek() throws IOException {
-        int peekStack = this.stack[this.stackSize - 1];
-        if (peekStack == 1) {
+        int i = 4;
+        int i2 = this.stack[this.stackSize - 1];
+        if (i2 == 1) {
             this.stack[this.stackSize - 1] = 2;
-        } else if (peekStack == 2) {
+        } else if (i2 != 2) {
+            if (i2 == 3 || i2 == 5) {
+                this.stack[this.stackSize - 1] = 4;
+                if (i2 == 5) {
+                    switch (nextNonWhitespace(true)) {
+                        case MotionEventCompat.AXIS_GENERIC_13 /* 44 */:
+                            break;
+                        case 59:
+                            checkLenient();
+                            break;
+                        case FTPReply.DATA_CONNECTION_ALREADY_OPEN /* 125 */:
+                            this.peeked = 2;
+                            i = 2;
+                            break;
+                        default:
+                            throw syntaxError("Unterminated object");
+                    }
+                }
+                int nextNonWhitespace = nextNonWhitespace(true);
+                switch (nextNonWhitespace) {
+                    case 34:
+                        i = 13;
+                        this.peeked = 13;
+                        break;
+                    case 39:
+                        checkLenient();
+                        i = 12;
+                        this.peeked = 12;
+                        break;
+                    case FTPReply.DATA_CONNECTION_ALREADY_OPEN /* 125 */:
+                        if (i2 == 5) {
+                            throw syntaxError("Expected name");
+                        }
+                        this.peeked = 2;
+                        i = 2;
+                        break;
+                    default:
+                        checkLenient();
+                        this.pos--;
+                        if (!isLiteral((char) nextNonWhitespace)) {
+                            throw syntaxError("Expected name");
+                        }
+                        i = 14;
+                        this.peeked = 14;
+                        break;
+                }
+            } else if (i2 == 4) {
+                this.stack[this.stackSize - 1] = 5;
+                switch (nextNonWhitespace(true)) {
+                    case 58:
+                        break;
+                    case 59:
+                    case 60:
+                    default:
+                        throw syntaxError("Expected ':'");
+                    case 61:
+                        checkLenient();
+                        if ((this.pos < this.limit || fillBuffer(1)) && this.buffer[this.pos] == '>') {
+                            this.pos++;
+                            break;
+                        }
+                        break;
+                }
+            } else if (i2 == 6) {
+                if (this.lenient) {
+                    consumeNonExecutePrefix();
+                }
+                this.stack[this.stackSize - 1] = 7;
+            } else if (i2 == 7) {
+                if (nextNonWhitespace(false) == -1) {
+                    i = 17;
+                    this.peeked = 17;
+                } else {
+                    checkLenient();
+                    this.pos--;
+                }
+            } else if (i2 == 8) {
+                throw new IllegalStateException("JsonReader is closed");
+            }
+            return i;
+        } else {
             switch (nextNonWhitespace(true)) {
                 case MotionEventCompat.AXIS_GENERIC_13 /* 44 */:
                     break;
@@ -214,315 +207,136 @@ public class JsonReader implements Closeable {
                     break;
                 case 93:
                     this.peeked = 4;
-                    return 4;
+                    return i;
                 default:
                     throw syntaxError("Unterminated array");
             }
-        } else if (peekStack == 3 || peekStack == 5) {
-            this.stack[this.stackSize - 1] = 4;
-            if (peekStack == 5) {
-                switch (nextNonWhitespace(true)) {
-                    case MotionEventCompat.AXIS_GENERIC_13 /* 44 */:
-                        break;
-                    case 59:
-                        checkLenient();
-                        break;
-                    case FTPReply.DATA_CONNECTION_ALREADY_OPEN /* 125 */:
-                        this.peeked = 2;
-                        return 2;
-                    default:
-                        throw syntaxError("Unterminated object");
-                }
-            }
-            int c = nextNonWhitespace(true);
-            switch (c) {
-                case 34:
-                    this.peeked = 13;
-                    return 13;
-                case 39:
-                    checkLenient();
-                    this.peeked = 12;
-                    return 12;
-                case FTPReply.DATA_CONNECTION_ALREADY_OPEN /* 125 */:
-                    if (peekStack != 5) {
-                        this.peeked = 2;
-                        return 2;
-                    }
-                    throw syntaxError("Expected name");
-                default:
-                    checkLenient();
-                    this.pos--;
-                    if (isLiteral((char) c)) {
-                        this.peeked = 14;
-                        return 14;
-                    }
-                    throw syntaxError("Expected name");
-            }
-        } else if (peekStack == 4) {
-            this.stack[this.stackSize - 1] = 5;
-            switch (nextNonWhitespace(true)) {
-                case 58:
-                    break;
-                case 59:
-                case 60:
-                default:
-                    throw syntaxError("Expected ':'");
-                case 61:
-                    checkLenient();
-                    if ((this.pos < this.limit || fillBuffer(1)) && this.buffer[this.pos] == '>') {
-                        this.pos++;
-                        break;
-                    }
-                    break;
-            }
-        } else if (peekStack == 6) {
-            if (this.lenient) {
-                consumeNonExecutePrefix();
-            }
-            this.stack[this.stackSize - 1] = 7;
-        } else if (peekStack == 7) {
-            if (nextNonWhitespace(false) == -1) {
-                this.peeked = 17;
-                return 17;
-            }
-            checkLenient();
-            this.pos--;
-        } else if (peekStack == 8) {
-            throw new IllegalStateException("JsonReader is closed");
         }
         switch (nextNonWhitespace(true)) {
             case 34:
                 if (this.stackSize == 1) {
                     checkLenient();
                 }
+                i = 9;
                 this.peeked = 9;
-                return 9;
+                return i;
             case 39:
                 checkLenient();
+                i = 8;
                 this.peeked = 8;
-                return 8;
+                return i;
             case MotionEventCompat.AXIS_GENERIC_13 /* 44 */:
             case 59:
-                break;
-            case 91:
-                this.peeked = 3;
-                return 3;
-            case 93:
-                if (peekStack == 1) {
-                    this.peeked = 4;
-                    return 4;
+                if (i2 == 1 && i2 != 2) {
+                    throw syntaxError("Unexpected value");
                 }
-                break;
+                checkLenient();
+                this.pos--;
+                this.peeked = 7;
+                i = 7;
+                return i;
+            case 91:
+                i = 3;
+                this.peeked = 3;
+                return i;
+            case 93:
+                if (i2 == 1) {
+                    this.peeked = 4;
+                    return i;
+                }
+                if (i2 == 1) {
+                    break;
+                }
+                checkLenient();
+                this.pos--;
+                this.peeked = 7;
+                i = 7;
+                return i;
             case 123:
                 this.peeked = 1;
-                return 1;
+                i = 1;
+                return i;
             default:
                 this.pos--;
                 if (this.stackSize == 1) {
                     checkLenient();
                 }
-                int result = peekKeyword();
-                if (result == 0) {
-                    int result2 = peekNumber();
-                    if (result2 == 0) {
+                i = peekKeyword();
+                if (i == 0) {
+                    int peekNumber = peekNumber();
+                    i = peekNumber;
+                    if (peekNumber == 0) {
                         if (!isLiteral(this.buffer[this.pos])) {
                             throw syntaxError("Expected value");
                         }
                         checkLenient();
+                        i = 10;
                         this.peeked = 10;
-                        return 10;
                     }
-                    return result2;
                 }
-                return result;
+                return i;
         }
-        if (peekStack == 1 || peekStack == 2) {
-            checkLenient();
-            this.pos--;
-            this.peeked = 7;
-            return 7;
-        }
-        throw syntaxError("Unexpected value");
     }
 
-    private int peekKeyword() throws IOException {
-        int peeking;
-        String keywordUpper;
-        String keyword;
-        char c = this.buffer[this.pos];
-        if (c == 't' || c == 'T') {
-            keyword = "true";
-            keywordUpper = "TRUE";
-            peeking = 5;
-        } else if (c == 'f' || c == 'F') {
-            keyword = "false";
-            keywordUpper = "FALSE";
-            peeking = 6;
-        } else if (c != 'n' && c != 'N') {
-            return 0;
+    private boolean fillBuffer(int i) throws IOException {
+        boolean z;
+        char[] cArr = this.buffer;
+        this.lineStart -= this.pos;
+        if (this.limit != this.pos) {
+            this.limit -= this.pos;
+            System.arraycopy(cArr, this.pos, cArr, 0, this.limit);
         } else {
-            keyword = "null";
-            keywordUpper = "NULL";
-            peeking = 7;
+            this.limit = 0;
         }
-        int length = keyword.length();
-        for (int i = 1; i < length; i++) {
-            if (this.pos + i >= this.limit && !fillBuffer(i + 1)) {
-                return 0;
-            }
-            char c2 = this.buffer[this.pos + i];
-            if (c2 != keyword.charAt(i) && c2 != keywordUpper.charAt(i)) {
-                return 0;
-            }
-        }
-        if ((this.pos + length < this.limit || fillBuffer(length + 1)) && isLiteral(this.buffer[this.pos + length])) {
-            return 0;
-        }
-        this.pos += length;
-        this.peeked = peeking;
-        return peeking;
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:103:?, code lost:
-        return 15;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:104:?, code lost:
-        return 16;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:11:0x0026, code lost:
-        if (r7 != 2) goto L76;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:12:0x0028, code lost:
-        if (r4 == false) goto L76;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:14:0x002e, code lost:
-        if (r12 != Long.MIN_VALUE) goto L16;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:15:0x0030, code lost:
-        if (r8 == false) goto L76;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:16:0x0032, code lost:
-        if (r8 == false) goto L75;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:17:0x0034, code lost:
-        r18.peekedLong = r12;
-        r18.pos += r5;
-        r18.peeked = 15;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:26:0x0065, code lost:
-        if (isLiteral(r3) == false) goto L10;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:27:0x0067, code lost:
-        return 0;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:75:0x00db, code lost:
-        r12 = -r12;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:77:0x00df, code lost:
-        if (r7 == 2) goto L82;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:79:0x00e2, code lost:
-        if (r7 == 4) goto L82;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:81:0x00e5, code lost:
-        if (r7 != 7) goto L83;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:82:0x00e7, code lost:
-        r18.peekedNumberLength = r5;
-        r18.peeked = 16;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:83:0x00f3, code lost:
-        return 0;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    private int peekNumber() throws IOException {
-        char[] buffer = this.buffer;
-        int p = this.pos;
-        int l = this.limit;
-        long value = 0;
-        boolean negative = false;
-        boolean fitsInLong = true;
-        int last = 0;
-        int i = 0;
+        this.pos = 0;
         while (true) {
-            if (p + i == l) {
-                if (i == buffer.length) {
-                    return 0;
-                }
-                if (fillBuffer(i + 1)) {
-                    p = this.pos;
-                    l = this.limit;
-                }
+            int read = this.in.read(cArr, this.limit, cArr.length - this.limit);
+            z = false;
+            if (read == -1) {
+                break;
             }
-            char c = buffer[p + i];
-            switch (c) {
-                case '+':
-                    if (last == 5) {
-                        last = 6;
-                        break;
-                    } else {
-                        return 0;
-                    }
-                case MotionEventCompat.AXIS_GENERIC_14 /* 45 */:
-                    if (last == 0) {
-                        negative = true;
-                        last = 1;
-                        break;
-                    } else if (last == 5) {
-                        last = 6;
-                        break;
-                    } else {
-                        return 0;
-                    }
-                case MotionEventCompat.AXIS_GENERIC_15 /* 46 */:
-                    if (last == 2) {
-                        last = 3;
-                        break;
-                    } else {
-                        return 0;
-                    }
-                case TFTP.DEFAULT_PORT /* 69 */:
-                case HttpStatus.SC_SWITCHING_PROTOCOLS /* 101 */:
-                    if (last == 2 || last == 4) {
-                        last = 5;
-                        break;
-                    } else {
-                        return 0;
-                    }
-                default:
-                    if (c >= '0' && c <= '9') {
-                        if (last == 1 || last == 0) {
-                            value = -(c - '0');
-                            last = 2;
-                            break;
-                        } else if (last == 2) {
-                            if (value == 0) {
-                                return 0;
-                            }
-                            long newValue = (10 * value) - (c - '0');
-                            fitsInLong &= value > MIN_INCOMPLETE_INTEGER || (value == MIN_INCOMPLETE_INTEGER && newValue < value);
-                            value = newValue;
-                            break;
-                        } else if (last == 3) {
-                            last = 4;
-                            break;
-                        } else if (last != 5 && last != 6) {
-                            break;
-                        } else {
-                            last = 7;
-                            break;
+            this.limit += read;
+            int i2 = i;
+            if (this.lineNumber == 0) {
+                i2 = i;
+                if (this.lineStart == 0) {
+                    i2 = i;
+                    if (this.limit > 0) {
+                        i2 = i;
+                        if (cArr[0] == 65279) {
+                            this.pos++;
+                            this.lineStart++;
+                            i2 = i + 1;
                         }
                     }
-                    break;
+                }
             }
-            i++;
+            i = i2;
+            if (this.limit >= i2) {
+                z = true;
+                break;
+            }
         }
+        return z;
+    }
+
+    public int getColumnNumber() {
+        return (this.pos - this.lineStart) + 1;
+    }
+
+    public int getLineNumber() {
+        return this.lineNumber + 1;
     }
 
     private boolean isLiteral(char c) throws IOException {
+        boolean z;
         switch (c) {
+            case '#':
+            case '/':
+            case ';':
+            case '=':
+            case IOUtils.DIR_SEPARATOR_WINDOWS /* 92 */:
+                checkLenient();
             case '\t':
             case '\n':
             case '\f':
@@ -534,199 +348,154 @@ public class JsonReader implements Closeable {
             case ']':
             case '{':
             case FTPReply.DATA_CONNECTION_ALREADY_OPEN /* 125 */:
+                z = false;
                 break;
             default:
-                return true;
-            case '#':
-            case MotionEventCompat.AXIS_GENERIC_16 /* 47 */:
-            case ';':
-            case '=':
-            case '\\':
-                checkLenient();
+                z = true;
                 break;
         }
-        return false;
+        return z;
     }
 
-    public String nextName() throws IOException {
-        String result;
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 14) {
-            result = nextUnquotedValue();
-        } else if (p == 12) {
-            result = nextQuotedValue('\'');
-        } else if (p == 13) {
-            result = nextQuotedValue('\"');
-        } else {
-            throw new IllegalStateException("Expected a name but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-        }
-        this.peeked = 0;
-        return result;
-    }
-
-    public String nextString() throws IOException {
-        String result;
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 10) {
-            result = nextUnquotedValue();
-        } else if (p == 8) {
-            result = nextQuotedValue('\'');
-        } else if (p == 9) {
-            result = nextQuotedValue('\"');
-        } else if (p == 11) {
-            result = this.peekedString;
-            this.peekedString = null;
-        } else if (p == 15) {
-            result = Long.toString(this.peekedLong);
-        } else if (p == 16) {
-            result = new String(this.buffer, this.pos, this.peekedNumberLength);
-            this.pos += this.peekedNumberLength;
-        } else {
-            throw new IllegalStateException("Expected a string but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-        }
-        this.peeked = 0;
-        return result;
-    }
-
-    public boolean nextBoolean() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 5) {
-            this.peeked = 0;
-            return true;
-        } else if (p == 6) {
-            this.peeked = 0;
-            return false;
-        } else {
-            throw new IllegalStateException("Expected a boolean but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-        }
-    }
-
-    public void nextNull() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 7) {
-            this.peeked = 0;
-            return;
-        }
-        throw new IllegalStateException("Expected null but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-    }
-
-    public double nextDouble() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 15) {
-            this.peeked = 0;
-            return this.peekedLong;
-        }
-        if (p == 16) {
-            this.peekedString = new String(this.buffer, this.pos, this.peekedNumberLength);
-            this.pos += this.peekedNumberLength;
-        } else if (p == 8 || p == 9) {
-            this.peekedString = nextQuotedValue(p == 8 ? '\'' : '\"');
-        } else if (p == 10) {
-            this.peekedString = nextUnquotedValue();
-        } else if (p != 11) {
-            throw new IllegalStateException("Expected a double but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
-        }
-        this.peeked = 11;
-        double result = Double.parseDouble(this.peekedString);
-        if (!this.lenient && (Double.isNaN(result) || Double.isInfinite(result))) {
-            throw new MalformedJsonException("JSON forbids NaN and infinities: " + result + " at line " + getLineNumber() + " column " + getColumnNumber());
-        }
-        this.peekedString = null;
-        this.peeked = 0;
-        return result;
-    }
-
-    public long nextLong() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
-        }
-        if (p == 15) {
-            this.peeked = 0;
-            return this.peekedLong;
-        }
-        if (p == 16) {
-            this.peekedString = new String(this.buffer, this.pos, this.peekedNumberLength);
-            this.pos += this.peekedNumberLength;
-        } else if (p == 8 || p == 9) {
-            this.peekedString = nextQuotedValue(p == 8 ? '\'' : '\"');
-            try {
-                long parseLong = Long.parseLong(this.peekedString);
-                this.peeked = 0;
-                return parseLong;
-            } catch (NumberFormatException e) {
+    private int nextNonWhitespace(boolean z) throws IOException {
+        char c;
+        char[] cArr = this.buffer;
+        int i = this.pos;
+        int i2 = this.limit;
+        while (true) {
+            int i3 = i2;
+            int i4 = i3;
+            int i5 = i;
+            if (i == i3) {
+                this.pos = i;
+                if (fillBuffer(1)) {
+                    i5 = this.pos;
+                    i4 = this.limit;
+                } else if (z) {
+                    throw new EOFException("End of input at line " + getLineNumber() + " column " + getColumnNumber());
+                } else {
+                    c = 65535;
+                }
             }
-        } else {
-            throw new IllegalStateException("Expected a long but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+            i = i5 + 1;
+            char c2 = cArr[i5];
+            if (c2 == '\n') {
+                this.lineNumber++;
+                this.lineStart = i;
+                i2 = i4;
+            } else if (c2 == ' ' || c2 == '\r') {
+                i2 = i4;
+            } else if (c2 == '\t') {
+                i2 = i4;
+            } else if (c2 == '/') {
+                this.pos = i;
+                if (i == i4) {
+                    this.pos--;
+                    boolean fillBuffer = fillBuffer(2);
+                    this.pos++;
+                    if (!fillBuffer) {
+                        c = c2;
+                    }
+                }
+                checkLenient();
+                switch (cArr[this.pos]) {
+                    case MotionEventCompat.AXIS_GENERIC_11 /* 42 */:
+                        this.pos++;
+                        if (!skipTo("*/")) {
+                            throw syntaxError("Unterminated comment");
+                        }
+                        i = this.pos + 2;
+                        i2 = this.limit;
+                        continue;
+                    case '/':
+                        this.pos++;
+                        skipToEndOfLine();
+                        i = this.pos;
+                        i2 = this.limit;
+                        continue;
+                    default:
+                        c = c2;
+                        break;
+                }
+            } else if (c2 == '#') {
+                this.pos = i;
+                checkLenient();
+                skipToEndOfLine();
+                i = this.pos;
+                i2 = this.limit;
+            } else {
+                this.pos = i;
+                c = c2;
+            }
         }
-        this.peeked = 11;
-        double asDouble = Double.parseDouble(this.peekedString);
-        long result = (long) asDouble;
-        if (result != asDouble) {
-            throw new NumberFormatException("Expected a long but was " + this.peekedString + " at line " + getLineNumber() + " column " + getColumnNumber());
-        }
-        this.peekedString = null;
-        this.peeked = 0;
-        return result;
+        return c;
     }
 
-    private String nextQuotedValue(char quote) throws IOException {
-        char[] buffer = this.buffer;
-        StringBuilder builder = new StringBuilder();
+    /* JADX WARN: Code restructure failed: missing block: B:17:0x00c2, code lost:
+        r0.append(r0, r12, r10 - r12);
+        r6.pos = r10;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    private String nextQuotedValue(char c) throws IOException {
+        int i;
+        int i2;
+        char[] cArr = this.buffer;
+        StringBuilder sb = new StringBuilder();
         do {
-            int p = this.pos;
-            int l = this.limit;
-            int start = p;
-            int p2 = p;
-            while (p2 < l) {
-                int p3 = p2 + 1;
-                char c = buffer[p2];
-                if (c == quote) {
-                    this.pos = p3;
-                    builder.append(buffer, start, (p3 - start) - 1);
-                    return builder.toString();
+            int i3 = this.pos;
+            int i4 = this.limit;
+            int i5 = i3;
+            while (true) {
+                int i6 = i5;
+                if (i3 >= i4) {
+                    break;
                 }
-                if (c == '\\') {
-                    this.pos = p3;
-                    builder.append(buffer, start, (p3 - start) - 1);
-                    builder.append(readEscapeCharacter());
-                    p3 = this.pos;
-                    l = this.limit;
-                    start = p3;
-                } else if (c == '\n') {
-                    this.lineNumber++;
-                    this.lineStart = p3;
+                int i7 = i3 + 1;
+                char c2 = cArr[i3];
+                if (c2 == c) {
+                    this.pos = i7;
+                    sb.append(cArr, i6, (i7 - i6) - 1);
+                    return sb.toString();
                 }
-                p2 = p3;
+                if (c2 == '\\') {
+                    this.pos = i7;
+                    sb.append(cArr, i6, (i7 - i6) - 1);
+                    sb.append(readEscapeCharacter());
+                    i3 = this.pos;
+                    i = this.limit;
+                    i2 = i3;
+                } else {
+                    i = i4;
+                    i3 = i7;
+                    i2 = i6;
+                    if (c2 == '\n') {
+                        this.lineNumber++;
+                        this.lineStart = i7;
+                        i = i4;
+                        i3 = i7;
+                        i2 = i6;
+                    }
+                }
+                i4 = i;
+                i5 = i2;
             }
-            builder.append(buffer, start, p2 - start);
-            this.pos = p2;
         } while (fillBuffer(1));
         throw syntaxError("Unterminated string");
     }
 
     private String nextUnquotedValue() throws IOException {
-        String result;
-        StringBuilder builder = null;
-        int i = 0;
+        StringBuilder sb;
+        int i;
+        String sb2;
+        StringBuilder sb3 = null;
+        int i2 = 0;
         while (true) {
-            if (this.pos + i < this.limit) {
-                switch (this.buffer[this.pos + i]) {
+            if (this.pos + i2 < this.limit) {
+                sb = sb3;
+                i = i2;
+                switch (this.buffer[this.pos + i2]) {
                     case '\t':
                     case '\n':
                     case '\f':
@@ -740,66 +509,435 @@ public class JsonReader implements Closeable {
                     case FTPReply.DATA_CONNECTION_ALREADY_OPEN /* 125 */:
                         break;
                     case '#':
-                    case MotionEventCompat.AXIS_GENERIC_16 /* 47 */:
+                    case '/':
                     case ';':
                     case '=':
-                    case '\\':
+                    case IOUtils.DIR_SEPARATOR_WINDOWS /* 92 */:
                         checkLenient();
+                        i = i2;
+                        sb = sb3;
                         break;
                     default:
-                        i++;
+                        i2++;
                 }
-            } else if (i < this.buffer.length) {
-                if (fillBuffer(i + 1)) {
+            } else if (i2 < this.buffer.length) {
+                sb = sb3;
+                i = i2;
+                if (fillBuffer(i2 + 1)) {
                 }
             } else {
-                if (builder == null) {
-                    builder = new StringBuilder();
+                sb = sb3;
+                if (sb3 == null) {
+                    sb = new StringBuilder();
                 }
-                builder.append(this.buffer, this.pos, i);
-                this.pos += i;
+                sb.append(this.buffer, this.pos, i2);
+                this.pos += i2;
                 i = 0;
+                i2 = 0;
+                sb3 = sb;
                 if (!fillBuffer(1)) {
                 }
             }
         }
-        if (builder == null) {
-            result = new String(this.buffer, this.pos, i);
+        if (sb == null) {
+            sb2 = new String(this.buffer, this.pos, i);
         } else {
-            builder.append(this.buffer, this.pos, i);
-            result = builder.toString();
+            sb.append(this.buffer, this.pos, i);
+            sb2 = sb.toString();
         }
         this.pos += i;
-        return result;
+        return sb2;
     }
 
-    private void skipQuotedValue(char quote) throws IOException {
-        char[] buffer = this.buffer;
+    private int peekKeyword() throws IOException {
+        int i;
+        String str;
+        String str2;
+        char c = this.buffer[this.pos];
+        if (c == 't' || c == 'T') {
+            str2 = "true";
+            str = "TRUE";
+            i = 5;
+        } else if (c == 'f' || c == 'F') {
+            str2 = "false";
+            str = "FALSE";
+            i = 6;
+        } else if (c != 'n' && c != 'N') {
+            i = 0;
+            return i;
+        } else {
+            str2 = "null";
+            str = "NULL";
+            i = 7;
+        }
+        int length = str2.length();
+        int i2 = 1;
+        while (true) {
+            if (i2 < length) {
+                if (this.pos + i2 >= this.limit && !fillBuffer(i2 + 1)) {
+                    i = 0;
+                    break;
+                }
+                char c2 = this.buffer[this.pos + i2];
+                if (c2 != str2.charAt(i2) && c2 != str.charAt(i2)) {
+                    i = 0;
+                    break;
+                }
+                i2++;
+            } else if ((this.pos + length < this.limit || fillBuffer(length + 1)) && isLiteral(this.buffer[this.pos + length])) {
+                i = 0;
+            } else {
+                this.pos += length;
+                this.peeked = i;
+            }
+        }
+        return i;
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:13:0x0045, code lost:
+        if (r13 != true) goto L83;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:15:0x004a, code lost:
+        if (r12 == false) goto L83;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:17:0x0053, code lost:
+        if (r9 != Long.MIN_VALUE) goto L20;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:19:0x0058, code lost:
+        if (r11 == false) goto L83;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:21:0x005d, code lost:
+        if (r11 == false) goto L82;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:22:0x0060, code lost:
+        r5.peekedLong = r9;
+        r5.pos += r14;
+        r7 = 15;
+        r5.peeked = 15;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:31:0x00dc, code lost:
+        if (isLiteral(r0) == false) goto L12;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:32:0x00df, code lost:
+        r7 = 0;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:82:0x0236, code lost:
+        r9 = -r9;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:84:0x0241, code lost:
+        if (r13 == true) goto L89;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:86:0x0247, code lost:
+        if (r13 == true) goto L89;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:88:0x024e, code lost:
+        if (r13 != true) goto L90;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:89:0x0251, code lost:
+        r5.peekedNumberLength = r14;
+        r7 = 16;
+        r5.peeked = 16;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:90:0x0263, code lost:
+        r7 = 0;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    private int peekNumber() throws IOException {
+        int i;
+        boolean z;
+        boolean z2;
+        boolean z3;
+        long j;
+        char[] cArr = this.buffer;
+        int i2 = this.pos;
+        int i3 = this.limit;
+        long j2 = 0;
+        boolean z4 = false;
+        boolean z5 = true;
+        boolean z6 = false;
+        int i4 = 0;
+        while (true) {
+            int i5 = i3;
+            int i6 = i2;
+            if (i2 + i4 == i3) {
+                if (i4 == cArr.length) {
+                    i = 0;
+                } else if (fillBuffer(i4 + 1)) {
+                    i6 = this.pos;
+                    i5 = this.limit;
+                }
+            }
+            char c = cArr[i6 + i4];
+            switch (c) {
+                case '+':
+                    if (!z6) {
+                        i = 0;
+                        break;
+                    } else {
+                        z = true;
+                        z2 = z5;
+                        z3 = z4;
+                        j = j2;
+                        break;
+                    }
+                case MotionEventCompat.AXIS_GENERIC_14 /* 45 */:
+                    if (z6) {
+                        if (!z6) {
+                            i = 0;
+                            break;
+                        } else {
+                            z = true;
+                            z2 = z5;
+                            z3 = z4;
+                            j = j2;
+                            break;
+                        }
+                    } else {
+                        z3 = true;
+                        z = true;
+                        j = j2;
+                        z2 = z5;
+                        break;
+                    }
+                case '.':
+                    if (!z6) {
+                        i = 0;
+                        break;
+                    } else {
+                        z = true;
+                        z2 = z5;
+                        z3 = z4;
+                        j = j2;
+                        break;
+                    }
+                case TFTP.DEFAULT_PORT /* 69 */:
+                case HttpStatus.SC_SWITCHING_PROTOCOLS /* 101 */:
+                    if (!z6 && !z6) {
+                        i = 0;
+                        break;
+                    } else {
+                        z = true;
+                        z2 = z5;
+                        z3 = z4;
+                        j = j2;
+                        break;
+                    }
+                default:
+                    if (c >= '0' && c <= '9') {
+                        if (!z6 && z6) {
+                            if (!z6) {
+                                if (!z6) {
+                                    if (!z6) {
+                                        z2 = z5;
+                                        z = z6;
+                                        z3 = z4;
+                                        j = j2;
+                                        if (!z6) {
+                                            break;
+                                        }
+                                    }
+                                    z = true;
+                                    z2 = z5;
+                                    z3 = z4;
+                                    j = j2;
+                                    break;
+                                } else {
+                                    z = true;
+                                    z2 = z5;
+                                    z3 = z4;
+                                    j = j2;
+                                    break;
+                                }
+                            } else if (j2 != 0) {
+                                j = (10 * j2) - (c - '0');
+                                z2 = z5 & (j2 > MIN_INCOMPLETE_INTEGER || (j2 == MIN_INCOMPLETE_INTEGER && j < j2));
+                                z = z6;
+                                z3 = z4;
+                                break;
+                            } else {
+                                i = 0;
+                                break;
+                            }
+                        } else {
+                            j = -(c - '0');
+                            z = true;
+                            z2 = z5;
+                            z3 = z4;
+                            break;
+                        }
+                    }
+                    break;
+            }
+            i4++;
+            z5 = z2;
+            i3 = i5;
+            z6 = z;
+            z4 = z3;
+            i2 = i6;
+            j2 = j;
+        }
+        return i;
+    }
+
+    private void push(int i) {
+        if (this.stackSize == this.stack.length) {
+            int[] iArr = new int[this.stackSize * 2];
+            System.arraycopy(this.stack, 0, iArr, 0, this.stackSize);
+            this.stack = iArr;
+        }
+        int[] iArr2 = this.stack;
+        int i2 = this.stackSize;
+        this.stackSize = i2 + 1;
+        iArr2[i2] = i;
+    }
+
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    private char readEscapeCharacter() throws IOException {
+        char c;
+        int i;
+        if (this.pos != this.limit || fillBuffer(1)) {
+            char[] cArr = this.buffer;
+            int i2 = this.pos;
+            this.pos = i2 + 1;
+            char c2 = cArr[i2];
+            switch (c2) {
+                case '\n':
+                    this.lineNumber++;
+                    this.lineStart = this.pos;
+                    c = c2;
+                    break;
+                case 'b':
+                    c = '\b';
+                    break;
+                case HttpStatus.SC_PROCESSING /* 102 */:
+                    c = '\f';
+                    break;
+                case 'n':
+                    c = '\n';
+                    break;
+                case 'r':
+                    c = '\r';
+                    break;
+                case 't':
+                    c = '\t';
+                    break;
+                case 'u':
+                    if (this.pos + 4 > this.limit && !fillBuffer(4)) {
+                        throw syntaxError("Unterminated escape sequence");
+                    }
+                    char c3 = 0;
+                    int i3 = this.pos;
+                    for (int i4 = i3; i4 < i3 + 4; i4++) {
+                        char c4 = this.buffer[i4];
+                        char c5 = (char) (c3 << 4);
+                        if (c4 >= '0' && c4 <= '9') {
+                            i = c4 - '0';
+                        } else if (c4 >= 'a' && c4 <= 'f') {
+                            i = (c4 - 'a') + 10;
+                        } else if (c4 < 'A' || c4 > 'F') {
+                            throw new NumberFormatException("\\u" + new String(this.buffer, this.pos, 4));
+                        } else {
+                            i = (c4 - 'A') + 10;
+                        }
+                        c3 = (char) (i + c5);
+                    }
+                    this.pos += 4;
+                    c = c3;
+                    break;
+                    break;
+                default:
+                    c = c2;
+                    break;
+            }
+            return c;
+        }
+        throw syntaxError("Unterminated escape sequence");
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:17:0x0079, code lost:
+        r4.pos = r7;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    private void skipQuotedValue(char c) throws IOException {
+        int i;
+        char[] cArr = this.buffer;
         do {
-            int p = this.pos;
-            int l = this.limit;
-            int p2 = p;
-            while (p2 < l) {
-                int p3 = p2 + 1;
-                char c = buffer[p2];
-                if (c == quote) {
-                    this.pos = p3;
+            int i2 = this.pos;
+            int i3 = this.limit;
+            while (true) {
+                int i4 = i3;
+                if (i2 >= i4) {
+                    break;
+                }
+                int i5 = i2 + 1;
+                char c2 = cArr[i2];
+                if (c2 == c) {
+                    this.pos = i5;
                     return;
                 }
-                if (c == '\\') {
-                    this.pos = p3;
+                if (c2 == '\\') {
+                    this.pos = i5;
                     readEscapeCharacter();
-                    p3 = this.pos;
-                    l = this.limit;
-                } else if (c == '\n') {
-                    this.lineNumber++;
-                    this.lineStart = p3;
+                    i2 = this.pos;
+                    i = this.limit;
+                } else {
+                    i = i4;
+                    i2 = i5;
+                    if (c2 == '\n') {
+                        this.lineNumber++;
+                        this.lineStart = i5;
+                        i = i4;
+                        i2 = i5;
+                    }
                 }
-                p2 = p3;
+                i3 = i;
             }
-            this.pos = p2;
         } while (fillBuffer(1));
         throw syntaxError("Unterminated string");
+    }
+
+    private boolean skipTo(String str) throws IOException {
+        boolean z;
+        loop0: while (true) {
+            if (this.pos + str.length() > this.limit && !fillBuffer(str.length())) {
+                z = false;
+                break;
+            }
+            if (this.buffer[this.pos] != '\n') {
+                for (int i = 0; i < str.length(); i++) {
+                    if (this.buffer[this.pos + i] == str.charAt(i)) {
+                    }
+                }
+                z = true;
+                break loop0;
+            }
+            this.lineNumber++;
+            this.lineStart = this.pos + 1;
+            this.pos++;
+        }
+        return z;
+    }
+
+    private void skipToEndOfLine() throws IOException {
+        char c;
+        do {
+            if (this.pos >= this.limit && !fillBuffer(1)) {
+                return;
+            }
+            char[] cArr = this.buffer;
+            int i = this.pos;
+            this.pos = i + 1;
+            c = cArr[i];
+            if (c == '\n') {
+                this.lineNumber++;
+                this.lineStart = this.pos;
+                return;
+            }
+        } while (c != '\r');
     }
 
     private void skipUnquotedValue() throws IOException {
@@ -821,10 +959,10 @@ public class JsonReader implements Closeable {
                         this.pos += i;
                         return;
                     case '#':
-                    case MotionEventCompat.AXIS_GENERIC_16 /* 47 */:
+                    case '/':
                     case ';':
                     case '=':
-                    case '\\':
+                    case IOUtils.DIR_SEPARATOR_WINDOWS /* 92 */:
                         checkLenient();
                         this.pos += i;
                         return;
@@ -836,42 +974,36 @@ public class JsonReader implements Closeable {
         } while (fillBuffer(1));
     }
 
-    public int nextInt() throws IOException {
-        int p = this.peeked;
-        if (p == 0) {
-            p = doPeek();
+    private IOException syntaxError(String str) throws IOException {
+        throw new MalformedJsonException(str + " at line " + getLineNumber() + " column " + getColumnNumber());
+    }
+
+    public void beginArray() throws IOException {
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
         }
-        if (p == 15) {
-            int result = (int) this.peekedLong;
-            if (this.peekedLong != result) {
-                throw new NumberFormatException("Expected an int but was " + this.peekedLong + " at line " + getLineNumber() + " column " + getColumnNumber());
-            }
+        if (i2 == 3) {
+            push(1);
             this.peeked = 0;
-            return result;
+            return;
         }
-        if (p == 16) {
-            this.peekedString = new String(this.buffer, this.pos, this.peekedNumberLength);
-            this.pos += this.peekedNumberLength;
-        } else if (p == 8 || p == 9) {
-            this.peekedString = nextQuotedValue(p == 8 ? '\'' : '\"');
-            try {
-                int result2 = Integer.parseInt(this.peekedString);
-                this.peeked = 0;
-                return result2;
-            } catch (NumberFormatException e) {
-            }
-        } else {
-            throw new IllegalStateException("Expected an int but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+        throw new IllegalStateException("Expected BEGIN_ARRAY but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+    }
+
+    public void beginObject() throws IOException {
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
         }
-        this.peeked = 11;
-        double asDouble = Double.parseDouble(this.peekedString);
-        int result3 = (int) asDouble;
-        if (result3 != asDouble) {
-            throw new NumberFormatException("Expected an int but was " + this.peekedString + " at line " + getLineNumber() + " column " + getColumnNumber());
+        if (i2 == 1) {
+            push(3);
+            this.peeked = 0;
+            return;
         }
-        this.peekedString = null;
-        this.peeked = 0;
-        return result3;
+        throw new IllegalStateException("Expected BEGIN_OBJECT but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
     }
 
     @Override // java.io.Closeable, java.lang.AutoCloseable
@@ -882,268 +1014,331 @@ public class JsonReader implements Closeable {
         this.in.close();
     }
 
-    public void skipValue() throws IOException {
-        int count = 0;
-        do {
-            int p = this.peeked;
-            if (p == 0) {
-                p = doPeek();
-            }
-            if (p == 3) {
-                push(1);
-                count++;
-            } else if (p == 1) {
-                push(3);
-                count++;
-            } else if (p == 4) {
-                this.stackSize--;
-                count--;
-            } else if (p == 2) {
-                this.stackSize--;
-                count--;
-            } else if (p == 14 || p == 10) {
-                skipUnquotedValue();
-            } else if (p == 8 || p == 12) {
-                skipQuotedValue('\'');
-            } else if (p == 9 || p == 13) {
-                skipQuotedValue('\"');
-            } else if (p == 16) {
+    public void endArray() throws IOException {
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 4) {
+            this.stackSize--;
+            this.peeked = 0;
+            return;
+        }
+        throw new IllegalStateException("Expected END_ARRAY but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+    }
+
+    public void endObject() throws IOException {
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 2) {
+            this.stackSize--;
+            this.peeked = 0;
+            return;
+        }
+        throw new IllegalStateException("Expected END_OBJECT but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+    }
+
+    public boolean hasNext() throws IOException {
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        return (i2 == 2 || i2 == 4) ? false : true;
+    }
+
+    public final boolean isLenient() {
+        return this.lenient;
+    }
+
+    public boolean nextBoolean() throws IOException {
+        boolean z = false;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 5) {
+            this.peeked = 0;
+            z = true;
+        } else if (i2 != 6) {
+            throw new IllegalStateException("Expected a boolean but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+        } else {
+            this.peeked = 0;
+        }
+        return z;
+    }
+
+    public double nextDouble() throws IOException {
+        double parseDouble;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 15) {
+            this.peeked = 0;
+            parseDouble = this.peekedLong;
+        } else {
+            if (i2 == 16) {
+                this.peekedString = new String(this.buffer, this.pos, this.peekedNumberLength);
                 this.pos += this.peekedNumberLength;
+            } else if (i2 == 8 || i2 == 9) {
+                this.peekedString = nextQuotedValue(i2 == 8 ? '\'' : '\"');
+            } else if (i2 == 10) {
+                this.peekedString = nextUnquotedValue();
+            } else if (i2 != 11) {
+                throw new IllegalStateException("Expected a double but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+            }
+            this.peeked = 11;
+            parseDouble = Double.parseDouble(this.peekedString);
+            if (!this.lenient && (Double.isNaN(parseDouble) || Double.isInfinite(parseDouble))) {
+                throw new MalformedJsonException("JSON forbids NaN and infinities: " + parseDouble + " at line " + getLineNumber() + " column " + getColumnNumber());
+            }
+            this.peekedString = null;
+            this.peeked = 0;
+        }
+        return parseDouble;
+    }
+
+    public int nextInt() throws IOException {
+        int parseInt;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 15) {
+            parseInt = (int) this.peekedLong;
+            if (this.peekedLong != parseInt) {
+                throw new NumberFormatException("Expected an int but was " + this.peekedLong + " at line " + getLineNumber() + " column " + getColumnNumber());
             }
             this.peeked = 0;
-        } while (count != 0);
-    }
-
-    private void push(int newTop) {
-        if (this.stackSize == this.stack.length) {
-            int[] newStack = new int[this.stackSize * 2];
-            System.arraycopy(this.stack, 0, newStack, 0, this.stackSize);
-            this.stack = newStack;
-        }
-        int[] iArr = this.stack;
-        int i = this.stackSize;
-        this.stackSize = i + 1;
-        iArr[i] = newTop;
-    }
-
-    private boolean fillBuffer(int minimum) throws IOException {
-        char[] buffer = this.buffer;
-        this.lineStart -= this.pos;
-        if (this.limit != this.pos) {
-            this.limit -= this.pos;
-            System.arraycopy(buffer, this.pos, buffer, 0, this.limit);
         } else {
-            this.limit = 0;
+            if (i2 == 16) {
+                this.peekedString = new String(this.buffer, this.pos, this.peekedNumberLength);
+                this.pos += this.peekedNumberLength;
+            } else if (i2 != 8 && i2 != 9) {
+                throw new IllegalStateException("Expected an int but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+            } else {
+                this.peekedString = nextQuotedValue(i2 == 8 ? '\'' : '\"');
+                try {
+                    parseInt = Integer.parseInt(this.peekedString);
+                    this.peeked = 0;
+                } catch (NumberFormatException e) {
+                }
+            }
+            this.peeked = 11;
+            double parseDouble = Double.parseDouble(this.peekedString);
+            parseInt = (int) parseDouble;
+            if (parseInt != parseDouble) {
+                throw new NumberFormatException("Expected an int but was " + this.peekedString + " at line " + getLineNumber() + " column " + getColumnNumber());
+            }
+            this.peekedString = null;
+            this.peeked = 0;
         }
-        this.pos = 0;
+        return parseInt;
+    }
+
+    public long nextLong() throws IOException {
+        long parseLong;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 15) {
+            this.peeked = 0;
+            parseLong = this.peekedLong;
+        } else {
+            if (i2 == 16) {
+                this.peekedString = new String(this.buffer, this.pos, this.peekedNumberLength);
+                this.pos += this.peekedNumberLength;
+            } else if (i2 != 8 && i2 != 9) {
+                throw new IllegalStateException("Expected a long but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+            } else {
+                this.peekedString = nextQuotedValue(i2 == 8 ? '\'' : '\"');
+                try {
+                    parseLong = Long.parseLong(this.peekedString);
+                    this.peeked = 0;
+                } catch (NumberFormatException e) {
+                }
+            }
+            this.peeked = 11;
+            double parseDouble = Double.parseDouble(this.peekedString);
+            parseLong = (long) parseDouble;
+            if (parseLong != parseDouble) {
+                throw new NumberFormatException("Expected a long but was " + this.peekedString + " at line " + getLineNumber() + " column " + getColumnNumber());
+            }
+            this.peekedString = null;
+            this.peeked = 0;
+        }
+        return parseLong;
+    }
+
+    public String nextName() throws IOException {
+        String nextQuotedValue;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 14) {
+            nextQuotedValue = nextUnquotedValue();
+        } else if (i2 == 12) {
+            nextQuotedValue = nextQuotedValue('\'');
+        } else if (i2 != 13) {
+            throw new IllegalStateException("Expected a name but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+        } else {
+            nextQuotedValue = nextQuotedValue('\"');
+        }
+        this.peeked = 0;
+        return nextQuotedValue;
+    }
+
+    public void nextNull() throws IOException {
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 7) {
+            this.peeked = 0;
+            return;
+        }
+        throw new IllegalStateException("Expected null but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+    }
+
+    public String nextString() throws IOException {
+        String str;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        if (i2 == 10) {
+            str = nextUnquotedValue();
+        } else if (i2 == 8) {
+            str = nextQuotedValue('\'');
+        } else if (i2 == 9) {
+            str = nextQuotedValue('\"');
+        } else if (i2 == 11) {
+            str = this.peekedString;
+            this.peekedString = null;
+        } else if (i2 == 15) {
+            str = Long.toString(this.peekedLong);
+        } else if (i2 != 16) {
+            throw new IllegalStateException("Expected a string but was " + peek() + " at line " + getLineNumber() + " column " + getColumnNumber());
+        } else {
+            str = new String(this.buffer, this.pos, this.peekedNumberLength);
+            this.pos += this.peekedNumberLength;
+        }
+        this.peeked = 0;
+        return str;
+    }
+
+    public JsonToken peek() throws IOException {
+        JsonToken jsonToken;
+        int i = this.peeked;
+        int i2 = i;
+        if (i == 0) {
+            i2 = doPeek();
+        }
+        switch (i2) {
+            case 1:
+                jsonToken = JsonToken.BEGIN_OBJECT;
+                break;
+            case 2:
+                jsonToken = JsonToken.END_OBJECT;
+                break;
+            case 3:
+                jsonToken = JsonToken.BEGIN_ARRAY;
+                break;
+            case 4:
+                jsonToken = JsonToken.END_ARRAY;
+                break;
+            case 5:
+            case 6:
+                jsonToken = JsonToken.BOOLEAN;
+                break;
+            case 7:
+                jsonToken = JsonToken.NULL;
+                break;
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                jsonToken = JsonToken.STRING;
+                break;
+            case 12:
+            case 13:
+            case 14:
+                jsonToken = JsonToken.NAME;
+                break;
+            case 15:
+            case 16:
+                jsonToken = JsonToken.NUMBER;
+                break;
+            case 17:
+                jsonToken = JsonToken.END_DOCUMENT;
+                break;
+            default:
+                throw new AssertionError();
+        }
+        return jsonToken;
+    }
+
+    public final void setLenient(boolean z) {
+        this.lenient = z;
+    }
+
+    public void skipValue() throws IOException {
+        int i;
+        int i2 = 0;
         do {
-            int total = this.in.read(buffer, this.limit, buffer.length - this.limit);
-            if (total == -1) {
-                return false;
+            int i3 = this.peeked;
+            int i4 = i3;
+            if (i3 == 0) {
+                i4 = doPeek();
             }
-            this.limit += total;
-            if (this.lineNumber == 0 && this.lineStart == 0 && this.limit > 0 && buffer[0] == 65279) {
-                this.pos++;
-                this.lineStart++;
-                minimum++;
-            }
-        } while (this.limit < minimum);
-        return true;
-    }
-
-    public int getLineNumber() {
-        return this.lineNumber + 1;
-    }
-
-    public int getColumnNumber() {
-        return (this.pos - this.lineStart) + 1;
-    }
-
-    private int nextNonWhitespace(boolean throwOnEof) throws IOException {
-        char[] buffer = this.buffer;
-        int p = this.pos;
-        int l = this.limit;
-        while (true) {
-            if (p == l) {
-                this.pos = p;
-                if (fillBuffer(1)) {
-                    p = this.pos;
-                    l = this.limit;
-                } else if (throwOnEof) {
-                    throw new EOFException("End of input at line " + getLineNumber() + " column " + getColumnNumber());
-                } else {
-                    return -1;
-                }
-            }
-            int p2 = p + 1;
-            char c = buffer[p];
-            if (c == '\n') {
-                this.lineNumber++;
-                this.lineStart = p2;
-                p = p2;
-            } else if (c == ' ' || c == '\r') {
-                p = p2;
-            } else if (c == '\t') {
-                p = p2;
-            } else if (c == '/') {
-                this.pos = p2;
-                if (p2 == l) {
-                    this.pos--;
-                    boolean charsLoaded = fillBuffer(2);
-                    this.pos++;
-                    if (!charsLoaded) {
-                        return c;
-                    }
-                }
-                checkLenient();
-                char peek = buffer[this.pos];
-                switch (peek) {
-                    case MotionEventCompat.AXIS_GENERIC_11 /* 42 */:
-                        this.pos++;
-                        if (!skipTo("*/")) {
-                            throw syntaxError("Unterminated comment");
-                        }
-                        p = this.pos + 2;
-                        l = this.limit;
-                        continue;
-                    case MotionEventCompat.AXIS_GENERIC_16 /* 47 */:
-                        this.pos++;
-                        skipToEndOfLine();
-                        p = this.pos;
-                        l = this.limit;
-                        continue;
-                    default:
-                        return c;
-                }
-            } else if (c == '#') {
-                this.pos = p2;
-                checkLenient();
-                skipToEndOfLine();
-                p = this.pos;
-                l = this.limit;
+            if (i4 == 3) {
+                push(1);
+                i = i2 + 1;
+            } else if (i4 == 1) {
+                push(3);
+                i = i2 + 1;
+            } else if (i4 == 4) {
+                this.stackSize--;
+                i = i2 - 1;
+            } else if (i4 == 2) {
+                this.stackSize--;
+                i = i2 - 1;
+            } else if (i4 == 14 || i4 == 10) {
+                skipUnquotedValue();
+                i = i2;
+            } else if (i4 == 8 || i4 == 12) {
+                skipQuotedValue('\'');
+                i = i2;
+            } else if (i4 == 9 || i4 == 13) {
+                skipQuotedValue('\"');
+                i = i2;
             } else {
-                this.pos = p2;
-                return c;
-            }
-        }
-    }
-
-    private void checkLenient() throws IOException {
-        if (!this.lenient) {
-            throw syntaxError("Use JsonReader.setLenient(true) to accept malformed JSON");
-        }
-    }
-
-    private void skipToEndOfLine() throws IOException {
-        char c;
-        do {
-            if (this.pos < this.limit || fillBuffer(1)) {
-                char[] cArr = this.buffer;
-                int i = this.pos;
-                this.pos = i + 1;
-                c = cArr[i];
-                if (c == '\n') {
-                    this.lineNumber++;
-                    this.lineStart = this.pos;
-                    return;
+                i = i2;
+                if (i4 == 16) {
+                    this.pos += this.peekedNumberLength;
+                    i = i2;
                 }
-            } else {
-                return;
             }
-        } while (c != '\r');
-    }
-
-    private boolean skipTo(String toFind) throws IOException {
-        while (true) {
-            if (this.pos + toFind.length() <= this.limit || fillBuffer(toFind.length())) {
-                if (this.buffer[this.pos] == '\n') {
-                    this.lineNumber++;
-                    this.lineStart = this.pos + 1;
-                } else {
-                    for (int c = 0; c < toFind.length(); c++) {
-                        if (this.buffer[this.pos + c] == toFind.charAt(c)) {
-                        }
-                    }
-                    return true;
-                }
-                this.pos++;
-            } else {
-                return false;
-            }
-        }
+            this.peeked = 0;
+            i2 = i;
+        } while (i != 0);
     }
 
     public String toString() {
         return getClass().getSimpleName() + " at line " + getLineNumber() + " column " + getColumnNumber();
-    }
-
-    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
-    private char readEscapeCharacter() throws IOException {
-        int i;
-        if (this.pos == this.limit && !fillBuffer(1)) {
-            throw syntaxError("Unterminated escape sequence");
-        }
-        char[] cArr = this.buffer;
-        int i2 = this.pos;
-        this.pos = i2 + 1;
-        char escaped = cArr[i2];
-        switch (escaped) {
-            case '\n':
-                this.lineNumber++;
-                this.lineStart = this.pos;
-                break;
-            case 'b':
-                return '\b';
-            case HttpStatus.SC_PROCESSING /* 102 */:
-                return '\f';
-            case 'n':
-                return '\n';
-            case 'r':
-                return '\r';
-            case 't':
-                return '\t';
-            case 'u':
-                if (this.pos + 4 > this.limit && !fillBuffer(4)) {
-                    throw syntaxError("Unterminated escape sequence");
-                }
-                char result = 0;
-                int i3 = this.pos;
-                int end = i3 + 4;
-                while (i3 < end) {
-                    char c = this.buffer[i3];
-                    char result2 = (char) (result << 4);
-                    if (c >= '0' && c <= '9') {
-                        i = c - '0';
-                    } else if (c >= 'a' && c <= 'f') {
-                        i = (c - 'a') + 10;
-                    } else if (c >= 'A' && c <= 'F') {
-                        i = (c - 'A') + 10;
-                    } else {
-                        throw new NumberFormatException("\\u" + new String(this.buffer, this.pos, 4));
-                    }
-                    result = (char) (i + result2);
-                    i3++;
-                }
-                this.pos += 4;
-                return result;
-        }
-        return escaped;
-    }
-
-    private IOException syntaxError(String message) throws IOException {
-        throw new MalformedJsonException(message + " at line " + getLineNumber() + " column " + getColumnNumber());
-    }
-
-    private void consumeNonExecutePrefix() throws IOException {
-        nextNonWhitespace(true);
-        this.pos--;
-        if (this.pos + NON_EXECUTE_PREFIX.length <= this.limit || fillBuffer(NON_EXECUTE_PREFIX.length)) {
-            for (int i = 0; i < NON_EXECUTE_PREFIX.length; i++) {
-                if (this.buffer[this.pos + i] != NON_EXECUTE_PREFIX[i]) {
-                    return;
-                }
-            }
-            this.pos += NON_EXECUTE_PREFIX.length;
-        }
     }
 }

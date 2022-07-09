@@ -10,10 +10,21 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Map;
 
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/anfengde/epub/ui/BookListAdapter.class */
 public class BookListAdapter extends BaseAdapter {
     private Context context;
     private List<Map<String, Object>> mData;
+
+    /* loaded from: classes.jar:com/anfengde/epub/ui/BookListAdapter$ViewHolder.class */
+    public final class ViewHolder {
+        public ImageView img;
+        public TextView info;
+        public TextView title;
+
+        public ViewHolder() {
+            BookListAdapter.this = r4;
+        }
+    }
 
     public BookListAdapter(Context context, List<Map<String, Object>> list) {
         this.mData = list;
@@ -26,42 +37,31 @@ public class BookListAdapter extends BaseAdapter {
     }
 
     @Override // android.widget.Adapter
-    public Object getItem(int position) {
-        return this.mData.get(position);
+    public Object getItem(int i) {
+        return this.mData.get(i);
     }
 
     @Override // android.widget.Adapter
-    public long getItemId(int position) {
-        return position;
+    public long getItemId(int i) {
+        return i;
     }
 
     @Override // android.widget.Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        if (convertView == null) {
-            holder = new ViewHolder();
-            convertView = LayoutInflater.from(this.context).inflate(R.layout.afd_books_list_item, (ViewGroup) null);
-            holder.img = (ImageView) convertView.findViewById(R.id.afd_img);
-            holder.title = (TextView) convertView.findViewById(R.id.afd_title);
-            holder.info = (TextView) convertView.findViewById(R.id.afd_info);
-            convertView.setTag(holder);
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        ViewHolder viewHolder;
+        if (view == null) {
+            viewHolder = new ViewHolder();
+            view = LayoutInflater.from(this.context).inflate(R.layout.afd_books_list_item, (ViewGroup) null);
+            viewHolder.img = (ImageView) view.findViewById(R.id.afd_img);
+            viewHolder.title = (TextView) view.findViewById(R.id.afd_title);
+            viewHolder.info = (TextView) view.findViewById(R.id.afd_info);
+            view.setTag(viewHolder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) view.getTag();
         }
-        holder.img.setBackgroundResource(((Integer) this.mData.get(position).get("img")).intValue());
-        holder.title.setText((String) this.mData.get(position).get("title"));
-        holder.info.setText((String) this.mData.get(position).get("info"));
-        return convertView;
-    }
-
-    /* loaded from: classes.dex */
-    public final class ViewHolder {
-        public ImageView img;
-        public TextView info;
-        public TextView title;
-
-        public ViewHolder() {
-            BookListAdapter.this = r1;
-        }
+        viewHolder.img.setBackgroundResource(((Integer) this.mData.get(i).get("img")).intValue());
+        viewHolder.title.setText((String) this.mData.get(i).get("title"));
+        viewHolder.info.setText((String) this.mData.get(i).get("info"));
+        return view;
     }
 }

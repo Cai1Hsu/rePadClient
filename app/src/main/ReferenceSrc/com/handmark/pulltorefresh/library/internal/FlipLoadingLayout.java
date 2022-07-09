@@ -13,9 +13,9 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.R;
 
 @SuppressLint({"ViewConstructor"})
-/* loaded from: classes.dex */
+/* loaded from: classes.jar:com/handmark/pulltorefresh/library/internal/FlipLoadingLayout.class */
 public class FlipLoadingLayout extends LoadingLayout {
-    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode = null;
+    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode;
     static final int FLIP_ANIMATION_DURATION = 150;
     private final Animation mResetRotateAnimation;
     private final Animation mRotateAnimation;
@@ -49,39 +49,65 @@ public class FlipLoadingLayout extends LoadingLayout {
         return iArr;
     }
 
-    public FlipLoadingLayout(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.Orientation scrollDirection, TypedArray attrs) {
-        super(context, mode, scrollDirection, attrs);
-        int rotateAngle = mode == PullToRefreshBase.Mode.PULL_FROM_START ? -180 : 180;
-        this.mRotateAnimation = new RotateAnimation(0.0f, rotateAngle, 1, 0.5f, 1, 0.5f);
+    public FlipLoadingLayout(Context context, PullToRefreshBase.Mode mode, PullToRefreshBase.Orientation orientation, TypedArray typedArray) {
+        super(context, mode, orientation, typedArray);
+        int i = mode == PullToRefreshBase.Mode.PULL_FROM_START ? -180 : 180;
+        this.mRotateAnimation = new RotateAnimation(0.0f, i, 1, 0.5f, 1, 0.5f);
         this.mRotateAnimation.setInterpolator(ANIMATION_INTERPOLATOR);
         this.mRotateAnimation.setDuration(150L);
         this.mRotateAnimation.setFillAfter(true);
-        this.mResetRotateAnimation = new RotateAnimation(rotateAngle, 0.0f, 1, 0.5f, 1, 0.5f);
+        this.mResetRotateAnimation = new RotateAnimation(i, 0.0f, 1, 0.5f, 1, 0.5f);
         this.mResetRotateAnimation.setInterpolator(ANIMATION_INTERPOLATOR);
         this.mResetRotateAnimation.setDuration(150L);
         this.mResetRotateAnimation.setFillAfter(true);
     }
 
+    private float getDrawableRotationAngle() {
+        float f = 0.0f;
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mMode.ordinal()]) {
+            case 2:
+                if (this.mScrollDirection == PullToRefreshBase.Orientation.HORIZONTAL) {
+                    f = 270.0f;
+                    break;
+                }
+                break;
+            case 3:
+                if (this.mScrollDirection != PullToRefreshBase.Orientation.HORIZONTAL) {
+                    f = 180.0f;
+                    break;
+                } else {
+                    f = 90.0f;
+                    break;
+                }
+        }
+        return f;
+    }
+
     @Override // com.handmark.pulltorefresh.library.internal.LoadingLayout
-    protected void onLoadingDrawableSet(Drawable imageDrawable) {
-        if (imageDrawable != null) {
-            int dHeight = imageDrawable.getIntrinsicHeight();
-            int dWidth = imageDrawable.getIntrinsicWidth();
-            ViewGroup.LayoutParams lp = this.mHeaderImage.getLayoutParams();
-            int max = Math.max(dHeight, dWidth);
-            lp.height = max;
-            lp.width = max;
+    protected int getDefaultDrawableResId() {
+        return R.drawable.default_ptr_flip;
+    }
+
+    @Override // com.handmark.pulltorefresh.library.internal.LoadingLayout
+    protected void onLoadingDrawableSet(Drawable drawable) {
+        if (drawable != null) {
+            int intrinsicHeight = drawable.getIntrinsicHeight();
+            int intrinsicWidth = drawable.getIntrinsicWidth();
+            ViewGroup.LayoutParams layoutParams = this.mHeaderImage.getLayoutParams();
+            int max = Math.max(intrinsicHeight, intrinsicWidth);
+            layoutParams.height = max;
+            layoutParams.width = max;
             this.mHeaderImage.requestLayout();
             this.mHeaderImage.setScaleType(ImageView.ScaleType.MATRIX);
             Matrix matrix = new Matrix();
-            matrix.postTranslate((lp.width - dWidth) / 2.0f, (lp.height - dHeight) / 2.0f);
-            matrix.postRotate(getDrawableRotationAngle(), lp.width / 2.0f, lp.height / 2.0f);
+            matrix.postTranslate((layoutParams.width - intrinsicWidth) / 2.0f, (layoutParams.height - intrinsicHeight) / 2.0f);
+            matrix.postRotate(getDrawableRotationAngle(), layoutParams.width / 2.0f, layoutParams.height / 2.0f);
             this.mHeaderImage.setImageMatrix(matrix);
         }
     }
 
     @Override // com.handmark.pulltorefresh.library.internal.LoadingLayout
-    protected void onPullImpl(float scaleOfLayout) {
+    protected void onPullImpl(float f) {
     }
 
     @Override // com.handmark.pulltorefresh.library.internal.LoadingLayout
@@ -108,27 +134,5 @@ public class FlipLoadingLayout extends LoadingLayout {
         this.mHeaderImage.clearAnimation();
         this.mHeaderProgress.setVisibility(8);
         this.mHeaderImage.setVisibility(0);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.internal.LoadingLayout
-    protected int getDefaultDrawableResId() {
-        return R.drawable.default_ptr_flip;
-    }
-
-    private float getDrawableRotationAngle() {
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mMode.ordinal()]) {
-            case 2:
-                if (this.mScrollDirection != PullToRefreshBase.Orientation.HORIZONTAL) {
-                    return 0.0f;
-                }
-                return 270.0f;
-            case 3:
-                if (this.mScrollDirection == PullToRefreshBase.Orientation.HORIZONTAL) {
-                    return 90.0f;
-                }
-                return 180.0f;
-            default:
-                return 0.0f;
-        }
     }
 }
