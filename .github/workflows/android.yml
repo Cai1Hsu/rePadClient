@@ -24,3 +24,10 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    
+    - uses: actions/download-artifact@v3.0.0
+    - name: Download a Build Artifact
+      with:
+        name: app-release.apk
+        path: /home/runner/work/rePadClient/rePadClient/app/build/output/apk/release/app-release.apk
+    
