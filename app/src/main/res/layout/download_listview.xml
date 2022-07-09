@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:background="#ff000000" android:layout_width="fill_parent" android:layout_height="45.0dip" android:weightSum="10.0">
+        <ImageView android:layout_gravity="center|left" android:id="@id/iv_downicon" android:paddingTop="5.0sp" android:paddingBottom="5.0sp" android:layout_width="0.0sp" android:layout_height="wrap_content" android:src="@drawable/icon_choose" android:layout_weight="0.66" />
+        <TextView android:textSize="17.0sp" android:textColor="#ffffffff" android:layout_gravity="center|left" android:id="@id/tv_downlabel" android:layout_width="0.0sp" android:layout_height="wrap_content" android:text="下载管理" android:layout_weight="8.92" />
+        <Button android:textColor="#ffffffff" android:layout_gravity="center|right" android:id="@id/btn_return" android:background="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="返回" android:onClick="onClick" />
+    </LinearLayout>
+    <TextView android:textSize="25.0sp" android:gravity="center" android:layout_gravity="center" android:id="@id/tv_nonedown" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="暂无下载任务" />
+    <ListView android:id="@id/listView_download" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+</LinearLayout>

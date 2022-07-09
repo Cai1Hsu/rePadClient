@@ -1,0 +1,731 @@
+body{
+	margin:0px;
+	padding:0px;
+	 /* background:yellow; */
+	 /*background: url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/afd_bookbg.png') no-repeat scroll 50% 50%; */
+	 z-index:-10;
+	  overflow:hidden;
+}
+
+a:link,a:visited{ text-decoration:none;  /*超链接无下划线*/}
+a:hover{ text-decoration:none;  /*鼠标放上去有下划线*/}
+#loading { position:fixed!important; *position:absolute; z-index:99999; left:50%; margin-left:-120px; top:50%; border-radius:5px; margin-top:-15px; padding:8px 12px 8px 28px; background:#000 url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/loading.gif') no-repeat 12px center; color:#fff; font-size:12px; display:none;}
+
+#afd_pageturn {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding:0px;
+    margin:0px;
+	z-index:0;
+    border: 0px solid lightblue;
+    background-color:rgba(0,0,0,0);
+}
+#afd_content {
+
+    position: fixed;
+	/*float:left;*/
+	top:55px;
+	bottom:20px;
+	z-index:0;
+	-webkit-column-width: 300px;
+   /* -webkit-column-gap:120px;*/
+	/*-webkit-column-rule:120px red solid;*/
+/* 	    -webkit-column-width:500em;
+	        -webkit-column-gap:80px; */
+    border:none;
+ /*   width: 360px;
+    height: 520px;*/
+	
+}
+#afd_menu #backimage img{
+    z-index:-2;
+}
+#afd_break {
+    height: 0px;
+}
+
+#afd_menu {
+    position:fixed;
+    z-index:1;
+    left:15px;
+    top:20px;
+    height:48px;
+    display:none;
+/*     border: #CCCCCC;
+    	border-bottom:1px;
+    	border-left:0px;
+    	border-right:0px;
+    	border-top:0px;
+    	border-style:solid;
+    border-color:#cccccc;
+    	background-repeat:repeat-x; */
+}
+
+#afd_bottomMenu{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:fixed;
+    z-index:1;
+    left:0px;
+    bottom:0px;
+    height:48px;
+    border: #CCCCCC;
+    display:none;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px;
+	border-top:1px;
+	border-style:solid;
+    border-color:#cccccc;
+	background-repeat:repeat-x;
+}
+#afd_menu #afd_bookmark{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+   /* right:125px;*/
+    right:3%;
+    width:30px;
+    height:48px;
+    text-align:center;
+    font-size:16px;
+}
+
+#afd_menu #afd_bookmark img{
+    position:relative;
+    top:10px;
+    height:30px;
+	width:18px;
+}
+
+#afd_menu #afd_zoom{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+    /*right:160px;*/
+	right:8%;
+    width:30px;
+    height:48px;
+    text-align:center;
+    font-size:16px;
+}
+
+#afd_menu #afd_zoom img{
+    position:relative;
+    width:25px;
+	height:25px;
+    top:12px;
+}
+
+#afd_menu #afd_title{
+    position:absolute;
+    width:200px;
+    height:25px;
+    text-align:right;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    font-size:16px;
+    padding-left:10px;
+    padding-right:10px;
+	 display:none;
+}
+#afd_menu #afd_title1{
+    position:absolute;
+    width:200px;
+    height:25px;
+    text-align:right;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    font-size:16px;
+    padding-left:10px;
+    padding-right:10px;
+	display:none;
+}
+#afd_booktitle{
+	position:fixed;
+	z-index:0;
+    width:100%;
+    height:48px;
+    font-size:16px;
+	margin-top:29px;
+		display:none;
+}
+#afd_booktitleportrait{
+	position:fixed;
+	z-index:0;
+    width:100%;
+    height:48px;
+	text-align:center;
+    white-space:nowrap;
+	overflow:hidden;
+    font-size:16px;
+	margin-top:29px;
+}
+#afd_booktitle #afd_booktitleleft{
+	position:fixed;
+	float:left;
+	z-index:0;
+    width:50%;
+    height:48px;
+	text-align:center;
+    white-space:nowrap;
+	overflow:hidden;
+    font-size:16px;
+	margin-top:7px;
+	
+}
+#afd_booktitle #afd_booktitleright{
+	position:fixed;
+	z-index:0;
+	float:right;
+	left:50%;
+    width:50%;
+    height:48px;
+	text-align:center;
+    white-space:nowrap;
+	overflow:hidden;
+    font-size:16px;
+	margin-top:7px;
+}
+#afd_menu #afd_TOC{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+    /*left:65px;*/
+	left:75px;
+    width: 41px;
+    height:48px;
+    text-align:left;
+    font-size:16px;
+}
+
+#afd_menu #afd_TOC img{
+    position:relative;
+    width:41px;
+    top:10px;
+	height:30px;
+}
+#afd_menu #afd_bookstore{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+    left:160px;
+    width: 50px;
+    height:48px;
+    text-align:left;
+    font-size:16px;
+	display:none;
+}
+
+#afd_menu #afd_bookstore img{
+    position:relative;
+	 display:none;
+    width:20px;
+    top:16px;
+}
+
+#afd_menu #afd_bookshelf{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+    left:15px;
+    width: 51px;
+    height:48px;
+    text-align:left;
+    font-size:16px;
+}
+
+#afd_menu #afd_bookshelf img{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:relative;
+    top:10px;
+    width:51px;
+	height:30px;
+}
+
+#afd_menu #afd_zoomin{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+    top:80px;
+    right:25px;
+    width:71px;
+    text-align:right;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_zoomin img{
+    width:71px;
+    height:30px;
+}
+
+#afd_menu #afd_zoomout{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+    top:80px;
+    width:71px;
+    right:110px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_zoomout img{
+    width:71px;
+    height:30px;
+}
+#afd_menu #afd_zoomtable{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:0;
+    top:45px;
+    width:178px;
+    right:15px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_zoomtable img{
+    width:178px;
+    height:152px;
+}
+
+#afd_menu #afd_brightness0{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:1;
+    top:120px;
+    width:157px;
+    right:25px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_brightness0 img{
+    width:157px;
+    height:30px;
+}
+
+#afd_menu #afd_brightness1{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:2;
+    top:128px;
+    width:19px;
+	height:19px;
+    right:155px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_brightness1 img{
+    width:14px;
+    height:14px;
+}
+#afd_menu #afd_brightness2{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:2;
+    top:132px;
+    width:86px;
+    right:63px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_brightness2 img{
+display:none;
+    width:86px;
+    height:6px;
+}
+#afd_menu #afd_brightness3{
+display:none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:3;
+    top:132px;
+    width:6px;
+    right:70px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_brightness3 img{
+display:none;
+    width:6px;
+    height:6px;
+}
+#afd_menu #afd_brightness4{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:2;
+    top:125px;
+    width:19px;
+    right:38px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_brightness4 img{
+    width:19px;
+    height:19px;
+}
+#afd_menu #afd_screen_orientation_portrait{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:1;
+    top:160px;
+    width:71px;
+    right:25px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_screen_orientation_portrait img{
+    width:71px;
+    height:30px;
+}
+#afd_menu #afd_screen_orientation_landscape{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:1;
+    top:160px;
+    width:71px;
+    right:106px;
+    text-align:left;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu #afd_screen_orientation_landscape img{
+    width:71px;
+    height:30px;
+}
+#afd_bottomMenu #afd_precedingChapter{
+    float:left;
+    height:48px;
+    text-align:center;
+    width:20%;
+}
+#afd_bottomMenu #afd_precedingChapter img{
+    height:100%;
+}
+#afd_bottomMenu #afd_jumping{
+    float:left;
+    height:48px;
+    text-align:center;
+    width:20%;
+}
+#afd_bottomMenu #afd_jumping img{
+    height:100%;
+}
+#afd_bottomMenu #afd_brightness{
+    float:left;
+    height:48px;
+    text-align:center;
+    width:20%;
+}
+#afd_bottomMenu #afd_brightness img{
+    height:100%;
+}
+
+#afd_bottomMenu #afd_setting{
+    float:left;
+    height:48px;
+    text-align:center;
+    width:20%;
+}
+#afd_bottomMenu #afd_setting img{
+    height:100%;
+}
+#afd_bottomMenu #afd_nextChapter{
+    float:left;
+    height:48px;
+    text-align:center;
+    width:20%;
+}
+#afd_bottomMenu #afd_nextChapter img{
+    height:100%;
+}
+#afd_bottomMenu #afd_divide_1{
+    position:absolute;
+    width:2px;
+    height:48px;
+    left:20%;
+}
+#afd_bottomMenu #afd_divide_2{
+    position:absolute;
+    width:2px;
+    height:48px;
+    left:40%;
+}
+#afd_bottomMenu #afd_divide_3{
+    position:absolute;
+    width:2px;
+    height:48px;
+    left:60%;
+}
+#afd_bottomMenu #afd_divide_4{
+    position:absolute;
+    width:2px;
+    height:48px;
+    left:80%;
+}
+
+.afd_divide img{
+    height:100%;
+    width:100%;
+}
+#afd_page_totalpage #afd_currentPage {
+	
+	text-align:left;
+	float:left;
+    position: absolute;
+    width: 100px;
+    bottom:0px;
+    left:2px;
+    font-size: 12px;
+}
+#afd_page_totalpage {
+	width:100%;
+	text-align:center;
+    position: absolute;
+    bottom:40px;
+    font-size: 12px;
+}
+#afd_currentPage_progress {
+	position: absolute;
+	z-index:1;
+    width:800px;
+    bottom:30px;
+    height:6px;
+	left:90px;
+    display:none;
+    font-size: 12px;
+}
+#afd_currentPage_progress #progress1{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:2;
+    bottom:5px;
+    width:800px;
+    left:0px;
+}
+
+#afd_currentPage_progress #progress1 img{
+    width:800px;
+    height:6px;
+}
+#afd_currentPage_progress #progress2{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:3;
+    bottom:5px;
+    width:800px;
+    left:0px;
+    font-size:16px;
+}
+
+#afd_currentPage_progress #progress2 img{
+	left:0px;
+    height:6px;
+}
+#afd_currentPage_progress #progress3{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:3;
+    bottom:5px;
+    width:6px;
+    left:444px;
+    font-size:16px;
+}
+
+#afd_currentPage_progress #progress3 img{
+    width:6px;
+    height:6px;
+}
+#afd_currentPage_progress #progress4{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:3;
+    bottom:10px;
+    width:193px;
+    font-size:16px;
+}
+
+#afd_currentPage_progress #progress4 img{
+    width:193px;
+    height:50px;
+}
+#afd_currentPage_progress #progress_html{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:absolute;
+	z-index:4;
+    bottom:30px;
+    width:100px;
+    font-size:16px;
+}
+#afd_page_totalpage{
+	left:55px;
+	width:100%;
+	height:15px;
+    bottom:15px;
+}
+#afd_page_totalpage #afd_page_totalpage_right {
+	text-align:center;
+	float:right;
+	right:50px;
+    width: 500px;
+    bottom:10px;
+    font-size: 12px;
+}
+#afd_page_totalpage #afd_page_totalpage_left {
+	text-align:center;
+	float:left;
+	left:175px;
+    width: 400px;
+    bottom:10px;
+    font-size: 12px;
+}
+.afd_scale_panel{
+    display:none;
+    height:60px;
+    z-index:10;
+	font-size:12px;
+	background-color:rgba(0,0,0,0);
+	position:fixed; 
+	line-height:18px; 
+	bottom:10px;
+    left:0px;
+    right:0px;
+}
+
+.afd_scale_panel #afd_value{
+    position:absolute;
+    text-align:right;
+    top:38px;
+    width:11%;
+}
+.afd_scale span{
+	background: no-repeat; 
+	width:22px;
+	height:22px; 
+	position:absolute; 
+	left:-11px;
+	top:-6px;
+	cursor:pointer;
+}
+.afd_scale{
+	background: url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/afd_progress1.png') repeat-x 0 100%;
+	width:80%;
+	height:6px; 
+	position:relative; 
+	font-size:0px;
+    margin-left:10%;
+    top:25px;
+    border-radius:5px;
+}
+.afd_scale div{
+	background: url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/afd_progress2.png') repeat-x;
+	width:0px; 
+	position:absolute; 
+	width:0;
+	left:0;
+	height:6px;
+	bottom:0;
+    border-radius:5px;
+}
+#afd_menu .afd_scale_panel1{
+    height:60px;
+    z-index:10;
+	background-color:rgba(0,0,0,0);
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+    position:fixed;
+	z-index:2;
+    top:122px;
+    width:90px;
+    right:70px;
+    text-align:left;
+	line-height:18px;
+    display:none;
+    font-size:16px;
+}
+
+#afd_menu .afd_scale_panel1 #afd_value1{
+    position:absolute;
+    text-align:right;
+    top:25px;
+    width:0%;
+	display:none;
+}
+#afd_menu .afd_scale1 span{
+	background: no-repeat; 
+	width:22px;
+	height:22px; 
+	position:absolute; 
+	left:-11px;
+	top:-9px;
+	cursor:pointer;
+}
+#afd_menu .afd_scale1{
+	background: url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/afd_progress1.png') repeat-x 0 100%;
+	width:80%;
+	height:6px; 
+	position:relative; 
+	font-size:0px;
+    margin-left:10%;
+    top:30px;
+    border-radius:5px;
+}
+#afd_menu .afd_scale1 div{
+	background: url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/afd_progress2.png') repeat-x;
+	width:0px; 
+	position:absolute; 
+	width:0;
+	left:0;
+	height:6px;
+	bottom:0;
+    border-radius:5px;
+}
+#afd_sharingBox{
+    margin-top:40%;
+    display:none;
+    position:fixed;
+    width:80%;
+    margin-left:10%;
+    background-color:#cccccc;
+    z-index:1;
+    border-radius:5px;
+    text-align:center;
+}
+.afd_shareItem{
+    background-color:#ffffff;
+    margin:2px;
+    border-radius:5px;
+    text-align:center;
+}
+.afd_shareItem a:link,a:visited{
+    display:block;
+    height:100%;
+    width:80%;
+    margin-left:10%;
+    text-align:center;
+    text-decoration:none;
+	
+}
+.afd_shareItem a img{
+    margin-top:8px;
+    max-height:25px;
+}
+.afd_shareItem a span{
+    display:block;
+    padding-bottom:5px;
+    font-size:28px;
+    width:100%;
+    text-align:center;
+}

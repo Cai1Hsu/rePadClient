@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@color/whilte" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:background="@color/whilte" android:layout_width="fill_parent" android:layout_height="45.0dip">
+        <TextView android:textSize="20.0sp" android:gravity="center|right" android:id="@id/tv_exit" android:paddingTop="5.0sp" android:paddingBottom="5.0sp" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="15.0dip" android:text="@string/exit_myapp" android:drawableLeft="@drawable/myapp_exit" android:drawablePadding="5.0dip" />
+        <TextView android:textSize="22.0sp" android:textStyle="bold" android:gravity="center_horizontal" android:layout_gravity="center" android:id="@id/tv_label" android:layout_width="0.0sp" android:layout_height="wrap_content" android:text="@string/myapp_title" android:layout_weight="1.0" />
+        <TextView android:textSize="20.0sp" android:gravity="center|right" android:id="@id/btn_refresh" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginRight="15.0dip" android:text="@string/action_refresh" android:drawableLeft="@drawable/myapp_refresh" android:drawablePadding="5.0dip" android:onClick="onClick" />
+    </LinearLayout>
+    <RelativeLayout android:id="@id/layout_appwarn" android:visibility="visible" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <TextView android:textSize="22.0sp" android:gravity="center_horizontal" android:id="@id/tv_wrong_net" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/appmanager_errornetwork" android:layout_centerInParent="true" />
+        <ImageView android:id="@id/img_appwarn" android:background="@drawable/nodetails" android:layout_width="200.0dip" android:layout_height="160.0dip" android:scaleType="matrix" android:layout_above="@id/tv_wrong_net" android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+    <GridView android:gravity="center" android:id="@id/GridView01" android:background="@color/myapp_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+</LinearLayout>

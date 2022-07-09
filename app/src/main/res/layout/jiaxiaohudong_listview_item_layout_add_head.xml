@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:descendantFocusability="blocksDescendants" android:layout_width="fill_parent" android:layout_height="@dimen/static_height_one"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/ll_search_contacts_stu" android:background="@color/white" android:paddingLeft="30.0sp" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="@dimen/static_height_two">
+        <ImageView android:id="@id/iv_show_group_stu" android:padding="18.0sp" android:layout_width="@dimen/static_height_three" android:layout_height="@dimen/static_height_three" android:src="@drawable/weidu_you" />
+        <TextView android:textSize="@dimen/static_text_three" android:textColor="@color/setting_item_color" android:id="@id/tv_contacts_groupname_stu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="学生" />
+    </LinearLayout>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <Button android:layout_gravity="center_vertical" android:id="@id/item_select_add_head" android:background="@drawable/jiaxiaohudong_contents_selelct" android:visibility="gone" android:layout_width="31.0dip" android:layout_height="31.0dip" android:layout_marginLeft="8.0dip" android:layout_marginRight="8.0dip" />
+        <com.edutech.jiaxiaohudong.myview.RoundImageView android:layout_gravity="center_vertical" android:id="@id/item_image_add_head" android:layout_width="@dimen/static_height_two" android:layout_height="@dimen/static_height_two" android:layout_marginLeft="8.0dip" android:scaleType="centerCrop" />
+        <TextView android:layout_gravity="center_vertical" android:id="@id/tv_username_add_head" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" style="@style/lv_text" />
+        <TextView android:layout_gravity="center_vertical" android:id="@id/tv_chattime_add_head" android:paddingRight="10.0dip" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2013-8-13" style="@style/lv_graytext" />
+    </LinearLayout>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/ll_info" android:background="@color/white" android:paddingLeft="@dimen/static_margin_three" android:layout_width="fill_parent" android:layout_height="@dimen/static_height_two">
+        <com.edutech.jiaxiaohudong.myview.RoundImageView android:id="@id/item_chattime_imagehead" android:layout_width="@dimen/static_height_four" android:layout_height="@dimen/static_height_four" android:layout_marginLeft="@dimen/static_margin_one" android:scaleType="centerCrop" />
+        <LinearLayout android:layout_gravity="center_vertical" android:orientation="vertical" android:layout_width="0.0sp" android:layout_height="wrap_content" android:layout_marginLeft="10.0sp" android:layout_weight="1.0">
+            <TextView android:textSize="@dimen/static_text_three" android:textColor="@color/setting_item_color" android:id="@id/tv_chattime_username" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3.0sp" android:layout_marginBottom="5.0sp" android:text="名字" />
+            <TextView android:textColor="#ff888888" android:id="@id/tv_chattime_online" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="[在线]" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

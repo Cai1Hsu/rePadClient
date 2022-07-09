@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="#ffefefef" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/jiaxiaohudong_titlebar" />
+    <ScrollView android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="horizontal" android:background="@android:color/white" android:padding="@dimen/setting_item_layout_padding" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <com.edutech.jiaxiaohudong.myview.RoundImageView android:id="@id/head_img" style="@style/setting_item_head_icon" />
+                <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:textSize="@dimen/setting_name" android:textColor="@color/Select_green" android:id="@id/tv_info_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="名字" android:singleLine="true" />
+                    <TextView android:textSize="@dimen/setting_sex" android:textColor="@android:color/darker_gray" android:id="@id/tv_info_sex" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="男" android:singleLine="true" />
+                </LinearLayout>
+            </LinearLayout>
+            <View style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout style="@style/setting_item_layout">
+                <TextView android:text="@string/tv_personal_signature" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_sign" android:layout_marginLeft="@dimen/ls_Margin1" android:text="个性签名" style="@style/setting_item" />
+            </LinearLayout>
+            <View style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout style="@style/setting_item_layout">
+                <TextView android:text="@string/tv_personal_account" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_account" android:layout_marginLeft="@dimen/ls_Margin1" android:text="个人账号" style="@style/setting_item" />
+            </LinearLayout>
+            <View style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout style="@style/setting_item_layout">
+                <TextView android:text="@string/tv_occupation" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_duty" android:layout_marginLeft="@dimen/ls_Margin1" android:text="职务" style="@style/setting_item" />
+            </LinearLayout>
+            <View style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout style="@style/setting_item_layout">
+                <TextView android:text="@string/class_str" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_class" android:layout_marginLeft="@dimen/ls_Margin1" android:text="班级" style="@style/setting_item" />
+            </LinearLayout>
+            <View style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout style="@style/setting_item_layout">
+                <TextView android:text="@string/user_phone" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_cellphone" android:layout_marginLeft="@dimen/ls_Margin1" android:text="手机" style="@style/setting_item" />
+            </LinearLayout>
+            <View style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout style="@style/setting_item_layout">
+                <TextView android:text="Email" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_email" android:layout_marginLeft="@dimen/ls_Margin1" android:text="Email" style="@style/setting_item" />
+            </LinearLayout>
+            <View android:id="@id/v_email" style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout android:id="@id/lyout_zuoji" style="@style/setting_item_layout">
+                <TextView android:text="@string/tv_landline" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_phone1" android:layout_marginLeft="@dimen/ls_Margin1" android:text="座机" style="@style/setting_item" />
+            </LinearLayout>
+            <View android:id="@id/v_zuoji" style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout android:id="@id/lyout_fenji" style="@style/setting_item_layout">
+                <TextView android:text="@string/tv_extension_line" style="@style/setting_item2" />
+                <TextView android:id="@id/tab4_info_phone2" android:layout_marginLeft="@dimen/ls_Margin1" android:text="分机" style="@style/setting_item" />
+            </LinearLayout>
+            <View android:id="@id/v_fenji" android:layout_marginBottom="@dimen/setting_layout_border_marginBottom" style="@style/setting_item_layout_border_bottom" />
+            <View android:id="@id/v_2" style="@style/setting_item_layout_border_bottom" />
+            <LinearLayout android:id="@id/ll_switch_account" style="@style/setting_item_layout">
+                <TextView android:text="切换账号" style="@style/setting_item" />
+            </LinearLayout>
+            <View android:id="@id/v_3" style="@style/setting_item_layout_border_bottom" />
+            <View android:id="@id/v_4" android:visibility="gone" android:layout_marginBottom="@dimen/setting_layout_border_marginBottom" style="@style/setting_item_layout_border_bottom" />
+            <Button android:textColor="@color/white" android:layout_gravity="center_horizontal" android:id="@id/send_infor" android:background="@drawable/btn_sendinfor_background" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="50.0dip" android:text="@string/send_infor" android:onClick="onClick" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

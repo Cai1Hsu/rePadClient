@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/mainbackground" android:background="@drawable/sdyb_bg" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="@android:color/transparent" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+        <LinearLayout android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="15.0dip" android:layout_marginTop="10.0dip" android:layout_alignParentLeft="true">
+            <ImageView android:background="@drawable/sdyb_logo" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:id="@id/time_headerll" android:background="@android:color/transparent" android:padding="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true">
+            <TextView android:textSize="20.0sp" android:textColor="@android:color/white" android:id="@id/tv_battery" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="100%" android:drawableTop="@drawable/sdyb_battery10" android:drawablePadding="6.0dip" />
+            <TextView android:textSize="20.0sp" android:textColor="@android:color/white" android:id="@id/wifi_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="Wi-Fi" android:drawableTop="@drawable/sdyb_wifi" android:drawablePadding="6.0dip" />
+            <TextView android:textSize="20.0sp" android:textColor="@android:color/white" android:id="@id/sdyb_myapp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="@string/myapp_title" android:drawableTop="@drawable/sdyb_myapp" android:drawablePadding="6.0dip" />
+            <TextView android:textSize="20.0sp" android:textColor="@android:color/white" android:id="@id/setting_img" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="@string/configuration" android:drawableTop="@drawable/sdyb_setting" android:drawablePadding="6.0dip" />
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:background="@android:color/transparent" android:paddingTop="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toLeftOf="@id/time_headerll">
+            <TextView android:textSize="16.0sp" android:textColor="@android:color/white" android:id="@id/sdyb_timedetails" android:layout_width="125.0dip" android:layout_height="fill_parent" android:text="00:00\n2017年8月22日\n星期二" />
+        </LinearLayout>
+    </RelativeLayout>
+    <LinearLayout android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="2.0">
+        <LinearLayout android:gravity="center" android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:id="@id/sdyb_btn1" android:background="@drawable/sdyb_btn1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center" android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:id="@id/sdyb_btn2" android:background="@drawable/sdyb_btn2" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center" android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:id="@id/sdyb_btn3" android:background="@drawable/sdyb_btn3" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center" android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:id="@id/sdyb_btn4" android:background="@drawable/sdyb_btn4" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+    <RelativeLayout android:background="@android:color/transparent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/happy_class_top">
+        <Switch android:textSize="22.0sp" android:id="@id/tv_main_eryproc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/dp20" android:textOn="" android:textOff="" android:thumb="@drawable/thumb" android:text="@string/eyeproc" android:layout_alignParentRight="true" android:track="@drawable/track" android:switchMinWidth="20.0dip" />
+        <TextView android:id="@id/tv_line" android:background="#ffececec" android:layout_width="2.0dip" android:layout_height="30.0dip" android:layout_marginRight="10.0dip" android:layout_toLeftOf="@id/tv_main_eryproc" android:layout_centerVertical="true" />
+        <TextView android:textSize="22.0sp" android:textColor="@android:color/black" android:gravity="right" android:id="@id/tv_main_stuname" android:background="@android:color/transparent" android:paddingRight="@dimen/dp20" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="学生" android:layout_toLeftOf="@id/tv_line" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <LinearLayout android:gravity="center_horizontal" android:orientation="horizontal" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/app_item_top">
+        <LinearLayout android:gravity="center" android:orientation="vertical" android:paddingLeft="100.0dip" android:paddingRight="100.0dip" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <LinearLayout android:gravity="center" android:layout_gravity="center" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="130.0dip" android:layout_marginTop="20.0dip" android:layout_marginBottom="@dimen/app_item_space">
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/one_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/one_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout android:layout_marginLeft="50.0dip" style="@style/cell_layout">
+                    <ImageView android:id="@id/two_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/two_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:gravity="center" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="130.0dip" android:layout_marginTop="20.0dip" android:layout_marginBottom="@dimen/app_item_space">
+                <LinearLayout style="@style/cell_layout">
+                    <RelativeLayout android:layout_width="75.0dip" android:layout_height="75.0dip">
+                        <ImageView android:id="@id/three_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                        <TextView android:textSize="10.0sp" android:textStyle="bold" android:textColor="@android:color/white" android:gravity="center" android:id="@id/three_noticetv" android:background="@drawable/circle" android:layout_width="20.0dip" android:layout_height="20.0dip" android:layout_marginTop="8.0dip" android:layout_marginRight="8.0dip" android:maxWidth="50.0dip" android:text="13" android:layout_alignParentRight="true" />
+                    </RelativeLayout>
+                    <TextView android:id="@id/three_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/four_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/four_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/five_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/five_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/six_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/six_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:gravity="center_horizontal" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="130.0dip">
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/seven_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/seven_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/eight_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/eight_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/nine_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/nine_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/ten_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/ten_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/eleven_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/eleven_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+                <LinearLayout style="@style/cell_layout">
+                    <ImageView android:id="@id/twelve_img" android:src="@drawable/app_add" style="@style/cell_imgview" />
+                    <TextView android:id="@id/twelve_txt" android:text="@string/add_app" style="@style/cell_txtview" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <RelativeLayout android:gravity="bottom" android:layout_gravity="bottom" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+        <LinearLayout android:orientation="horizontal" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_centerVertical="true">
+            <TextView android:textSize="18.0sp" android:gravity="center" android:id="@id/tv_tel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="150.0dip" android:text="@string/user_telephone" android:drawableTop="@drawable/tel_home" />
+            <TextView android:textSize="18.0sp" android:gravity="center" android:id="@id/tv_sms" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tv_sms" android:drawableTop="@drawable/sms_home" />
+        </LinearLayout>
+        <LinearLayout android:gravity="bottom" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginTop="5.0dip" android:layout_marginBottom="25.0dip" android:layout_alignParentLeft="true">
+            <TextView android:textSize="20.0sp" android:textColor="@android:color/white" android:id="@id/tv_wifi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20.0dip" android:layout_marginBottom="10.0dip" />
+        </LinearLayout>
+        <LinearLayout android:gravity="bottom" android:orientation="horizontal" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginRight="20.0dip" android:layout_marginBottom="25.0dip" android:layout_alignParentRight="true">
+            <ImageButton android:id="@id/sdyb_btn5" android:background="@drawable/sdyb_btn5" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

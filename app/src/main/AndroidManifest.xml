@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.launcher.activity" platformBuildVersionCode="24" platformBuildVersionName="7.0">
+    <uses-permission android:name="android.permission.BLUETOOTH"/>  
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>  
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>  
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>  
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>  
+    <uses-permission android:name="android.permission.sec.MDM_RESTRICTION"/>  
+    <uses-permission android:name="android.permission.sec.MDM_DATE_TIME"/> 
+    <uses-permission android:name="android.permission.RESTART_PACKAGES"/>  
+    <uses-permission android:name="android.permission.GET_TASKS"/>  
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+    <uses-permission android:name="android.permission.sec.MDM_RESTRICTION"/>  
+    <uses-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS"/> 
+    <uses-permission android:name="android.permission.VIBRATE"/>  
+    <uses-permission android:name="android.permission.CALL_PHONE"/>  
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>  
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS"/>  
+    <uses-permission android:name="android.permission.BIND_APPWIDGET"/>  
+    <uses-permission android:name="android.permission.GET_TASKS"/>  
+    <uses-permission android:name="android.permission.READ_FRAME_BUFFER"/>  
+    <uses-permission android:name="android.permission.REORDER_TASKS"/>  
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>  
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>  
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES"/>  
+    <uses-permission android:name="android.permission.DELETE_PACKAGES"/>  
+    <uses-permission android:name="android.permission.STOP_APP_SWITCHES"/>  
+    <uses-permission android:name="android.permission.sec.MDM_HW_CONTROL"/>  
+    <uses-permission android:name="android.permission.sec.MDM_APP_MGMT"/>  
+    <uses-permission android:name="android.permission.sec.MDM_KIOSK_MODE"/>  
+    <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>  
+    <uses-permission android:name="android.permission.CLEAR_APP_USER_DATA"/>  
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>  
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>  
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>  
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>  
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>  
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>  
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>  
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>  
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>  
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>  
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>  
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>  
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>  
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>  
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>  
+    <uses-permission android:name="android.permission.SEND_SMS"/>  
+    <uses-permission android:name="android.permission.CAMERA"/>  
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>  
+    <uses-permission android:name="android.permission.INTERNET"/>  
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>  
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>  
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>  
+    <uses-permission android:name="android.permission.READ_LOGS"/>  
+    <uses-permission android:name="android.permission.sec.MDM_HW_CONTROL"/>  
+    <uses-permission android:name="android.permission.sec.MDM_APP_MGMT"/>  
+    <uses-permission android:name="android.permission.sec.MDM_KIOSK_MODE"/>  
+    <uses-permission android:name="com.zbedu.b2b.USER_SETTING_PERMISSION"/>  
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>  
+    <uses-permission android:name="android.permission.sec.MDM_MULTI_USER_MGMT"/>  
+    <uses-feature android:name="android.hardware.usb.host" android:required="true"/>  
+    <application android:icon="@drawable/app_logo_new" android:label="@string/app_name" android:name="com.android.boot.App" android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" > 
+        <activity android:configChanges="keyboardHidden|layoutDirection|orientation|screenSize" android:excludeFromRecents="true" android:label="@string/app_name" android:launchMode="singleInstance" android:name="com.edutech.mobilestudyclient.activity.CloudClientActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"> 
+            <intent-filter> 
+                <action android:name="android.intent.action.MAIN"/>  
+                <category android:name="android.intent.category.LAUNCHER"/>  
+                <category android:name="android.intent.category.HOME"/>  
+                <category android:name="android.intent.category.DEFAULT"/> 
+            </intent-filter>  
+            <intent-filter android:priority="1000"> 
+                <action android:name="android.hardware.usb.action.USB_STATE"/> 
+            </intent-filter> 
+        </activity>  
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.edutech.mobilestudyclient.activity.AddAdminActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>  
+        <receiver android:description="@string/enterprise_device_admin_description" android:name="com.edutech.mobilestudyclient.activity.SampleAdmin" android:permission="android.permission.BIND_DEVICE_ADMIN"> 
+            <meta-data android:name="android.app.device_admin" android:resource="@xml/device"/>  
+            <intent-filter> 
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/> 
+            </intent-filter> 
+        </receiver>  
+        <activity android:name="com.edutech.publicedu.log.EvkActivity" android:screenOrientation="landscape"/>  
+        <activity android:name="com.lee.demo.view.VideoPlayActivity" android:screenOrientation="landscape"/>  
+        <activity android:excludeFromRecents="true" android:hardwareAccelerated="true" android:name="com.edutech.cloudclientsetting.activity.DiscussActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"/>  
+        <activity android:excludeFromRecents="true" android:name="com.edutech.mobilestudyclient.activity.AppControlActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustResize|stateHidden"/>  
+        <activity android:excludeFromRecents="true" android:hardwareAccelerated="true" android:name="com.edutech.appmanage.MainActivity" android:screenOrientation="landscape" android:taskAffinity="com.edutech.appmanage" android:windowSoftInputMode="adjustPan"/>  
+        <activity android:excludeFromRecents="true" android:label="@string/app_name" android:name="com.edutech.appmanage.DownLoadManage" android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"> 
+            <intent-filter> 
+                <action android:name="android.intent.action.DOWN"/>  
+                <category android:name="android.intent.category.DEFAULT"/> 
+            </intent-filter> 
+        </activity>  
+        <service android:name="com.edutech.appmanage.SilentUninstall_Service"/>  
+        <service android:exported="false" android:name="com.edutech.appmanage.utils.Delete_APKfile"> 
+            <intent-filter> 
+                <action android:name="android.intent.action.DELETE_APKFILES"/> 
+            </intent-filter> 
+        </service>  
+        <activity android:excludeFromRecents="true" android:name="com.edutech.cloudclientsetting.activity.CloudClientSetActivity" android:screenOrientation="landscape" android:taskAffinity="com.edutech.cloudclientsetting" android:windowSoftInputMode="adjustPan"/>  
+        <activity android:excludeFromRecents="true" android:name="com.edutech.mobilestudyclient.activity.PasswdDialogActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"/>  
+        <activity android:configChanges="keyboardHidden|orientation" android:excludeFromRecents="true" android:name="com.mining.app.zxing.activity.MipcaActivityCapture" android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden"/>  
+        <activity android:hardwareAccelerated="true" android:name="com.edutech.mobilestudyclient.activity.XueersiActivity" android:screenOrientation="landscape"/>  
+        <service android:exported="true" android:label="ProtectService" android:name="com.edutech.mobilestudyclient.activity.service.sysProtectService" android:process=":remote"/>  
+        <receiver android:name="com.edutech.mobilestudyclient.UsbReceiver"> 
+            <intent-filter android:priority="1000"> 
+                <action android:name="android.intent.action.MEDIA_MOUNTED"/>  
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED"/>  
+                <action android:name="android.intent.action.MEDIA_EJECT"/>  
+                <data android:scheme="file"/> 
+            </intent-filter> 
+        </receiver>
+    </application> 
+</manifest>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="#ffe7e7e7" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:gravity="center_vertical" android:background="#fff5f5f5" android:layout_width="fill_parent" android:layout_height="60.0px">
+        <ImageView android:id="@id/ex_myfile_logo" android:background="@drawable/myfile_kaoshi_logo_normal" android:layout_width="60.0px" android:layout_height="60.0px" android:layout_marginLeft="19.0px" android:layout_alignParentLeft="true" />
+        <TextView android:textSize="18.0sp" android:textColor="#ff000000" android:gravity="center_vertical" android:id="@id/ex_examination_name" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="15.0px" android:text="@string/html_my_homework" android:layout_toRightOf="@id/ex_myfile_logo" />
+        <ImageView android:layout_gravity="bottom|clip_vertical" android:id="@id/ex_examination_portrait" android:background="@drawable/portrait_ask" android:layout_width="60.0px" android:layout_height="60.0px" android:layout_toLeftOf="@id/ex_studentinfo_layout" />
+        <LinearLayout android:gravity="bottom" android:orientation="horizontal" android:id="@id/ex_studentinfo_layout" android:layout_width="wrap_content" android:layout_height="58.0px" android:layout_marginLeft="20.0px" android:layout_alignParentRight="true">
+            <TextView android:textSize="12.0sp" android:textColor="#ff000000" android:gravity="center_vertical" android:id="@id/ex_examination_wait" android:layout_width="wrap_content" android:layout_height="28.0px" android:text="@string/html_waiting_examination" />
+        </LinearLayout>
+    </RelativeLayout>
+    <FrameLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <RelativeLayout android:background="#ffe7e7e7" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <RelativeLayout android:id="@id/ex_webview_layout" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_margin="10.0dip" android:layout_above="@id/ex_btn_layout">
+                <WebView android:id="@id/ex_examintion_webview" android:background="#ffffffff" android:visibility="visible" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+                <Button android:textColor="#ff00ff00" android:id="@id/exam_shrink_btn_up" android:background="@drawable/popup_up" android:layout_width="36.0dip" android:layout_height="36.0dip" android:layout_alignParentRight="true" android:layout_alignParentBottom="true" />
+            </RelativeLayout>
+            <Button android:textColor="#ff00ff00" android:id="@id/exam_shrink_btn" android:background="@drawable/less" android:layout_width="36.0dip" android:layout_height="36.0dip" android:layout_below="@id/ex_webview_layout" android:layout_alignParentRight="true" />
+            <LinearLayout android:orientation="horizontal" android:id="@id/exam_layout_answer" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/ex_webview_layout" android:layout_alignParentBottom="true">
+                <FrameLayout android:background="@drawable/askme_bg" android:layout_width="750.0dip" android:layout_height="fill_parent" android:layout_marginLeft="2.0dip" android:layout_marginBottom="5.0dip">
+                    <ListView android:id="@id/ex_examination_listview" android:background="#ffe7e7e7" android:fadingEdge="none" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+                    <ImageView android:id="@id/ex_examination_mengban" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+                </FrameLayout>
+                <LinearLayout android:gravity="bottom|center|right" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginRight="10.0dip" android:layout_marginBottom="10.0dip">
+                    <Button android:textSize="18.0sp" android:textColor="#ff000000" android:gravity="center" android:id="@id/ex_examination_finish" android:background="@drawable/exam_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/html_their_papers" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout android:gravity="center" android:id="@id/ex_zhuangtai_layout" android:background="#ffe7e7e7" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <Button android:textSize="65.0sp" android:textColor="#ff000000" android:layout_gravity="center" android:id="@id/ex_examination_ztmb" android:background="@color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="等待接收试卷……" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

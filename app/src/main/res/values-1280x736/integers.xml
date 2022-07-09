@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="pingtai_layout_height">400</integer>
+    <integer name="gridview_num">4</integer>
+    <integer name="img_width">50</integer>
+</resources>

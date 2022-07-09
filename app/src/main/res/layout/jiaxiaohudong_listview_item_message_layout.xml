@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:descendantFocusability="blocksDescendants" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <com.edutech.jiaxiaohudong.myview.RoundImageView android:id="@id/item_image_message" android:layout_marginLeft="8.0dip" android:src="@drawable/icon" android:scaleType="centerCrop" android:layout_centerVertical="true" style="@style/lv_img" />
+        <LinearLayout android:gravity="right" android:orientation="vertical" android:id="@id/right" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true">
+            <TextView android:id="@id/tv_chattime_message" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/static_margin_three" android:layout_marginRight="10.0dip" android:layout_marginBottom="5.0sp" android:text="2013-8-13" style="@style/lv_graytext" />
+            <TextView android:textSize="@dimen/static_text_five" android:textColor="#ffffffff" android:gravity="center" android:id="@id/tv_unread_message" android:background="@drawable/jiaxiaohudong_unread" android:paddingLeft="5.0sp" android:paddingRight="5.0sp" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="22.0sp" android:layout_marginRight="10.0dip" android:minWidth="22.0sp" android:text="9" />
+        </LinearLayout>
+        <LinearLayout android:orientation="vertical" android:layout_marginLeft="@dimen/static_margin_two" android:layout_marginTop="@dimen/static_margin_three" android:layout_toLeftOf="@id/right" android:layout_toRightOf="@id/item_image_message" style="@style/lv_item_layout">
+            <TextView android:gravity="center_vertical" android:id="@id/tv_username_message" android:layout_width="wrap_content" android:layout_height="0.0sp" android:singleLine="true" android:layout_weight="1.0" style="@style/lv_text" />
+            <TextView android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/tv_historymessage_message" android:layout_width="wrap_content" android:layout_height="0.0sp" android:singleLine="true" android:layout_weight="1.0" style="@style/lv_graytext" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

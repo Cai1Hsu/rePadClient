@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0px" android:layout_marginBottom="30.0px"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="#ff000000" android:gravity="center_vertical" android:id="@id/ex_check_id" android:layout_width="40.0px" android:layout_height="wrap_content" android:layout_marginLeft="60.0px" android:layout_marginRight="152.0px" />"
+<Button android:id="@id/ex_trueorfalse_j" android:background="@drawable/button_j" android:layout_width="40.0px" android:layout_height="40.0px" android:layout_marginRight="152.0px" />
+    <Button android:id="@id/ex_trueorfalse_x" android:background="@drawable/button_x" android:layout_width="40.0px" android:layout_height="40.0px" />
+    <Button android:id="@id/btn_analysis" android:background="@drawable/analysis" android:layout_width="40.0px" android:layout_height="40.0px" android:layout_marginLeft="15.0dip" />
+    <Button android:id="@id/btn_askhelp" android:background="@drawable/askhelp" android:layout_width="40.0px" android:layout_height="40.0px" android:layout_marginLeft="15.0dip" />
+</LinearLayout>

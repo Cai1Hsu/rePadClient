@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/caiyi/workspace/PadClient/app/.cxx/cmake/release/armeabi-v7a",
+  "command": "/home/caiyi/android-sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi21 --gcc-toolchain=/home/caiyi/android-sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/caiyi/android-sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/linux-x86_64/sysroot  -DABC -DENABLE_DEBUG -Dnative_lib_EXPORTS -I/home/caiyi/workspace/PadClient/app/src/main/cpp/src/main/cpp/include -isystem /home/caiyi/.gradle/caches/transforms-3/b8b3fedc3add6739e63c555df1de746a/transformed/support-1.0.38/prefab/modules/tool/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++11 -Oz -DNDEBUG  -fPIC   -o CMakeFiles/native-lib.dir/native-lib.cpp.o -c /home/caiyi/workspace/PadClient/app/src/main/cpp/native-lib.cpp",
+  "file": "/home/caiyi/workspace/PadClient/app/src/main/cpp/native-lib.cpp"
+}
+]

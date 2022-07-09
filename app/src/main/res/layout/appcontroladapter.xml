@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/img_icon" android:padding="5.0dip" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_margin="5.0dip" android:layout_marginLeft="30.0dip" android:scaleType="fitCenter" />
+    <TextView android:textColor="@color/ForgotPassword" android:id="@id/tv_name" android:padding="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5.0dip" android:layout_marginLeft="20.0dip" android:layout_toRightOf="@id/img_icon" />
+    <TextView android:textColor="@color/black" android:id="@id/tv_version" android:padding="5.0dip" android:layout_width="120.0dip" android:layout_height="wrap_content" android:layout_margin="5.0dip" android:layout_marginRight="20.0dip" android:singleLine="true" android:layout_alignParentRight="true" />
+</RelativeLayout>

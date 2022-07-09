@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.edutech.jiaxiaohudong.myview.MyLinearLayout android:orientation="vertical" android:id="@id/ll_main_view" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <include layout="@layout/jiaxiaohudong_titlebar" />
+        <LinearLayout android:id="@id/layout_net_error" android:background="@color/bac_net_error" android:layout_width="fill_parent" android:layout_height="@dimen/Net_Error">
+            <RelativeLayout android:layout_gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0sp">
+                <ImageView android:id="@id/imv_net_err" android:layout_marginLeft="8.0dip" android:src="@drawable/net_error" android:scaleType="fitXY" android:layout_centerVertical="true" style="@style/lv_img" />
+                <LinearLayout android:orientation="vertical" android:layout_marginLeft="@dimen/static_margin_two" android:layout_toRightOf="@id/imv_net_err" style="@style/lv_item_layout">
+                    <TextView android:textColor="@color/setting_item_color" android:gravity="center_vertical" android:id="@id/tv_net_err" android:layout_width="wrap_content" android:layout_height="0.0sp" android:text="@string/str_net_error" android:singleLine="true" android:layout_weight="1.0" />
+                    <TextView android:textColor="@color/setting_item_color" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/tv_Crowded_Dropped" android:layout_width="wrap_content" android:layout_height="0.0sp" android:text="@string/str_offline_drop" android:singleLine="true" android:layout_weight="1.0" />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+        <com.edutech.jiaxiaohudong.listview.XListView android:id="@id/lv_message" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_margin="5.0sp" />
+    </com.edutech.jiaxiaohudong.myview.MyLinearLayout>
+    <include layout="@layout/jiaxiaohudong_progress_include" />
+</RelativeLayout>

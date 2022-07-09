@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="pingtai_layout_height">400</integer>
+    <integer name="gridview_num">4</integer>
+    <integer name="img_width">50</integer>
+    <integer name="tv_state">30</integer>
+    <integer name="gv_img_length">50</integer>
+    <integer name="gv_img_length_choose">80</integer>
+    <integer name="lv_item_height">60</integer>
+</resources>

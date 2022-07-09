@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="#ffffffff" android:layout_width="600.0dip" android:layout_height="wrap_content">
+        <ScrollView android:id="@id/ScrollView" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="400.0dip">
+            <TextView android:textSize="15.0sp" android:textColor="@android:color/black" android:id="@id/tvUserLiceseContent" android:scrollbars="vertical" android:layout_width="wrap_content" android:layout_height="400.0dip" android:layout_marginLeft="10.0dip" android:layout_marginTop="10.0dip" android:layout_marginRight="10.0dip" android:layout_marginBottom="10.0dip" android:text="用户许可文件" />
+        </ScrollView>
+        <RelativeLayout android:gravity="center" android:background="@android:color/darker_gray" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <Button android:id="@id/btnCancle" android:layout_width="100.0dip" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="10.0dip" android:text="取消" />
+            <Button android:enabled="false" android:id="@id/btnYes" android:layout_width="100.0dip" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="10.0dip" android:text="同意" android:layout_toRightOf="@id/btnCancle" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

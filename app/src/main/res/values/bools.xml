@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="large_land_layout">false</bool>
+    <bool name="show_server_url_input">true</bool>
+    <bool name="show_welcome_link">true</bool>
+    <bool name="multiaccount_support">true</bool>
+    <bool name="help_enabled">true</bool>
+    <bool name="imprint_enabled">false</bool>
+    <bool name="recommend_enabled">true</bool>
+    <bool name="feedback_enabled">true</bool>
+</resources>

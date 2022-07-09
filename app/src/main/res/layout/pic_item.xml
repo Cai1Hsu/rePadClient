@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/linearlayout_pre" android:background="@color/myapp_background" android:layout_width="fill_parent" android:layout_height="fill_parent" android:weightSum="3.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/item_background" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_margin="5.0dip" android:weightSum="3.0">
+        <LinearLayout android:orientation="horizontal" android:background="@drawable/itemup_background" android:layout_width="fill_parent" android:layout_height="0.0dip" android:weightSum="5.0" android:layout_weight="1.9">
+            <RelativeLayout android:gravity="center" android:layout_width="0.0sp" android:layout_height="fill_parent" android:layout_marginRight="2.0sp" android:layout_weight="1.5">
+                <ImageView android:id="@id/imageView_pre" android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@drawable/default_icon" />
+                <ImageView android:id="@id/iv_update" android:visibility="gone" android:layout_width="15.0sp" android:layout_height="15.0sp" android:layout_marginRight="7.0sp" android:src="@drawable/update_icons" android:layout_alignParentTop="true" android:layout_alignParentRight="true" />
+            </RelativeLayout>
+            <LinearLayout android:gravity="left" android:layout_gravity="center" android:orientation="vertical" android:layout_width="0.0sp" android:layout_height="wrap_content" android:layout_weight="3.5">
+                <TextView android:textSize="20.0sp" android:textStyle="bold" android:textColor="#ff000000" android:gravity="left" android:layout_gravity="left" android:id="@id/textView_pre" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" />
+                <TextView android:textColor="#ff000000" android:gravity="left" android:layout_gravity="left" android:id="@id/textView_versioncode" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:gravity="right" android:layout_gravity="center" android:orientation="horizontal" android:background="@drawable/itemdown_background" android:layout_width="fill_parent" android:layout_height="0.0dip" android:weightSum="6.0" android:layout_weight="1.1">
+            <View android:layout_gravity="center|right" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0" />
+            <Button android:textSize="20.0sp" android:textColor="#ffffffff" android:gravity="center" android:layout_gravity="center|right" android:id="@id/btn_start" android:background="@drawable/btn_open" android:padding="2.0sp" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_margin="5.0sp" android:text="@string/open_app" android:layout_weight="2.0" />
+            <Button android:textSize="20.0sp" android:textColor="#ffa1a1a1" android:gravity="center" android:layout_gravity="center|right" android:id="@id/btn_uninstall" android:background="@drawable/btn_uninstall" android:padding="2.0sp" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_margin="5.0sp" android:text="@string/uninstall" android:layout_weight="2.0" />
+            <View android:layout_gravity="center|right" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

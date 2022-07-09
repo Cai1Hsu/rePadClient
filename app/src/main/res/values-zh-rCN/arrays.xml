@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="actionbar_sortby">
+        <item>A - Z</item>
+        <item>新 - 旧</item>
+    </string-array>
+    <string-array name="arrcontent_system_notice">
+        <item>移除列表</item>
+        <item>清空此消息记录</item>
+    </string-array>
+    <string-array name="arrcontent_muc_self_muc_parent_meeting">
+        <item>结束家长会</item>
+        <item>清空聊天记录</item>
+    </string-array>
+    <string-array name="arrcontent_muc_other_muc_parent_meeting">
+        <item>清空聊天记录</item>
+    </string-array>
+    <string-array name="arrcontent_muc_self_muc_notice">
+        <item>关闭此通知</item>
+    </string-array>
+    <string-array name="arrcontent_muc_other_muc_notice">
+        <item>清空此通知记录</item>
+    </string-array>
+    <string-array name="arrcontent_muc_self">
+        <item>结束会话</item>
+        <item>清空聊天记录</item>
+    </string-array>
+    <string-array name="arrcontent_muc_other">
+        <item>清空聊天记录</item>
+    </string-array>
+    <string-array name="arrcontent_muc_Not_Exit">
+        <item>移除列表</item>
+    </string-array>
+    <string-array name="arrcontent_chat">
+        <item>清空聊天记录</item>
+    </string-array>
+</resources>

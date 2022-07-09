@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:gravity="center" android:orientation="horizontal" android:background="@android:color/white" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+        <ScrollView android:id="@id/scroll_ex_write_answer" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/ex_bgimageview" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="wrap_content" android:scaleType="matrix" android:minHeight="@dimen/writeheight" />
+            </LinearLayout>
+        </ScrollView>
+        <com.lee.homework.view.SketchPadView android:id="@id/ex_sketchpad" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+        <LinearLayout android:orientation="vertical" android:id="@id/ex_txt_layout" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <EditText android:gravity="top" android:id="@id/ex_bgtext_edit" android:background="#ffffffff" android:visibility="gone" android:scrollbars="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" android:hint="@string/html_hint_answer" android:ems="10" android:lineSpacingExtra="4.0dip" />
+            <ListView android:id="@id/lv_bgtext_edit" android:background="#ffffffff" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" android:transcriptMode="normal" />
+        </LinearLayout>
+        <LinearLayout android:orientation="vertical" android:id="@id/voice_layout" android:paddingBottom="10.0dip" android:clickable="true" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+                <LinearLayout android:orientation="horizontal" android:id="@id/voice_play_btn" android:background="@drawable/voice_play_btn_bg" android:visibility="gone" android:layout_width="100.0dip" android:layout_height="30.0dip" android:layout_marginLeft="20.0dip" android:layout_marginTop="10.0dip" android:layout_marginRight="10.0dip">
+                    <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/sound3" />
+                </LinearLayout>
+                <TextView android:textSize="20.0sp" android:textColor="#ffcccccc" android:id="@id/tv_voice_secend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" />
+            </LinearLayout>
+            <TextView android:textSize="20.0sp" android:textColor="@android:color/white" android:layout_gravity="center" android:id="@id/tv_say_btn" android:background="@drawable/btn_say_bg" android:paddingLeft="30.0dip" android:paddingTop="5.0dip" android:paddingRight="30.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/hold_talk" />
+        </LinearLayout>
+    </RelativeLayout>
+    <LinearLayout android:gravity="center" android:orientation="horizontal" android:background="#ffe1e1e1" android:paddingBottom="13.0dip" android:layout_width="fill_parent" android:layout_height="55.0dip">
+        <Button android:textColor="#ff000000" android:id="@id/ex_rephoto" android:background="@null" android:visibility="gone" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:text="@string/html_retake" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_clear" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:text="@string/html_clear" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_undo" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:text="@string/html_undo" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_redo" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:text="@string/html_restore" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_save" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:text="@string/html_save" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_delete" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginLeft="63.0dip" android:text="@string/html_delete" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_enter" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginRight="3.0dip" android:text="@string/html_newline" />
+        <Button android:textColor="#ff000000" android:id="@id/ex_space" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginRight="3.0dip" android:text="@string/html_space" />
+        <Button android:textColor="#ff000000" android:id="@id/dialog_btnback" android:background="@null" android:layout_width="72.0dip" android:layout_height="wrap_content" android:layout_marginRight="3.0dip" android:text="@string/html_back" />
+    </LinearLayout>
+</LinearLayout>

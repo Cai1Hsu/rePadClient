@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@drawable/border_bg" android:padding="1.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="20.0sp" android:textColor="#ffef9972" android:id="@id/tv_tihao" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5.0dip" />
+    <RelativeLayout android:padding="5.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/html_loding_topic" />
+        <WebView android:id="@id/tv_tv" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <LinearLayout android:orientation="horizontal" android:id="@id/ll_rb" android:background="#fff7f7f7" android:paddingLeft="20.0dip" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="57.0dip" />
+    <LinearLayout android:orientation="horizontal" android:id="@id/ll_btn_tiandaan" android:background="#fff7f7f7" android:paddingLeft="20.0dip" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <TextView android:textSize="18.0sp" android:layout_gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/html_answer" />
+        <Button android:textSize="18.0sp" android:ellipsize="end" android:gravity="center|left" android:id="@id/btn_tiandaan" android:background="@null" android:layout_width="fill_parent" android:layout_height="50.0dip" android:layout_marginLeft="8.0dip" android:hint="@string/html_enter_your_answer" />
+        <Button android:textSize="18.0sp" android:ellipsize="end" android:gravity="center|left" android:id="@id/btn_voice_anwser" android:background="@null" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="50.0dip" android:layout_marginLeft="8.0dip" android:text="@string/see_voice_anwser" />
+        <ImageView android:id="@id/iv_tupiandaan" android:background="@android:color/white" android:visibility="gone" android:layout_width="150.0dip" android:layout_height="150.0dip" android:layout_margin="20.0dip" android:scaleType="centerCrop" />
+    </LinearLayout>
+    <RelativeLayout android:id="@id/rl_btn" android:background="#fff7f7f7" android:paddingLeft="20.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <Button android:enabled="false" android:id="@id/btn_tijiangjie" android:background="@null" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="@string/html_listen_explain" android:drawableLeft="@drawable/tingjiangjie_w" android:drawablePadding="10.0dip" />
+        <Button android:enabled="false" android:id="@id/btn_kanjiexi" android:background="@null" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/html_parsing" android:drawableLeft="@drawable/kanjiexi_w" android:drawablePadding="10.0dip" android:layout_toRightOf="@id/btn_tijiangjie" />
+        <Button android:enabled="false" android:id="@id/btn_kaodian" android:background="@null" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="@string/html_examination_site" android:drawableLeft="@drawable/kaodian_w" android:drawablePadding="10.0dip" android:layout_toLeftOf="@id/btn_cuotiji" />
+        <Button android:enabled="false" android:id="@id/btn_cuotiji" android:background="@null" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="@string/html_wrong_set" android:drawableLeft="@drawable/cuotiji_w" android:drawablePadding="10.0dip" android:layout_toLeftOf="@id/btn_qiujiangjie" />
+        <Button android:id="@id/btn_qiujiangjie" android:background="@null" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="@string/html_interpretation" android:drawableLeft="@drawable/qiujiangjie" android:drawablePadding="10.0dip" android:layout_alignParentRight="true" />
+    </RelativeLayout>
+</LinearLayout>

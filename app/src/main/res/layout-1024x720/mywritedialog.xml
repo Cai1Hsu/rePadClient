@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="#00000000" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="#ffe1e1e1" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <LinearLayout android:background="#ffe1e1e1" android:layout_width="fill_parent" android:layout_height="10.0sp" />
+        <RelativeLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <RelativeLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/bottom_line">
+                <WebView android:id="@id/write_webview" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_alignParentBottom="true" />
+                <LinearLayout android:orientation="horizontal" android:background="#ffe1e1e1" android:padding="5.0sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+                    <Button android:textColor="#ff000000" android:id="@id/handinput_btn" android:layout_width="wrap_content" android:layout_height="40.0dip" android:text="@string/html_handwritten" />
+                    <Button android:textColor="#ff000000" android:id="@id/keyboardinput_btn" android:layout_width="wrap_content" android:layout_height="40.0dip" android:text="@string/html_input" />
+                    <Button android:textColor="#ff000000" android:id="@id/camerainput_btn" android:layout_width="wrap_content" android:layout_height="40.0dip" android:text="@string/html_taking_pictures" />
+                    <Button android:textColor="#ff000000" android:id="@id/voice_btn" android:layout_width="wrap_content" android:layout_height="40.0dip" android:text="@string/voice" />
+                    <Button android:textColor="#ff000000" android:id="@id/ex_front" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:layout_marginTop="3.0dip" android:text="@string/html_previous" />
+                    <TextView android:textColor="@android:color/black" android:id="@id/tvCurrQuestionNum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="当前的题号：20" />
+                    <Button android:textColor="#ff000000" android:id="@id/ex_next" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="3.0dip" android:layout_marginTop="3.0dip" android:text="@string/html_next" />
+                </LinearLayout>
+            </RelativeLayout>
+            <View android:id="@id/bottom_line" android:background="#ffe1e1e1" android:layout_width="fill_parent" android:layout_height="5.0dip" android:layout_above="@id/bottom_layout" />
+            <LinearLayout android:id="@id/bottom_layout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+                <include layout="@layout/examination_image_homework" />
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout android:background="#ffe1e1e1" android:layout_width="fill_parent" android:layout_height="10.0sp" />
+    </LinearLayout>
+</LinearLayout>

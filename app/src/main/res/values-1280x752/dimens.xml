@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="draw_text_size">40.0px</dimen>
+    <dimen name="draw_text_x">29.0px</dimen>
+    <dimen name="draw_text_y">45.0px</dimen>
+    <dimen name="happy_class_top">40.0dip</dimen>
+    <dimen name="app_item_top">0.0dip</dimen>
+    <dimen name="app_item_space">20.0dip</dimen>
+    <dimen name="app_item_space2">35.0dip</dimen>
+    <dimen name="Net_Error">50.0dip</dimen>
+    <dimen name="homework_answerweb">300.0px</dimen>
+    <dimen name="homework_answerqw">400.0px</dimen>
+    <dimen name="dp100">100.0dip</dimen>
+    <dimen name="dp40">20.0sp</dimen>
+    <dimen name="dp20">10.0dip</dimen>
+    <dimen name="dp10">5.0dip</dimen>
+</resources>

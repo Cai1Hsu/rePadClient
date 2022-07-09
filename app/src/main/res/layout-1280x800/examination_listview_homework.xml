@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginLeft="10.0dip" android:layout_marginBottom="30.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="#ff000000" android:gravity="center_vertical" android:id="@id/ex_choice_id" android:layout_width="40.0dip" android:layout_height="wrap_content" android:layout_marginLeft="60.0dip" />
+    <Button android:id="@id/ex_choice_a" android:background="@drawable/button_a" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginRight="31.0dip" />
+    <Button android:id="@id/ex_choice_b" android:background="@drawable/button_b" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginRight="31.0dip" />
+    <Button android:id="@id/ex_choice_c" android:background="@drawable/button_c" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginRight="31.0dip" />
+    <Button android:id="@id/ex_choice_d" android:background="@drawable/button_d" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginRight="31.0dip" />
+    <Button android:id="@id/ex_choice_e" android:background="@drawable/button_e" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginRight="31.0dip" />
+    <Button android:id="@id/ex_choice_f" android:background="@drawable/button_f" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginRight="31.0dip" />
+    <Button android:id="@id/ex_choice_g" android:background="@drawable/button_g" android:layout_width="40.0dip" android:layout_height="40.0dip" />
+    <Button android:id="@id/btn_analysis" android:background="@drawable/analysis" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginLeft="15.0dip" />
+    <Button android:id="@id/btn_askhelp" android:background="@drawable/askhelp" android:layout_width="40.0dip" android:layout_height="40.0dip" android:layout_marginLeft="15.0dip" />
+</LinearLayout>

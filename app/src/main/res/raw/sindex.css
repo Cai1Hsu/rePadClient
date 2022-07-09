@@ -1,0 +1,485 @@
+
+body{
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    background-repeat:repeat;
+    font-size:16px;
+    font-family:Arial, Helvetica, sans-serif;
+    margin:0px;
+    padding:0px;
+    width:100%;
+    /*background-image:url(../image/afd_index_bg_image.png);*/
+    /*background-image:url(../image/afd_bookshelf.png);*/
+}
+#loading { position:fixed!important; *position:absolute; z-index:99999; left:50%; margin-left:-120px; top:50%; border-radius:5px; margin-top:-15px; padding:8px 12px 8px 28px; background:#000 url('/sdcard/CloudClient/.System/MultiMediaMaterial/Epub/image/loading.gif') no-repeat 12px center; color:#fff; font-size:12px; display:none;}
+
+.afd_bookshelf{
+	position:absolute;
+	width:100%;
+	height:100%;
+}
+#afd_bookshelf{
+	margin-top:0px;
+    margin-left:0px;
+	margin-right:0px;
+	z-index:-3;
+}
+#mystore{
+	font-size:21px;
+	font-weight:bold;
+	text-decoration:none;
+	width:100%;
+	text-align:center;
+	/*kao 20130805 更改书架字体颜色*/
+	/*color:black;*/
+	color:#92602b;
+	position:absolute;
+	margin-top:8px;
+}
+
+#storemenu{
+    background:url(../image/afd_storemenu.png);
+	width:100%;
+	height:43px;
+}
+#storemenu1{
+	z-index:-1;
+	width:100%;
+	height:53px;
+}
+#storemenubroderleft{
+	z-index:-2;
+	width:30px;
+	height:100%;
+	left:0px;
+}
+#storemenubroderright{
+	z-index:-2;
+	width:30px;
+	height:100%;
+	right:0px;
+}
+#storemenu21{
+	z-index:-1;
+	width:100%;
+	height:100px;
+	margin-top:150px;
+}
+.storemenu21{
+	z-index:-1;
+	width:100%;
+	height:100px;
+	left:0px;
+}
+#storemenu22{
+	z-index:-1;
+	width:100%;
+	height:100px;
+	margin-top:320px;
+}
+#storemenu23{
+	z-index:-1;
+	width:100%;
+	height:100px;
+	margin-top:490px;
+}
+#storemenu24{
+	z-index:-1;
+	width:100%;
+	height:100px;
+	margin-top:660px;
+}
+#storemenu25{
+	z-index:-1;
+	width:100%;
+	height:100px;
+	margin-top:840px;
+}
+#storemenu #quit{
+	position:absolute;
+    float:left;
+    width:100px;
+    padding-left:10px;
+    padding-top:5px;
+} 
+
+#storemenuquit{
+	z-index:-1;
+	width:100%;
+	height:600px;
+}
+#storemenu #edit_finish{
+	position:absolute;
+    float:left;
+    width:100px;
+    padding-left:10px;
+    padding-top:5px;
+	display:none;
+}
+#storemenu #edit_finish img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+#storemenu #bookstore{
+	position:absolute;
+    float:left;
+	left:85px;
+    width:100px;
+    padding-left:10px;
+    padding-top:5px;
+} 
+
+#storemenu #bookstore img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+#storemenu #edit{
+    float:right;
+    width:68px;
+    padding-top:5px;
+    padding-right:10px;
+}
+
+#storemenu #edit img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+#storemenu #download{
+    float:right;
+    width:68px;
+	right:85px;
+    padding-top:5px;
+    padding-right:10px;
+}
+
+#storemenu #download img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+#storemenu #afd_editDelete1{
+    float:right;
+    width:68px;
+    padding-top:5px;
+    padding-right:10px;
+    display:none;
+}
+
+#storemenu #afd_editDelete1 img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+#storemenu #afd_editMove{
+    position:absolute;
+    float:right;
+    padding-top:5px;
+	right:88px;
+    width:68px;
+    display:none;
+}
+
+#storemenu #afd_editMove img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+#storemenu #import{
+    position:absolute;
+    float:right;
+    padding-top:5px;
+	right:78px;
+    width:68px;
+}
+
+#storemenu #import img{
+	position:relative;
+	height:31px;
+    width:68px;
+}
+
+#container{
+    display:inline;
+    width:100%;
+    height:100%;
+}
+/* kao 20130730 width 改为103px margin-left 改为 20px; */
+#container #afd_books ul{
+    float:left;
+   /* width:11%;*/
+    width:103px;
+	height:120px;
+	/*margin-left:27px;*/
+	margin-left:20px;
+    padding:10px;
+}
+#container #afd_books ul li{
+    position:relative;
+}
+#container #afd_books ul .coverimage{
+
+    background-color:#666;
+    height:120px;/*update 20140829 wp g改为120px，之前是100% ，在三星T800，T705C上课本拉伸显示*/
+    max-width:100%;
+    border:1px solid #000;
+    -moz-box-shadow:3px 3px 4px #000;
+    -webkit-box-shadow:3px 3px 4px #000;
+    box-shadow:3px 3px 4px #000;
+    background:#fff;
+    filter:progid:DXImageTransform.Microsoft.Shadow(Strength=4,Direction=135,Color='#000000');
+}
+#container #afd_books ul span{
+    display:block;
+    position:absolute;
+    padding:10%;
+    width:80%;
+    height:60%;
+    word-wrap: break-word;
+    font-size:12px;
+    overflow:hidden;
+}
+/* #container #afd_books ul .baseimage{
+    position:relative;
+    max-width:100%;
+} */
+
+#container ul .li_coverimage{
+    list-style:none;
+    text-align:center;
+}
+/* #container ul .li_baseimage{
+    width:100%;
+    list-style:none;
+    text-align:center;
+    line-height:60%;
+} */
+.afd_selectBg{
+    z-index:2;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0);
+    display:none;
+}
+.afd_selectBg .afd_edit_selectedPng{
+    position:absolute;
+    width:28px;
+	left:35%;
+    bottom:25px;
+    display:none;
+}
+.afd_selectBg .afd_edit_selectedPng1{
+    position:relative;/*update 20140829 wp */
+	padding-left:3%;
+	padding-right:3%;
+    width:94%;
+	height:97%;
+    bottom:3%;
+    display:none;
+}
+/* .afd_selectBg1{
+    z-index:1;
+    position:absolute;
+	left:5%;
+    width:90%;
+    height:90%;
+    background-color:rgba(0,0,0,0);
+    display:none;
+}
+.afd_selectBg1 img{
+    position:absolute;
+    width:90%;
+	height:90%;
+    bottom:0px;
+    display:none;
+} */
+
+#afd_editMenu{
+    width:100%;
+    z-index:2;
+    position:absolute;
+    display:none;
+    text-align:center;
+}
+
+#afd_editMenu #afd_editBox{
+    margin:0 auto;
+    width:210px;
+}
+.afd_editItem{
+    float:left;
+    text-align:center;
+    width:70px;
+}
+
+.afd_editItem img{
+    position:relative;
+    width:90%;
+}
+
+.afd_importdialog {
+    position: fixed;
+    /*font-family: Arial, Helvetica, sans-serif;*/
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 9;
+    opacity:0;
+    -webkit-transition: opacity 400ms ease-in;
+    -moz-transition: opacity 400ms ease-in;
+    transition: opacity 400ms ease-in;
+    pointer-events: none;
+    width:100%;
+    height:100%;
+}
+
+.afd_importdialog:target {
+    opacity:2;
+    pointer-events: auto;
+}
+
+.afd_importdialog > div {
+    font-size:25px;
+    width:80%;
+    height:50%;
+    position:relative;
+    margin-top:20%;
+    margin-left:10%;
+    border-radius: 10px;
+    background:#ffffff;
+    text-align:center;
+}
+#afd_background{
+	position:absolute;
+	left:0px;
+	width:100%;
+	height:100%;
+}
+.close {
+	z-index:1;
+    background: #606061;
+    color:#FFFFFF;
+    line-height:25px;
+    position:absolute;
+    right:-5px;
+    text-align:center;
+    top:-5px;
+    width: 24px;
+    text-decoration: none;
+    font-weight: bold;
+    -webkit-border-radius:12px;
+    -moz-border-radius:12px;
+    border-radius:12px;
+    -moz-box-shadow:1px 1px 3px #000;
+    -webkit-box-shadow:1px 1px 3px #000;
+    box-shadow:1px 1px 3px #000;
+}
+
+.close:hover{
+    background:#5A9A30;
+    background-repeat:no-repeat;
+}
+
+#afd_import_popuptab{
+    width:100%;
+    height:60px;
+    /*background:url(../image/afd_import_popuptabbg.png);*/
+    float:left;
+}
+
+
+#afd_internet{
+	position:relative;
+	z-index:10;
+	width:100%;
+	display:none;
+	margin-top:10%;
+    text-align:center;
+}
+#afd_internet .afd_downloadbutton{
+	font-size:14px;
+	color:#000000;
+    padding:5px;
+    border-color:#5A9A30;
+    background-color:#ffffff;
+    border-radius:2px;
+    border-style:solid;
+    position:relative;
+    top:10px;
+}
+
+#filepath{
+    border-color:#5A9A30;
+    height:25px;
+	width:80%;
+    margin-bottom:30px;
+}
+#fileurl{
+    border-color:#5A9A30;
+    height:25px;
+	width:80%;
+    margin-bottom:30px;
+}
+#afd_local{
+	position:relative;
+	z-index:10;
+	width:100%;
+	display:none;
+	margin-top:10%;
+	text-align:center;
+}
+#afd_local .importbutton{
+	font-size:14px;
+	color:#000000;
+    padding:5px;
+    border-color:#5A9A30;
+    background-color:#ffffff;
+    border-radius:2px;
+    border-style:solid;
+}
+
+#afd_wifi{
+	position:relative;
+	z-index:10;
+	width:100%;
+	display:none;
+}
+#afd_importingoptions{
+    text-align:center;
+    height:60px;
+    width:100%;
+    overflow:hidden;
+    background-color:#b5b5b5;
+    border-top-left-radius:7px;
+    border-top-right-radius:7px;
+}
+.afd_option{
+    float:left;
+    width:33%;
+    margin-top:8px;
+    font-size:14px;
+}
+.afd_progress{
+    background:grey;
+    margin-left:10%;
+    width:80%;
+    text-align:left;
+    height:8px;
+    border-radius:5px;
+    float:left;
+}
+#afd_dprogress{
+    width:0;
+    height:100%;
+    background:green;
+    border-radius:5px;
+}
+#afd_dpercent{
+    float:left;
+    margin-left:2px;
+    font-size:8px;
+}

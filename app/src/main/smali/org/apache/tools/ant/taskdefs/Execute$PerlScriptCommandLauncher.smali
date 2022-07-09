@@ -1,0 +1,197 @@
+.class Lorg/apache/tools/ant/taskdefs/Execute$PerlScriptCommandLauncher;
+.super Lorg/apache/tools/ant/taskdefs/Execute$CommandLauncherProxy;
+.source "Execute.java"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lorg/apache/tools/ant/taskdefs/Execute;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0xa
+    name = "PerlScriptCommandLauncher"
+.end annotation
+
+
+# instance fields
+.field private myScript:Ljava/lang/String;
+
+
+# direct methods
+.method constructor <init>(Ljava/lang/String;Lorg/apache/tools/ant/taskdefs/Execute$CommandLauncher;)V
+    .locals 0
+    .param p1, "script"    # Ljava/lang/String;
+    .param p2, "launcher"    # Lorg/apache/tools/ant/taskdefs/Execute$CommandLauncher;
+
+    .prologue
+    .line 1102
+    invoke-direct {p0, p2}, Lorg/apache/tools/ant/taskdefs/Execute$CommandLauncherProxy;-><init>(Lorg/apache/tools/ant/taskdefs/Execute$CommandLauncher;)V
+
+    .line 1103
+    iput-object p1, p0, Lorg/apache/tools/ant/taskdefs/Execute$PerlScriptCommandLauncher;->myScript:Ljava/lang/String;
+
+    .line 1104
+    return-void
+.end method
+
+
+# virtual methods
+.method public exec(Lorg/apache/tools/ant/Project;[Ljava/lang/String;[Ljava/lang/String;Ljava/io/File;)Ljava/lang/Process;
+    .locals 9
+    .param p1, "project"    # Lorg/apache/tools/ant/Project;
+    .param p2, "cmd"    # [Ljava/lang/String;
+    .param p3, "env"    # [Ljava/lang/String;
+    .param p4, "workingDir"    # Ljava/io/File;
+    .annotation system Ldalvik/annotation/Throws;
+        value = {
+            Ljava/io/IOException;
+        }
+    .end annotation
+
+    .prologue
+    const/4 v8, 0x0
+
+    .line 1119
+    if-nez p1, :cond_1
+
+    .line 1120
+    if-nez p4, :cond_0
+
+    .line 1121
+    invoke-virtual {p0, p1, p2, p3}, Lorg/apache/tools/ant/taskdefs/Execute$PerlScriptCommandLauncher;->exec(Lorg/apache/tools/ant/Project;[Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/Process;
+
+    move-result-object v4
+
+    .line 1149
+    :goto_0
+    return-object v4
+
+    .line 1123
+    :cond_0
+    new-instance v4, Ljava/io/IOException;
+
+    const-string/jumbo v5, "Cannot locate antRun script: No project provided"
+
+    invoke-direct {v4, v5}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
+
+    throw v4
+
+    .line 1127
+    :cond_1
+    const-string/jumbo v4, "ant.home"
+
+    invoke-virtual {p1, v4}, Lorg/apache/tools/ant/Project;->getProperty(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    .line 1128
+    .local v0, "antHome":Ljava/lang/String;
+    if-nez v0, :cond_2
+
+    .line 1129
+    new-instance v4, Ljava/io/IOException;
+
+    const-string/jumbo v5, "Cannot locate antRun script: Property \'ant.home\' not found"
+
+    invoke-direct {v4, v5}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
+
+    throw v4
+
+    .line 1132
+    :cond_2
+    invoke-static {}, Lorg/apache/tools/ant/taskdefs/Execute;->access$200()Lorg/apache/tools/ant/util/FileUtils;
+
+    move-result-object v4
+
+    invoke-virtual {p1}, Lorg/apache/tools/ant/Project;->getBaseDir()Ljava/io/File;
+
+    move-result-object v5
+
+    new-instance v6, Ljava/lang/StringBuffer;
+
+    invoke-direct {v6}, Ljava/lang/StringBuffer;-><init>()V
+
+    invoke-virtual {v6, v0}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    move-result-object v6
+
+    sget-object v7, Ljava/io/File;->separator:Ljava/lang/String;
+
+    invoke-virtual {v6, v7}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    move-result-object v6
+
+    iget-object v7, p0, Lorg/apache/tools/ant/taskdefs/Execute$PerlScriptCommandLauncher;->myScript:Ljava/lang/String;
+
+    invoke-virtual {v6, v7}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    move-result-object v6
+
+    invoke-virtual {v6}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    move-result-object v6
+
+    invoke-virtual {v4, v5, v6}, Lorg/apache/tools/ant/util/FileUtils;->resolveFile(Ljava/io/File;Ljava/lang/String;)Ljava/io/File;
+
+    move-result-object v4
+
+    invoke-virtual {v4}, Ljava/io/File;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    .line 1137
+    .local v1, "antRun":Ljava/lang/String;
+    move-object v2, p4
+
+    .line 1138
+    .local v2, "commandDir":Ljava/io/File;
+    if-nez p4, :cond_3
+
+    .line 1139
+    invoke-virtual {p1}, Lorg/apache/tools/ant/Project;->getBaseDir()Ljava/io/File;
+
+    move-result-object v2
+
+    .line 1142
+    :cond_3
+    array-length v4, p2
+
+    add-int/lit8 v4, v4, 0x3
+
+    new-array v3, v4, [Ljava/lang/String;
+
+    .line 1143
+    .local v3, "newcmd":[Ljava/lang/String;
+    const-string/jumbo v4, "perl"
+
+    aput-object v4, v3, v8
+
+    .line 1144
+    const/4 v4, 0x1
+
+    aput-object v1, v3, v4
+
+    .line 1145
+    const/4 v4, 0x2
+
+    invoke-virtual {v2}, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
+
+    move-result-object v5
+
+    aput-object v5, v3, v4
+
+    .line 1146
+    const/4 v4, 0x3
+
+    array-length v5, p2
+
+    invoke-static {p2, v8, v3, v4, v5}, Ljava/lang/System;->arraycopy(Ljava/lang/Object;ILjava/lang/Object;II)V
+
+    .line 1149
+    invoke-virtual {p0, p1, v3, p3}, Lorg/apache/tools/ant/taskdefs/Execute$PerlScriptCommandLauncher;->exec(Lorg/apache/tools/ant/Project;[Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/Process;
+
+    move-result-object v4
+
+    goto :goto_0
+.end method

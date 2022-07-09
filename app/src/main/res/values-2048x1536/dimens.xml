@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="homework_answerweb">700.0px</dimen>
+    <dimen name="homework_answerqw">740.0px</dimen>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageButton android:id="@id/qry_button" android:layout_width="46.0dip" android:layout_height="46.0dip" android:layout_marginLeft="0.0dip" android:src="@drawable/query" android:layout_alignParentRight="true" />
+    <EditText android:textSize="20.0sp" android:textColor="#ff0000ff" android:id="@id/path_edit" android:padding="2.0px" android:layout_width="fill_parent" android:layout_height="wrap_content" android:drawableLeft="@drawable/path" android:drawablePadding="1.0dip" android:layout_toLeftOf="@id/qry_button" android:layout_alignTop="@id/qry_button" />
+    <ListView android:id="@android:id/list" android:longClickable="true" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/path_edit" />
+</RelativeLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/iv_fujian" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0sp" android:layout_marginTop="2.0sp" android:layout_marginRight="5.0sp" android:layout_marginBottom="2.0sp" android:src="@drawable/fujian" />
+    <TextView android:textColor="#ff888888" android:layout_gravity="center_vertical" android:id="@id/tv_fujian_name" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0sp" android:text="附件名" android:singleLine="true" />
+</LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="actionbar_sortby">
+        <item>A-Z</item>
+        <item>Newest - Oldest</item>
+    </string-array>
+    <string-array name="arrcontent_system_notice">
+        <item>Remove list</item>
+        <item>Empty the message record</item>
+    </string-array>
+    <string-array name="arrcontent_muc_self_muc_parent_meeting">
+        <item>End parents</item>
+        <item>Empty the message record</item>
+    </string-array>
+    <string-array name="arrcontent_muc_other_muc_parent_meeting">
+        <item>Empty the message record</item>
+    </string-array>
+    <string-array name="arrcontent_muc_self_muc_notice">
+        <item>Close this notice</item>
+    </string-array>
+    <string-array name="arrcontent_muc_other_muc_notice">
+        <item>Empty the notification record</item>
+    </string-array>
+    <string-array name="arrcontent_muc_self">
+        <item>End session</item>
+        <item>Empty the message record</item>
+    </string-array>
+    <string-array name="arrcontent_muc_other">
+        <item>Empty the message record</item>
+    </string-array>
+    <string-array name="arrcontent_muc_Not_Exit">
+        <item>Remove list</item>
+    </string-array>
+    <string-array name="arrcontent_chat">
+        <item>Empty the message record</item>
+    </string-array>
+</resources>

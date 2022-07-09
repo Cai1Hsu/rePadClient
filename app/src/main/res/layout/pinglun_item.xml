@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="20.0sp" android:textColor="#ff0eaea5" android:id="@id/tv_pinglun_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20.0dip" android:layout_marginRight="20.0dip" android:text="name" />
+    <LinearLayout android:orientation="vertical" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_marginBottom="5.0dip" android:layout_weight="1.0">
+        <TextView android:textSize="20.0sp" android:textColor="#ffcccccc" android:id="@id/tv_pinglun_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="time" />
+        <TextView android:textSize="20.0sp" android:textColor="@android:color/black" android:id="@id/tv_pinglun_context" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="context" />
+    </LinearLayout>
+    <TextView android:textSize="20.0sp" android:textColor="@android:color/black" android:id="@id/tv_pinglun_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="20.0dip" android:text="count" />
+</LinearLayout>

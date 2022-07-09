@@ -1,0 +1,54 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: PadClientPassword.apk
+compressionType: false
+doNotCompress:
+- resources.arsc
+- png
+- jpg
+- gif
+- res/drawable/mm_title_back_pressed.9.PNG
+- res/drawable/mm_title_back_focused.9.PNG
+- res/drawable/mmtitle_bg_alpha.9.PNG
+- res/drawable/mm_title_back_normal.9.PNG
+isFrameworkApk: false
+packageInfo:
+  forcedPackageId: '127'
+  renameManifestPackage: null
+sdkInfo:
+  minSdkVersion: '14'
+sharedLibrary: false
+sparseResources: false
+unknownFiles:
+  git-hash: '8'
+  XPP3_1.1.4c_MIN_VERSION: '8'
+  gnu-public-license-2.txt: '8'
+  apache-license-2.0.txt: '8'
+  images/question_and_answer.png: '8'
+  images/trafficlight_green.png: '8'
+  images/warning.png: '8'
+  images/photo_portrait.png: '8'
+  images/nav_right_red.png: '8'
+  images/message.png: '8'
+  images/nav_left_blue.png: '8'
+  images/trafficlight_red.png: '8'
+  images/unknown.png: '8'
+  images/ant_logo_large.gif: '8'
+  images/trafficlight_off.png: '8'
+  org/apache/tools/ant/defaultManifest.mf: '8'
+  org/apache/tools/ant/version.txt: '8'
+  org/apache/tools/ant/antlib.xml: '8'
+  org/apache/tools/ant/types/defaults.properties: '8'
+  org/apache/tools/ant/types/resources/selectors/antlib.xml: '8'
+  org/apache/tools/ant/types/resources/comparators/antlib.xml: '8'
+  org/apache/tools/ant/types/conditions/antlib.xml: '8'
+  org/apache/tools/ant/listener/defaults.properties: '8'
+  org/apache/tools/ant/taskdefs/defaults.properties: '8'
+  org/apache/http/entity/mime/version.properties: '8'
+usesFramework:
+  ids:
+  - 1
+  tag: null
+version: '@version@'
+versionInfo:
+  versionCode: '1480'
+  versionName: 1.4.70

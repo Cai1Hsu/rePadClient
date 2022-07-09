@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:id="@id/myLl" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <Button android:textColor="@android:color/black" android:id="@id/btnFloatAnaysis" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="看解析" />
+    <Button android:textColor="@android:color/black" android:id="@id/btnFloatAskForHelp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="求讲解" />
+    <ImageView android:id="@id/imageView1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/drag" />
+</LinearLayout>
