@@ -3679,39 +3679,11 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
     }
 
     private void startActivity(Intent intent, String pkg) {
-        boolean canStart = isApkUpdating(pkg);
-        if (canStart) {
-            startActivity(intent);
-        } else {
-            showNoticeDialog(getResources().getString(R.string.dialog_noticetitle), getResources().getString(R.string.dialog_noticemessage));
-        }
+        startActivity(intent);
     }
 
     private boolean isApkUpdating(String pkg) {
-        boolean canStart = true;
-        long time = System.currentTimeMillis();
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        long pretime = sp.getLong("updateapks", 0L);
-        if (time - pretime > 480000 && pretime != 0) {
-            this.apkUpdatePkgList = null;
-        }
-        if (this.apkUpdatePkgList == null || this.apkUpdatePkgList.size() <= 0 || TextUtils.isEmpty(pkg)) {
-            return true;
-        }
-        int i = 0;
-        while (true) {
-            if (i >= this.apkUpdatePkgList.size()) {
-                break;
-            }
-            String pkgName = this.apkUpdatePkgList.get(i);
-            if (!pkg.equals(pkgName)) {
-                i++;
-            } else {
-                canStart = false;
-                break;
-            }
-        }
-        return canStart;
+        return true;
     }
 
     private void showNoticeDialog(String title, String message) {
