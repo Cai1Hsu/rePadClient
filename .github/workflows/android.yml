@@ -29,6 +29,6 @@ jobs:
       uses: actions/upload-artifact@v3.1.0
       with:
         name: app-release.apk
-        path: /home/runner/work/rePadClient/rePadClient/app/build/output/apk/release/app-release.apk
+        path: /home/runner/work/rePadClient/app/build/output/apk/release/app-release.apk
     
     
