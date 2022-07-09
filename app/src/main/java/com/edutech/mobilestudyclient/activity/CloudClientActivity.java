@@ -1383,7 +1383,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
             this.ll_sms.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.CloudClientActivity.16
                 @Override // android.view.View.OnClickListener
                 public void onClick(View arg0) {
-                    PackageManager pm = CloudClientActivity.this.getPackageManager();
+		    PackageManager pm = CloudClientActivity.this.getPackageManager();
                     Intent intent = pm.getLaunchIntentForPackage("com.hjwordgames");
                     intent.addFlags(335544320);
                     if (intent != null) {
@@ -3602,18 +3602,9 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                 break;
             case R.id.eleven_img /* 2131362167 */:
             case R.id.ll_eleven /* 2131362182 */:
-                if (AppEnvironment.isDEMO) {
-                    PackageManager pm7 = getPackageManager();
-                    Intent intent8 = pm7.getLaunchIntentForPackage("com.record.ing");
-                    intent8.addFlags(335544320);
-                    if (intent8 != null) {
-                        startActivity(intent8, "com.record.ing");
-                        break;
-                    }
-                } else {
-                    Toast.makeText(this, (int) R.string.app_name_building, 0).show();
-                    break;
-                }
+                Intent intent8 = new Intent( CloudClientActivity.this, PasswdDialogActivity.class);
+                intent8.addFlags(335544320);
+                startActivity(intent8);
                 break;
             case R.id.twelve_img /* 2131362169 */:
             case R.id.ll_twelve /* 2131362179 */:
