@@ -2,28 +2,25 @@ package com.anfengde.epub.core.value;
 
 import com.anfengde.epub.EPubChapter;
 import java.util.ArrayList;
-
-/* loaded from: classes.jar:com/anfengde/epub/core/value/TableOfContent.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class TableOfContent {
     private ArrayList<EPubChapter> chapterList = new ArrayList<>();
 
-    public void addChapter(EPubChapter ePubChapter) {
-        this.chapterList.add(ePubChapter);
+    public EPubChapter getChapter(int num) {
+        int chapNum;
+        if (num < 0) {
+            chapNum = 0;
+        } else {
+            chapNum = num;
+        }
+        if (chapNum >= this.chapterList.size()) {
+            chapNum = this.chapterList.size() - 1;
+        }
+        return this.chapterList.get(chapNum);
     }
 
-    public void clearChapter() {
-        this.chapterList.clear();
-    }
-
-    public EPubChapter getChapter(int i) {
-        if (i < 0) {
-            i = 0;
-        }
-        int i2 = i;
-        if (i >= this.chapterList.size()) {
-            i2 = this.chapterList.size() - 1;
-        }
-        return this.chapterList.get(i2);
+    public void addChapter(EPubChapter chapter) {
+        this.chapterList.add(chapter);
     }
 
     public ArrayList<EPubChapter> getChapterList() {
@@ -32,5 +29,9 @@ public class TableOfContent {
 
     public int getTotalSize() {
         return this.chapterList.size();
+    }
+
+    public void clearChapter() {
+        this.chapterList.clear();
     }
 }

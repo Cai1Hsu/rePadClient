@@ -12,83 +12,63 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
-
-/* loaded from: classes.jar:com/pgyersdk/c/g.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class g {
     static final HostnameVerifier a = new h();
 
-    /* JADX DEBUG: Another duplicated slice has different insns count: {[MOVE]}, finally: {[MOVE, INVOKE, INVOKE, MOVE_EXCEPTION, MOVE, INVOKE, INVOKE, INVOKE, MOVE_EXCEPTION, IF] complete} */
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r0v8, types: [java.io.InputStream] */
     public static String a(String str, List list) {
-        InputStream inputStream;
-        String str2;
-        String readLine;
-        InputStream inputStream2 = null;
+        InputStream inputStream = null;
+        String str2 = "";
         HttpPost httpPost = new HttpPost(str);
-        try {
-            if (list != null) {
-                inputStream = null;
-                str = null;
+        if (list != null) {
+            try {
                 try {
                     httpPost.setEntity(new UrlEncodedFormEntity(list, "UTF-8"));
                 } catch (Exception e) {
-                    InputStream inputStream3 = inputStream;
-                    InputStream inputStream4 = inputStream;
-                    InputStream inputStream5 = inputStream;
                     System.out.println("log_tag:Error in http connection " + e.toString());
-                    str2 = "";
                     if (inputStream != null) {
                         try {
                             inputStream.close();
-                            str2 = "";
                         } catch (IOException e2) {
                             e2.printStackTrace();
-                            str2 = "";
                         }
                     }
                 }
-            }
-            BasicHttpParams basicHttpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(basicHttpParams, 10000);
-            HttpConnectionParams.setSoTimeout(basicHttpParams, 10000);
-            HttpResponse execute = new DefaultHttpClient(basicHttpParams).execute(httpPost);
-            String str3 = "";
-            if (execute.getStatusLine().getStatusCode() == 200) {
-                InputStream content = execute.getEntity().getContent();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(content, "UTF-8"), 8);
-                StringBuilder sb = new StringBuilder();
-                while (true) {
-                    if (bufferedReader.readLine() == null) {
-                        break;
+            } catch (Throwable th) {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e3) {
+                        e3.printStackTrace();
                     }
-                    sb.append(String.valueOf(readLine) + "\n");
                 }
-                inputStream = content;
-                str = content;
-                inputStream2 = content;
-                str3 = sb.toString();
+                throw th;
             }
-            str2 = str3;
-            if (inputStream2 != null) {
-                try {
-                    inputStream2.close();
-                    str2 = str3;
-                } catch (IOException e3) {
-                    e3.printStackTrace();
-                    str2 = str3;
-                }
-            }
-            return str2;
-        } catch (Throwable th) {
-            if (str != null) {
-                try {
-                    str.close();
-                } catch (IOException e4) {
-                    e4.printStackTrace();
-                }
-            }
-            throw th;
         }
+        BasicHttpParams basicHttpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(basicHttpParams, 10000);
+        HttpConnectionParams.setSoTimeout(basicHttpParams, 10000);
+        HttpResponse execute = new DefaultHttpClient(basicHttpParams).execute(httpPost);
+        if (execute.getStatusLine().getStatusCode() == 200) {
+            inputStream = execute.getEntity().getContent();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
+            StringBuilder sb = new StringBuilder();
+            while (true) {
+                String readLine = bufferedReader.readLine();
+                if (readLine == null) {
+                    break;
+                }
+                sb.append(String.valueOf(readLine) + "\n");
+            }
+            str2 = sb.toString();
+        }
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e4) {
+                e4.printStackTrace();
+            }
+        }
+        return str2;
     }
 }

@@ -1,71 +1,70 @@
 package com.google.zxing.common;
 
 import com.google.zxing.NotFoundException;
-
-/* loaded from: classes.jar:com/google/zxing/common/GridSampler.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public abstract class GridSampler {
     private static GridSampler gridSampler = new DefaultGridSampler();
 
-    protected static void checkAndNudgePoints(BitMatrix bitMatrix, float[] fArr) throws NotFoundException {
-        int width = bitMatrix.getWidth();
-        int height = bitMatrix.getHeight();
-        boolean z = true;
-        for (int i = 0; i < fArr.length && z; i += 2) {
-            int i2 = (int) fArr[i];
-            int i3 = (int) fArr[i + 1];
-            if (i2 < -1 || i2 > width || i3 < -1 || i3 > height) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            z = false;
-            if (i2 == -1) {
-                fArr[i] = 0.0f;
-                z = true;
-            } else if (i2 == width) {
-                fArr[i] = width - 1;
-                z = true;
-            }
-            if (i3 == -1) {
-                fArr[i + 1] = 0.0f;
-                z = true;
-            } else if (i3 == height) {
-                fArr[i + 1] = height - 1;
-                z = true;
-            }
-        }
-        boolean z2 = true;
-        for (int length = fArr.length - 2; length >= 0 && z2; length -= 2) {
-            int i4 = (int) fArr[length];
-            int i5 = (int) fArr[length + 1];
-            if (i4 < -1 || i4 > width || i5 < -1 || i5 > height) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            z2 = false;
-            if (i4 == -1) {
-                fArr[length] = 0.0f;
-                z2 = true;
-            } else if (i4 == width) {
-                fArr[length] = width - 1;
-                z2 = true;
-            }
-            if (i5 == -1) {
-                fArr[length + 1] = 0.0f;
-                z2 = true;
-            } else if (i5 == height) {
-                fArr[length + 1] = height - 1;
-                z2 = true;
-            }
-        }
+    public abstract BitMatrix sampleGrid(BitMatrix bitMatrix, int i, int i2, float f, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9, float f10, float f11, float f12, float f13, float f14, float f15, float f16) throws NotFoundException;
+
+    public abstract BitMatrix sampleGrid(BitMatrix bitMatrix, int i, int i2, PerspectiveTransform perspectiveTransform) throws NotFoundException;
+
+    public static void setGridSampler(GridSampler newGridSampler) {
+        gridSampler = newGridSampler;
     }
 
     public static GridSampler getInstance() {
         return gridSampler;
     }
 
-    public static void setGridSampler(GridSampler gridSampler2) {
-        gridSampler = gridSampler2;
+    public static void checkAndNudgePoints(BitMatrix image, float[] points) throws NotFoundException {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        boolean nudged = true;
+        for (int offset = 0; offset < points.length && nudged; offset += 2) {
+            int x = (int) points[offset];
+            int y = (int) points[offset + 1];
+            if (x < -1 || x > width || y < -1 || y > height) {
+                throw NotFoundException.getNotFoundInstance();
+            }
+            nudged = false;
+            if (x == -1) {
+                points[offset] = 0.0f;
+                nudged = true;
+            } else if (x == width) {
+                points[offset] = width - 1;
+                nudged = true;
+            }
+            if (y == -1) {
+                points[offset + 1] = 0.0f;
+                nudged = true;
+            } else if (y == height) {
+                points[offset + 1] = height - 1;
+                nudged = true;
+            }
+        }
+        boolean nudged2 = true;
+        for (int offset2 = points.length - 2; offset2 >= 0 && nudged2; offset2 -= 2) {
+            int x2 = (int) points[offset2];
+            int y2 = (int) points[offset2 + 1];
+            if (x2 < -1 || x2 > width || y2 < -1 || y2 > height) {
+                throw NotFoundException.getNotFoundInstance();
+            }
+            nudged2 = false;
+            if (x2 == -1) {
+                points[offset2] = 0.0f;
+                nudged2 = true;
+            } else if (x2 == width) {
+                points[offset2] = width - 1;
+                nudged2 = true;
+            }
+            if (y2 == -1) {
+                points[offset2 + 1] = 0.0f;
+                nudged2 = true;
+            } else if (y2 == height) {
+                points[offset2 + 1] = height - 1;
+                nudged2 = true;
+            }
+        }
     }
-
-    public abstract BitMatrix sampleGrid(BitMatrix bitMatrix, int i, int i2, float f, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9, float f10, float f11, float f12, float f13, float f14, float f15, float f16) throws NotFoundException;
-
-    public abstract BitMatrix sampleGrid(BitMatrix bitMatrix, int i, int i2, PerspectiveTransform perspectiveTransform) throws NotFoundException;
 }

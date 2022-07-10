@@ -23,8 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.cookie.ClientCookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-
-/* loaded from: classes.jar:com/pgyersdk/crash/PgyCrashManager.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class PgyCrashManager {
     private static String a = null;
     private static String b = null;
@@ -32,49 +31,50 @@ public class PgyCrashManager {
     private static Context d;
 
     private static int a(WeakReference weakReference) {
-        int i;
         String[] b2 = b();
-        if (b2 != null && b2.length > 0) {
-            List list = null;
-            if (weakReference != null) {
-                try {
-                    Context context = (Context) weakReference.get();
-                    list = null;
-                    if (context != null) {
-                        list = Arrays.asList(context.getSharedPreferences("PgyerSDK", 0).getString("ConfirmedFilenames", "").split("\\|"));
-                    }
-                } catch (Exception e) {
-                    list = null;
-                }
-            }
-            if (list != null) {
-                for (String str : b2) {
-                    if (list.contains(str)) {
-                    }
-                }
-                i = 2;
-            }
-            i = 1;
-            break;
+        List list = null;
+        if (b2 == null || b2.length <= 0) {
+            return 0;
         }
-        i = 0;
-        return i;
+        if (weakReference != null) {
+            try {
+                Context context = (Context) weakReference.get();
+                if (context != null) {
+                    list = Arrays.asList(context.getSharedPreferences("PgyerSDK", 0).getString("ConfirmedFilenames", "").split("\\|"));
+                }
+            } catch (Exception e) {
+            }
+        }
+        if (list != null) {
+            for (String str : b2) {
+                if (list.contains(str)) {
+                }
+            }
+            return 2;
+        }
+        return 1;
     }
 
-    static /* synthetic */ void a(WeakReference weakReference, g gVar) {
-        Boolean bool;
+    public static /* synthetic */ void a() {
+        c = false;
+    }
+
+    public static /* synthetic */ void a(WeakReference weakReference, g gVar) {
+        int i = 0;
         String[] b2 = b();
         if (b2 == null || b2.length <= 0) {
             return;
         }
         Log.d("PgyerSDK", "Found " + b2.length + " stacktrace(s).");
-        Boolean bool2 = false;
-        int i = 0;
-        while (i < b2.length) {
+        Boolean bool = false;
+        while (true) {
+            int i2 = i;
+            if (i2 >= b2.length) {
+                return;
+            }
             try {
                 try {
-                    String b3 = b(weakReference, b2[i]);
-                    bool = bool2;
+                    String b3 = b(weakReference, b2[i2]);
                     if (b3.length() > 0) {
                         Log.d("PgyerSDK", "Transmitting crash data: \n" + b3);
                         DefaultHttpClient defaultHttpClient = (DefaultHttpClient) com.pgyersdk.c.b.a().b();
@@ -101,34 +101,38 @@ public class PgyCrashManager {
                         defaultHttpClient.execute(httpPost);
                         bool = true;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (bool2.booleanValue()) {
+                    if (bool.booleanValue()) {
                         Log.d("PgyerSDK", "Transmission succeeded");
-                        a(weakReference, b2[i]);
-                        bool = bool2;
+                        a(weakReference, b2[i2]);
                         if (gVar != null) {
-                            bool = bool2;
                         }
                     } else {
                         Log.d("PgyerSDK", "Transmission failed, will retry on next register() call");
-                        bool = bool2;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (bool.booleanValue()) {
+                        Log.d("PgyerSDK", "Transmission succeeded");
+                        a(weakReference, b2[i2]);
                         if (gVar != null) {
-                            bool = bool2;
+                        }
+                    } else {
+                        Log.d("PgyerSDK", "Transmission failed, will retry on next register() call");
+                        if (gVar != null) {
                         }
                     }
                 }
-                i++;
-                bool2 = bool;
-            } finally {
-                if (bool2.booleanValue()) {
+                i = i2 + 1;
+            } catch (Throwable th) {
+                if (bool.booleanValue()) {
                     Log.d("PgyerSDK", "Transmission succeeded");
-                    a(weakReference, b2[i]);
+                    a(weakReference, b2[i2]);
                     if (gVar != null) {
                     }
                 } else {
                     Log.d("PgyerSDK", "Transmission failed, will retry on next register() call");
                 }
+                throw th;
             }
         }
     }
@@ -190,110 +194,100 @@ public class PgyCrashManager {
         ((a) defaultUncaughtExceptionHandler).a(a);
     }
 
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Removed duplicated region for block: B:54:0x0094 A[EXC_TOP_SPLITTER, SYNTHETIC] */
-    /* JADX WARN: Type inference failed for: r0v11, types: [java.io.BufferedReader] */
+    /* JADX WARN: Removed duplicated region for block: B:42:0x0055 A[EXC_TOP_SPLITTER, SYNTHETIC] */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
     */
     private static String b(WeakReference weakReference, String str) {
-        String str2;
         Context context;
         BufferedReader bufferedReader;
         IOException e;
+        BufferedReader bufferedReader2 = null;
         if (weakReference == null || (context = (Context) weakReference.get()) == null) {
-            str2 = null;
-        } else {
-            StringBuilder sb = new StringBuilder();
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        try {
             try {
-                try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(context.openFileInput(str)));
-                    while (true) {
-                        try {
-                            String readLine = bufferedReader.readLine();
-                            if (readLine == null) {
-                                try {
-                                    break;
-                                } catch (IOException e2) {
-                                }
-                            } else {
-                                sb.append(readLine);
-                                sb.append(System.getProperty("line.separator"));
+                bufferedReader = new BufferedReader(new InputStreamReader(context.openFileInput(str)));
+                while (true) {
+                    try {
+                        String readLine = bufferedReader.readLine();
+                        if (readLine == null) {
+                            try {
+                                break;
+                            } catch (IOException e2) {
                             }
-                        } catch (FileNotFoundException e3) {
-                            if (bufferedReader != null) {
-                                try {
-                                    bufferedReader.close();
-                                } catch (IOException e4) {
-                                }
-                            }
-                            str2 = sb.toString();
-                            return str2;
-                        } catch (IOException e5) {
-                            e = e5;
-                            e.printStackTrace();
-                            if (bufferedReader != null) {
-                                try {
-                                    bufferedReader.close();
-                                } catch (IOException e6) {
-                                }
-                            }
-                            str2 = sb.toString();
-                            return str2;
+                        } else {
+                            sb.append(readLine);
+                            sb.append(System.getProperty("line.separator"));
                         }
-                    }
-                    bufferedReader.close();
-                } catch (Throwable th) {
-                    th = th;
-                    if (str != null) {
-                        try {
-                            str.close();
-                        } catch (IOException e7) {
+                    } catch (FileNotFoundException e3) {
+                        bufferedReader2 = bufferedReader;
+                        if (bufferedReader2 != null) {
+                            try {
+                                bufferedReader2.close();
+                            } catch (IOException e4) {
+                            }
                         }
+                        return sb.toString();
+                    } catch (IOException e5) {
+                        e = e5;
+                        e.printStackTrace();
+                        if (bufferedReader != null) {
+                            try {
+                                bufferedReader.close();
+                            } catch (IOException e6) {
+                            }
+                        }
+                        return sb.toString();
                     }
-                    throw th;
                 }
-            } catch (FileNotFoundException e8) {
-                bufferedReader = null;
-            } catch (IOException e9) {
-                e = e9;
-                bufferedReader = null;
-            } catch (Throwable th2) {
-                th = th2;
-                str = null;
-                if (str != null) {
+                bufferedReader.close();
+            } catch (Throwable th) {
+                th = th;
+                if (0 != 0) {
+                    try {
+                        bufferedReader2.close();
+                    } catch (IOException e7) {
+                    }
                 }
                 throw th;
             }
-            str2 = sb.toString();
+        } catch (FileNotFoundException e8) {
+        } catch (IOException e9) {
+            e = e9;
+            bufferedReader = null;
+        } catch (Throwable th2) {
+            th = th2;
+            if (0 != 0) {
+            }
+            throw th;
         }
-        return str2;
+        return sb.toString();
     }
 
     private static String[] b() {
-        String[] strArr;
-        if (com.pgyersdk.a.a.a != null) {
-            Log.d("PgyerSDK", "Looking for exceptions in: " + com.pgyersdk.a.a.a);
-            File file = new File(String.valueOf(com.pgyersdk.a.a.a) + "/");
-            strArr = (file.mkdir() || file.exists()) ? file.list(new d()) : new String[0];
-        } else {
+        if (com.pgyersdk.a.a.a == null) {
             Log.d("PgyerSDK", "Can't search for exception as file path is null.");
-            strArr = null;
+            return null;
         }
-        return strArr;
+        Log.d("PgyerSDK", "Looking for exceptions in: " + com.pgyersdk.a.a.a);
+        File file = new File(String.valueOf(com.pgyersdk.a.a.a) + "/");
+        return (file.mkdir() || file.exists()) ? file.list(new d()) : new String[0];
     }
 
-    public static void register(Context context, String str) {
+    public static void register(Context context, String appId) {
         try {
             d = context;
-            com.pgyersdk.a.a.k = str;
+            com.pgyersdk.a.a.k = appId;
             if (m.a(k.a(context, "install"))) {
                 com.pgyersdk.c.a.a(new e());
             }
             com.pgyersdk.c.a.a(new f());
             if (context != null) {
                 b = "http://www.pgyer.com/";
-                a = n.a(str);
+                a = n.a(appId);
                 com.pgyersdk.a.a.a(context);
                 if (a == null) {
                     a = com.pgyersdk.a.a.c;
@@ -303,6 +297,7 @@ public class PgyCrashManager {
             WeakReference weakReference = new WeakReference(context);
             int a2 = a(weakReference);
             if (a2 == 1) {
+                Boolean.valueOf(false);
                 a(weakReference, bool.booleanValue());
             } else if (a2 == 2) {
                 a(weakReference, bool.booleanValue());

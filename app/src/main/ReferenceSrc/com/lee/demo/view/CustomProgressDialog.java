@@ -6,13 +6,12 @@ import android.graphics.drawable.AnimationDrawable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.launcher.activity.R;
-
-/* loaded from: classes.jar:com/lee/demo/view/CustomProgressDialog.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class CustomProgressDialog extends Dialog {
     private static CustomProgressDialog customProgressDialog = null;
 
-    public CustomProgressDialog(Context context, int i) {
-        super(context, i);
+    public CustomProgressDialog(Context context, int theme) {
+        super(context, theme);
     }
 
     public static CustomProgressDialog createDialog(Context context) {
@@ -24,22 +23,23 @@ public class CustomProgressDialog extends Dialog {
     }
 
     @Override // android.app.Dialog, android.view.Window.Callback
-    public void onWindowFocusChanged(boolean z) {
-        if (customProgressDialog == null) {
-            return;
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (customProgressDialog != null) {
+            ImageView imageView = (ImageView) customProgressDialog.findViewById(R.id.loadingImageView);
+            AnimationDrawable animationDrawable = (AnimationDrawable) imageView.getBackground();
+            animationDrawable.start();
         }
-        ((AnimationDrawable) ((ImageView) customProgressDialog.findViewById(R.id.loadingImageView)).getBackground()).start();
     }
 
-    public CustomProgressDialog setMessage(String str) {
-        TextView textView = (TextView) customProgressDialog.findViewById(R.id.id_tv_loadingmsg);
-        if (textView != null) {
-            textView.setText(str);
-        }
+    public CustomProgressDialog setTitile(String strTitle) {
         return customProgressDialog;
     }
 
-    public CustomProgressDialog setTitile(String str) {
+    public CustomProgressDialog setMessage(String strMessage) {
+        TextView tvMsg = (TextView) customProgressDialog.findViewById(R.id.id_tv_loadingmsg);
+        if (tvMsg != null) {
+            tvMsg.setText(strMessage);
+        }
         return customProgressDialog;
     }
 }

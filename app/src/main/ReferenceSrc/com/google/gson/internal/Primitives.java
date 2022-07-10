@@ -4,34 +4,33 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/gson/internal/Primitives.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class Primitives {
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPE;
     private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE_TYPE;
 
-    static {
-        HashMap hashMap = new HashMap(16);
-        HashMap hashMap2 = new HashMap(16);
-        add(hashMap, hashMap2, Boolean.TYPE, Boolean.class);
-        add(hashMap, hashMap2, Byte.TYPE, Byte.class);
-        add(hashMap, hashMap2, Character.TYPE, Character.class);
-        add(hashMap, hashMap2, Double.TYPE, Double.class);
-        add(hashMap, hashMap2, Float.TYPE, Float.class);
-        add(hashMap, hashMap2, Integer.TYPE, Integer.class);
-        add(hashMap, hashMap2, Long.TYPE, Long.class);
-        add(hashMap, hashMap2, Short.TYPE, Short.class);
-        add(hashMap, hashMap2, Void.TYPE, Void.class);
-        PRIMITIVE_TO_WRAPPER_TYPE = Collections.unmodifiableMap(hashMap);
-        WRAPPER_TO_PRIMITIVE_TYPE = Collections.unmodifiableMap(hashMap2);
-    }
-
     private Primitives() {
     }
 
-    private static void add(Map<Class<?>, Class<?>> map, Map<Class<?>, Class<?>> map2, Class<?> cls, Class<?> cls2) {
-        map.put(cls, cls2);
-        map2.put(cls2, cls);
+    static {
+        Map<Class<?>, Class<?>> primToWrap = new HashMap<>(16);
+        Map<Class<?>, Class<?>> wrapToPrim = new HashMap<>(16);
+        add(primToWrap, wrapToPrim, Boolean.TYPE, Boolean.class);
+        add(primToWrap, wrapToPrim, Byte.TYPE, Byte.class);
+        add(primToWrap, wrapToPrim, Character.TYPE, Character.class);
+        add(primToWrap, wrapToPrim, Double.TYPE, Double.class);
+        add(primToWrap, wrapToPrim, Float.TYPE, Float.class);
+        add(primToWrap, wrapToPrim, Integer.TYPE, Integer.class);
+        add(primToWrap, wrapToPrim, Long.TYPE, Long.class);
+        add(primToWrap, wrapToPrim, Short.TYPE, Short.class);
+        add(primToWrap, wrapToPrim, Void.TYPE, Void.class);
+        PRIMITIVE_TO_WRAPPER_TYPE = Collections.unmodifiableMap(primToWrap);
+        WRAPPER_TO_PRIMITIVE_TYPE = Collections.unmodifiableMap(wrapToPrim);
+    }
+
+    private static void add(Map<Class<?>, Class<?>> forward, Map<Class<?>, Class<?>> backward, Class<?> key, Class<?> value) {
+        forward.put(key, value);
+        backward.put(value, key);
     }
 
     public static boolean isPrimitive(Type type) {
@@ -42,19 +41,13 @@ public final class Primitives {
         return WRAPPER_TO_PRIMITIVE_TYPE.containsKey(C$Gson$Preconditions.checkNotNull(type));
     }
 
-    public static <T> Class<T> unwrap(Class<T> cls) {
-        Class<?> cls2 = WRAPPER_TO_PRIMITIVE_TYPE.get(C$Gson$Preconditions.checkNotNull(cls));
-        if (cls2 != null) {
-            cls = cls2;
-        }
-        return cls;
+    public static <T> Class<T> wrap(Class<T> type) {
+        Class<T> wrapped = (Class<T>) PRIMITIVE_TO_WRAPPER_TYPE.get(C$Gson$Preconditions.checkNotNull(type));
+        return wrapped == null ? type : wrapped;
     }
 
-    public static <T> Class<T> wrap(Class<T> cls) {
-        Class<?> cls2 = PRIMITIVE_TO_WRAPPER_TYPE.get(C$Gson$Preconditions.checkNotNull(cls));
-        if (cls2 != null) {
-            cls = cls2;
-        }
-        return cls;
+    public static <T> Class<T> unwrap(Class<T> type) {
+        Class<T> unwrapped = (Class<T>) WRAPPER_TO_PRIMITIVE_TYPE.get(C$Gson$Preconditions.checkNotNull(type));
+        return unwrapped == null ? type : unwrapped;
     }
 }

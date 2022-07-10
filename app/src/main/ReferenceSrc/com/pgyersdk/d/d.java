@@ -1,26 +1,20 @@
 package com.pgyersdk.d;
 
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-
-/* loaded from: classes.jar:com/pgyersdk/d/d.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class d implements CompoundButton.OnCheckedChangeListener {
     final /* synthetic */ a a;
 
-    d(a aVar) {
+    public d(a aVar) {
         this.a = aVar;
     }
 
     @Override // android.widget.CompoundButton.OnCheckedChangeListener
-    public final void onCheckedChanged(CompoundButton compoundButton, boolean z) {
-        ImageView imageView;
-        ImageView imageView2;
-        if (z) {
-            imageView2 = this.a.f;
-            imageView2.setVisibility(0);
-            return;
+    public final void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+        if (isChecked) {
+            a.a(this.a).setVisibility(0);
+        } else {
+            a.a(this.a).setVisibility(8);
         }
-        imageView = this.a.f;
-        imageView.setVisibility(8);
     }
 }

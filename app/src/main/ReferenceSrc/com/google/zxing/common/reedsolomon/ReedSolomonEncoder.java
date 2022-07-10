@@ -2,48 +2,50 @@ package com.google.zxing.common.reedsolomon;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/* loaded from: classes.jar:com/google/zxing/common/reedsolomon/ReedSolomonEncoder.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class ReedSolomonEncoder {
     private final List<GenericGFPoly> cachedGenerators;
     private final GenericGF field;
 
-    public ReedSolomonEncoder(GenericGF genericGF) {
-        if (!GenericGF.QR_CODE_FIELD_256.equals(genericGF)) {
+    public ReedSolomonEncoder(GenericGF field) {
+        if (!GenericGF.QR_CODE_FIELD_256.equals(field)) {
             throw new IllegalArgumentException("Only QR Code is supported at this time");
         }
-        this.field = genericGF;
+        this.field = field;
         this.cachedGenerators = new ArrayList();
-        this.cachedGenerators.add(new GenericGFPoly(genericGF, new int[]{1}));
+        this.cachedGenerators.add(new GenericGFPoly(field, new int[]{1}));
     }
 
-    private GenericGFPoly buildGenerator(int i) {
-        if (i >= this.cachedGenerators.size()) {
-            GenericGFPoly genericGFPoly = this.cachedGenerators.get(this.cachedGenerators.size() - 1);
-            for (int size = this.cachedGenerators.size(); size <= i; size++) {
-                genericGFPoly = genericGFPoly.multiply(new GenericGFPoly(this.field, new int[]{1, this.field.exp(size - 1)}));
-                this.cachedGenerators.add(genericGFPoly);
+    private GenericGFPoly buildGenerator(int degree) {
+        if (degree >= this.cachedGenerators.size()) {
+            GenericGFPoly lastGenerator = this.cachedGenerators.get(this.cachedGenerators.size() - 1);
+            for (int d = this.cachedGenerators.size(); d <= degree; d++) {
+                GenericGFPoly nextGenerator = lastGenerator.multiply(new GenericGFPoly(this.field, new int[]{1, this.field.exp(d - 1)}));
+                this.cachedGenerators.add(nextGenerator);
+                lastGenerator = nextGenerator;
             }
         }
-        return this.cachedGenerators.get(i);
+        return this.cachedGenerators.get(degree);
     }
 
-    public void encode(int[] iArr, int i) {
-        if (i == 0) {
+    public void encode(int[] toEncode, int ecBytes) {
+        if (ecBytes == 0) {
             throw new IllegalArgumentException("No error correction bytes");
         }
-        int length = iArr.length - i;
-        if (length <= 0) {
+        int dataBytes = toEncode.length - ecBytes;
+        if (dataBytes <= 0) {
             throw new IllegalArgumentException("No data bytes provided");
         }
-        GenericGFPoly buildGenerator = buildGenerator(i);
-        int[] iArr2 = new int[length];
-        System.arraycopy(iArr, 0, iArr2, 0, length);
-        int[] coefficients = new GenericGFPoly(this.field, iArr2).multiplyByMonomial(i, 1).divide(buildGenerator)[1].getCoefficients();
-        int length2 = i - coefficients.length;
-        for (int i2 = 0; i2 < length2; i2++) {
-            iArr[length + i2] = 0;
+        GenericGFPoly generator = buildGenerator(ecBytes);
+        int[] infoCoefficients = new int[dataBytes];
+        System.arraycopy(toEncode, 0, infoCoefficients, 0, dataBytes);
+        GenericGFPoly info = new GenericGFPoly(this.field, infoCoefficients);
+        GenericGFPoly remainder = info.multiplyByMonomial(ecBytes, 1).divide(generator)[1];
+        int[] coefficients = remainder.getCoefficients();
+        int numZeroCoefficients = ecBytes - coefficients.length;
+        for (int i = 0; i < numZeroCoefficients; i++) {
+            toEncode[dataBytes + i] = 0;
         }
-        System.arraycopy(coefficients, 0, iArr, length + length2, coefficients.length);
+        System.arraycopy(coefficients, 0, toEncode, dataBytes + numZeroCoefficients, coefficients.length);
     }
 }

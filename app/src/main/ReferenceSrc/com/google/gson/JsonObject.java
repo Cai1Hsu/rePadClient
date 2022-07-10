@@ -3,81 +3,79 @@ package com.google.gson;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.Map;
 import java.util.Set;
-
-/* loaded from: classes.jar:com/google/gson/JsonObject.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class JsonObject extends JsonElement {
     private final LinkedTreeMap<String, JsonElement> members = new LinkedTreeMap<>();
 
-    private JsonElement createJsonElement(Object obj) {
-        return obj == null ? JsonNull.INSTANCE : new JsonPrimitive(obj);
-    }
-
-    public void add(String str, JsonElement jsonElement) {
-        JsonNull jsonNull = jsonElement;
-        if (jsonElement == null) {
-            jsonNull = JsonNull.INSTANCE;
-        }
-        this.members.put(str, jsonNull);
-    }
-
-    public void addProperty(String str, Boolean bool) {
-        add(str, createJsonElement(bool));
-    }
-
-    public void addProperty(String str, Character ch) {
-        add(str, createJsonElement(ch));
-    }
-
-    public void addProperty(String str, Number number) {
-        add(str, createJsonElement(number));
-    }
-
-    public void addProperty(String str, String str2) {
-        add(str, createJsonElement(str2));
-    }
-
     @Override // com.google.gson.JsonElement
     public JsonObject deepCopy() {
-        JsonObject jsonObject = new JsonObject();
+        JsonObject result = new JsonObject();
         for (Map.Entry<String, JsonElement> entry : this.members.entrySet()) {
-            jsonObject.add(entry.getKey(), entry.getValue().deepCopy());
+            result.add(entry.getKey(), entry.getValue().deepCopy());
         }
-        return jsonObject;
+        return result;
+    }
+
+    public void add(String property, JsonElement value) {
+        if (value == null) {
+            value = JsonNull.INSTANCE;
+        }
+        this.members.put(property, value);
+    }
+
+    public JsonElement remove(String property) {
+        return this.members.remove(property);
+    }
+
+    public void addProperty(String property, String value) {
+        add(property, createJsonElement(value));
+    }
+
+    public void addProperty(String property, Number value) {
+        add(property, createJsonElement(value));
+    }
+
+    public void addProperty(String property, Boolean value) {
+        add(property, createJsonElement(value));
+    }
+
+    public void addProperty(String property, Character value) {
+        add(property, createJsonElement(value));
+    }
+
+    private JsonElement createJsonElement(Object value) {
+        return value == null ? JsonNull.INSTANCE : new JsonPrimitive(value);
     }
 
     public Set<Map.Entry<String, JsonElement>> entrySet() {
         return this.members.entrySet();
     }
 
-    public boolean equals(Object obj) {
-        return obj == this || ((obj instanceof JsonObject) && ((JsonObject) obj).members.equals(this.members));
+    public boolean has(String memberName) {
+        return this.members.containsKey(memberName);
     }
 
-    public JsonElement get(String str) {
-        return this.members.get(str);
+    public JsonElement get(String memberName) {
+        return this.members.get(memberName);
     }
 
-    public JsonArray getAsJsonArray(String str) {
-        return (JsonArray) this.members.get(str);
+    public JsonPrimitive getAsJsonPrimitive(String memberName) {
+        return (JsonPrimitive) this.members.get(memberName);
     }
 
-    public JsonObject getAsJsonObject(String str) {
-        return (JsonObject) this.members.get(str);
+    public JsonArray getAsJsonArray(String memberName) {
+        return (JsonArray) this.members.get(memberName);
     }
 
-    public JsonPrimitive getAsJsonPrimitive(String str) {
-        return (JsonPrimitive) this.members.get(str);
+    public JsonObject getAsJsonObject(String memberName) {
+        return (JsonObject) this.members.get(memberName);
     }
 
-    public boolean has(String str) {
-        return this.members.containsKey(str);
+    public boolean equals(Object o) {
+        return o == this || ((o instanceof JsonObject) && ((JsonObject) o).members.equals(this.members));
     }
 
     public int hashCode() {
         return this.members.hashCode();
-    }
-
-    public JsonElement remove(String str) {
-        return this.members.remove(str);
     }
 }

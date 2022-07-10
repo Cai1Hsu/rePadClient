@@ -1,12 +1,11 @@
 package com.pgyersdk.feedback;
 
 import android.content.DialogInterface;
-
-/* loaded from: classes.jar:com/pgyersdk/feedback/g.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class g implements DialogInterface.OnDismissListener {
     final /* synthetic */ c a;
 
-    g(c cVar) {
+    public g(c cVar) {
         this.a = cVar;
     }
 

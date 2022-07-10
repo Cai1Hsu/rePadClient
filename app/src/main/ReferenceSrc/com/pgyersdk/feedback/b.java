@@ -1,6 +1,5 @@
 package com.pgyersdk.feedback;
-
-/* loaded from: classes.jar:com/pgyersdk/feedback/b.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface b {
     void a(String str);
 }

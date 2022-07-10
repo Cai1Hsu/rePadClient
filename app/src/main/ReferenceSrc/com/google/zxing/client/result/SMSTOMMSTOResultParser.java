@@ -1,26 +1,21 @@
 package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/SMSTOMMSTOResultParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class SMSTOMMSTOResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public SMSParsedResult parse(Result result) {
-        SMSParsedResult sMSParsedResult;
-        String text = result.getText();
-        if (text.startsWith("smsto:") || text.startsWith("SMSTO:") || text.startsWith("mmsto:") || text.startsWith("MMSTO:")) {
-            String substring = text.substring(6);
-            String str = null;
-            int indexOf = substring.indexOf(58);
-            String str2 = substring;
-            if (indexOf >= 0) {
-                str = substring.substring(indexOf + 1);
-                str2 = substring.substring(0, indexOf);
+        String rawText = result.getText();
+        if (rawText.startsWith("smsto:") || rawText.startsWith("SMSTO:") || rawText.startsWith("mmsto:") || rawText.startsWith("MMSTO:")) {
+            String number = rawText.substring(6);
+            String body = null;
+            int bodyStart = number.indexOf(58);
+            if (bodyStart >= 0) {
+                body = number.substring(bodyStart + 1);
+                number = number.substring(0, bodyStart);
             }
-            sMSParsedResult = new SMSParsedResult(str2, (String) null, (String) null, str);
-        } else {
-            sMSParsedResult = null;
+            return new SMSParsedResult(number, (String) null, (String) null, body);
         }
-        return sMSParsedResult;
+        return null;
     }
 }

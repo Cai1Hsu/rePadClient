@@ -6,15 +6,36 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
-/* loaded from: classes.jar:com/mining/app/zxing/decoding/InactivityTimer.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class InactivityTimer {
     private static final int INACTIVITY_DELAY_SECONDS = 300;
     private final Activity activity;
     private final ScheduledExecutorService inactivityTimer = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory(null));
     private ScheduledFuture<?> inactivityFuture = null;
 
-    /* loaded from: classes.jar:com/mining/app/zxing/decoding/InactivityTimer$DaemonThreadFactory.class */
+    public InactivityTimer(Activity activity) {
+        this.activity = activity;
+        onActivity();
+    }
+
+    public void onActivity() {
+        cancel();
+        this.inactivityFuture = this.inactivityTimer.schedule(new FinishListener(this.activity), 300L, TimeUnit.SECONDS);
+    }
+
+    private void cancel() {
+        if (this.inactivityFuture != null) {
+            this.inactivityFuture.cancel(true);
+            this.inactivityFuture = null;
+        }
+    }
+
+    public void shutdown() {
+        cancel();
+        this.inactivityTimer.shutdown();
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     private static final class DaemonThreadFactory implements ThreadFactory {
         private DaemonThreadFactory() {
         }
@@ -29,27 +50,5 @@ public final class InactivityTimer {
             thread.setDaemon(true);
             return thread;
         }
-    }
-
-    public InactivityTimer(Activity activity) {
-        this.activity = activity;
-        onActivity();
-    }
-
-    private void cancel() {
-        if (this.inactivityFuture != null) {
-            this.inactivityFuture.cancel(true);
-            this.inactivityFuture = null;
-        }
-    }
-
-    public void onActivity() {
-        cancel();
-        this.inactivityFuture = this.inactivityTimer.schedule(new FinishListener(this.activity), 300L, TimeUnit.SECONDS);
-    }
-
-    public void shutdown() {
-        cancel();
-        this.inactivityTimer.shutdown();
     }
 }

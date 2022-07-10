@@ -3,8 +3,8 @@ package com.google.zxing.pdf417.encoder;
 import com.google.zxing.WriterException;
 import java.math.BigInteger;
 import java.util.Arrays;
-
-/* loaded from: classes.jar:com/google/zxing/pdf417/encoder/PDF417HighLevelEncoder.class */
+import org.bson.BSON;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class PDF417HighLevelEncoder {
     private static final int BYTE_COMPACTION = 1;
     private static final int LATCH_TO_BYTE = 924;
@@ -18,37 +18,24 @@ final class PDF417HighLevelEncoder {
     private static final int SUBMODE_MIXED = 2;
     private static final int SUBMODE_PUNCTUATION = 3;
     private static final int TEXT_COMPACTION = 0;
-    private static final byte[] TEXT_MIXED_RAW = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 38, 13, 9, 44, 58, 35, 45, 46, 36, 47, 43, 37, 42, 61, 94, 0, 32, 0, 0, 0};
-    private static final byte[] TEXT_PUNCTUATION_RAW = {59, 60, 62, 64, 91, 92, 93, 95, 96, 126, 33, 13, 9, 44, 58, 10, 45, 46, 36, 47, 34, 124, 42, 40, 41, 63, 123, 125, 39, 0};
+    private static final byte[] TEXT_MIXED_RAW = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 38, BSON.CODE, 9, 44, 58, 35, 45, 46, 36, 47, 43, 37, 42, 61, 94, 0, 32, 0, 0, 0};
+    private static final byte[] TEXT_PUNCTUATION_RAW = {59, 60, 62, 64, 91, 92, 93, 95, 96, 126, 33, BSON.CODE, 9, 44, 58, 10, 45, 46, 36, 47, 34, 124, 42, 40, 41, 63, 123, 125, 39, 0};
     private static final byte[] MIXED = new byte[128];
     private static final byte[] PUNCTUATION = new byte[128];
 
     static {
         Arrays.fill(MIXED, (byte) -1);
-        byte b = 0;
-        while (true) {
-            byte b2 = b;
-            if (b2 >= TEXT_MIXED_RAW.length) {
-                break;
+        for (byte i = 0; i < TEXT_MIXED_RAW.length; i = (byte) (i + 1)) {
+            byte b = TEXT_MIXED_RAW[i];
+            if (b > 0) {
+                MIXED[b] = i;
             }
-            byte b3 = TEXT_MIXED_RAW[b2];
-            if (b3 > 0) {
-                MIXED[b3] = b2;
-            }
-            b = (byte) (b2 + 1);
         }
         Arrays.fill(PUNCTUATION, (byte) -1);
-        byte b4 = 0;
-        while (true) {
-            byte b5 = b4;
-            if (b5 < TEXT_PUNCTUATION_RAW.length) {
-                byte b6 = TEXT_PUNCTUATION_RAW[b5];
-                if (b6 > 0) {
-                    PUNCTUATION[b6] = b5;
-                }
-                b4 = (byte) (b5 + 1);
-            } else {
-                return;
+        for (byte i2 = 0; i2 < TEXT_PUNCTUATION_RAW.length; i2 = (byte) (i2 + 1)) {
+            byte b2 = TEXT_PUNCTUATION_RAW[i2];
+            if (b2 > 0) {
+                PUNCTUATION[b2] = i2;
             }
         }
     }
@@ -56,240 +43,60 @@ final class PDF417HighLevelEncoder {
     private PDF417HighLevelEncoder() {
     }
 
-    private static int determineConsecutiveBinaryCount(CharSequence charSequence, byte[] bArr, int i) throws WriterException {
-        int i2;
-        char c;
-        int i3;
-        int i4;
-        int length = charSequence.length();
-        int i5 = i;
-        while (true) {
-            if (i5 >= length) {
-                i2 = i5 - i;
-                break;
-            }
-            char charAt = charSequence.charAt(i5);
-            int i6 = 0;
-            while (true) {
-                c = charAt;
-                i3 = i6;
-                if (i6 >= 13) {
-                    break;
-                }
-                i3 = i6;
-                if (!isDigit(c)) {
-                    break;
-                }
-                i6++;
-                int i7 = i5 + i6;
-                if (i7 >= length) {
-                    i3 = i6;
-                    break;
-                }
-                charAt = charSequence.charAt(i7);
-            }
-            if (i3 >= 13) {
-                i2 = i5 - i;
-                break;
-            }
-            int i8 = 0;
-            while (true) {
-                i4 = i8;
-                if (i8 >= 5) {
-                    break;
-                }
-                i4 = i8;
-                if (!isText(c)) {
-                    break;
-                }
-                i8++;
-                int i9 = i5 + i8;
-                if (i9 >= length) {
-                    i4 = i8;
-                    break;
-                }
-                c = charSequence.charAt(i9);
-            }
-            if (i4 >= 5) {
-                i2 = i5 - i;
-                break;
-            }
-            char charAt2 = charSequence.charAt(i5);
-            if (bArr[i5] == 63 && charAt2 != '?') {
-                throw new WriterException("Non-encodable character detected: " + charAt2 + " (Unicode: " + ((int) charAt2) + ')');
-            }
-            i5++;
-        }
-        return i2;
+    private static byte[] getBytesForMessage(String msg) {
+        return msg.getBytes();
     }
 
-    private static int determineConsecutiveDigitCount(CharSequence charSequence, int i) {
-        int i2 = 0;
-        int length = charSequence.length();
-        if (i < length) {
-            char charAt = charSequence.charAt(i);
-            int i3 = i;
-            int i4 = 0;
-            char c = charAt;
-            while (true) {
-                i2 = i4;
-                if (!isDigit(c)) {
-                    break;
-                }
-                i2 = i4;
-                if (i3 >= length) {
-                    break;
-                }
-                int i5 = i4 + 1;
-                int i6 = i3 + 1;
-                i4 = i5;
-                i3 = i6;
-                if (i6 < length) {
-                    c = charSequence.charAt(i6);
-                    i4 = i5;
-                    i3 = i6;
-                }
-            }
-        }
-        return i2;
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:24:0x008e, code lost:
-        r4 = r7 - r4;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    private static int determineConsecutiveTextCount(CharSequence charSequence, int i) {
-        int i2;
-        int length = charSequence.length();
-        int i3 = i;
-        while (true) {
-            int i4 = i3;
-            if (i3 >= length) {
-                break;
-            }
-            int i5 = 0;
-            i4 = i3;
-            char charAt = charSequence.charAt(i3);
-            while (i5 < 13 && isDigit(charAt) && i4 < length) {
-                int i6 = i5 + 1;
-                int i7 = i4 + 1;
-                i4 = i7;
-                i5 = i6;
-                if (i7 < length) {
-                    charAt = charSequence.charAt(i7);
-                    i4 = i7;
-                    i5 = i6;
-                }
-            }
-            if (i5 >= 13) {
-                i2 = (i4 - i) - i5;
-                break;
-            }
-            i3 = i4;
-            if (i5 <= 0) {
-                if (!isText(charSequence.charAt(i4))) {
-                    break;
-                }
-                i3 = i4 + 1;
-            }
-        }
-        return i2;
-    }
-
-    private static void encodeBinary(byte[] bArr, int i, int i2, int i3, StringBuilder sb) {
-        if (i2 == 1 && i3 == 0) {
-            sb.append((char) 913);
-        }
-        int i4 = i;
-        int i5 = i4;
-        if (i2 >= 6) {
-            sb.append((char) 924);
-            char[] cArr = new char[5];
-            while (true) {
-                i5 = i4;
-                if ((i + i2) - i4 < 6) {
-                    break;
-                }
-                long j = 0;
-                for (int i6 = 0; i6 < 6; i6++) {
-                    j = (j << 8) + (bArr[i4 + i6] & 255);
-                }
-                for (int i7 = 0; i7 < 5; i7++) {
-                    cArr[i7] = (char) (j % 900);
-                    j /= 900;
-                }
-                for (int length = cArr.length - 1; length >= 0; length--) {
-                    sb.append(cArr[length]);
-                }
-                i4 += 6;
-            }
-        }
-        if (i5 < i + i2) {
-            sb.append((char) 901);
-        }
-        while (i5 < i + i2) {
-            sb.append((char) (bArr[i5] & 255));
-            i5++;
-        }
-    }
-
-    static String encodeHighLevel(String str, Compaction compaction) throws WriterException {
-        byte[] bArr = null;
-        StringBuilder sb = new StringBuilder(str.length());
-        int length = str.length();
-        int i = 0;
-        int i2 = 0;
-        int i3 = 0;
+    public static String encodeHighLevel(String msg, Compaction compaction) throws WriterException {
+        byte[] bytes = null;
+        StringBuilder sb = new StringBuilder(msg.length());
+        int len = msg.length();
+        int p = 0;
+        int encodingMode = 0;
+        int textSubMode = 0;
         if (compaction == Compaction.TEXT) {
-            encodeText(str, 0, length, sb, 0);
+            encodeText(msg, 0, len, sb, 0);
         } else if (compaction == Compaction.BYTE) {
-            byte[] bytesForMessage = getBytesForMessage(str);
-            encodeBinary(bytesForMessage, 0, bytesForMessage.length, 1, sb);
+            byte[] bytes2 = getBytesForMessage(msg);
+            encodeBinary(bytes2, 0, bytes2.length, 1, sb);
         } else if (compaction == Compaction.NUMERIC) {
             sb.append((char) 902);
-            encodeNumeric(str, 0, length, sb);
+            encodeNumeric(msg, 0, len, sb);
         } else {
-            while (i < length) {
-                int determineConsecutiveDigitCount = determineConsecutiveDigitCount(str, i);
-                if (determineConsecutiveDigitCount >= 13) {
+            while (p < len) {
+                int n = determineConsecutiveDigitCount(msg, p);
+                if (n >= 13) {
                     sb.append((char) 902);
-                    i2 = 2;
-                    i3 = 0;
-                    encodeNumeric(str, i, determineConsecutiveDigitCount, sb);
-                    i += determineConsecutiveDigitCount;
+                    encodingMode = 2;
+                    textSubMode = 0;
+                    encodeNumeric(msg, p, n, sb);
+                    p += n;
                 } else {
-                    int determineConsecutiveTextCount = determineConsecutiveTextCount(str, i);
-                    if (determineConsecutiveTextCount >= 5 || determineConsecutiveDigitCount == length) {
-                        int i4 = i2;
-                        if (i2 != 0) {
+                    int t = determineConsecutiveTextCount(msg, p);
+                    if (t >= 5 || n == len) {
+                        if (encodingMode != 0) {
                             sb.append((char) 900);
-                            i4 = 0;
-                            i3 = 0;
+                            encodingMode = 0;
+                            textSubMode = 0;
                         }
-                        i3 = encodeText(str, i, determineConsecutiveTextCount, sb, i3);
-                        i += determineConsecutiveTextCount;
-                        i2 = i4;
+                        textSubMode = encodeText(msg, p, t, sb, textSubMode);
+                        p += t;
                     } else {
-                        byte[] bArr2 = bArr;
-                        if (bArr == null) {
-                            bArr2 = getBytesForMessage(str);
+                        if (bytes == null) {
+                            bytes = getBytesForMessage(msg);
                         }
-                        int determineConsecutiveBinaryCount = determineConsecutiveBinaryCount(str, bArr2, i);
-                        int i5 = determineConsecutiveBinaryCount;
-                        if (determineConsecutiveBinaryCount == 0) {
-                            i5 = 1;
+                        int b = determineConsecutiveBinaryCount(msg, bytes, p);
+                        if (b == 0) {
+                            b = 1;
                         }
-                        if (i5 == 1 && i2 == 0) {
-                            encodeBinary(bArr2, i, 1, 0, sb);
+                        if (b == 1 && encodingMode == 0) {
+                            encodeBinary(bytes, p, 1, 0, sb);
                         } else {
-                            encodeBinary(bArr2, i, i5, i2, sb);
-                            i2 = 1;
-                            i3 = 0;
+                            encodeBinary(bytes, p, b, encodingMode, sb);
+                            encodingMode = 1;
+                            textSubMode = 0;
                         }
-                        i += i5;
-                        bArr = bArr2;
+                        p += b;
                     }
                 }
             }
@@ -297,156 +104,270 @@ final class PDF417HighLevelEncoder {
         return sb.toString();
     }
 
-    private static void encodeNumeric(String str, int i, int i2, StringBuilder sb) {
-        BigInteger divide;
-        int i3 = 0;
-        StringBuilder sb2 = new StringBuilder((i2 / 3) + 1);
-        BigInteger valueOf = BigInteger.valueOf(900L);
-        BigInteger valueOf2 = BigInteger.valueOf(0L);
-        while (i3 < i2 - 1) {
-            sb2.setLength(0);
-            int min = Math.min(44, i2 - i3);
-            BigInteger bigInteger = new BigInteger('1' + str.substring(i + i3, i + i3 + min));
-            do {
-                sb2.append((char) bigInteger.mod(valueOf).intValue());
-                divide = bigInteger.divide(valueOf);
-                bigInteger = divide;
-            } while (!divide.equals(valueOf2));
-            for (int length = sb2.length() - 1; length >= 0; length--) {
-                sb.append(sb2.charAt(length));
-            }
-            i3 += min;
-        }
-    }
-
-    private static int encodeText(CharSequence charSequence, int i, int i2, StringBuilder sb, int i3) {
-        char charAt;
-        StringBuilder sb2 = new StringBuilder(i2);
-        int i4 = 0;
+    private static int encodeText(CharSequence msg, int startpos, int count, StringBuilder sb, int initialSubmode) {
+        StringBuilder tmp = new StringBuilder(count);
+        int submode = initialSubmode;
+        int idx = 0;
         while (true) {
-            char charAt2 = charSequence.charAt(i + i4);
-            switch (i3) {
+            char ch = msg.charAt(startpos + idx);
+            switch (submode) {
                 case 0:
-                    if (isAlphaUpper(charAt2)) {
-                        if (charAt2 == ' ') {
-                            sb2.append((char) 26);
+                    if (isAlphaUpper(ch)) {
+                        if (ch == ' ') {
+                            tmp.append((char) 26);
                             break;
                         } else {
-                            sb2.append((char) (charAt2 - 'A'));
+                            tmp.append((char) (ch - 'A'));
                             break;
                         }
-                    } else if (isAlphaLower(charAt2)) {
-                        i3 = 1;
-                        sb2.append((char) 27);
+                    } else if (isAlphaLower(ch)) {
+                        submode = 1;
+                        tmp.append((char) 27);
                         continue;
-                    } else if (!isMixed(charAt2)) {
-                        sb2.append((char) 29);
-                        sb2.append((char) PUNCTUATION[charAt2]);
-                        break;
+                    } else if (isMixed(ch)) {
+                        submode = 2;
+                        tmp.append((char) 28);
                     } else {
-                        i3 = 2;
-                        sb2.append((char) 28);
+                        tmp.append((char) 29);
+                        tmp.append((char) PUNCTUATION[ch]);
+                        break;
                     }
                 case 1:
-                    if (isAlphaLower(charAt2)) {
-                        if (charAt2 == ' ') {
-                            sb2.append((char) 26);
+                    if (isAlphaLower(ch)) {
+                        if (ch == ' ') {
+                            tmp.append((char) 26);
                             break;
                         } else {
-                            sb2.append((char) (charAt2 - 'a'));
+                            tmp.append((char) (ch - 'a'));
                             break;
                         }
-                    } else if (isAlphaUpper(charAt2)) {
-                        sb2.append((char) 27);
-                        sb2.append((char) (charAt2 - 'A'));
+                    } else if (isAlphaUpper(ch)) {
+                        tmp.append((char) 27);
+                        tmp.append((char) (ch - 'A'));
                         break;
-                    } else if (!isMixed(charAt2)) {
-                        sb2.append((char) 29);
-                        sb2.append((char) PUNCTUATION[charAt2]);
-                        break;
-                    } else {
-                        i3 = 2;
-                        sb2.append((char) 28);
+                    } else if (isMixed(ch)) {
+                        submode = 2;
+                        tmp.append((char) 28);
                         continue;
+                    } else {
+                        tmp.append((char) 29);
+                        tmp.append((char) PUNCTUATION[ch]);
+                        break;
                     }
                 case 2:
-                    if (isMixed(charAt2)) {
-                        sb2.append((char) MIXED[charAt2]);
+                    if (isMixed(ch)) {
+                        tmp.append((char) MIXED[ch]);
                         break;
-                    } else if (isAlphaUpper(charAt2)) {
-                        i3 = 0;
-                        sb2.append((char) 28);
+                    } else if (isAlphaUpper(ch)) {
+                        submode = 0;
+                        tmp.append((char) 28);
                         continue;
-                    } else if (isAlphaLower(charAt2)) {
-                        i3 = 1;
-                        sb2.append((char) 27);
-                    } else if (i + i4 + 1 >= i2 || !isPunctuation(charSequence.charAt(i + i4 + 1))) {
-                        sb2.append((char) 29);
-                        sb2.append((char) PUNCTUATION[charAt2]);
-                        break;
+                    } else if (isAlphaLower(ch)) {
+                        submode = 1;
+                        tmp.append((char) 27);
                     } else {
-                        i3 = 3;
-                        sb2.append((char) 25);
+                        if (startpos + idx + 1 < count) {
+                            char next = msg.charAt(startpos + idx + 1);
+                            if (isPunctuation(next)) {
+                                submode = 3;
+                                tmp.append((char) 25);
+                            }
+                        }
+                        tmp.append((char) 29);
+                        tmp.append((char) PUNCTUATION[ch]);
+                        break;
                     }
-                    break;
                 default:
-                    if (isPunctuation(charAt2)) {
-                        sb2.append((char) PUNCTUATION[charAt2]);
+                    if (isPunctuation(ch)) {
+                        tmp.append((char) PUNCTUATION[ch]);
                         break;
                     } else {
-                        i3 = 0;
-                        sb2.append((char) 29);
+                        submode = 0;
+                        tmp.append((char) 29);
                         continue;
                     }
             }
-            int i5 = i4 + 1;
-            i4 = i5;
-            if (i5 >= i2) {
-                char c = 0;
-                int length = sb2.length();
-                for (int i6 = 0; i6 < length; i6++) {
-                    if (i6 % 2 != 0) {
-                        char charAt3 = (char) ((c * 30) + sb2.charAt(i6));
-                        sb.append(charAt3);
-                        charAt = charAt3;
+            idx++;
+            if (idx >= count) {
+                char h = 0;
+                int len = tmp.length();
+                for (int i = 0; i < len; i++) {
+                    boolean odd = i % 2 != 0;
+                    if (odd) {
+                        h = (char) ((h * 30) + tmp.charAt(i));
+                        sb.append(h);
                     } else {
-                        charAt = sb2.charAt(i6);
+                        h = tmp.charAt(i);
                     }
-                    c = charAt;
                 }
-                if (length % 2 != 0) {
-                    sb.append((char) ((c * 30) + 29));
+                if (len % 2 != 0) {
+                    sb.append((char) ((h * 30) + 29));
                 }
-                return i3;
+                return submode;
             }
         }
     }
 
-    private static byte[] getBytesForMessage(String str) {
-        return str.getBytes();
+    private static void encodeBinary(byte[] bytes, int startpos, int count, int startmode, StringBuilder sb) {
+        if (count == 1 && startmode == 0) {
+            sb.append((char) 913);
+        }
+        int idx = startpos;
+        if (count >= 6) {
+            sb.append((char) 924);
+            char[] chars = new char[5];
+            while ((startpos + count) - idx >= 6) {
+                long t = 0;
+                for (int i = 0; i < 6; i++) {
+                    t = (t << 8) + (bytes[idx + i] & BSON.MINKEY);
+                }
+                for (int i2 = 0; i2 < 5; i2++) {
+                    chars[i2] = (char) (t % 900);
+                    t /= 900;
+                }
+                for (int i3 = chars.length - 1; i3 >= 0; i3--) {
+                    sb.append(chars[i3]);
+                }
+                idx += 6;
+            }
+        }
+        if (idx < startpos + count) {
+            sb.append((char) 901);
+        }
+        for (int i4 = idx; i4 < startpos + count; i4++) {
+            int ch = bytes[i4] & BSON.MINKEY;
+            sb.append((char) ch);
+        }
     }
 
-    private static boolean isAlphaLower(char c) {
-        return c == ' ' || (c >= 'a' && c <= 'z');
+    private static void encodeNumeric(String msg, int startpos, int count, StringBuilder sb) {
+        int idx = 0;
+        StringBuilder tmp = new StringBuilder((count / 3) + 1);
+        BigInteger num900 = BigInteger.valueOf(900L);
+        BigInteger num0 = BigInteger.valueOf(0L);
+        while (idx < count - 1) {
+            tmp.setLength(0);
+            int len = Math.min(44, count - idx);
+            String part = '1' + msg.substring(startpos + idx, startpos + idx + len);
+            BigInteger bigint = new BigInteger(part);
+            do {
+                BigInteger c = bigint.mod(num900);
+                tmp.append((char) c.intValue());
+                bigint = bigint.divide(num900);
+            } while (!bigint.equals(num0));
+            for (int i = tmp.length() - 1; i >= 0; i--) {
+                sb.append(tmp.charAt(i));
+            }
+            idx += len;
+        }
     }
 
-    private static boolean isAlphaUpper(char c) {
-        return c == ' ' || (c >= 'A' && c <= 'Z');
+    private static boolean isDigit(char ch) {
+        return ch >= '0' && ch <= '9';
     }
 
-    private static boolean isDigit(char c) {
-        return c >= '0' && c <= '9';
+    private static boolean isAlphaUpper(char ch) {
+        return ch == ' ' || (ch >= 'A' && ch <= 'Z');
     }
 
-    private static boolean isMixed(char c) {
-        return MIXED[c] != -1;
+    private static boolean isAlphaLower(char ch) {
+        return ch == ' ' || (ch >= 'a' && ch <= 'z');
     }
 
-    private static boolean isPunctuation(char c) {
-        return PUNCTUATION[c] != -1;
+    private static boolean isMixed(char ch) {
+        return MIXED[ch] != -1;
     }
 
-    private static boolean isText(char c) {
-        return c == '\t' || c == '\n' || c == '\r' || (c >= ' ' && c <= '~');
+    private static boolean isPunctuation(char ch) {
+        return PUNCTUATION[ch] != -1;
+    }
+
+    private static boolean isText(char ch) {
+        return ch == '\t' || ch == '\n' || ch == '\r' || (ch >= ' ' && ch <= '~');
+    }
+
+    private static int determineConsecutiveDigitCount(CharSequence msg, int startpos) {
+        int count = 0;
+        int len = msg.length();
+        int idx = startpos;
+        if (idx < len) {
+            char ch = msg.charAt(idx);
+            while (isDigit(ch) && idx < len) {
+                count++;
+                idx++;
+                if (idx < len) {
+                    ch = msg.charAt(idx);
+                }
+            }
+        }
+        return count;
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:14:0x0028, code lost:
+        return (r1 - r7) - r3;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    private static int determineConsecutiveTextCount(CharSequence msg, int startpos) {
+        int len = msg.length();
+        int idx = startpos;
+        while (idx < len) {
+            char ch = msg.charAt(idx);
+            int numericCount = 0;
+            while (numericCount < 13 && isDigit(ch) && idx < len) {
+                numericCount++;
+                idx++;
+                if (idx < len) {
+                    ch = msg.charAt(idx);
+                }
+            }
+            if (numericCount <= 0) {
+                char ch2 = msg.charAt(idx);
+                if (!isText(ch2)) {
+                    break;
+                }
+                idx++;
+            }
+        }
+        return idx - startpos;
+    }
+
+    private static int determineConsecutiveBinaryCount(CharSequence msg, byte[] bytes, int startpos) throws WriterException {
+        int len = msg.length();
+        int idx = startpos;
+        while (idx < len) {
+            char ch = msg.charAt(idx);
+            int numericCount = 0;
+            while (numericCount < 13 && isDigit(ch)) {
+                numericCount++;
+                int i = idx + numericCount;
+                if (i >= len) {
+                    break;
+                }
+                ch = msg.charAt(i);
+            }
+            if (numericCount >= 13) {
+                return idx - startpos;
+            }
+            int textCount = 0;
+            while (textCount < 5 && isText(ch)) {
+                textCount++;
+                int i2 = idx + textCount;
+                if (i2 >= len) {
+                    break;
+                }
+                ch = msg.charAt(i2);
+            }
+            if (textCount >= 5) {
+                return idx - startpos;
+            }
+            char ch2 = msg.charAt(idx);
+            if (bytes[idx] == 63 && ch2 != '?') {
+                throw new WriterException("Non-encodable character detected: " + ch2 + " (Unicode: " + ((int) ch2) + ')');
+            }
+            idx++;
+        }
+        return idx - startpos;
     }
 }

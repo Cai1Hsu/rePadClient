@@ -32,11 +32,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/gson/Gson.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class Gson {
     static final boolean DEFAULT_JSON_NON_EXECUTABLE = false;
     private static final String JSON_NON_EXECUTABLE_PREFIX = ")]}'\n";
@@ -51,34 +49,38 @@ public final class Gson {
     private final boolean serializeNulls;
     private final Map<TypeToken<?>, TypeAdapter<?>> typeTokenCache;
 
-    /* loaded from: classes.jar:com/google/gson/Gson$FutureTypeAdapter.class */
-    static class FutureTypeAdapter<T> extends TypeAdapter<T> {
-        private TypeAdapter<T> delegate;
+    static /* synthetic */ void access$000(Gson x0, double x1) {
+        x0.checkValidFloatingPoint(x1);
+    }
 
-        FutureTypeAdapter() {
+    /* renamed from: com.google.gson.Gson$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 implements JsonDeserializationContext {
+        AnonymousClass1() {
+            Gson.this = r1;
         }
 
-        @Override // com.google.gson.TypeAdapter
-        public T read(JsonReader jsonReader) throws IOException {
-            if (this.delegate == null) {
-                throw new IllegalStateException();
-            }
-            return this.delegate.read(jsonReader);
+        @Override // com.google.gson.JsonDeserializationContext
+        public <T> T deserialize(JsonElement json, Type typeOfT) throws JsonParseException {
+            return (T) Gson.this.fromJson(json, typeOfT);
+        }
+    }
+
+    /* renamed from: com.google.gson.Gson$2 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass2 implements JsonSerializationContext {
+        AnonymousClass2() {
+            Gson.this = r1;
         }
 
-        public void setDelegate(TypeAdapter<T> typeAdapter) {
-            if (this.delegate != null) {
-                throw new AssertionError();
-            }
-            this.delegate = typeAdapter;
+        @Override // com.google.gson.JsonSerializationContext
+        public JsonElement serialize(Object src) {
+            return Gson.this.toJsonTree(src);
         }
 
-        @Override // com.google.gson.TypeAdapter
-        public void write(JsonWriter jsonWriter, T t) throws IOException {
-            if (this.delegate == null) {
-                throw new IllegalStateException();
-            }
-            this.delegate.write(jsonWriter, t);
+        @Override // com.google.gson.JsonSerializationContext
+        public JsonElement serialize(Object src, Type typeOfSrc) {
+            return Gson.this.toJsonTree(src, typeOfSrc);
         }
     }
 
@@ -86,165 +88,283 @@ public final class Gson {
         this(Excluder.DEFAULT, FieldNamingPolicy.IDENTITY, Collections.emptyMap(), false, false, false, true, false, false, LongSerializationPolicy.DEFAULT, Collections.emptyList());
     }
 
-    Gson(Excluder excluder, FieldNamingStrategy fieldNamingStrategy, Map<Type, InstanceCreator<?>> map, boolean z, boolean z2, boolean z3, boolean z4, boolean z5, boolean z6, LongSerializationPolicy longSerializationPolicy, List<TypeAdapterFactory> list) {
+    public Gson(Excluder excluder, FieldNamingStrategy fieldNamingPolicy, Map<Type, InstanceCreator<?>> instanceCreators, boolean serializeNulls, boolean complexMapKeySerialization, boolean generateNonExecutableGson, boolean htmlSafe, boolean prettyPrinting, boolean serializeSpecialFloatingPointValues, LongSerializationPolicy longSerializationPolicy, List<TypeAdapterFactory> typeAdapterFactories) {
         this.calls = new ThreadLocal<>();
         this.typeTokenCache = Collections.synchronizedMap(new HashMap());
-        this.deserializationContext = new JsonDeserializationContext() { // from class: com.google.gson.Gson.1
-            @Override // com.google.gson.JsonDeserializationContext
-            public <T> T deserialize(JsonElement jsonElement, Type type) throws JsonParseException {
-                return (T) Gson.this.fromJson(jsonElement, type);
-            }
-        };
-        this.serializationContext = new JsonSerializationContext() { // from class: com.google.gson.Gson.2
-            @Override // com.google.gson.JsonSerializationContext
-            public JsonElement serialize(Object obj) {
-                return Gson.this.toJsonTree(obj);
-            }
-
-            @Override // com.google.gson.JsonSerializationContext
-            public JsonElement serialize(Object obj, Type type) {
-                return Gson.this.toJsonTree(obj, type);
-            }
-        };
-        this.constructorConstructor = new ConstructorConstructor(map);
-        this.serializeNulls = z;
-        this.generateNonExecutableJson = z3;
-        this.htmlSafe = z4;
-        this.prettyPrinting = z5;
-        ArrayList arrayList = new ArrayList();
-        arrayList.add(TypeAdapters.JSON_ELEMENT_FACTORY);
-        arrayList.add(ObjectTypeAdapter.FACTORY);
-        arrayList.add(excluder);
-        arrayList.addAll(list);
-        arrayList.add(TypeAdapters.STRING_FACTORY);
-        arrayList.add(TypeAdapters.INTEGER_FACTORY);
-        arrayList.add(TypeAdapters.BOOLEAN_FACTORY);
-        arrayList.add(TypeAdapters.BYTE_FACTORY);
-        arrayList.add(TypeAdapters.SHORT_FACTORY);
-        arrayList.add(TypeAdapters.newFactory(Long.TYPE, Long.class, longAdapter(longSerializationPolicy)));
-        arrayList.add(TypeAdapters.newFactory(Double.TYPE, Double.class, doubleAdapter(z6)));
-        arrayList.add(TypeAdapters.newFactory(Float.TYPE, Float.class, floatAdapter(z6)));
-        arrayList.add(TypeAdapters.NUMBER_FACTORY);
-        arrayList.add(TypeAdapters.CHARACTER_FACTORY);
-        arrayList.add(TypeAdapters.STRING_BUILDER_FACTORY);
-        arrayList.add(TypeAdapters.STRING_BUFFER_FACTORY);
-        arrayList.add(TypeAdapters.newFactory(BigDecimal.class, TypeAdapters.BIG_DECIMAL));
-        arrayList.add(TypeAdapters.newFactory(BigInteger.class, TypeAdapters.BIG_INTEGER));
-        arrayList.add(TypeAdapters.URL_FACTORY);
-        arrayList.add(TypeAdapters.URI_FACTORY);
-        arrayList.add(TypeAdapters.UUID_FACTORY);
-        arrayList.add(TypeAdapters.LOCALE_FACTORY);
-        arrayList.add(TypeAdapters.INET_ADDRESS_FACTORY);
-        arrayList.add(TypeAdapters.BIT_SET_FACTORY);
-        arrayList.add(DateTypeAdapter.FACTORY);
-        arrayList.add(TypeAdapters.CALENDAR_FACTORY);
-        arrayList.add(TimeTypeAdapter.FACTORY);
-        arrayList.add(SqlDateTypeAdapter.FACTORY);
-        arrayList.add(TypeAdapters.TIMESTAMP_FACTORY);
-        arrayList.add(ArrayTypeAdapter.FACTORY);
-        arrayList.add(TypeAdapters.ENUM_FACTORY);
-        arrayList.add(TypeAdapters.CLASS_FACTORY);
-        arrayList.add(new CollectionTypeAdapterFactory(this.constructorConstructor));
-        arrayList.add(new MapTypeAdapterFactory(this.constructorConstructor, z2));
-        arrayList.add(new ReflectiveTypeAdapterFactory(this.constructorConstructor, fieldNamingStrategy, excluder));
-        this.factories = Collections.unmodifiableList(arrayList);
+        this.deserializationContext = new AnonymousClass1();
+        this.serializationContext = new AnonymousClass2();
+        this.constructorConstructor = new ConstructorConstructor(instanceCreators);
+        this.serializeNulls = serializeNulls;
+        this.generateNonExecutableJson = generateNonExecutableGson;
+        this.htmlSafe = htmlSafe;
+        this.prettyPrinting = prettyPrinting;
+        List<TypeAdapterFactory> factories = new ArrayList<>();
+        factories.add(TypeAdapters.JSON_ELEMENT_FACTORY);
+        factories.add(ObjectTypeAdapter.FACTORY);
+        factories.add(excluder);
+        factories.addAll(typeAdapterFactories);
+        factories.add(TypeAdapters.STRING_FACTORY);
+        factories.add(TypeAdapters.INTEGER_FACTORY);
+        factories.add(TypeAdapters.BOOLEAN_FACTORY);
+        factories.add(TypeAdapters.BYTE_FACTORY);
+        factories.add(TypeAdapters.SHORT_FACTORY);
+        factories.add(TypeAdapters.newFactory(Long.TYPE, Long.class, longAdapter(longSerializationPolicy)));
+        factories.add(TypeAdapters.newFactory(Double.TYPE, Double.class, doubleAdapter(serializeSpecialFloatingPointValues)));
+        factories.add(TypeAdapters.newFactory(Float.TYPE, Float.class, floatAdapter(serializeSpecialFloatingPointValues)));
+        factories.add(TypeAdapters.NUMBER_FACTORY);
+        factories.add(TypeAdapters.CHARACTER_FACTORY);
+        factories.add(TypeAdapters.STRING_BUILDER_FACTORY);
+        factories.add(TypeAdapters.STRING_BUFFER_FACTORY);
+        factories.add(TypeAdapters.newFactory(BigDecimal.class, TypeAdapters.BIG_DECIMAL));
+        factories.add(TypeAdapters.newFactory(BigInteger.class, TypeAdapters.BIG_INTEGER));
+        factories.add(TypeAdapters.URL_FACTORY);
+        factories.add(TypeAdapters.URI_FACTORY);
+        factories.add(TypeAdapters.UUID_FACTORY);
+        factories.add(TypeAdapters.LOCALE_FACTORY);
+        factories.add(TypeAdapters.INET_ADDRESS_FACTORY);
+        factories.add(TypeAdapters.BIT_SET_FACTORY);
+        factories.add(DateTypeAdapter.FACTORY);
+        factories.add(TypeAdapters.CALENDAR_FACTORY);
+        factories.add(TimeTypeAdapter.FACTORY);
+        factories.add(SqlDateTypeAdapter.FACTORY);
+        factories.add(TypeAdapters.TIMESTAMP_FACTORY);
+        factories.add(ArrayTypeAdapter.FACTORY);
+        factories.add(TypeAdapters.ENUM_FACTORY);
+        factories.add(TypeAdapters.CLASS_FACTORY);
+        factories.add(new CollectionTypeAdapterFactory(this.constructorConstructor));
+        factories.add(new MapTypeAdapterFactory(this.constructorConstructor, complexMapKeySerialization));
+        factories.add(new ReflectiveTypeAdapterFactory(this.constructorConstructor, fieldNamingPolicy, excluder));
+        this.factories = Collections.unmodifiableList(factories);
     }
 
-    private static void assertFullConsumption(Object obj, JsonReader jsonReader) {
-        if (obj != null) {
-            try {
-                if (jsonReader.peek() == JsonToken.END_DOCUMENT) {
-                    return;
-                }
-                throw new JsonIOException("JSON document was not fully consumed.");
-            } catch (MalformedJsonException e) {
-                throw new JsonSyntaxException(e);
-            } catch (IOException e2) {
-                throw new JsonIOException(e2);
+    private TypeAdapter<Number> doubleAdapter(boolean serializeSpecialFloatingPointValues) {
+        return serializeSpecialFloatingPointValues ? TypeAdapters.DOUBLE : new AnonymousClass3();
+    }
+
+    /* renamed from: com.google.gson.Gson$3 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass3 extends TypeAdapter<Number> {
+        AnonymousClass3() {
+            Gson.this = r1;
+        }
+
+        @Override // com.google.gson.TypeAdapter
+        /* renamed from: read */
+        public Number read2(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
             }
+            return Double.valueOf(in.nextDouble());
+        }
+
+        public void write(JsonWriter out, Number value) throws IOException {
+            if (value == null) {
+                out.nullValue();
+                return;
+            }
+            double doubleValue = value.doubleValue();
+            Gson.access$000(Gson.this, doubleValue);
+            out.value(value);
         }
     }
 
-    public void checkValidFloatingPoint(double d) {
-        if (Double.isNaN(d) || Double.isInfinite(d)) {
-            throw new IllegalArgumentException(d + " is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.");
+    private TypeAdapter<Number> floatAdapter(boolean serializeSpecialFloatingPointValues) {
+        return serializeSpecialFloatingPointValues ? TypeAdapters.FLOAT : new AnonymousClass4();
+    }
+
+    /* renamed from: com.google.gson.Gson$4 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass4 extends TypeAdapter<Number> {
+        AnonymousClass4() {
+            Gson.this = r1;
+        }
+
+        @Override // com.google.gson.TypeAdapter
+        /* renamed from: read */
+        public Number read2(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            return Float.valueOf((float) in.nextDouble());
+        }
+
+        public void write(JsonWriter out, Number value) throws IOException {
+            if (value == null) {
+                out.nullValue();
+                return;
+            }
+            float floatValue = value.floatValue();
+            Gson.access$000(Gson.this, floatValue);
+            out.value(value);
         }
     }
 
-    private TypeAdapter<Number> doubleAdapter(boolean z) {
-        return z ? TypeAdapters.DOUBLE : new TypeAdapter<Number>() { // from class: com.google.gson.Gson.3
-            @Override // com.google.gson.TypeAdapter
-            /* renamed from: read */
-            public Number read2(JsonReader jsonReader) throws IOException {
-                Double valueOf;
-                if (jsonReader.peek() == JsonToken.NULL) {
-                    jsonReader.nextNull();
-                    valueOf = null;
-                } else {
-                    valueOf = Double.valueOf(jsonReader.nextDouble());
-                }
-                return valueOf;
-            }
-
-            public void write(JsonWriter jsonWriter, Number number) throws IOException {
-                if (number == null) {
-                    jsonWriter.nullValue();
-                    return;
-                }
-                Gson.this.checkValidFloatingPoint(number.doubleValue());
-                jsonWriter.value(number);
-            }
-        };
-    }
-
-    private TypeAdapter<Number> floatAdapter(boolean z) {
-        return z ? TypeAdapters.FLOAT : new TypeAdapter<Number>() { // from class: com.google.gson.Gson.4
-            @Override // com.google.gson.TypeAdapter
-            /* renamed from: read */
-            public Number read2(JsonReader jsonReader) throws IOException {
-                Float valueOf;
-                if (jsonReader.peek() == JsonToken.NULL) {
-                    jsonReader.nextNull();
-                    valueOf = null;
-                } else {
-                    valueOf = Float.valueOf((float) jsonReader.nextDouble());
-                }
-                return valueOf;
-            }
-
-            public void write(JsonWriter jsonWriter, Number number) throws IOException {
-                if (number == null) {
-                    jsonWriter.nullValue();
-                    return;
-                }
-                Gson.this.checkValidFloatingPoint(number.floatValue());
-                jsonWriter.value(number);
-            }
-        };
+    private void checkValidFloatingPoint(double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            throw new IllegalArgumentException(value + " is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.");
+        }
     }
 
     private TypeAdapter<Number> longAdapter(LongSerializationPolicy longSerializationPolicy) {
-        return longSerializationPolicy == LongSerializationPolicy.DEFAULT ? TypeAdapters.LONG : new TypeAdapter<Number>() { // from class: com.google.gson.Gson.5
-            @Override // com.google.gson.TypeAdapter
-            public Number read(JsonReader jsonReader) throws IOException {
-                Long valueOf;
-                if (jsonReader.peek() == JsonToken.NULL) {
-                    jsonReader.nextNull();
-                    valueOf = null;
-                } else {
-                    valueOf = Long.valueOf(jsonReader.nextLong());
-                }
-                return valueOf;
-            }
+        return longSerializationPolicy == LongSerializationPolicy.DEFAULT ? TypeAdapters.LONG : new AnonymousClass5();
+    }
 
-            public void write(JsonWriter jsonWriter, Number number) throws IOException {
-                if (number == null) {
-                    jsonWriter.nullValue();
-                } else {
-                    jsonWriter.value(number.toString());
+    /* renamed from: com.google.gson.Gson$5 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass5 extends TypeAdapter<Number> {
+        AnonymousClass5() {
+            Gson.this = r1;
+        }
+
+        @Override // com.google.gson.TypeAdapter
+        public Number read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            return Long.valueOf(in.nextLong());
+        }
+
+        public void write(JsonWriter out, Number value) throws IOException {
+            if (value == null) {
+                out.nullValue();
+            } else {
+                out.value(value.toString());
+            }
+        }
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    public <T> TypeAdapter<T> getAdapter(TypeToken<T> type) {
+        TypeAdapter<T> typeAdapter = (TypeAdapter<T>) this.typeTokenCache.get(type);
+        if (typeAdapter == null) {
+            Map<TypeToken<?>, FutureTypeAdapter<?>> threadCalls = this.calls.get();
+            boolean requiresThreadLocalCleanup = false;
+            if (threadCalls == null) {
+                threadCalls = new HashMap<>();
+                this.calls.set(threadCalls);
+                requiresThreadLocalCleanup = true;
+            }
+            FutureTypeAdapter<?> futureTypeAdapter = threadCalls.get(type);
+            if (futureTypeAdapter != null) {
+                return futureTypeAdapter;
+            }
+            try {
+                FutureTypeAdapter<?> futureTypeAdapter2 = new FutureTypeAdapter<>();
+                threadCalls.put(type, futureTypeAdapter2);
+                for (TypeAdapterFactory factory : this.factories) {
+                    TypeAdapter typeAdapter2 = (TypeAdapter<T>) factory.create(this, type);
+                    if (typeAdapter2 != null) {
+                        futureTypeAdapter2.setDelegate(typeAdapter2);
+                        this.typeTokenCache.put(type, typeAdapter2);
+                        return typeAdapter2;
+                    }
+                }
+                throw new IllegalArgumentException("GSON cannot handle " + type);
+            } finally {
+                threadCalls.remove(type);
+                if (requiresThreadLocalCleanup) {
+                    this.calls.remove();
                 }
             }
-        };
+        }
+        return typeAdapter;
+    }
+
+    public <T> TypeAdapter<T> getDelegateAdapter(TypeAdapterFactory skipPast, TypeToken<T> type) {
+        boolean skipPastFound = false;
+        for (TypeAdapterFactory factory : this.factories) {
+            if (!skipPastFound) {
+                if (factory == skipPast) {
+                    skipPastFound = true;
+                }
+            } else {
+                TypeAdapter<T> candidate = factory.create(this, type);
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        throw new IllegalArgumentException("GSON cannot serialize " + type);
+    }
+
+    public <T> TypeAdapter<T> getAdapter(Class<T> type) {
+        return getAdapter(TypeToken.get((Class) type));
+    }
+
+    public JsonElement toJsonTree(Object src) {
+        return src == null ? JsonNull.INSTANCE : toJsonTree(src, src.getClass());
+    }
+
+    public JsonElement toJsonTree(Object src, Type typeOfSrc) {
+        JsonTreeWriter writer = new JsonTreeWriter();
+        toJson(src, typeOfSrc, writer);
+        return writer.get();
+    }
+
+    public String toJson(Object src) {
+        return src == null ? toJson((JsonElement) JsonNull.INSTANCE) : toJson(src, src.getClass());
+    }
+
+    public String toJson(Object src, Type typeOfSrc) {
+        StringWriter writer = new StringWriter();
+        toJson(src, typeOfSrc, writer);
+        return writer.toString();
+    }
+
+    public void toJson(Object src, Appendable writer) throws JsonIOException {
+        if (src != null) {
+            toJson(src, src.getClass(), writer);
+        } else {
+            toJson((JsonElement) JsonNull.INSTANCE, writer);
+        }
+    }
+
+    public void toJson(Object src, Type typeOfSrc, Appendable writer) throws JsonIOException {
+        try {
+            JsonWriter jsonWriter = newJsonWriter(Streams.writerForAppendable(writer));
+            toJson(src, typeOfSrc, jsonWriter);
+        } catch (IOException e) {
+            throw new JsonIOException(e);
+        }
+    }
+
+    public void toJson(Object src, Type typeOfSrc, JsonWriter writer) throws JsonIOException {
+        TypeAdapter<?> adapter = getAdapter(TypeToken.get(typeOfSrc));
+        boolean oldLenient = writer.isLenient();
+        writer.setLenient(true);
+        boolean oldHtmlSafe = writer.isHtmlSafe();
+        writer.setHtmlSafe(this.htmlSafe);
+        boolean oldSerializeNulls = writer.getSerializeNulls();
+        writer.setSerializeNulls(this.serializeNulls);
+        try {
+            try {
+                adapter.write(writer, src);
+            } catch (IOException e) {
+                throw new JsonIOException(e);
+            }
+        } finally {
+            writer.setLenient(oldLenient);
+            writer.setHtmlSafe(oldHtmlSafe);
+            writer.setSerializeNulls(oldSerializeNulls);
+        }
+    }
+
+    public String toJson(JsonElement jsonElement) {
+        StringWriter writer = new StringWriter();
+        toJson(jsonElement, (Appendable) writer);
+        return writer.toString();
+    }
+
+    public void toJson(JsonElement jsonElement, Appendable writer) throws JsonIOException {
+        try {
+            JsonWriter jsonWriter = newJsonWriter(Streams.writerForAppendable(writer));
+            toJson(jsonElement, jsonWriter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private JsonWriter newJsonWriter(Writer writer) throws IOException {
@@ -259,225 +379,137 @@ public final class Gson {
         return jsonWriter;
     }
 
-    public <T> T fromJson(JsonElement jsonElement, Class<T> cls) throws JsonSyntaxException {
-        return (T) Primitives.wrap(cls).cast(fromJson(jsonElement, (Type) cls));
-    }
-
-    public <T> T fromJson(JsonElement jsonElement, Type type) throws JsonSyntaxException {
-        return (T) (jsonElement == null ? null : fromJson(new JsonTreeReader(jsonElement), type));
-    }
-
-    /* JADX DEBUG: Multi-variable search result rejected for r0v24, resolved type: java.lang.Object */
-    /* JADX WARN: Multi-variable type inference failed */
-    public <T> T fromJson(JsonReader jsonReader, Type type) throws JsonIOException, JsonSyntaxException {
-        T t;
-        boolean z = true;
-        boolean isLenient = jsonReader.isLenient();
-        jsonReader.setLenient(true);
+    public void toJson(JsonElement jsonElement, JsonWriter writer) throws JsonIOException {
+        boolean oldLenient = writer.isLenient();
+        writer.setLenient(true);
+        boolean oldHtmlSafe = writer.isHtmlSafe();
+        writer.setHtmlSafe(this.htmlSafe);
+        boolean oldSerializeNulls = writer.getSerializeNulls();
+        writer.setSerializeNulls(this.serializeNulls);
         try {
             try {
-                try {
-                    jsonReader.peek();
-                    z = false;
-                    t = getAdapter(TypeToken.get(type)).read(jsonReader);
-                    jsonReader.setLenient(isLenient);
-                } catch (IOException e) {
+                Streams.write(jsonElement, writer);
+            } catch (IOException e) {
+                throw new JsonIOException(e);
+            }
+        } finally {
+            writer.setLenient(oldLenient);
+            writer.setHtmlSafe(oldHtmlSafe);
+            writer.setSerializeNulls(oldSerializeNulls);
+        }
+    }
+
+    public <T> T fromJson(String json, Class<T> classOfT) throws JsonSyntaxException {
+        Object object = fromJson(json, (Type) classOfT);
+        return (T) Primitives.wrap(classOfT).cast(object);
+    }
+
+    public <T> T fromJson(String json, Type typeOfT) throws JsonSyntaxException {
+        if (json == null) {
+            return null;
+        }
+        StringReader reader = new StringReader(json);
+        return (T) fromJson(reader, typeOfT);
+    }
+
+    public <T> T fromJson(Reader json, Class<T> classOfT) throws JsonSyntaxException, JsonIOException {
+        JsonReader jsonReader = new JsonReader(json);
+        Object object = fromJson(jsonReader, classOfT);
+        assertFullConsumption(object, jsonReader);
+        return (T) Primitives.wrap(classOfT).cast(object);
+    }
+
+    public <T> T fromJson(Reader json, Type typeOfT) throws JsonIOException, JsonSyntaxException {
+        JsonReader jsonReader = new JsonReader(json);
+        T object = (T) fromJson(jsonReader, typeOfT);
+        assertFullConsumption(object, jsonReader);
+        return object;
+    }
+
+    private static void assertFullConsumption(Object obj, JsonReader reader) {
+        if (obj != null) {
+            try {
+                if (reader.peek() != JsonToken.END_DOCUMENT) {
+                    throw new JsonIOException("JSON document was not fully consumed.");
+                }
+            } catch (MalformedJsonException e) {
+                throw new JsonSyntaxException(e);
+            } catch (IOException e2) {
+                throw new JsonIOException(e2);
+            }
+        }
+    }
+
+    public <T> T fromJson(JsonReader reader, Type typeOfT) throws JsonIOException, JsonSyntaxException {
+        boolean isEmpty = true;
+        boolean oldLenient = reader.isLenient();
+        reader.setLenient(true);
+        try {
+            try {
+                reader.peek();
+                isEmpty = false;
+                TypeAdapter<T> typeAdapter = getAdapter(TypeToken.get(typeOfT));
+                T object = typeAdapter.read(reader);
+                reader.setLenient(oldLenient);
+                return object;
+            } catch (EOFException e) {
+                if (!isEmpty) {
                     throw new JsonSyntaxException(e);
                 }
-            } catch (EOFException e2) {
-                if (!z) {
-                    throw new JsonSyntaxException(e2);
-                }
-                t = null;
-                jsonReader.setLenient(isLenient);
+                reader.setLenient(oldLenient);
+                return null;
+            } catch (IOException e2) {
+                throw new JsonSyntaxException(e2);
             } catch (IllegalStateException e3) {
                 throw new JsonSyntaxException(e3);
             }
-            return t;
         } catch (Throwable th) {
-            jsonReader.setLenient(isLenient);
+            reader.setLenient(oldLenient);
             throw th;
         }
     }
 
-    public <T> T fromJson(Reader reader, Class<T> cls) throws JsonSyntaxException, JsonIOException {
-        JsonReader jsonReader = new JsonReader(reader);
-        Object fromJson = fromJson(jsonReader, cls);
-        assertFullConsumption(fromJson, jsonReader);
-        return (T) Primitives.wrap(cls).cast(fromJson);
+    public <T> T fromJson(JsonElement json, Class<T> classOfT) throws JsonSyntaxException {
+        Object object = fromJson(json, (Type) classOfT);
+        return (T) Primitives.wrap(classOfT).cast(object);
     }
 
-    public <T> T fromJson(Reader reader, Type type) throws JsonIOException, JsonSyntaxException {
-        JsonReader jsonReader = new JsonReader(reader);
-        T t = (T) fromJson(jsonReader, type);
-        assertFullConsumption(t, jsonReader);
-        return t;
+    public <T> T fromJson(JsonElement json, Type typeOfT) throws JsonSyntaxException {
+        if (json == null) {
+            return null;
+        }
+        return (T) fromJson(new JsonTreeReader(json), typeOfT);
     }
 
-    public <T> T fromJson(String str, Class<T> cls) throws JsonSyntaxException {
-        return (T) Primitives.wrap(cls).cast(fromJson(str, (Type) cls));
-    }
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    static class FutureTypeAdapter<T> extends TypeAdapter<T> {
+        private TypeAdapter<T> delegate;
 
-    public <T> T fromJson(String str, Type type) throws JsonSyntaxException {
-        return (T) (str == null ? null : fromJson(new StringReader(str), type));
-    }
+        FutureTypeAdapter() {
+        }
 
-    public <T> TypeAdapter<T> getAdapter(TypeToken<T> typeToken) {
-        TypeAdapter<?> create;
-        FutureTypeAdapter<?> futureTypeAdapter;
-        TypeAdapter<?> typeAdapter = this.typeTokenCache.get(typeToken);
-        if (typeAdapter != null) {
-            futureTypeAdapter = typeAdapter;
-        } else {
-            Map<TypeToken<?>, FutureTypeAdapter<?>> map = this.calls.get();
-            boolean z = false;
-            HashMap hashMap = map;
-            if (map == null) {
-                hashMap = new HashMap();
-                this.calls.set(hashMap);
-                z = true;
+        public void setDelegate(TypeAdapter<T> typeAdapter) {
+            if (this.delegate != null) {
+                throw new AssertionError();
             }
-            FutureTypeAdapter<?> futureTypeAdapter2 = hashMap.get(typeToken);
-            if (futureTypeAdapter2 != null) {
-                futureTypeAdapter = futureTypeAdapter2;
-            } else {
-                try {
-                    FutureTypeAdapter<?> futureTypeAdapter3 = new FutureTypeAdapter<>();
-                    hashMap.put(typeToken, futureTypeAdapter3);
-                    Iterator<TypeAdapterFactory> it = this.factories.iterator();
-                    do {
-                        if (!it.hasNext()) {
-                            throw new IllegalArgumentException("GSON cannot handle " + typeToken);
-                        }
-                        create = it.next().create(this, typeToken);
-                    } while (create == null);
-                    futureTypeAdapter3.setDelegate(create);
-                    this.typeTokenCache.put(typeToken, create);
-                    hashMap.remove(typeToken);
-                    if (z) {
-                        this.calls.remove();
-                    }
-                    futureTypeAdapter = create;
-                } catch (Throwable th) {
-                    hashMap.remove(typeToken);
-                    if (z) {
-                        this.calls.remove();
-                    }
-                    throw th;
-                }
+            this.delegate = typeAdapter;
+        }
+
+        @Override // com.google.gson.TypeAdapter
+        public T read(JsonReader in) throws IOException {
+            if (this.delegate == null) {
+                throw new IllegalStateException();
             }
+            return this.delegate.read(in);
         }
-        return (TypeAdapter<T>) futureTypeAdapter;
-    }
 
-    public <T> TypeAdapter<T> getAdapter(Class<T> cls) {
-        return getAdapter(TypeToken.get((Class) cls));
-    }
-
-    public <T> TypeAdapter<T> getDelegateAdapter(TypeAdapterFactory typeAdapterFactory, TypeToken<T> typeToken) {
-        boolean z = false;
-        for (TypeAdapterFactory typeAdapterFactory2 : this.factories) {
-            if (z) {
-                TypeAdapter<T> create = typeAdapterFactory2.create(this, typeToken);
-                if (create != null) {
-                    return create;
-                }
-            } else if (typeAdapterFactory2 == typeAdapterFactory) {
-                z = true;
+        @Override // com.google.gson.TypeAdapter
+        public void write(JsonWriter out, T value) throws IOException {
+            if (this.delegate == null) {
+                throw new IllegalStateException();
             }
+            this.delegate.write(out, value);
         }
-        throw new IllegalArgumentException("GSON cannot serialize " + typeToken);
-    }
-
-    public String toJson(JsonElement jsonElement) {
-        StringWriter stringWriter = new StringWriter();
-        toJson(jsonElement, (Appendable) stringWriter);
-        return stringWriter.toString();
-    }
-
-    public String toJson(Object obj) {
-        return obj == null ? toJson((JsonElement) JsonNull.INSTANCE) : toJson(obj, obj.getClass());
-    }
-
-    public String toJson(Object obj, Type type) {
-        StringWriter stringWriter = new StringWriter();
-        toJson(obj, type, stringWriter);
-        return stringWriter.toString();
-    }
-
-    public void toJson(JsonElement jsonElement, JsonWriter jsonWriter) throws JsonIOException {
-        boolean isLenient = jsonWriter.isLenient();
-        jsonWriter.setLenient(true);
-        boolean isHtmlSafe = jsonWriter.isHtmlSafe();
-        jsonWriter.setHtmlSafe(this.htmlSafe);
-        boolean serializeNulls = jsonWriter.getSerializeNulls();
-        jsonWriter.setSerializeNulls(this.serializeNulls);
-        try {
-            try {
-                Streams.write(jsonElement, jsonWriter);
-            } catch (IOException e) {
-                throw new JsonIOException(e);
-            }
-        } finally {
-            jsonWriter.setLenient(isLenient);
-            jsonWriter.setHtmlSafe(isHtmlSafe);
-            jsonWriter.setSerializeNulls(serializeNulls);
-        }
-    }
-
-    public void toJson(JsonElement jsonElement, Appendable appendable) throws JsonIOException {
-        try {
-            toJson(jsonElement, newJsonWriter(Streams.writerForAppendable(appendable)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void toJson(Object obj, Appendable appendable) throws JsonIOException {
-        if (obj != null) {
-            toJson(obj, obj.getClass(), appendable);
-        } else {
-            toJson((JsonElement) JsonNull.INSTANCE, appendable);
-        }
-    }
-
-    public void toJson(Object obj, Type type, JsonWriter jsonWriter) throws JsonIOException {
-        TypeAdapter adapter = getAdapter(TypeToken.get(type));
-        boolean isLenient = jsonWriter.isLenient();
-        jsonWriter.setLenient(true);
-        boolean isHtmlSafe = jsonWriter.isHtmlSafe();
-        jsonWriter.setHtmlSafe(this.htmlSafe);
-        boolean serializeNulls = jsonWriter.getSerializeNulls();
-        jsonWriter.setSerializeNulls(this.serializeNulls);
-        try {
-            try {
-                adapter.write(jsonWriter, obj);
-            } catch (IOException e) {
-                throw new JsonIOException(e);
-            }
-        } finally {
-            jsonWriter.setLenient(isLenient);
-            jsonWriter.setHtmlSafe(isHtmlSafe);
-            jsonWriter.setSerializeNulls(serializeNulls);
-        }
-    }
-
-    public void toJson(Object obj, Type type, Appendable appendable) throws JsonIOException {
-        try {
-            toJson(obj, type, newJsonWriter(Streams.writerForAppendable(appendable)));
-        } catch (IOException e) {
-            throw new JsonIOException(e);
-        }
-    }
-
-    public JsonElement toJsonTree(Object obj) {
-        return obj == null ? JsonNull.INSTANCE : toJsonTree(obj, obj.getClass());
-    }
-
-    public JsonElement toJsonTree(Object obj, Type type) {
-        JsonTreeWriter jsonTreeWriter = new JsonTreeWriter();
-        toJson(obj, type, jsonTreeWriter);
-        return jsonTreeWriter.get();
     }
 
     public String toString() {

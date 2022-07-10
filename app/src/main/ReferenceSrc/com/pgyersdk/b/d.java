@@ -1,43 +1,31 @@
 package com.pgyersdk.b;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import com.pgyersdk.c.k;
 import com.pgyersdk.c.m;
-
-/* loaded from: classes.jar:com/pgyersdk/b/d.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class d implements DialogInterface.OnClickListener {
     final /* synthetic */ b a;
 
-    d(b bVar) {
+    public d(b bVar) {
         this.a = bVar;
     }
 
     @Override // android.content.DialogInterface.OnClickListener
     public final void onClick(DialogInterface dialogInterface, int i) {
-        String str;
-        String str2;
-        Activity activity;
-        Activity activity2;
-        String str3;
         try {
-            str = this.a.i;
-            if (!m.a(str)) {
-                str3 = this.a.i;
-                k.a("buildNo", str3);
+            if (!m.a(b.a(this.a))) {
+                k.a("buildNo", b.a(this.a));
             }
             Intent intent = new Intent();
             intent.setAction("android.intent.action.VIEW");
-            str2 = this.a.h;
-            intent.setData(Uri.parse(str2));
-            activity = this.a.f;
-            if (activity == null) {
+            intent.setData(Uri.parse(b.b(this.a)));
+            if (b.c(this.a) == null) {
                 return;
             }
-            activity2 = this.a.f;
-            activity2.startActivity(intent);
+            b.c(this.a).startActivity(intent);
         } catch (Exception e) {
         }
     }

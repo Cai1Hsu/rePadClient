@@ -3,8 +3,7 @@ package com.handmark.pulltorefresh.library;
 import android.view.View;
 import android.view.animation.Interpolator;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
-
-/* loaded from: classes.jar:com/handmark/pulltorefresh/library/IPullToRefresh.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface IPullToRefresh<T extends View> {
     boolean demo();
 

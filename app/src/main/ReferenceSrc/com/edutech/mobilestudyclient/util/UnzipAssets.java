@@ -8,70 +8,67 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipException;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/util/UnzipAssets.class */
+import org.bson.BSON;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class UnzipAssets {
-    public static void copyBigDataToSD(Context context, String str, String str2) throws IOException {
-        File file = new File(str2);
+    public static void copyBigDataToSD(Context context, String zipName, String outputDirectory) throws IOException {
+        File file = new File(outputDirectory);
         if (!file.exists()) {
             file.mkdirs();
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(String.valueOf(str2) + str);
-        InputStream open = context.getAssets().open(str);
-        byte[] bArr = new byte[1024];
-        int read = open.read(bArr);
-        while (true) {
-            int i = read;
-            if (i <= 0) {
-                fileOutputStream.flush();
-                open.close();
-                fileOutputStream.close();
-                return;
-            }
-            fileOutputStream.write(bArr, 0, i);
-            read = open.read(bArr);
+        OutputStream myOutput = new FileOutputStream(String.valueOf(outputDirectory) + zipName);
+        InputStream myInput = context.getAssets().open(zipName);
+        byte[] buffer = new byte[1024];
+        for (int length = myInput.read(buffer); length > 0; length = myInput.read(buffer)) {
+            myOutput.write(buffer, 0, length);
         }
+        myOutput.flush();
+        myInput.close();
+        myOutput.close();
     }
 
-    public static int upZipFile(String str, String str2) throws ZipException, IOException {
-        Log.i("wpdemo", "UnzipAssets unZipFile() zipFlie: " + str);
-        Log.i("wpdemo", "UnzipAssets unZipFile() folderPath: " + str2);
-        ZipFile zipFile = new ZipFile(str, "GBK");
-        Enumeration entries = zipFile.getEntries();
-        byte[] bArr = new byte[1024];
-        while (entries.hasMoreElements()) {
-            ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-            StringBuffer stringBuffer = new StringBuffer();
-            for (int i = 0; i < zipEntry.getName().getBytes().length; i++) {
-                stringBuffer.append(Integer.toHexString(zipEntry.getName().getBytes()[i] & 255));
-                stringBuffer.append(" ");
+    public static int upZipFile(String zipFile, String folderPath) throws ZipException, IOException {
+        Log.i("wpdemo", "UnzipAssets unZipFile() zipFlie: " + zipFile);
+        Log.i("wpdemo", "UnzipAssets unZipFile() folderPath: " + folderPath);
+        ZipFile zfile = new ZipFile(zipFile, "GBK");
+        Enumeration zList = zfile.getEntries();
+        byte[] buf = new byte[1024];
+        while (zList.hasMoreElements()) {
+            ZipEntry ze = (ZipEntry) zList.nextElement();
+            StringBuffer xxx = new StringBuffer();
+            for (int i = 0; i < ze.getName().getBytes().length; i++) {
+                xxx.append(Integer.toHexString(ze.getName().getBytes()[i] & BSON.MINKEY));
+                xxx.append(" ");
             }
-            if (zipEntry.isDirectory()) {
-                new File(new String((String.valueOf(str2) + zipEntry.getName().replace("\\", "/")).getBytes("GBK"), "UTF-8")).mkdir();
+            if (ze.isDirectory()) {
+                String dirstr = String.valueOf(folderPath) + ze.getName().replace("\\", "/");
+                File f = new File(new String(dirstr.getBytes("GBK"), "UTF-8"));
+                f.mkdir();
             } else {
-                String str3 = String.valueOf(str2) + zipEntry.getName().replace("\\", "/");
-                File file = new File(str3.substring(0, str3.lastIndexOf("/")));
-                if (!file.exists()) {
-                    file.mkdirs();
+                String filestr = String.valueOf(folderPath) + ze.getName().replace("\\", "/");
+                File tmpname = new File(filestr.substring(0, filestr.lastIndexOf("/")));
+                if (!tmpname.exists()) {
+                    tmpname.mkdirs();
                 }
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(str3));
-                BufferedInputStream bufferedInputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
+                OutputStream os = new BufferedOutputStream(new FileOutputStream(filestr));
+                InputStream is = new BufferedInputStream(zfile.getInputStream(ze));
                 while (true) {
-                    int read = bufferedInputStream.read(bArr, 0, 1024);
-                    if (read == -1) {
+                    int readLen = is.read(buf, 0, 1024);
+                    if (readLen == -1) {
                         break;
                     }
-                    bufferedOutputStream.write(bArr, 0, read);
+                    os.write(buf, 0, readLen);
                 }
-                bufferedInputStream.close();
-                bufferedOutputStream.close();
+                is.close();
+                os.close();
             }
         }
-        zipFile.close();
+        zfile.close();
         return 0;
     }
 }

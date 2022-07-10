@@ -7,109 +7,91 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-/* loaded from: classes.jar:com/edutech/json/CommonJSONParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class CommonJSONParser {
-    public boolean isJsonArray(Object obj) {
-        boolean z = false;
-        if (obj != null) {
+    public HashMap<String, Object> parse(String jsonStr) {
+        if (jsonStr == null) {
+            return null;
+        }
+        try {
+            JSONTokener jsonTokener = new JSONTokener(jsonStr);
+            JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+            HashMap<String, Object> result = parseJSONObject(jsonObject);
+            return result;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            return null;
+        }
+    }
+
+    public Object parseValue(Object inputObject) throws JSONException {
+        Object outputObject = null;
+        if (inputObject != null) {
             try {
-                if (obj instanceof JSONArray) {
-                    z = true;
-                } else {
-                    z = false;
-                    if (!(obj instanceof JSONObject)) {
-                        z = false;
-                        if (!(obj instanceof String)) {
-                            z = false;
-                            if (!(obj instanceof Boolean)) {
-                                z = false;
-                                if (obj instanceof Integer) {
-                                    z = false;
-                                }
-                            }
-                        }
-                    }
+                if (inputObject instanceof JSONArray) {
+                    outputObject = parseJSONArray((JSONArray) inputObject);
+                } else if (inputObject instanceof JSONObject) {
+                    outputObject = parseJSONObject((JSONObject) inputObject);
+                } else if ((inputObject instanceof String) || (inputObject instanceof Boolean) || (inputObject instanceof Integer)) {
+                    outputObject = inputObject;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                z = false;
             }
         }
-        return z;
+        return outputObject;
     }
 
-    public HashMap<String, Object> parse(String str) {
-        HashMap<String, Object> hashMap = null;
-        if (str != null) {
+    public boolean isJsonArray(Object inputObject) {
+        if (inputObject != null) {
             try {
-                hashMap = parseJSONObject((JSONObject) new JSONTokener(str).nextValue());
-            } catch (JSONException e) {
-                e.printStackTrace();
-                hashMap = null;
-            } catch (Exception e2) {
-                e2.printStackTrace();
-                hashMap = null;
-            }
-        }
-        return hashMap;
-    }
-
-    public ArrayList<Object> parseJSONArray(JSONArray jSONArray) throws JSONException {
-        ArrayList<Object> arrayList = null;
-        if (jSONArray != null) {
-            arrayList = new ArrayList<>();
-            for (int i = 0; i < jSONArray.length(); i++) {
-                Object obj = jSONArray.get(i);
-                if (obj != null) {
-                    arrayList.add(obj);
+                if (inputObject instanceof JSONArray) {
+                    return true;
                 }
-            }
-        }
-        return arrayList;
-    }
-
-    public HashMap<String, Object> parseJSONObject(JSONObject jSONObject) throws JSONException {
-        HashMap<String, Object> hashMap = null;
-        if (jSONObject != null) {
-            hashMap = new HashMap<>();
-            Iterator<String> keys = jSONObject.keys();
-            while (keys.hasNext()) {
-                String next = keys.next();
-                Object opt = jSONObject.opt(next);
-                if (opt != null) {
-                    hashMap.put(next, opt);
+                if ((inputObject instanceof JSONObject) || (inputObject instanceof String) || (inputObject instanceof Boolean)) {
+                    return false;
                 }
-            }
-        }
-        return hashMap;
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:18:0x0045, code lost:
-        if ((r4 instanceof java.lang.Integer) != false) goto L19;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    public Object parseValue(Object obj) throws JSONException {
-        ArrayList<Object> arrayList = null;
-        if (obj != null) {
-            try {
-                if (obj instanceof JSONArray) {
-                    arrayList = parseJSONArray((JSONArray) obj);
-                } else if (obj instanceof JSONObject) {
-                    arrayList = parseJSONObject((JSONObject) obj);
-                } else {
-                    if (!(obj instanceof String) && !(obj instanceof Boolean)) {
-                        arrayList = null;
-                    }
-                    arrayList = obj;
+                if (inputObject instanceof Integer) {
                 }
+                return false;
             } catch (Exception e) {
                 e.printStackTrace();
-                arrayList = null;
+                return false;
             }
         }
-        return arrayList;
+        return false;
+    }
+
+    public ArrayList<Object> parseJSONArray(JSONArray jsonArray) throws JSONException {
+        ArrayList<Object> valueList = null;
+        if (jsonArray != null) {
+            valueList = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Object itemObject = jsonArray.get(i);
+                if (itemObject != null) {
+                    valueList.add(itemObject);
+                }
+            }
+        }
+        return valueList;
+    }
+
+    public HashMap<String, Object> parseJSONObject(JSONObject jsonObject) throws JSONException {
+        HashMap<String, Object> valueObject = null;
+        if (jsonObject != null) {
+            valueObject = new HashMap<>();
+            Iterator<String> keyIter = jsonObject.keys();
+            while (keyIter.hasNext()) {
+                String keyStr = keyIter.next();
+                Object itemObject = jsonObject.opt(keyStr);
+                if (itemObject != null) {
+                    valueObject.put(keyStr, itemObject);
+                }
+            }
+        }
+        return valueObject;
     }
 }

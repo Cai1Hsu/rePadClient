@@ -2,35 +2,34 @@ package com.google.zxing.oned.rss.expanded;
 
 import com.google.zxing.oned.rss.DataCharacter;
 import com.google.zxing.oned.rss.FinderPattern;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/ExpandedPair.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class ExpandedPair {
     private final FinderPattern finderPattern;
     private final DataCharacter leftChar;
     private final boolean mayBeLast;
     private final DataCharacter rightChar;
 
-    ExpandedPair(DataCharacter dataCharacter, DataCharacter dataCharacter2, FinderPattern finderPattern, boolean z) {
-        this.leftChar = dataCharacter;
-        this.rightChar = dataCharacter2;
+    public ExpandedPair(DataCharacter leftChar, DataCharacter rightChar, FinderPattern finderPattern, boolean mayBeLast) {
+        this.leftChar = leftChar;
+        this.rightChar = rightChar;
         this.finderPattern = finderPattern;
-        this.mayBeLast = z;
+        this.mayBeLast = mayBeLast;
     }
 
-    FinderPattern getFinderPattern() {
-        return this.finderPattern;
+    public boolean mayBeLast() {
+        return this.mayBeLast;
     }
 
-    DataCharacter getLeftChar() {
+    public DataCharacter getLeftChar() {
         return this.leftChar;
     }
 
-    DataCharacter getRightChar() {
+    public DataCharacter getRightChar() {
         return this.rightChar;
     }
 
-    boolean mayBeLast() {
-        return this.mayBeLast;
+    public FinderPattern getFinderPattern() {
+        return this.finderPattern;
     }
 
     public boolean mustBeLast() {

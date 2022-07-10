@@ -1,19 +1,26 @@
 package com.google.zxing.pdf417.encoder;
-
-/* loaded from: classes.jar:com/google/zxing/pdf417/encoder/BarcodeRow.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class BarcodeRow {
     private int currentLocation = 0;
     private final byte[] row;
 
-    BarcodeRow(int i) {
-        this.row = new byte[i];
+    public BarcodeRow(int width) {
+        this.row = new byte[width];
     }
 
-    void addBar(boolean z, int i) {
-        for (int i2 = 0; i2 < i; i2++) {
-            int i3 = this.currentLocation;
-            this.currentLocation = i3 + 1;
-            set(i3, z);
+    public void set(int x, byte value) {
+        this.row[x] = value;
+    }
+
+    void set(int x, boolean black) {
+        this.row[x] = (byte) (black ? 1 : 0);
+    }
+
+    public void addBar(boolean black, int width) {
+        for (int ii = 0; ii < width; ii++) {
+            int i = this.currentLocation;
+            this.currentLocation = i + 1;
+            set(i, black);
         }
     }
 
@@ -21,19 +28,11 @@ final class BarcodeRow {
         return this.row;
     }
 
-    byte[] getScaledRow(int i) {
-        byte[] bArr = new byte[this.row.length * i];
-        for (int i2 = 0; i2 < bArr.length; i2++) {
-            bArr[i2] = this.row[i2 / i];
+    public byte[] getScaledRow(int scale) {
+        byte[] output = new byte[this.row.length * scale];
+        for (int i = 0; i < output.length; i++) {
+            output[i] = this.row[i / scale];
         }
-        return bArr;
-    }
-
-    void set(int i, byte b) {
-        this.row[i] = b;
-    }
-
-    void set(int i, boolean z) {
-        this.row[i] = (byte) (z ? 1 : 0);
+        return output;
     }
 }

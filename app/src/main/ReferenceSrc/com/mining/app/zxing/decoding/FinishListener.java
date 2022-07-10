@@ -2,13 +2,12 @@ package com.mining.app.zxing.decoding;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-
-/* loaded from: classes.jar:com/mining/app/zxing/decoding/FinishListener.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class FinishListener implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener, Runnable {
     private final Activity activityToFinish;
 
-    public FinishListener(Activity activity) {
-        this.activityToFinish = activity;
+    public FinishListener(Activity activityToFinish) {
+        this.activityToFinish = activityToFinish;
     }
 
     @Override // android.content.DialogInterface.OnCancelListener

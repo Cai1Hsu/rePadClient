@@ -7,8 +7,8 @@ import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.common.BitArray;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/oned/CodaBarReader.class */
+import org.apache.tools.ant.taskdefs.Execute;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class CodaBarReader extends OneDReader {
     private static final int minCharacterLength = 6;
     private static final String ALPHABET_STRING = "0123456789-$:/.+ABCDTN";
@@ -16,169 +16,142 @@ public final class CodaBarReader extends OneDReader {
     static final int[] CHARACTER_ENCODINGS = {3, 6, 9, 96, 18, 66, 33, 36, 48, 72, 12, 24, 69, 81, 84, 21, 26, 41, 11, 14, 26, 41};
     private static final char[] STARTEND_ENCODING = {'E', '*', 'A', 'B', 'C', 'D', 'T', 'N'};
 
-    static boolean arrayContains(char[] cArr, char c) {
-        boolean z;
-        if (cArr != null) {
-            for (char c2 : cArr) {
-                if (c2 == c) {
-                    z = true;
-                    break;
-                }
+    @Override // com.google.zxing.oned.OneDReader
+    public Result decodeRow(int rowNumber, BitArray row, Map<DecodeHintType, ?> hints) throws NotFoundException {
+        int lastStart;
+        int[] start = findAsteriskPattern(row);
+        start[1] = 0;
+        int nextStart = row.getNextSet(start[1]);
+        int end = row.getSize();
+        StringBuilder result = new StringBuilder();
+        int[] counters = new int[7];
+        do {
+            for (int i = 0; i < counters.length; i++) {
+                counters[i] = 0;
             }
-        }
-        z = false;
-        return z;
-    }
-
-    private static int[] findAsteriskPattern(BitArray bitArray) throws NotFoundException {
-        int size = bitArray.getSize();
-        int nextSet = bitArray.getNextSet(0);
-        int i = 0;
-        int[] iArr = new int[7];
-        int i2 = nextSet;
-        boolean z = false;
-        int length = iArr.length;
-        while (nextSet < size) {
-            if (bitArray.get(nextSet) ^ z) {
-                iArr[i] = iArr[i] + 1;
-            } else {
-                if (i == length - 1) {
-                    try {
-                        if (arrayContains(STARTEND_ENCODING, toNarrowWidePattern(iArr)) && bitArray.isRange(Math.max(0, i2 - ((nextSet - i2) / 2)), i2, false)) {
-                            return new int[]{i2, nextSet};
-                        }
-                    } catch (IllegalArgumentException e) {
-                    }
-                    i2 += iArr[0] + iArr[1];
-                    System.arraycopy(iArr, 2, iArr, 0, length - 2);
-                    iArr[length - 2] = 0;
-                    iArr[length - 1] = 0;
-                    i--;
-                } else {
-                    i++;
-                }
-                iArr[i] = 1;
-                z = !z;
+            recordPattern(row, nextStart, counters);
+            char decodedChar = toNarrowWidePattern(counters);
+            if (decodedChar == '!') {
+                throw NotFoundException.getNotFoundInstance();
             }
-            nextSet++;
+            result.append(decodedChar);
+            lastStart = nextStart;
+            for (int counter : counters) {
+                nextStart += counter;
+            }
+            nextStart = row.getNextSet(nextStart);
+        } while (nextStart < end);
+        int lastPatternSize = 0;
+        for (int counter2 : counters) {
+            lastPatternSize += counter2;
         }
-        throw NotFoundException.getNotFoundInstance();
-    }
-
-    private static char toNarrowWidePattern(int[] iArr) {
-        int i;
-        char c;
-        int length = iArr.length;
-        int i2 = 0;
-        int i3 = Integer.MAX_VALUE;
-        int i4 = 0;
+        int whiteSpaceAfterEnd = (nextStart - lastStart) - lastPatternSize;
+        if (nextStart != end && whiteSpaceAfterEnd / 2 < lastPatternSize) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        if (result.length() < 2) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        char startchar = result.charAt(0);
+        if (!arrayContains(STARTEND_ENCODING, startchar)) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        int k = 1;
         while (true) {
-            i = i2;
-            if (i4 < length) {
-                int i5 = i3;
-                if (iArr[i4] < i3) {
-                    i5 = iArr[i4];
-                }
-                int i6 = i2;
-                if (iArr[i4] > i2) {
-                    i6 = iArr[i4];
-                }
-                i4++;
-                i2 = i6;
-                i3 = i5;
-            }
-        }
-        loop1: while (true) {
-            int i7 = 0;
-            int i8 = 0;
-            int i9 = 0;
-            while (i9 < length) {
-                int i10 = i8;
-                int i11 = i7;
-                if (iArr[i9] > i) {
-                    i10 = i8 | (1 << ((length - 1) - i9));
-                    i11 = i7 + 1;
-                }
-                i9++;
-                i8 = i10;
-                i7 = i11;
-            }
-            if (i7 == 2 || i7 == 3) {
-                for (int i12 = 0; i12 < CHARACTER_ENCODINGS.length; i12++) {
-                    if (CHARACTER_ENCODINGS[i12] == i8) {
-                        c = ALPHABET[i12];
-                        break loop1;
-                    }
-                }
-            }
-            int i13 = i - 1;
-            i = i13;
-            if (i13 <= i3) {
-                c = '!';
+            if (k >= result.length()) {
+                break;
+            } else if (result.charAt(k) != startchar || k + 1 == result.length()) {
+                k++;
+            } else {
+                result.delete(k + 1, result.length() - 1);
                 break;
             }
         }
-        return c;
+        if (result.length() <= 6) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        result.deleteCharAt(result.length() - 1);
+        result.deleteCharAt(0);
+        float left = (start[1] + start[0]) / 2.0f;
+        float right = (nextStart + lastStart) / 2.0f;
+        return new Result(result.toString(), null, new ResultPoint[]{new ResultPoint(left, rowNumber), new ResultPoint(right, rowNumber)}, BarcodeFormat.CODABAR);
     }
 
-    @Override // com.google.zxing.oned.OneDReader
-    public Result decodeRow(int i, BitArray bitArray, Map<DecodeHintType, ?> map) throws NotFoundException {
-        int i2;
-        int nextSet;
-        int[] findAsteriskPattern = findAsteriskPattern(bitArray);
-        findAsteriskPattern[1] = 0;
-        int nextSet2 = bitArray.getNextSet(findAsteriskPattern[1]);
-        int size = bitArray.getSize();
-        StringBuilder sb = new StringBuilder();
-        int[] iArr = new int[7];
-        do {
-            i2 = nextSet2;
-            for (int i3 = 0; i3 < iArr.length; i3++) {
-                iArr[i3] = 0;
-            }
-            recordPattern(bitArray, i2, iArr);
-            char narrowWidePattern = toNarrowWidePattern(iArr);
-            if (narrowWidePattern == '!') {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            sb.append(narrowWidePattern);
-            int i4 = i2;
-            for (int i5 : iArr) {
-                i4 += i5;
-            }
-            nextSet = bitArray.getNextSet(i4);
-            nextSet2 = nextSet;
-        } while (nextSet < size);
-        int i6 = 0;
-        for (int i7 : iArr) {
-            i6 += i7;
-        }
-        if (nextSet == size || ((nextSet - i2) - i6) / 2 >= i6) {
-            if (sb.length() < 2) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            char charAt = sb.charAt(0);
-            if (!arrayContains(STARTEND_ENCODING, charAt)) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            int i8 = 1;
-            while (true) {
-                if (i8 >= sb.length()) {
-                    break;
+    private static int[] findAsteriskPattern(BitArray row) throws NotFoundException {
+        int width = row.getSize();
+        int rowOffset = row.getNextSet(0);
+        int counterPosition = 0;
+        int[] counters = new int[7];
+        int patternStart = rowOffset;
+        boolean isWhite = false;
+        int patternLength = counters.length;
+        for (int i = rowOffset; i < width; i++) {
+            if (row.get(i) ^ isWhite) {
+                counters[counterPosition] = counters[counterPosition] + 1;
+            } else {
+                if (counterPosition == patternLength - 1) {
+                    try {
+                        if (arrayContains(STARTEND_ENCODING, toNarrowWidePattern(counters)) && row.isRange(Math.max(0, patternStart - ((i - patternStart) / 2)), patternStart, false)) {
+                            return new int[]{patternStart, i};
+                        }
+                    } catch (IllegalArgumentException e) {
+                    }
+                    patternStart += counters[0] + counters[1];
+                    System.arraycopy(counters, 2, counters, 0, patternLength - 2);
+                    counters[patternLength - 2] = 0;
+                    counters[patternLength - 1] = 0;
+                    counterPosition--;
+                } else {
+                    counterPosition++;
                 }
-                if (sb.charAt(i8) == charAt && i8 + 1 != sb.length()) {
-                    sb.delete(i8 + 1, sb.length() - 1);
-                    break;
-                }
-                i8++;
+                counters[counterPosition] = 1;
+                isWhite = !isWhite;
             }
-            if (sb.length() <= 6) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            sb.deleteCharAt(sb.length() - 1);
-            sb.deleteCharAt(0);
-            return new Result(sb.toString(), null, new ResultPoint[]{new ResultPoint((findAsteriskPattern[1] + findAsteriskPattern[0]) / 2.0f, i), new ResultPoint((nextSet + i2) / 2.0f, i)}, BarcodeFormat.CODABAR);
         }
         throw NotFoundException.getNotFoundInstance();
+    }
+
+    public static boolean arrayContains(char[] array, char key) {
+        if (array != null) {
+            for (char c : array) {
+                if (c == key) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static char toNarrowWidePattern(int[] counters) {
+        int numCounters = counters.length;
+        int maxNarrowCounter = 0;
+        int minCounter = Execute.INVALID;
+        for (int i = 0; i < numCounters; i++) {
+            if (counters[i] < minCounter) {
+                minCounter = counters[i];
+            }
+            if (counters[i] > maxNarrowCounter) {
+                maxNarrowCounter = counters[i];
+            }
+        }
+        do {
+            int wideCounters = 0;
+            int pattern = 0;
+            for (int i2 = 0; i2 < numCounters; i2++) {
+                if (counters[i2] > maxNarrowCounter) {
+                    pattern |= 1 << ((numCounters - 1) - i2);
+                    wideCounters++;
+                }
+            }
+            if (wideCounters == 2 || wideCounters == 3) {
+                for (int i3 = 0; i3 < CHARACTER_ENCODINGS.length; i3++) {
+                    if (CHARACTER_ENCODINGS[i3] == pattern) {
+                        return ALPHABET[i3];
+                    }
+                }
+            }
+            maxNarrowCounter--;
+        } while (maxNarrowCounter > minCounter);
+        return '!';
     }
 }

@@ -1,6 +1,5 @@
 package com.anfengde.epub.db;
-
-/* loaded from: classes.jar:com/anfengde/epub/db/DBBooks.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class DBBooks {
     private String _author;
     private String _bookpath;
@@ -11,51 +10,51 @@ public class DBBooks {
     public DBBooks() {
     }
 
-    public DBBooks(String str, String str2, String str3, String str4, String str5) {
-        setIdentifier(str);
-        setName(str2);
-        setAuthor(str3);
-        setCoverimage(str4);
-        setBookpath(str5);
-    }
-
-    public String getAuthor() {
-        return this._author;
-    }
-
-    public String getBookpath() {
-        return this._bookpath;
-    }
-
-    public String getCoverimage() {
-        return this._coverimage;
+    public DBBooks(String identifier, String name, String author, String coverimage, String bookpath) {
+        setIdentifier(identifier);
+        setName(name);
+        setAuthor(author);
+        setCoverimage(coverimage);
+        setBookpath(bookpath);
     }
 
     public String getIdentifier() {
         return this._identifier;
     }
 
+    public void setIdentifier(String identifier) {
+        this._identifier = identifier;
+    }
+
     public String getName() {
         return this._name;
     }
 
-    public void setAuthor(String str) {
-        this._author = str;
+    public void setName(String name) {
+        this._name = name;
     }
 
-    public void setBookpath(String str) {
-        this._bookpath = str;
+    public String getAuthor() {
+        return this._author;
     }
 
-    public void setCoverimage(String str) {
-        this._coverimage = str;
+    public void setAuthor(String author) {
+        this._author = author;
     }
 
-    public void setIdentifier(String str) {
-        this._identifier = str;
+    public String getCoverimage() {
+        return this._coverimage;
     }
 
-    public void setName(String str) {
-        this._name = str;
+    public void setCoverimage(String coverimage) {
+        this._coverimage = coverimage;
+    }
+
+    public String getBookpath() {
+        return this._bookpath;
+    }
+
+    public void setBookpath(String bookpath) {
+        this._bookpath = bookpath;
     }
 }

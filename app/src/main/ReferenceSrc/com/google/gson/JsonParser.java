@@ -7,35 +7,20 @@ import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-
-/* loaded from: classes.jar:com/google/gson/JsonParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class JsonParser {
-    public JsonElement parse(JsonReader jsonReader) throws JsonIOException, JsonSyntaxException {
-        boolean isLenient = jsonReader.isLenient();
-        isLenient = true;
-        try {
-            try {
-                try {
-                    return Streams.parse(jsonReader);
-                } catch (OutOfMemoryError e) {
-                    throw new JsonParseException("Failed parsing JSON source: " + jsonReader + " to Json", e);
-                }
-            } catch (StackOverflowError e2) {
-                throw new JsonParseException("Failed parsing JSON source: " + jsonReader + " to Json", e2);
-            }
-        } finally {
-            jsonReader.setLenient(isLenient);
-        }
+    public JsonElement parse(String json) throws JsonSyntaxException {
+        return parse(new StringReader(json));
     }
 
-    public JsonElement parse(Reader reader) throws JsonIOException, JsonSyntaxException {
+    public JsonElement parse(Reader json) throws JsonIOException, JsonSyntaxException {
         try {
-            JsonReader jsonReader = new JsonReader(reader);
-            JsonElement parse = parse(jsonReader);
-            if (parse.isJsonNull() || jsonReader.peek() == JsonToken.END_DOCUMENT) {
-                return parse;
+            JsonReader jsonReader = new JsonReader(json);
+            JsonElement element = parse(jsonReader);
+            if (!element.isJsonNull() && jsonReader.peek() != JsonToken.END_DOCUMENT) {
+                throw new JsonSyntaxException("Did not consume the entire document.");
             }
-            throw new JsonSyntaxException("Did not consume the entire document.");
+            return element;
         } catch (MalformedJsonException e) {
             throw new JsonSyntaxException(e);
         } catch (IOException e2) {
@@ -45,7 +30,19 @@ public final class JsonParser {
         }
     }
 
-    public JsonElement parse(String str) throws JsonSyntaxException {
-        return parse(new StringReader(str));
+    public JsonElement parse(JsonReader json) throws JsonIOException, JsonSyntaxException {
+        boolean lenient = json.isLenient();
+        lenient = true;
+        try {
+            try {
+                return Streams.parse(json);
+            } catch (OutOfMemoryError e) {
+                throw new JsonParseException("Failed parsing JSON source: " + json + " to Json", e);
+            } catch (StackOverflowError e2) {
+                throw new JsonParseException("Failed parsing JSON source: " + json + " to Json", e2);
+            }
+        } finally {
+            json.setLenient(lenient);
+        }
     }
 }

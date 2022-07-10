@@ -1,8 +1,7 @@
 package com.google.zxing;
 
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/Reader.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface Reader {
     Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, ChecksumException, FormatException;
 

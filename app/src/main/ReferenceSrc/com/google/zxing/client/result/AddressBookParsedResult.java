@@ -1,6 +1,5 @@
 package com.google.zxing.client.result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/AddressBookParsedResult.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class AddressBookParsedResult extends ParsedResult {
     private final String[] addressTypes;
     private final String[] addresses;
@@ -19,75 +18,30 @@ public final class AddressBookParsedResult extends ParsedResult {
     private final String title;
     private final String url;
 
-    public AddressBookParsedResult(String[] strArr, String str, String[] strArr2, String[] strArr3, String[] strArr4, String[] strArr5, String str2, String str3, String[] strArr6, String[] strArr7, String str4, String str5, String str6, String str7) {
+    public AddressBookParsedResult(String[] names, String pronunciation, String[] phoneNumbers, String[] phoneTypes, String[] emails, String[] emailTypes, String instantMessenger, String note, String[] addresses, String[] addressTypes, String org2, String birthday, String title, String url) {
         super(ParsedResultType.ADDRESSBOOK);
-        this.names = strArr;
-        this.pronunciation = str;
-        this.phoneNumbers = strArr2;
-        this.phoneTypes = strArr3;
-        this.emails = strArr4;
-        this.emailTypes = strArr5;
-        this.instantMessenger = str2;
-        this.note = str3;
-        this.addresses = strArr6;
-        this.addressTypes = strArr7;
-        this.f0org = str4;
-        this.birthday = str5;
-        this.title = str6;
-        this.url = str7;
-    }
-
-    public String[] getAddressTypes() {
-        return this.addressTypes;
-    }
-
-    public String[] getAddresses() {
-        return this.addresses;
-    }
-
-    public String getBirthday() {
-        return this.birthday;
-    }
-
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
-        StringBuilder sb = new StringBuilder(100);
-        maybeAppend(this.names, sb);
-        maybeAppend(this.pronunciation, sb);
-        maybeAppend(this.title, sb);
-        maybeAppend(this.f0org, sb);
-        maybeAppend(this.addresses, sb);
-        maybeAppend(this.phoneNumbers, sb);
-        maybeAppend(this.emails, sb);
-        maybeAppend(this.instantMessenger, sb);
-        maybeAppend(this.url, sb);
-        maybeAppend(this.birthday, sb);
-        maybeAppend(this.note, sb);
-        return sb.toString();
-    }
-
-    public String[] getEmailTypes() {
-        return this.emailTypes;
-    }
-
-    public String[] getEmails() {
-        return this.emails;
-    }
-
-    public String getInstantMessenger() {
-        return this.instantMessenger;
+        this.names = names;
+        this.pronunciation = pronunciation;
+        this.phoneNumbers = phoneNumbers;
+        this.phoneTypes = phoneTypes;
+        this.emails = emails;
+        this.emailTypes = emailTypes;
+        this.instantMessenger = instantMessenger;
+        this.note = note;
+        this.addresses = addresses;
+        this.addressTypes = addressTypes;
+        this.f0org = org2;
+        this.birthday = birthday;
+        this.title = title;
+        this.url = url;
     }
 
     public String[] getNames() {
         return this.names;
     }
 
-    public String getNote() {
-        return this.note;
-    }
-
-    public String getOrg() {
-        return this.f0org;
+    public String getPronunciation() {
+        return this.pronunciation;
     }
 
     public String[] getPhoneNumbers() {
@@ -98,15 +52,60 @@ public final class AddressBookParsedResult extends ParsedResult {
         return this.phoneTypes;
     }
 
-    public String getPronunciation() {
-        return this.pronunciation;
+    public String[] getEmails() {
+        return this.emails;
+    }
+
+    public String[] getEmailTypes() {
+        return this.emailTypes;
+    }
+
+    public String getInstantMessenger() {
+        return this.instantMessenger;
+    }
+
+    public String getNote() {
+        return this.note;
+    }
+
+    public String[] getAddresses() {
+        return this.addresses;
+    }
+
+    public String[] getAddressTypes() {
+        return this.addressTypes;
     }
 
     public String getTitle() {
         return this.title;
     }
 
+    public String getOrg() {
+        return this.f0org;
+    }
+
     public String getURL() {
         return this.url;
+    }
+
+    public String getBirthday() {
+        return this.birthday;
+    }
+
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
+        StringBuilder result = new StringBuilder(100);
+        maybeAppend(this.names, result);
+        maybeAppend(this.pronunciation, result);
+        maybeAppend(this.title, result);
+        maybeAppend(this.f0org, result);
+        maybeAppend(this.addresses, result);
+        maybeAppend(this.phoneNumbers, result);
+        maybeAppend(this.emails, result);
+        maybeAppend(this.instantMessenger, result);
+        maybeAppend(this.url, result);
+        maybeAppend(this.birthday, result);
+        maybeAppend(this.note, result);
+        return result.toString();
     }
 }

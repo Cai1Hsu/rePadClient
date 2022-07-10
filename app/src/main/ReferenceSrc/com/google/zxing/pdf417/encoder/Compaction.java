@@ -1,6 +1,5 @@
 package com.google.zxing.pdf417.encoder;
-
-/* loaded from: classes.jar:com/google/zxing/pdf417/encoder/Compaction.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public enum Compaction {
     AUTO,
     TEXT,

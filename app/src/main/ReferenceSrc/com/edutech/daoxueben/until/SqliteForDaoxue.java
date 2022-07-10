@@ -11,8 +11,7 @@ import com.edutech.publicedu.log.LogHelp;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-/* loaded from: classes.jar:com/edutech/daoxueben/until/SqliteForDaoxue.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class SqliteForDaoxue {
     public SQLiteDatabase db = null;
     private Context mcontext;
@@ -32,26 +31,59 @@ public class SqliteForDaoxue {
         initDataBaseFile();
     }
 
-    private void initDataBaseFile() {
-        synchronized (this) {
-            File file = new File(SQLFILEPATH);
-            if (!file.isDirectory()) {
-                file.mkdirs();
+    private synchronized void initDataBaseFile() {
+        File file = new File(SQLFILEPATH);
+        if (!file.isDirectory()) {
+            file.mkdirs();
+        }
+        File dbFile = new File(String.valueOf(SQLFILEPATH) + AppEnvironment.STUDENT_ID + ".db");
+        if (!dbFile.exists()) {
+            try {
+                UpOrDownFile.firstInitSql = LogHelp.TYPE_GUIDANCE;
+                dbFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            File file2 = new File(String.valueOf(SQLFILEPATH) + AppEnvironment.STUDENT_ID + ".db");
-            if (!file2.exists()) {
-                try {
-                    UpOrDownFile.firstInitSql = LogHelp.TYPE_GUIDANCE;
-                    file2.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        }
+        if (this.db == null) {
+            this.db = SQLiteDatabase.openOrCreateDatabase(dbFile, (SQLiteDatabase.CursorFactory) null);
+        }
+        onCreateTable();
+    }
+
+    public boolean tabbleIsExist(String tableName) {
+        boolean result = false;
+        if (tableName == null) {
+            return false;
+        }
+        Cursor cursor = null;
+        try {
+            try {
+                String sql = "select count(*) as c from sqlite_master  where type ='table' and name ='" + tableName.trim() + "' ";
+                cursor = this.db.rawQuery(sql, null);
+                if (cursor.moveToNext()) {
+                    int count = cursor.getInt(0);
+                    if (count > 0) {
+                        result = true;
+                    }
+                }
+            } catch (Exception e) {
+                Log.d("tabbleIsExist", "操作失败");
+                if (cursor != null) {
+                    cursor.close();
                 }
             }
-            if (this.db == null) {
-                this.db = SQLiteDatabase.openOrCreateDatabase(file2, (SQLiteDatabase.CursorFactory) null);
+            return result;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
-            onCreateTable();
         }
+    }
+
+    public void onCreateTable() {
+        String sqlStr = "CREATE TABLE IF NOT EXISTS " + DAOXUE_TABLE + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + DAOXUE_ID + " TEXT," + DAOXUE_ISDOWNLOAD + " TEXT," + DAOXUE_BOOKID + " TEXT," + DAOXUE_DEFAULT1 + " TEXT," + DAOXUE_DEFAULT2 + " TEXT);";
+        this.db.execSQL(sqlStr);
     }
 
     public void close() {
@@ -63,137 +95,82 @@ public class SqliteForDaoxue {
         }
     }
 
-    public boolean containColums(String str, String str2, String[] strArr) {
-        boolean z = false;
-        boolean z2 = false;
+    public long insertDiscuss(String table, List<ContentValues> values) {
+        long num = 0;
         synchronized (this.db) {
-            if (this.db != null) {
-                Cursor query = this.db.query(str, null, str2, strArr, null, null, null, null);
-                if (query != null) {
-                    z2 = query.moveToFirst();
-                }
-                z = z2;
-                if (query != null) {
-                    query.close();
-                    z = z2;
-                }
-            }
-        }
-        return z;
-    }
-
-    public long deleteDiscuss(String str, String str2, String[] strArr) {
-        long j = 0;
-        synchronized (this.db) {
-            if (this.db != null) {
-                j = this.db.delete(str, str2, strArr);
-            }
-        }
-        return j;
-    }
-
-    public long insertDiscuss(String str, ContentValues contentValues) {
-        long j;
-        synchronized (this.db) {
-            j = 0;
             if (this.db != null) {
                 this.db.beginTransaction();
-                j = 0;
-                if (contentValues != null) {
-                    j = this.db.insert(str, null, contentValues);
-                }
-                this.db.setTransactionSuccessful();
-                this.db.endTransaction();
-            }
-        }
-        return j;
-    }
-
-    public long insertDiscuss(String str, List<ContentValues> list) {
-        long j;
-        synchronized (this.db) {
-            j = 0;
-            if (this.db != null) {
-                this.db.beginTransaction();
-                j = 0;
-                for (int i = 0; i < list.size(); i++) {
-                    ContentValues contentValues = list.get(i);
-                    if (contentValues != null) {
-                        j = this.db.insert(str, null, contentValues);
+                for (int i = 0; i < values.size(); i++) {
+                    ContentValues value = values.get(i);
+                    if (value != null) {
+                        num = this.db.insert(table, null, value);
                     }
                 }
                 this.db.setTransactionSuccessful();
                 this.db.endTransaction();
             }
         }
-        return j;
+        return num;
     }
 
-    public void onCreateTable() {
-        this.db.execSQL("CREATE TABLE IF NOT EXISTS " + DAOXUE_TABLE + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + DAOXUE_ID + " TEXT," + DAOXUE_ISDOWNLOAD + " TEXT," + DAOXUE_BOOKID + " TEXT," + DAOXUE_DEFAULT1 + " TEXT," + DAOXUE_DEFAULT2 + " TEXT);");
+    public long insertDiscuss(String table, ContentValues value) {
+        long num = 0;
+        synchronized (this.db) {
+            if (this.db != null) {
+                this.db.beginTransaction();
+                if (value != null) {
+                    num = this.db.insert(table, null, value);
+                }
+                this.db.setTransactionSuccessful();
+                this.db.endTransaction();
+            }
+        }
+        return num;
     }
 
-    public Cursor queryDiscuss(String str, String str2, String[] strArr, String str3) {
+    public long updateDiscuss(String table, ContentValues values, String whereClause, String[] whereArgs) {
+        long num = 0;
+        synchronized (this.db) {
+            if (this.db != null) {
+                num = this.db.update(table, values, whereClause, whereArgs);
+            }
+        }
+        return num;
+    }
+
+    public long deleteDiscuss(String table, String whereClause, String[] whereArgs) {
+        long num = 0;
+        synchronized (this.db) {
+            if (this.db != null) {
+                num = this.db.delete(table, whereClause, whereArgs);
+            }
+        }
+        return num;
+    }
+
+    public Cursor queryDiscuss(String table, String selection, String[] selectionArgs, String orderBy) {
         Cursor cursor = null;
         synchronized (this.db) {
             if (this.db != null) {
-                cursor = this.db.query(str, null, str2, strArr, null, null, str3, null);
+                cursor = this.db.query(table, null, selection, selectionArgs, null, null, orderBy, null);
             }
         }
         return cursor;
     }
 
-    /* JADX DEBUG: Another duplicated slice has different insns count: {[MOVE]}, finally: {[MOVE, MOVE, INVOKE, MOVE, INVOKE, IF] complete} */
-    public boolean tabbleIsExist(String str) {
-        boolean z;
-        if (str == null) {
-            z = false;
-        } else {
-            Cursor cursor = null;
-            Cursor cursor2 = null;
-            try {
-                try {
-                    Cursor rawQuery = this.db.rawQuery("select count(*) as c from sqlite_master  where type ='table' and name ='" + str.trim() + "' ", null);
-                    boolean z2 = false;
-                    if (rawQuery.moveToNext()) {
-                        cursor = rawQuery;
-                        cursor2 = rawQuery;
-                        z2 = false;
-                        if (rawQuery.getInt(0) > 0) {
-                            z2 = true;
-                        }
-                    }
-                    z = z2;
-                    if (rawQuery != null) {
-                        rawQuery.close();
-                        z = z2;
-                    }
-                } catch (Exception e) {
-                    cursor2 = cursor;
-                    Log.d("tabbleIsExist", "操作失败");
-                    z = false;
-                    if (cursor != null) {
-                        cursor.close();
-                        z = false;
-                    }
-                }
-            } catch (Throwable th) {
-                if (cursor2 != null) {
-                    cursor2.close();
-                }
-                throw th;
-            }
-        }
-        return z;
-    }
-
-    public long updateDiscuss(String str, ContentValues contentValues, String str2, String[] strArr) {
-        long j = 0;
+    public boolean containColums(String table, String selection, String[] selectionArgs) {
+        boolean boo = false;
         synchronized (this.db) {
             if (this.db != null) {
-                j = this.db.update(str, contentValues, str2, strArr);
+                Cursor cursor = this.db.query(table, null, selection, selectionArgs, null, null, null, null);
+                if (cursor != null) {
+                    boo = cursor.moveToFirst();
+                }
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
         }
-        return j;
+        return boo;
     }
 }

@@ -2,22 +2,22 @@ package com.google.zxing.oned.rss.expanded.decoders;
 
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI01AndOtherAIs.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class AI01AndOtherAIs extends AI01decoder {
     private static final int HEADER_SIZE = 4;
 
-    AI01AndOtherAIs(BitArray bitArray) {
-        super(bitArray);
+    public AI01AndOtherAIs(BitArray information) {
+        super(information);
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
     public String parseInformation() throws NotFoundException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("(01)");
-        int length = sb.length();
-        sb.append(getGeneralDecoder().extractNumericValueFromBitArray(4, 4));
-        encodeCompressedGtinWithoutAI(sb, 8, length);
-        return getGeneralDecoder().decodeAllCodes(sb, 48);
+        StringBuilder buff = new StringBuilder();
+        buff.append("(01)");
+        int initialGtinPosition = buff.length();
+        int firstGtinDigit = getGeneralDecoder().extractNumericValueFromBitArray(4, 4);
+        buff.append(firstGtinDigit);
+        encodeCompressedGtinWithoutAI(buff, 8, initialGtinPosition);
+        return getGeneralDecoder().decodeAllCodes(buff, 48);
     }
 }

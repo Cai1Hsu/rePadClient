@@ -1,8 +1,7 @@
 package com.pgyersdk.c;
 
 import android.content.Context;
-
-/* loaded from: classes.jar:com/pgyersdk/c/f.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class f {
     private static String a = "GLSurfaceUtils";
     private static f b = null;

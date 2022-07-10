@@ -1,6 +1,5 @@
 package com.google.zxing;
-
-/* loaded from: classes.jar:com/google/zxing/BarcodeFormat.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public enum BarcodeFormat {
     AZTEC,
     CODABAR,

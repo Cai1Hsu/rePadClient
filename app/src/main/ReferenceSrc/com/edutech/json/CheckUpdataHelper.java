@@ -6,9 +6,12 @@ import com.edutech.publicedu.log.LogHelp;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -16,444 +19,377 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.tools.ant.taskdefs.optional.vss.MSVSSConstants;
-
-/* loaded from: classes.jar:com/edutech/json/CheckUpdataHelper.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class CheckUpdataHelper {
     private static TreeData checkdata = new TreeData();
 
-    public static boolean aBookCheckUpdata(Tree<HashMap<String, Object>> tree, String str, String str2, String str3, String str4) {
-        boolean z = false;
-        if (tree.getHead() != null) {
-            z = false;
-            if (tree.getHead().get("id") != null) {
-                String obj = tree.getHead().get("id").toString();
-                ArrayList arrayList = new ArrayList();
-                ArrayList arrayList2 = new ArrayList();
-                getLeafCheckUpdateJson(arrayList2, arrayList, obj, tree, tree.getHead(), str4);
-                ArrayList arrayList3 = new ArrayList();
-                Iterator it = arrayList.iterator();
-                while (it.hasNext()) {
-                    HashMap hashMap = (HashMap) it.next();
-                    String str5 = (String) hashMap.get(KeyEnvironment.SOURCEID);
-                    String str6 = (String) hashMap.get(KeyEnvironment.UPDATETIME);
-                    int i = 0;
-                    boolean z2 = false;
-                    Iterator it2 = arrayList2.iterator();
-                    while (it2.hasNext()) {
-                        HashMap hashMap2 = (HashMap) it2.next();
-                        String str7 = (String) hashMap2.get(KeyEnvironment.SOURCEIDLIST);
-                        String str8 = (String) hashMap2.get(KeyEnvironment.COUNT);
-                        if (str7 != null && str5 != null && str7.indexOf(str5) != -1) {
-                            int intValue = i + Integer.valueOf(str8).intValue();
-                            String str9 = (String) hashMap2.get(KeyEnvironment.ISNEEDUPDATE);
-                            i = intValue;
-                            if (str9 != null) {
-                                i = intValue;
-                                if (str9.equals("true")) {
-                                    z2 = true;
-                                    i = intValue;
-                                }
-                            }
-                        }
-                    }
-                    if (z2) {
-                        hashMap.put(KeyEnvironment.COUNT, Integer.toString(i));
-                        HashMap hashMap3 = new HashMap();
-                        if (str4.equals("DaoXueBen")) {
-                            getPostHashMap(hashMap3, str5, LogHelp.TYPE_MYWORK, LogHelp.TYPE_GUIDANCE, str6, i);
-                        } else if (str4.equals("DaoXueBenNew")) {
-                            getPostHashMap(hashMap3, str5, LogHelp.TYPE_MYWORK, LogHelp.TYPE_GUIDANCE, str6, i);
-                        } else {
-                            getPostHashMap(hashMap3, str5, "4", LogHelp.TYPE_MYWORK, str6, 1);
-                        }
-                        Object MaptoJSONObject = JsonCreate.MaptoJSONObject(hashMap3);
-                        if (MaptoJSONObject != null) {
-                            arrayList3.add(MaptoJSONObject);
-                        }
-                    }
-                }
-                String postJson = getPostJson("", arrayList3);
-                z = false;
-                if (postJson != null) {
-                    z = false;
-                    if (!"".equals(postJson)) {
-                        String jsonUpdateHttpPost = jsonUpdateHttpPost(str, str2, postJson);
-                        z = false;
-                        if (jsonUpdateHttpPost != null) {
-                            z = false;
-                            if (!"".equals(jsonUpdateHttpPost)) {
-                                HashMap<String, Object> parse = new CommonJSONParser().parse(jsonUpdateHttpPost);
-                                z = false;
-                                if (parse != null) {
-                                    z = false;
-                                    if (parse.get("status") != null) {
-                                        z = false;
-                                        if (parse.get("errorNum") != null) {
-                                            ArrayList arrayList4 = new ArrayList();
-                                            getNeedCheckLeafBookIdList(arrayList4, parse);
-                                            z = false;
-                                            if (arrayList4.size() > 0) {
-                                                Iterator it3 = arrayList4.iterator();
-                                                z = false;
-                                                while (it3.hasNext()) {
-                                                    String str10 = (String) it3.next();
-                                                    Iterator it4 = arrayList.iterator();
-                                                    boolean z3 = z;
-                                                    while (true) {
-                                                        z = z3;
-                                                        if (it4.hasNext()) {
-                                                            HashMap hashMap4 = (HashMap) it4.next();
-                                                            if (str10.equals((String) hashMap4.get(KeyEnvironment.SOURCEID))) {
-                                                                z3 = updateIsNew(z3, checkdata.sourceidToList((String) hashMap4.get(KeyEnvironment.SOURCEIDLIST)), tree, tree.getHead(), str4);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return z;
-    }
-
-    public static String getBookCheckUpdateJson(String str, String str2) {
-        ArrayList<Books> parseBooksJson = JsonParse.parseBooksJson(new ArrayList(), str);
-        ArrayList arrayList = new ArrayList();
-        Iterator<Books> it = parseBooksJson.iterator();
+    public static String getBookCheckUpdateJson(String booksJsonPath, String appName) {
+        ArrayList<Books> books = new ArrayList<>();
+        ArrayList<Books> books2 = JsonParse.parseBooksJson(books, booksJsonPath);
+        ArrayList<Object> checkUpdataJsonList = new ArrayList<>();
+        Iterator<Books> it = books2.iterator();
         while (it.hasNext()) {
-            Books next = it.next();
-            String str3 = next.getbook_id();
-            next.getbook_path();
-            String book_updatetime = next.getBook_updatetime();
-            int book_total = next.getBook_total();
-            if (str3 != null && !"".equals(str3)) {
-                HashMap hashMap = new HashMap();
-                if (str2.equals("DaoXueBen")) {
-                    getPostHashMap(hashMap, str3, LogHelp.TYPE_GUIDANCE, LogHelp.TYPE_GUIDANCE, book_updatetime, book_total);
-                } else if (str2.equals("DaoXueBenNew")) {
-                    getPostHashMap(hashMap, str3, LogHelp.TYPE_GUIDANCE, LogHelp.TYPE_GUIDANCE, book_updatetime, book_total);
+            Books tempBook = it.next();
+            String bookid = tempBook.getbook_id();
+            tempBook.getbook_path();
+            String book_updatetime = tempBook.getBook_updatetime();
+            int book_total = tempBook.getBook_total();
+            if (bookid != null && !"".equals(bookid)) {
+                HashMap<String, Object> bookinfo = new HashMap<>();
+                if (appName.equals("DaoXueBen")) {
+                    getPostHashMap(bookinfo, bookid, LogHelp.TYPE_GUIDANCE, LogHelp.TYPE_GUIDANCE, book_updatetime, book_total);
+                } else if (appName.equals("DaoXueBenNew")) {
+                    getPostHashMap(bookinfo, bookid, LogHelp.TYPE_GUIDANCE, LogHelp.TYPE_GUIDANCE, book_updatetime, book_total);
                 } else {
-                    getPostHashMap(hashMap, str3, LogHelp.TYPE_GUIDANCE, LogHelp.TYPE_MYWORK, book_updatetime, book_total);
+                    getPostHashMap(bookinfo, bookid, LogHelp.TYPE_GUIDANCE, LogHelp.TYPE_MYWORK, book_updatetime, book_total);
                 }
-                Object MaptoJSONObject = JsonCreate.MaptoJSONObject(hashMap);
-                if (MaptoJSONObject != null) {
-                    arrayList.add(MaptoJSONObject);
+                Object newObject = JsonCreate.MaptoJSONObject(bookinfo);
+                if (newObject != null) {
+                    checkUpdataJsonList.add(newObject);
                 }
             }
         }
-        return getPostJson("", arrayList);
+        String postJson = getPostJson("", checkUpdataJsonList);
+        return postJson;
     }
 
-    private static void getLeafCheckUpdateJson(ArrayList<HashMap<String, String>> arrayList, ArrayList<HashMap<String, String>> arrayList2, String str, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, String str2) {
-        for (HashMap<String, Object> hashMap2 : tree.getSuccessors(hashMap)) {
-            if (hashMap2.get("id") != null && hashMap2.get("updatetime") != null) {
-                String obj = hashMap2.get("id").toString();
-                String str3 = String.valueOf(str) + "_" + obj;
-                String obj2 = hashMap2.get("updatetime").toString();
-                if (str2.equals("DaoXueBen")) {
-                    boolean z = false;
-                    if (hashMap2.get("isdown") != null) {
-                        try {
-                            z = ((Boolean) hashMap2.get("isdown")).booleanValue();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            z = false;
-                        }
-                    }
-                    if (z) {
-                        HashMap<String, String> hashMap3 = new HashMap<>();
-                        hashMap3.put(KeyEnvironment.SOURCEID, obj);
-                        hashMap3.put(KeyEnvironment.SOURCEIDLIST, str3);
-                        hashMap3.put(KeyEnvironment.ISUPDATED, "0");
-                        hashMap3.put(KeyEnvironment.UPDATETIME, obj2);
-                        arrayList2.add(hashMap3);
-                    }
-                    int i = 0;
-                    if (hashMap2.get(KeyEnvironment.KEYWEBPATH) != null) {
-                        i = 0 + checkdata.getValueList(new ArrayList<>(), hashMap2.get(KeyEnvironment.KEYWEBPATH)).size();
-                    }
-                    int i2 = i;
-                    if (hashMap2.get("exams") != null) {
-                        i2 = i + checkdata.getValueList(new ArrayList<>(), hashMap2.get("exams")).size();
-                    }
-                    if (i2 > 0) {
-                        HashMap<String, String> hashMap4 = new HashMap<>();
-                        hashMap4.put(KeyEnvironment.SOURCEIDLIST, str3);
-                        hashMap4.put(KeyEnvironment.COUNT, Integer.toString(i2));
-                        arrayList.add(hashMap4);
-                    }
-                } else if (str2.equals("DaoXueBenNew")) {
-                    if (str3 != null) {
-                        HashMap<String, String> hashMap5 = new HashMap<>();
-                        hashMap5.put(KeyEnvironment.SOURCEID, obj);
-                        hashMap5.put(KeyEnvironment.SOURCEIDLIST, str3);
-                        hashMap5.put(KeyEnvironment.ISUPDATED, "0");
-                        hashMap5.put(KeyEnvironment.UPDATETIME, obj2);
-                        arrayList2.add(hashMap5);
-                    }
-                    int i3 = 0;
-                    boolean z2 = false;
-                    if (hashMap2.get("dxitems") != null) {
-                        ArrayList<Object> valueList = checkdata.getValueList(new ArrayList<>(), hashMap2.get("dxitems"));
-                        if (valueList != null && valueList.size() > 0) {
-                            int i4 = 0;
-                            while (i4 < valueList.size()) {
-                                HashMap<String, Object> hashMap6 = JsonParse.geteObjectToMap(valueList.get(i4));
-                                boolean z3 = z2;
-                                int i5 = i3;
-                                if (hashMap6 != null) {
-                                    int i6 = i3;
-                                    if (hashMap6.get(KeyEnvironment.KEYWEBPATH) != null) {
-                                        i6 = i3 + checkdata.getValueList(new ArrayList<>(), hashMap6.get(KeyEnvironment.KEYWEBPATH)).size();
-                                    }
-                                    int i7 = i6;
-                                    if (hashMap6.get("exams") != null) {
-                                        i7 = i6 + checkdata.getValueList(new ArrayList<>(), hashMap6.get("exams")).size();
-                                    }
-                                    z3 = z2;
-                                    i5 = i7;
-                                    if (hashMap6.get("isdown") != null) {
-                                        z3 = z2;
-                                        i5 = i7;
-                                        if (((Boolean) hashMap6.get("isdown")).booleanValue()) {
-                                            z3 = ((Boolean) hashMap6.get("isdown")).booleanValue();
-                                            i5 = i7;
-                                        }
-                                    }
-                                }
-                                i4++;
-                                z2 = z3;
-                                i3 = i5;
-                            }
-                            if (i3 > 0) {
-                                HashMap<String, String> hashMap7 = new HashMap<>();
-                                hashMap7.put(KeyEnvironment.SOURCEIDLIST, str3);
-                                hashMap7.put(KeyEnvironment.COUNT, Integer.toString(i3));
-                                hashMap7.put(KeyEnvironment.ISNEEDUPDATE, String.valueOf(z2));
-                                arrayList.add(hashMap7);
-                            }
-                        }
-                    }
-                } else if (hashMap2.get("question") != null) {
-                    Iterator<Object> it = checkdata.getValueList(new ArrayList<>(), hashMap2.get("question")).iterator();
-                    while (it.hasNext()) {
-                        HashMap<String, Object> hashMap8 = JsonParse.geteObjectToMap(it.next());
-                        if (hashMap8 != null && hashMap8.get("id") != null && hashMap8.get("updatetime") != null) {
-                            String obj3 = hashMap8.get("id").toString();
-                            String obj4 = hashMap2.get("updatetime").toString();
-                            boolean z4 = false;
-                            if (hashMap8.get("isdown") != null) {
-                                try {
-                                    z4 = ((Boolean) hashMap8.get("isdown")).booleanValue();
-                                } catch (Exception e2) {
-                                    e2.printStackTrace();
-                                    z4 = false;
-                                }
-                            }
-                            if (z4) {
-                                HashMap<String, String> hashMap9 = new HashMap<>();
-                                hashMap9.put(KeyEnvironment.SOURCEID, obj3);
-                                hashMap9.put(KeyEnvironment.SOURCEIDLIST, String.valueOf(str3) + "_" + obj3);
-                                hashMap9.put(KeyEnvironment.ISUPDATED, "0");
-                                hashMap9.put(KeyEnvironment.UPDATETIME, obj4);
-                                hashMap9.put(KeyEnvironment.COUNT, LogHelp.TYPE_GUIDANCE);
-                                arrayList2.add(hashMap9);
-                            }
-                        }
-                    }
-                }
-                if (hashMap2.get("children") != null) {
-                    getLeafCheckUpdateJson(arrayList, arrayList2, str3, tree, hashMap2, str2);
-                }
-                str = checkdata.removeSourceId(str3);
+    private static void getPostHashMap(HashMap<String, Object> bookinfo, String bookid, String type, String source, String updatetime, int count) {
+        bookinfo.put("id", bookid);
+        bookinfo.put("type", type);
+        bookinfo.put("source", source);
+        bookinfo.put("updatetime", updatetime);
+        bookinfo.put("total", Integer.valueOf(count));
+    }
+
+    private static String getPostJson(String postJson, ArrayList<Object> checkUpdataJsonList) {
+        Object JsonListObject;
+        if (checkUpdataJsonList.size() > 0 && (JsonListObject = JsonCreate.toJSONArrayObject(checkUpdataJsonList)) != null) {
+            HashMap<String, Object> postCheckJson = new HashMap<>();
+            postCheckJson.put("data", JsonListObject);
+            Object postObject = JsonCreate.MaptoJSONObject(postCheckJson);
+            if (postObject != null) {
+                return postObject.toString();
             }
+            return postJson;
         }
+        return postJson;
     }
 
-    public static Tree<HashMap<String, Object>> getLocalTree(String str, String str2, String str3) {
-        String str4 = String.valueOf(str) + str2 + "/json.json";
-        Tree<HashMap<String, Object>> tree = null;
-        if (new File(str4).exists()) {
-            tree = JsonParse.parsejson(null, JsonHelper.getFileString(str4), "data", "children");
+    public static Tree<HashMap<String, Object>> getLocalTree(String offline_download, String bookid, String appName) {
+        String bookJsonPath = String.valueOf(offline_download) + bookid + "/json.json";
+        File bookJsonFile = new File(bookJsonPath);
+        if (!bookJsonFile.exists()) {
+            return null;
         }
-        return tree;
+        String localjson = JsonHelper.getFileString(bookJsonPath);
+        Tree<HashMap<String, Object>> localTree = JsonParse.parsejson(null, localjson, "data", "children");
+        return localTree;
     }
 
-    public static ArrayList<String> getNeedCheckLeafBookIdList(ArrayList<String> arrayList, HashMap<String, Object> hashMap) {
-        boolean z;
+    public static String jsonUpdateHttpPost(String ip, String studentid, String json) {
+        String url = AppEnvironment.UPDATEJSON_HTTPPOST_URL(ip, studentid);
+        if (json == null || "".equals(json)) {
+            return "";
+        }
+        HttpPost httpRequest = new HttpPost(url);
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("data", json));
         try {
-            z = ((Boolean) hashMap.get("status")).booleanValue();
+            httpRequest.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                String strResult = EntityUtils.toString(httpResponse.getEntity());
+                return strResult;
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        } catch (Exception e3) {
+            e3.printStackTrace();
+        }
+        return "";
+    }
+
+    public static ArrayList<String> getNeedCheckLeafBookIdList(ArrayList<String> bookidList, HashMap<String, Object> tempMap) {
+        boolean status = false;
+        try {
+            status = ((Boolean) tempMap.get("status")).booleanValue();
         } catch (Exception e) {
             e.printStackTrace();
-            z = false;
         }
-        int intValue = Integer.valueOf(hashMap.get("errorNum").toString()).intValue();
-        if (z && intValue == 0 && hashMap.get("data") != null) {
-            ArrayList<Object> valueList = new TreeData().getValueList(new ArrayList<>(), hashMap.get("data"));
-            if (valueList.size() > 0) {
-                Iterator<Object> it = valueList.iterator();
+        int errorNum = Integer.valueOf(tempMap.get("errorNum").toString()).intValue();
+        if (status && errorNum == 0 && tempMap.get("data") != null) {
+            ArrayList<Object> dataList = new ArrayList<>();
+            TreeData datatree = new TreeData();
+            ArrayList<Object> dataList2 = datatree.getValueList(dataList, tempMap.get("data"));
+            if (dataList2.size() > 0) {
+                Iterator<Object> it = dataList2.iterator();
                 while (it.hasNext()) {
-                    HashMap<String, Object> hashMap2 = JsonParse.geteObjectToMap(it.next());
-                    if (hashMap2 != null && hashMap2.get(MSVSSConstants.TIME_UPDATED) != null) {
-                        boolean z2 = false;
+                    Object tempDataObject = it.next();
+                    HashMap<String, Object> tempDataMap = JsonParse.geteObjectToMap(tempDataObject);
+                    if (tempDataMap != null && tempDataMap.get(MSVSSConstants.TIME_UPDATED) != null) {
+                        boolean updated = false;
                         try {
-                            z2 = ((Boolean) hashMap2.get(MSVSSConstants.TIME_UPDATED)).booleanValue();
+                            updated = ((Boolean) tempDataMap.get(MSVSSConstants.TIME_UPDATED)).booleanValue();
                         } catch (Exception e2) {
                             e2.printStackTrace();
                         }
-                        if (z2 && hashMap2.get("id") != null) {
-                            arrayList.add(hashMap2.get("id").toString());
+                        if (updated && tempDataMap.get("id") != null) {
+                            String id = tempDataMap.get("id").toString();
+                            bookidList.add(id);
                         }
                     }
                 }
             }
         }
-        return arrayList;
+        return bookidList;
     }
 
-    private static void getPostHashMap(HashMap<String, Object> hashMap, String str, String str2, String str3, String str4, int i) {
-        hashMap.put("id", str);
-        hashMap.put("type", str2);
-        hashMap.put("source", str3);
-        hashMap.put("updatetime", str4);
-        hashMap.put("total", Integer.valueOf(i));
-    }
-
-    private static String getPostJson(String str, ArrayList<Object> arrayList) {
-        String str2 = str;
-        if (arrayList.size() > 0) {
-            Object jSONArrayObject = JsonCreate.toJSONArrayObject(arrayList);
-            str2 = str;
-            if (jSONArrayObject != null) {
-                HashMap hashMap = new HashMap();
-                hashMap.put("data", jSONArrayObject);
-                Object MaptoJSONObject = JsonCreate.MaptoJSONObject(hashMap);
-                str2 = str;
-                if (MaptoJSONObject != null) {
-                    str2 = MaptoJSONObject.toString();
-                }
-            }
-        }
-        return str2;
-    }
-
-    public static String jsonUpdateHttpPost(String str, String str2, String str3) {
-        String str4;
-        String UPDATEJSON_HTTPPOST_URL = AppEnvironment.UPDATEJSON_HTTPPOST_URL(str, str2);
-        if (str3 == null || "".equals(str3)) {
-            str4 = "";
-        } else {
-            HttpPost httpPost = new HttpPost(UPDATEJSON_HTTPPOST_URL);
-            ArrayList arrayList = new ArrayList();
-            arrayList.add(new BasicNameValuePair("data", str3));
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(arrayList, "UTF-8"));
-                HttpResponse execute = new DefaultHttpClient().execute(httpPost);
-                if (execute.getStatusLine().getStatusCode() == 200) {
-                    str4 = EntityUtils.toString(execute.getEntity());
-                }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            } catch (Exception e3) {
-                e3.printStackTrace();
-            }
-            str4 = "";
-        }
-        return str4;
-    }
-
-    private static boolean updateIsNew(boolean z, ArrayList<String> arrayList, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, String str) {
-        HashMap<String, Object> hashMap2;
-        boolean z2;
-        int i = 1;
-        boolean z3 = z;
-        while (i < arrayList.size()) {
-            String str2 = arrayList.get(i);
-            Iterator<HashMap<String, Object>> it = tree.getSuccessors(hashMap).iterator();
-            while (true) {
-                if (!it.hasNext()) {
-                    hashMap2 = hashMap;
-                    z2 = z3;
-                    break;
-                }
-                HashMap<String, Object> next = it.next();
-                if (next.get("id") != null && str2.equals(next.get("id").toString())) {
-                    if (str.equals("DaoXueBen")) {
-                        z2 = z3;
-                        hashMap2 = next;
-                        if (i == arrayList.size() - 1) {
-                            z2 = true;
-                            checkdata.changeTreeData(tree, next, true, AppEnvironment.ISNEW);
-                            hashMap2 = next;
+    public static boolean aBookCheckUpdata(Tree<HashMap<String, Object>> localTree, String ip, String studentid, String bookid, String appName) {
+        String leafReturnJson;
+        boolean isNew = false;
+        if (localTree.getHead() != null && localTree.getHead().get("id") != null) {
+            String bookId = localTree.getHead().get("id").toString();
+            ArrayList<HashMap<String, String>> idList = new ArrayList<>();
+            ArrayList<HashMap<String, String>> countList = new ArrayList<>();
+            getLeafCheckUpdateJson(countList, idList, bookId, localTree, localTree.getHead(), appName);
+            ArrayList<Object> checkUpdataJsonList = new ArrayList<>();
+            Iterator<HashMap<String, String>> it = idList.iterator();
+            while (it.hasNext()) {
+                HashMap<String, String> tempidList = it.next();
+                String id = tempidList.get(KeyEnvironment.SOURCEID);
+                String updatetime = tempidList.get(KeyEnvironment.UPDATETIME);
+                int count = 0;
+                boolean isneedupdate = false;
+                Iterator<HashMap<String, String>> it2 = countList.iterator();
+                while (it2.hasNext()) {
+                    HashMap<String, String> tempcountList = it2.next();
+                    String countid = tempcountList.get(KeyEnvironment.SOURCEIDLIST);
+                    String strcount = tempcountList.get(KeyEnvironment.COUNT);
+                    if (countid != null && id != null && countid.indexOf(id) != -1) {
+                        count += Integer.valueOf(strcount).intValue();
+                        String needcount = tempcountList.get(KeyEnvironment.ISNEEDUPDATE);
+                        if (needcount != null && needcount.equals("true")) {
+                            isneedupdate = true;
                         }
-                    } else if (str.equals("DaoXueBenNew")) {
-                        z2 = z3;
-                        hashMap2 = next;
-                        if (i == arrayList.size() - 1) {
-                            z2 = true;
-                            checkdata.changeTreeData(tree, next, true, AppEnvironment.ISNEW);
-                            hashMap2 = next;
-                        }
+                    }
+                }
+                if (isneedupdate) {
+                    tempidList.put(KeyEnvironment.COUNT, Integer.toString(count));
+                    HashMap<String, Object> bookinfo = new HashMap<>();
+                    if (appName.equals("DaoXueBen")) {
+                        getPostHashMap(bookinfo, id, LogHelp.TYPE_MYWORK, LogHelp.TYPE_GUIDANCE, updatetime, count);
+                    } else if (appName.equals("DaoXueBenNew")) {
+                        getPostHashMap(bookinfo, id, LogHelp.TYPE_MYWORK, LogHelp.TYPE_GUIDANCE, updatetime, count);
                     } else {
-                        z2 = z3;
-                        hashMap2 = next;
-                        if (i == arrayList.size() - 2) {
-                            String str3 = arrayList.get(arrayList.size() - 1);
-                            z2 = z3;
-                            hashMap2 = next;
-                            if (str3 != null) {
-                                z2 = z3;
-                                hashMap2 = next;
-                                if (!"".equals(str3)) {
-                                    z2 = z3;
-                                    hashMap2 = next;
-                                    if (next.get("question") != null) {
-                                        ArrayList<Object> valueList = checkdata.getValueList(new ArrayList<>(), next.get("question"));
-                                        z2 = z3;
-                                        hashMap2 = next;
-                                        if (valueList != null) {
-                                            z2 = z3;
-                                            hashMap2 = next;
-                                            if (valueList.size() > 0) {
-                                                int i2 = 0;
-                                                while (true) {
-                                                    if (i2 < valueList.size()) {
-                                                        HashMap<String, Object> hashMap3 = JsonParse.geteObjectToMap(valueList.get(i2));
-                                                        if (hashMap3 != null && hashMap3.get("id") != null && str3.equals(hashMap3.get("id").toString())) {
-                                                            z2 = true;
-                                                            hashMap3.put(AppEnvironment.ISNEW, true);
-                                                            valueList.set(i2, JsonCreate.MaptoJSONObject(hashMap3));
-                                                            break;
-                                                        }
-                                                        i2++;
-                                                    } else {
-                                                        z2 = z3;
-                                                        break;
-                                                    }
-                                                }
-                                                checkdata.changeTreeData(tree, next, JsonCreate.toJSONArrayObject(valueList), "question");
-                                                hashMap2 = next;
-                                            }
-                                        }
-                                    }
+                        getPostHashMap(bookinfo, id, "4", LogHelp.TYPE_MYWORK, updatetime, 1);
+                    }
+                    Object newObject = JsonCreate.MaptoJSONObject(bookinfo);
+                    if (newObject != null) {
+                        checkUpdataJsonList.add(newObject);
+                    }
+                }
+            }
+            String postJson = getPostJson("", checkUpdataJsonList);
+            if (postJson != null && !"".equals(postJson) && (leafReturnJson = jsonUpdateHttpPost(ip, studentid, postJson)) != null && !"".equals(leafReturnJson)) {
+                CommonJSONParser common = new CommonJSONParser();
+                HashMap<String, Object> leaftempMap = common.parse(leafReturnJson);
+                if (leaftempMap != null && leaftempMap.get("status") != null && leaftempMap.get("errorNum") != null) {
+                    ArrayList<String> leafidList = new ArrayList<>();
+                    getNeedCheckLeafBookIdList(leafidList, leaftempMap);
+                    if (leafidList.size() > 0) {
+                        Iterator<String> it3 = leafidList.iterator();
+                        while (it3.hasNext()) {
+                            String strleafid = it3.next();
+                            Iterator<HashMap<String, String>> it4 = idList.iterator();
+                            while (it4.hasNext()) {
+                                HashMap<String, String> tempidList2 = it4.next();
+                                String tempid = tempidList2.get(KeyEnvironment.SOURCEID);
+                                if (strleafid.equals(tempid)) {
+                                    String sourceIdList = tempidList2.get(KeyEnvironment.SOURCEIDLIST);
+                                    ArrayList<String> stridList = checkdata.sourceidToList(sourceIdList);
+                                    isNew = updateIsNew(isNew, stridList, localTree, localTree.getHead(), appName);
                                 }
                             }
                         }
                     }
                 }
             }
-            i++;
-            z3 = z2;
-            hashMap = hashMap2;
         }
-        return z3;
+        return isNew;
+    }
+
+    private static void getLeafCheckUpdateJson(ArrayList<HashMap<String, String>> countList, ArrayList<HashMap<String, String>> idList, String sourceId, Tree<HashMap<String, Object>> localTree, HashMap<String, Object> head, String appName) {
+        Collection<HashMap<String, Object>> Successors = localTree.getSuccessors(head);
+        for (HashMap<String, Object> tempSuccessors : Successors) {
+            if (tempSuccessors.get("id") != null && tempSuccessors.get("updatetime") != null) {
+                String id = tempSuccessors.get("id").toString();
+                String sourceId2 = String.valueOf(sourceId) + "_" + id;
+                String updatetime = tempSuccessors.get("updatetime").toString();
+                if (appName.equals("DaoXueBen")) {
+                    boolean boolisdown = false;
+                    if (tempSuccessors.get("isdown") != null) {
+                        try {
+                            boolisdown = ((Boolean) tempSuccessors.get("isdown")).booleanValue();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (boolisdown) {
+                        HashMap<String, String> hashList = new HashMap<>();
+                        hashList.put(KeyEnvironment.SOURCEID, id);
+                        hashList.put(KeyEnvironment.SOURCEIDLIST, sourceId2);
+                        hashList.put(KeyEnvironment.ISUPDATED, "0");
+                        hashList.put(KeyEnvironment.UPDATETIME, updatetime);
+                        idList.add(hashList);
+                    }
+                    int leafcount = 0;
+                    if (tempSuccessors.get(KeyEnvironment.KEYWEBPATH) != null) {
+                        ArrayList<Object> webpathList = new ArrayList<>();
+                        leafcount = 0 + checkdata.getValueList(webpathList, tempSuccessors.get(KeyEnvironment.KEYWEBPATH)).size();
+                    }
+                    if (tempSuccessors.get("exams") != null) {
+                        ArrayList<Object> examsobjectList = new ArrayList<>();
+                        leafcount += checkdata.getValueList(examsobjectList, tempSuccessors.get("exams")).size();
+                    }
+                    if (leafcount > 0) {
+                        HashMap<String, String> hashcount = new HashMap<>();
+                        hashcount.put(KeyEnvironment.SOURCEIDLIST, sourceId2);
+                        hashcount.put(KeyEnvironment.COUNT, Integer.toString(leafcount));
+                        countList.add(hashcount);
+                    }
+                } else if (appName.equals("DaoXueBenNew")) {
+                    if (sourceId2 != null) {
+                        HashMap<String, String> hashList2 = new HashMap<>();
+                        hashList2.put(KeyEnvironment.SOURCEID, id);
+                        hashList2.put(KeyEnvironment.SOURCEIDLIST, sourceId2);
+                        hashList2.put(KeyEnvironment.ISUPDATED, "0");
+                        hashList2.put(KeyEnvironment.UPDATETIME, updatetime);
+                        idList.add(hashList2);
+                    }
+                    int leafcount2 = 0;
+                    boolean isNeedUpdate = false;
+                    if (tempSuccessors.get("dxitems") != null) {
+                        ArrayList<Object> dxitemsobjectList = checkdata.getValueList(new ArrayList<>(), tempSuccessors.get("dxitems"));
+                        if (dxitemsobjectList != null && dxitemsobjectList.size() > 0) {
+                            for (int i = 0; i < dxitemsobjectList.size(); i++) {
+                                HashMap<String, Object> tempMap = JsonParse.geteObjectToMap(dxitemsobjectList.get(i));
+                                if (tempMap != null) {
+                                    if (tempMap.get(KeyEnvironment.KEYWEBPATH) != null) {
+                                        ArrayList<Object> webpathList2 = new ArrayList<>();
+                                        leafcount2 += checkdata.getValueList(webpathList2, tempMap.get(KeyEnvironment.KEYWEBPATH)).size();
+                                    }
+                                    if (tempMap.get("exams") != null) {
+                                        ArrayList<Object> examsobjectList2 = new ArrayList<>();
+                                        leafcount2 += checkdata.getValueList(examsobjectList2, tempMap.get("exams")).size();
+                                    }
+                                    if (tempMap.get("isdown") != null && ((Boolean) tempMap.get("isdown")).booleanValue()) {
+                                        isNeedUpdate = ((Boolean) tempMap.get("isdown")).booleanValue();
+                                    }
+                                }
+                            }
+                            if (leafcount2 > 0) {
+                                HashMap<String, String> hashcount2 = new HashMap<>();
+                                hashcount2.put(KeyEnvironment.SOURCEIDLIST, sourceId2);
+                                hashcount2.put(KeyEnvironment.COUNT, Integer.toString(leafcount2));
+                                hashcount2.put(KeyEnvironment.ISNEEDUPDATE, String.valueOf(isNeedUpdate));
+                                countList.add(hashcount2);
+                            }
+                        }
+                    }
+                } else if (tempSuccessors.get("question") != null) {
+                    ArrayList<Object> questionList = new ArrayList<>();
+                    Iterator<Object> it = checkdata.getValueList(questionList, tempSuccessors.get("question")).iterator();
+                    while (it.hasNext()) {
+                        Object tempQues = it.next();
+                        HashMap<String, Object> hashQuesMap = JsonParse.geteObjectToMap(tempQues);
+                        if (hashQuesMap != null && hashQuesMap.get("id") != null && hashQuesMap.get("updatetime") != null) {
+                            String quesid = hashQuesMap.get("id").toString();
+                            String quesupdatetime = tempSuccessors.get("updatetime").toString();
+                            boolean boolisdown2 = false;
+                            if (hashQuesMap.get("isdown") != null) {
+                                try {
+                                    boolisdown2 = ((Boolean) hashQuesMap.get("isdown")).booleanValue();
+                                } catch (Exception e2) {
+                                    e2.printStackTrace();
+                                }
+                            }
+                            if (boolisdown2) {
+                                HashMap<String, String> hashList3 = new HashMap<>();
+                                hashList3.put(KeyEnvironment.SOURCEID, quesid);
+                                hashList3.put(KeyEnvironment.SOURCEIDLIST, String.valueOf(sourceId2) + "_" + quesid);
+                                hashList3.put(KeyEnvironment.ISUPDATED, "0");
+                                hashList3.put(KeyEnvironment.UPDATETIME, quesupdatetime);
+                                hashList3.put(KeyEnvironment.COUNT, LogHelp.TYPE_GUIDANCE);
+                                idList.add(hashList3);
+                            }
+                        }
+                    }
+                }
+                if (tempSuccessors.get("children") != null) {
+                    getLeafCheckUpdateJson(countList, idList, sourceId2, localTree, tempSuccessors, appName);
+                }
+                sourceId = checkdata.removeSourceId(sourceId2);
+            }
+        }
+    }
+
+    private static boolean updateIsNew(boolean isNew, ArrayList<String> idList, Tree<HashMap<String, Object>> localTree, HashMap<String, Object> head, String appName) {
+        String quesid;
+        for (int i = 1; i < idList.size(); i++) {
+            String id = idList.get(i);
+            Collection<HashMap<String, Object>> Successors = localTree.getSuccessors(head);
+            Iterator<HashMap<String, Object>> it = Successors.iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    break;
+                }
+                HashMap<String, Object> tempSuccessors = it.next();
+                if (tempSuccessors.get("id") != null) {
+                    String leafid = tempSuccessors.get("id").toString();
+                    if (id.equals(leafid)) {
+                        head = tempSuccessors;
+                        if (appName.equals("DaoXueBen")) {
+                            if (i == idList.size() - 1) {
+                                isNew = true;
+                                checkdata.changeTreeData(localTree, head, true, AppEnvironment.ISNEW);
+                            }
+                        } else if (appName.equals("DaoXueBenNew")) {
+                            if (i == idList.size() - 1) {
+                                isNew = true;
+                                checkdata.changeTreeData(localTree, head, true, AppEnvironment.ISNEW);
+                            }
+                        } else if (i == idList.size() - 2 && (quesid = idList.get(idList.size() - 1)) != null && !"".equals(quesid) && head.get("question") != null) {
+                            ArrayList<Object> quesObjectList = checkdata.getValueList(new ArrayList<>(), head.get("question"));
+                            if (quesObjectList != null && quesObjectList.size() > 0) {
+                                int j = 0;
+                                while (true) {
+                                    if (j >= quesObjectList.size()) {
+                                        break;
+                                    }
+                                    Object tempQues = quesObjectList.get(j);
+                                    HashMap<String, Object> tempQuesMap = JsonParse.geteObjectToMap(tempQues);
+                                    if (tempQuesMap != null && tempQuesMap.get("id") != null) {
+                                        String tempQuesid = tempQuesMap.get("id").toString();
+                                        if (quesid.equals(tempQuesid)) {
+                                            isNew = true;
+                                            tempQuesMap.put(AppEnvironment.ISNEW, true);
+                                            Object newQuesObject = JsonCreate.MaptoJSONObject(tempQuesMap);
+                                            quesObjectList.set(j, newQuesObject);
+                                            break;
+                                        }
+                                    }
+                                    j++;
+                                }
+                                Object newQuesListObject = JsonCreate.toJSONArrayObject(quesObjectList);
+                                checkdata.changeTreeData(localTree, head, newQuesListObject, "question");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return isNew;
     }
 }

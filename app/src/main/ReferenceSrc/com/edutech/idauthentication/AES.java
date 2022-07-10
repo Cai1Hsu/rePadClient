@@ -4,88 +4,98 @@ import com.edutech.mobilestudyclient.util.AESUtils;
 import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-/* loaded from: classes.jar:com/edutech/idauthentication/AES.class */
+import org.bson.BSON;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class AES {
     private static final String HEX = "0123456789ABCDEF";
     private static final String iv = "0123456789ABCDEF";
 
-    private static void appendHex(StringBuffer stringBuffer, byte b) {
-        stringBuffer.append("0123456789ABCDEF".charAt((b >> 4) & 15)).append("0123456789ABCDEF".charAt(b & 15));
+    public static String encrypt(String seed, String cleartext) throws Exception {
+        byte[] rawKey = getRawKey(seed.getBytes());
+        byte[] result = encrypt(rawKey, cleartext.getBytes());
+        return toHex(result);
     }
 
-    public static String decrypt(String str, String str2) throws Exception {
-        return new String(decrypt(getRawKey(str.getBytes()), toByte(str2)));
+    public static String encryptChecksum(String seed, String cleartext) throws Exception {
+        byte[] rawKey = getRawKey(seed.getBytes());
+        byte[] result = encryptCheckSum(rawKey, cleartext.getBytes());
+        return toHex(result);
     }
 
-    private static byte[] decrypt(byte[] bArr, byte[] bArr2) throws Exception {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(bArr, AESUtils.AES);
+    public static String decrypt(String seed, String encrypted) throws Exception {
+        byte[] rawKey = getRawKey(seed.getBytes());
+        byte[] enc = toByte(encrypted);
+        byte[] result = decrypt(rawKey, enc);
+        return new String(result);
+    }
+
+    private static byte[] getRawKey(byte[] seed) throws Exception {
+        KeyGenerator kgen = KeyGenerator.getInstance(AESUtils.AES);
+        SecureRandom sr = SecureRandom.getInstance(AESUtils.SHA1, AESUtils.CRYPTO);
+        sr.setSeed(seed);
+        kgen.init(128, sr);
+        SecretKey skey = kgen.generateKey();
+        byte[] raw = skey.getEncoded();
+        return raw;
+    }
+
+    private static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, AESUtils.AES);
         Cipher cipher = Cipher.getInstance(AESUtils.AES);
-        cipher.init(2, secretKeySpec);
-        return cipher.doFinal(bArr2);
+        cipher.init(1, skeySpec);
+        byte[] encrypted = cipher.doFinal(clear);
+        return encrypted;
     }
 
-    public static String encrypt(String str, String str2) throws Exception {
-        return toHex(encrypt(getRawKey(str.getBytes()), str2.getBytes()));
-    }
-
-    private static byte[] encrypt(byte[] bArr, byte[] bArr2) throws Exception {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(bArr, AESUtils.AES);
+    private static byte[] encryptCheckSum(byte[] raw, byte[] clear) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, AESUtils.AES);
+        IvParameterSpec ivps = new IvParameterSpec("0123456789ABCDEF".getBytes());
         Cipher cipher = Cipher.getInstance(AESUtils.AES);
-        cipher.init(1, secretKeySpec);
-        return cipher.doFinal(bArr2);
+        cipher.init(1, skeySpec, ivps);
+        byte[] encrypted = cipher.doFinal(clear);
+        return encrypted;
     }
 
-    private static byte[] encryptCheckSum(byte[] bArr, byte[] bArr2) throws Exception {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(bArr, AESUtils.AES);
-        IvParameterSpec ivParameterSpec = new IvParameterSpec("0123456789ABCDEF".getBytes());
+    private static byte[] decrypt(byte[] raw, byte[] encrypted) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, AESUtils.AES);
         Cipher cipher = Cipher.getInstance(AESUtils.AES);
-        cipher.init(1, secretKeySpec, ivParameterSpec);
-        return cipher.doFinal(bArr2);
+        cipher.init(2, skeySpec);
+        byte[] decrypted = cipher.doFinal(encrypted);
+        return decrypted;
     }
 
-    public static String encryptChecksum(String str, String str2) throws Exception {
-        return toHex(encryptCheckSum(getRawKey(str.getBytes()), str2.getBytes()));
+    public static String toHex(String txt) {
+        return toHex(txt.getBytes());
     }
 
-    public static String fromHex(String str) {
-        return new String(toByte(str));
+    public static String fromHex(String hex) {
+        return new String(toByte(hex));
     }
 
-    private static byte[] getRawKey(byte[] bArr) throws Exception {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(AESUtils.AES);
-        SecureRandom secureRandom = SecureRandom.getInstance(AESUtils.SHA1, AESUtils.CRYPTO);
-        secureRandom.setSeed(bArr);
-        keyGenerator.init(128, secureRandom);
-        return keyGenerator.generateKey().getEncoded();
-    }
-
-    public static byte[] toByte(String str) {
-        int length = str.length() / 2;
-        byte[] bArr = new byte[length];
-        for (int i = 0; i < length; i++) {
-            bArr[i] = Integer.valueOf(str.substring(i * 2, (i * 2) + 2), 16).byteValue();
+    public static byte[] toByte(String hexString) {
+        int len = hexString.length() / 2;
+        byte[] result = new byte[len];
+        for (int i = 0; i < len; i++) {
+            result[i] = Integer.valueOf(hexString.substring(i * 2, (i * 2) + 2), 16).byteValue();
         }
-        return bArr;
+        return result;
     }
 
-    public static String toHex(String str) {
-        return toHex(str.getBytes());
-    }
-
-    public static String toHex(byte[] bArr) {
-        String stringBuffer;
-        if (bArr == null) {
-            stringBuffer = "";
-        } else {
-            StringBuffer stringBuffer2 = new StringBuffer(bArr.length * 2);
-            for (byte b : bArr) {
-                appendHex(stringBuffer2, b);
-            }
-            stringBuffer = stringBuffer2.toString();
+    public static String toHex(byte[] buf) {
+        if (buf == null) {
+            return "";
         }
-        return stringBuffer;
+        StringBuffer result = new StringBuffer(buf.length * 2);
+        for (byte b : buf) {
+            appendHex(result, b);
+        }
+        return result.toString();
+    }
+
+    private static void appendHex(StringBuffer sb, byte b) {
+        sb.append("0123456789ABCDEF".charAt((b >> 4) & 15)).append("0123456789ABCDEF".charAt(b & BSON.CODE_W_SCOPE));
     }
 }

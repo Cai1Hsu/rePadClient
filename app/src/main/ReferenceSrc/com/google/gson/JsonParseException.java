@@ -1,18 +1,17 @@
 package com.google.gson;
-
-/* loaded from: classes.jar:com/google/gson/JsonParseException.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class JsonParseException extends RuntimeException {
     static final long serialVersionUID = -4086729973971783390L;
 
-    public JsonParseException(String str) {
-        super(str);
+    public JsonParseException(String msg) {
+        super(msg);
     }
 
-    public JsonParseException(String str, Throwable th) {
-        super(str, th);
+    public JsonParseException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
-    public JsonParseException(Throwable th) {
-        super(th);
+    public JsonParseException(Throwable cause) {
+        super(cause);
     }
 }

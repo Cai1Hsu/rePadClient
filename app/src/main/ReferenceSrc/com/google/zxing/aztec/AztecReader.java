@@ -15,33 +15,32 @@ import com.google.zxing.aztec.detector.Detector;
 import com.google.zxing.common.DecoderResult;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/aztec/AztecReader.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class AztecReader implements Reader {
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, FormatException {
-        return decode(binaryBitmap, null);
+    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
+        return decode(image, null);
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, FormatException {
-        ResultPointCallback resultPointCallback;
-        AztecDetectorResult detect = new Detector(binaryBitmap.getBlackMatrix()).detect();
-        ResultPoint[] points = detect.getPoints();
-        if (map != null && (resultPointCallback = (ResultPointCallback) map.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK)) != null) {
-            for (ResultPoint resultPoint : points) {
-                resultPointCallback.foundPossibleResultPoint(resultPoint);
+    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, FormatException {
+        ResultPointCallback rpcb;
+        AztecDetectorResult detectorResult = new Detector(image.getBlackMatrix()).detect();
+        ResultPoint[] points = detectorResult.getPoints();
+        if (hints != null && (rpcb = (ResultPointCallback) hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK)) != null) {
+            for (ResultPoint point : points) {
+                rpcb.foundPossibleResultPoint(point);
             }
         }
-        DecoderResult decode = new Decoder().decode(detect);
-        Result result = new Result(decode.getText(), decode.getRawBytes(), points, BarcodeFormat.AZTEC);
-        List<byte[]> byteSegments = decode.getByteSegments();
+        DecoderResult decoderResult = new Decoder().decode(detectorResult);
+        Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), points, BarcodeFormat.AZTEC);
+        List<byte[]> byteSegments = decoderResult.getByteSegments();
         if (byteSegments != null) {
             result.putMetadata(ResultMetadataType.BYTE_SEGMENTS, byteSegments);
         }
-        String eCLevel = decode.getECLevel();
-        if (eCLevel != null) {
-            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, eCLevel);
+        String ecLevel = decoderResult.getECLevel();
+        if (ecLevel != null) {
+            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, ecLevel);
         }
         return result;
     }

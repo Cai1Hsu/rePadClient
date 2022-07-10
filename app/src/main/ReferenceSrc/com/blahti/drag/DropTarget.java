@@ -1,8 +1,7 @@
 package com.blahti.drag;
 
 import android.graphics.Rect;
-
-/* loaded from: classes.jar:com/blahti/drag/DropTarget.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface DropTarget {
     boolean acceptDrop(DragSource dragSource, int i, int i2, int i3, int i4, DragView dragView, Object obj);
 

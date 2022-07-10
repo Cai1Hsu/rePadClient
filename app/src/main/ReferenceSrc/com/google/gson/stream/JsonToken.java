@@ -1,6 +1,5 @@
 package com.google.gson.stream;
-
-/* loaded from: classes.jar:com/google/gson/stream/JsonToken.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public enum JsonToken {
     BEGIN_ARRAY,
     END_ARRAY,

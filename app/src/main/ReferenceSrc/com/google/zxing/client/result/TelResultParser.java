@@ -1,20 +1,17 @@
 package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/TelResultParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class TelResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public TelParsedResult parse(Result result) {
-        TelParsedResult telParsedResult;
-        String text = result.getText();
-        if (text.startsWith("tel:") || text.startsWith("TEL:")) {
-            String str = text.startsWith("TEL:") ? "tel:" + text.substring(4) : text;
-            int indexOf = text.indexOf(63, 4);
-            telParsedResult = new TelParsedResult(indexOf < 0 ? text.substring(4) : text.substring(4, indexOf), str, null);
-        } else {
-            telParsedResult = null;
+        String rawText = result.getText();
+        if (rawText.startsWith("tel:") || rawText.startsWith("TEL:")) {
+            String telURI = rawText.startsWith("TEL:") ? "tel:" + rawText.substring(4) : rawText;
+            int queryStart = rawText.indexOf(63, 4);
+            String number = queryStart < 0 ? rawText.substring(4) : rawText.substring(4, queryStart);
+            return new TelParsedResult(number, telURI, null);
         }
-        return telParsedResult;
+        return null;
     }
 }

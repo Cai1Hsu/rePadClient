@@ -1,29 +1,27 @@
 package com.google.zxing.oned.rss.expanded.decoders;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/DecodedNumeric.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class DecodedNumeric extends DecodedObject {
     static final int FNC1 = 10;
     private final int firstDigit;
     private final int secondDigit;
 
-    DecodedNumeric(int i, int i2, int i3) {
-        super(i);
-        this.firstDigit = i2;
-        this.secondDigit = i3;
+    public DecodedNumeric(int newPosition, int firstDigit, int secondDigit) {
+        super(newPosition);
+        this.firstDigit = firstDigit;
+        this.secondDigit = secondDigit;
         if (this.firstDigit < 0 || this.firstDigit > 10) {
-            throw new IllegalArgumentException("Invalid firstDigit: " + i2);
+            throw new IllegalArgumentException("Invalid firstDigit: " + firstDigit);
         }
-        if (this.secondDigit >= 0 && this.secondDigit <= 10) {
-            return;
+        if (this.secondDigit < 0 || this.secondDigit > 10) {
+            throw new IllegalArgumentException("Invalid secondDigit: " + secondDigit);
         }
-        throw new IllegalArgumentException("Invalid secondDigit: " + i3);
     }
 
-    int getFirstDigit() {
+    public int getFirstDigit() {
         return this.firstDigit;
     }
 
-    int getSecondDigit() {
+    public int getSecondDigit() {
         return this.secondDigit;
     }
 
@@ -31,15 +29,15 @@ final class DecodedNumeric extends DecodedObject {
         return (this.firstDigit * 10) + this.secondDigit;
     }
 
-    boolean isAnyFNC1() {
-        return this.firstDigit == 10 || this.secondDigit == 10;
-    }
-
-    boolean isFirstDigitFNC1() {
+    public boolean isFirstDigitFNC1() {
         return this.firstDigit == 10;
     }
 
-    boolean isSecondDigitFNC1() {
+    public boolean isSecondDigitFNC1() {
         return this.secondDigit == 10;
+    }
+
+    boolean isAnyFNC1() {
+        return this.firstDigit == 10 || this.secondDigit == 10;
     }
 }

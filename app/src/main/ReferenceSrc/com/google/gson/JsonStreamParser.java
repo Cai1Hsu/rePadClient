@@ -10,11 +10,14 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-/* loaded from: classes.jar:com/google/gson/JsonStreamParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class JsonStreamParser implements Iterator<JsonElement> {
     private final Object lock;
     private final JsonReader parser;
+
+    public JsonStreamParser(String json) {
+        this(new StringReader(json));
+    }
 
     public JsonStreamParser(Reader reader) {
         this.parser = new JsonReader(reader);
@@ -22,8 +25,23 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
         this.lock = new Object();
     }
 
-    public JsonStreamParser(String str) {
-        this(new StringReader(str));
+    @Override // java.util.Iterator
+    public JsonElement next() throws JsonParseException {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        try {
+            return Streams.parse(this.parser);
+        } catch (JsonParseException e) {
+            if (!(e.getCause() instanceof EOFException)) {
+                throw e;
+            }
+            throw new NoSuchElementException();
+        } catch (OutOfMemoryError e2) {
+            throw new JsonParseException("Failed parsing JSON source to Json", e2);
+        } catch (StackOverflowError e3) {
+            throw new JsonParseException("Failed parsing JSON source to Json", e3);
+        }
     }
 
     @Override // java.util.Iterator
@@ -39,26 +57,6 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
             }
         }
         return z;
-    }
-
-    @Override // java.util.Iterator
-    public JsonElement next() throws JsonParseException {
-        if (!hasNext()) {
-            throw new NoSuchElementException();
-        }
-        try {
-            return Streams.parse(this.parser);
-        } catch (JsonParseException e) {
-            Throwable th = e;
-            if (e.getCause() instanceof EOFException) {
-                th = new NoSuchElementException();
-            }
-            throw th;
-        } catch (OutOfMemoryError e2) {
-            throw new JsonParseException("Failed parsing JSON source to Json", e2);
-        } catch (StackOverflowError e3) {
-            throw new JsonParseException("Failed parsing JSON source to Json", e3);
-        }
     }
 
     @Override // java.util.Iterator

@@ -1,18 +1,17 @@
 package com.google.gson;
-
-/* loaded from: classes.jar:com/google/gson/JsonSyntaxException.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class JsonSyntaxException extends JsonParseException {
     private static final long serialVersionUID = 1;
 
-    public JsonSyntaxException(String str) {
-        super(str);
+    public JsonSyntaxException(String msg) {
+        super(msg);
     }
 
-    public JsonSyntaxException(String str, Throwable th) {
-        super(str, th);
+    public JsonSyntaxException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
-    public JsonSyntaxException(Throwable th) {
-        super(th);
+    public JsonSyntaxException(Throwable cause) {
+        super(cause);
     }
 }

@@ -1,10 +1,6 @@
 package com.google.zxing;
-
-/* loaded from: classes.jar:com/google/zxing/ReaderException.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public abstract class ReaderException extends Exception {
-    ReaderException() {
-    }
-
     @Override // java.lang.Throwable
     public final Throwable fillInStackTrace() {
         return null;

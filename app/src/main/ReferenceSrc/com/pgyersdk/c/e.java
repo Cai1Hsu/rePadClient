@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-/* loaded from: classes.jar:com/pgyersdk/c/e.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class e {
     private static final String f = e.class.getName();
     private static e j = null;
@@ -59,36 +58,33 @@ public class e {
     }
 
     private String c(Context context) {
-        String str;
         int i = 0;
         if (this.g != null) {
-            str = this.g;
-        } else {
-            this.g = String.valueOf(context.getFilesDir().getPath()) + File.separator + this.h;
-            if ("mounted".equals(Environment.getExternalStorageState())) {
-                String[] strArr = {Environment.getExternalStorageDirectory().getAbsolutePath(), "/sdcard", "/mnt/sdcard", "/mnt/sdcard2", "/mnt/ext_sdcard", "/storage/sdcard0", "/storage/sdcard1", "/mnt/sdcard/tencent"};
-                while (true) {
-                    if (i >= strArr.length) {
-                        break;
-                    }
-                    String str2 = String.valueOf(strArr[i]) + File.separator + this.h;
-                    File file = new File(str2);
-                    file.mkdirs();
-                    if (file.exists()) {
-                        this.g = str2;
-                        break;
-                    }
-                    i++;
-                }
-            } else {
-                File file2 = new File(this.g);
-                if (!file2.exists()) {
-                    file2.mkdirs();
-                }
-            }
-            str = this.g;
+            return this.g;
         }
-        return str;
+        this.g = String.valueOf(context.getFilesDir().getPath()) + File.separator + this.h;
+        if ("mounted".equals(Environment.getExternalStorageState())) {
+            String[] strArr = {Environment.getExternalStorageDirectory().getAbsolutePath(), "/sdcard", "/mnt/sdcard", "/mnt/sdcard2", "/mnt/ext_sdcard", "/storage/sdcard0", "/storage/sdcard1", "/mnt/sdcard/tencent"};
+            while (true) {
+                if (i >= strArr.length) {
+                    break;
+                }
+                String str = String.valueOf(strArr[i]) + File.separator + this.h;
+                File file = new File(str);
+                file.mkdirs();
+                if (file.exists()) {
+                    this.g = str;
+                    break;
+                }
+                i++;
+            }
+        } else {
+            File file2 = new File(this.g);
+            if (!file2.exists()) {
+                file2.mkdirs();
+            }
+        }
+        return this.g;
     }
 
     public final String a(Context context) {
@@ -100,7 +96,8 @@ public class e {
         if (!file.exists() || !file.isDirectory()) {
             return;
         }
-        for (File file2 : file.listFiles()) {
+        File[] listFiles = file.listFiles();
+        for (File file2 : listFiles) {
             a(file2);
         }
     }

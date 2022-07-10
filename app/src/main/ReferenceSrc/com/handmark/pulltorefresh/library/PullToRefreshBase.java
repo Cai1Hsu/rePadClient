@@ -21,12 +21,11 @@ import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 import com.handmark.pulltorefresh.library.internal.RotateLoadingLayout;
 import com.handmark.pulltorefresh.library.internal.Utils;
 import com.handmark.pulltorefresh.library.internal.ViewCompat;
-
-/* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout implements IPullToRefresh<T> {
-    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode;
-    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation;
-    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$State;
+    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode = null;
+    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation = null;
+    private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$State = null;
     static final boolean DEBUG = true;
     static final int DEMO_SCROLL_INTERVAL = 225;
     static final float FRICTION = 2.0f;
@@ -65,234 +64,46 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     private State mState;
     private int mTouchSlop;
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$AnimationStyle.class */
-    public enum AnimationStyle {
-        ROTATE,
-        FLIP;
-        
-        private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle;
-
-        static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle() {
-            int[] iArr = $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle;
-            if (iArr == null) {
-                iArr = new int[values().length];
-                try {
-                    iArr[FLIP.ordinal()] = 2;
-                } catch (NoSuchFieldError e) {
-                }
-                try {
-                    iArr[ROTATE.ordinal()] = 1;
-                } catch (NoSuchFieldError e2) {
-                }
-                $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle = iArr;
-            }
-            return iArr;
-        }
-
-        static AnimationStyle getDefault() {
-            return ROTATE;
-        }
-
-        static AnimationStyle mapIntToValue(int i) {
-            AnimationStyle animationStyle;
-            switch (i) {
-                case 1:
-                    animationStyle = FLIP;
-                    break;
-                default:
-                    animationStyle = ROTATE;
-                    break;
-            }
-            return animationStyle;
-        }
-
-        LoadingLayout createLoadingLayout(Context context, Mode mode, Orientation orientation, TypedArray typedArray) {
-            LoadingLayout flipLoadingLayout;
-            switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle()[ordinal()]) {
-                case 2:
-                    flipLoadingLayout = new FlipLoadingLayout(context, mode, orientation, typedArray);
-                    break;
-                default:
-                    flipLoadingLayout = new RotateLoadingLayout(context, mode, orientation, typedArray);
-                    break;
-            }
-            return flipLoadingLayout;
-        }
-    }
-
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$Mode.class */
-    public enum Mode {
-        DISABLED(0),
-        PULL_FROM_START(1),
-        PULL_FROM_END(2),
-        BOTH(3),
-        MANUAL_REFRESH_ONLY(4);
-        
-        private int mIntValue;
-        public static Mode PULL_DOWN_TO_REFRESH = PULL_FROM_START;
-        public static Mode PULL_UP_TO_REFRESH = PULL_FROM_END;
-
-        Mode(int i) {
-            this.mIntValue = i;
-        }
-
-        static Mode getDefault() {
-            return PULL_FROM_START;
-        }
-
-        static Mode mapIntToValue(int i) {
-            Mode mode;
-            Mode[] values = values();
-            int length = values.length;
-            int i2 = 0;
-            while (true) {
-                if (i2 < length) {
-                    Mode mode2 = values[i2];
-                    mode = mode2;
-                    if (i == mode2.getIntValue()) {
-                        break;
-                    }
-                    i2++;
-                } else {
-                    mode = getDefault();
-                    break;
-                }
-            }
-            return mode;
-        }
-
-        int getIntValue() {
-            return this.mIntValue;
-        }
-
-        boolean permitsPullToRefresh() {
-            return (this == DISABLED || this == MANUAL_REFRESH_ONLY) ? false : true;
-        }
-
-        public boolean showFooterLoadingLayout() {
-            return this == PULL_FROM_END || this == BOTH || this == MANUAL_REFRESH_ONLY;
-        }
-
-        public boolean showHeaderLoadingLayout() {
-            return this == PULL_FROM_START || this == BOTH;
-        }
-    }
-
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$OnLastItemVisibleListener.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public interface OnLastItemVisibleListener {
         void onLastItemVisible();
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$OnPullEventListener.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public interface OnPullEventListener<V extends View> {
         void onPullEvent(PullToRefreshBase<V> pullToRefreshBase, State state, Mode mode);
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$OnRefreshListener.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public interface OnRefreshListener<V extends View> {
         void onRefresh(PullToRefreshBase<V> pullToRefreshBase);
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$OnRefreshListener2.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public interface OnRefreshListener2<V extends View> {
         void onPullDownToRefresh(PullToRefreshBase<V> pullToRefreshBase);
 
         void onPullUpToRefresh(PullToRefreshBase<V> pullToRefreshBase);
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$OnSmoothScrollFinishedListener.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     interface OnSmoothScrollFinishedListener {
         void onSmoothScrollFinished();
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$Orientation.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public enum Orientation {
         VERTICAL,
         HORIZONTAL
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$SmoothScrollRunnable.class */
-    final class SmoothScrollRunnable implements Runnable {
-        private final long mDuration;
-        private final Interpolator mInterpolator;
-        private OnSmoothScrollFinishedListener mListener;
-        private final int mScrollFromY;
-        private final int mScrollToY;
-        private boolean mContinueRunning = true;
-        private long mStartTime = -1;
-        private int mCurrentY = -1;
+    protected abstract T createRefreshableView(Context context, AttributeSet attributeSet);
 
-        public SmoothScrollRunnable(int i, int i2, long j, OnSmoothScrollFinishedListener onSmoothScrollFinishedListener) {
-            PullToRefreshBase.this = r5;
-            this.mScrollFromY = i;
-            this.mScrollToY = i2;
-            this.mInterpolator = r5.mScrollAnimationInterpolator;
-            this.mDuration = j;
-            this.mListener = onSmoothScrollFinishedListener;
-        }
+    public abstract Orientation getPullToRefreshScrollDirection();
 
-        @Override // java.lang.Runnable
-        public void run() {
-            if (this.mStartTime == -1) {
-                this.mStartTime = System.currentTimeMillis();
-            } else {
-                this.mCurrentY = this.mScrollFromY - Math.round((this.mScrollFromY - this.mScrollToY) * this.mInterpolator.getInterpolation(((float) Math.max(Math.min(((System.currentTimeMillis() - this.mStartTime) * 1000) / this.mDuration, 1000L), 0L)) / 1000.0f));
-                PullToRefreshBase.this.setHeaderScroll(this.mCurrentY);
-            }
-            if (this.mContinueRunning && this.mScrollToY != this.mCurrentY) {
-                ViewCompat.postOnAnimation(PullToRefreshBase.this, this);
-            } else if (this.mListener == null) {
-            } else {
-                this.mListener.onSmoothScrollFinished();
-            }
-        }
+    protected abstract boolean isReadyForPullEnd();
 
-        public void stop() {
-            this.mContinueRunning = false;
-            PullToRefreshBase.this.removeCallbacks(this);
-        }
-    }
-
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/PullToRefreshBase$State.class */
-    public enum State {
-        RESET(0),
-        PULL_TO_REFRESH(1),
-        RELEASE_TO_REFRESH(2),
-        REFRESHING(8),
-        MANUAL_REFRESHING(9),
-        OVERSCROLLING(16);
-        
-        private int mIntValue;
-
-        State(int i) {
-            this.mIntValue = i;
-        }
-
-        static State mapIntToValue(int i) {
-            State state;
-            State[] values = values();
-            int length = values.length;
-            int i2 = 0;
-            while (true) {
-                if (i2 < length) {
-                    State state2 = values[i2];
-                    state = state2;
-                    if (i == state2.getIntValue()) {
-                        break;
-                    }
-                    i2++;
-                } else {
-                    state = RESET;
-                    break;
-                }
-            }
-            return state;
-        }
-
-        int getIntValue() {
-            return this.mIntValue;
-        }
-    }
+    protected abstract boolean isReadyForPullStart();
 
     static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode() {
         int[] iArr = $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode;
@@ -373,6 +184,10 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         return iArr;
     }
 
+    static /* synthetic */ Interpolator access$0(PullToRefreshBase pullToRefreshBase) {
+        return pullToRefreshBase.mScrollAnimationInterpolator;
+    }
+
     public PullToRefreshBase(Context context) {
         super(context);
         this.mIsBeingDragged = false;
@@ -387,8 +202,8 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         init(context, null);
     }
 
-    public PullToRefreshBase(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
+    public PullToRefreshBase(Context context, AttributeSet attrs) {
+        super(context, attrs);
         this.mIsBeingDragged = false;
         this.mState = State.RESET;
         this.mMode = Mode.getDefault();
@@ -398,7 +213,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         this.mOverScrollEnabled = true;
         this.mLayoutVisibilityChangesEnabled = true;
         this.mLoadingAnimationStyle = AnimationStyle.getDefault();
-        init(context, attributeSet);
+        init(context, attrs);
     }
 
     public PullToRefreshBase(Context context, Mode mode) {
@@ -416,7 +231,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         init(context, null);
     }
 
-    public PullToRefreshBase(Context context, Mode mode, AnimationStyle animationStyle) {
+    public PullToRefreshBase(Context context, Mode mode, AnimationStyle animStyle) {
         super(context);
         this.mIsBeingDragged = false;
         this.mState = State.RESET;
@@ -428,258 +243,32 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         this.mLayoutVisibilityChangesEnabled = true;
         this.mLoadingAnimationStyle = AnimationStyle.getDefault();
         this.mMode = mode;
-        this.mLoadingAnimationStyle = animationStyle;
+        this.mLoadingAnimationStyle = animStyle;
         init(context, null);
     }
 
-    private void addRefreshableView(Context context, T t) {
-        this.mRefreshableViewWrapper = new FrameLayout(context);
-        this.mRefreshableViewWrapper.addView(t, -1, -1);
-        addViewInternal(this.mRefreshableViewWrapper, new LinearLayout.LayoutParams(-1, -1));
-    }
-
-    public void callRefreshListener() {
-        if (this.mOnRefreshListener != null) {
-            this.mOnRefreshListener.onRefresh(this);
-        } else if (this.mOnRefreshListener2 == null) {
-        } else {
-            if (this.mCurrentMode == Mode.PULL_FROM_START) {
-                this.mOnRefreshListener2.onPullDownToRefresh(this);
-            } else if (this.mCurrentMode != Mode.PULL_FROM_END) {
-            } else {
-                this.mOnRefreshListener2.onPullUpToRefresh(this);
-            }
-        }
-    }
-
-    private LinearLayout.LayoutParams getLoadingLayoutLayoutParams() {
-        LinearLayout.LayoutParams layoutParams;
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
-            case 2:
-                layoutParams = new LinearLayout.LayoutParams(-2, -1);
-                break;
-            default:
-                layoutParams = new LinearLayout.LayoutParams(-1, -2);
-                break;
-        }
-        return layoutParams;
-    }
-
-    private int getMaximumPullScroll() {
-        int round;
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
-            case 2:
-                round = Math.round(getWidth() / FRICTION);
-                break;
-            default:
-                round = Math.round(getHeight() / FRICTION);
-                break;
-        }
-        return round;
-    }
-
-    private void init(Context context, AttributeSet attributeSet) {
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
-            case 2:
-                setOrientation(0);
-                break;
-            default:
-                setOrientation(1);
-                break;
-        }
-        setGravity(17);
-        this.mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R.styleable.PullToRefresh);
-        if (obtainStyledAttributes.hasValue(R.styleable.PullToRefresh_ptrMode)) {
-            this.mMode = Mode.mapIntToValue(obtainStyledAttributes.getInteger(R.styleable.PullToRefresh_ptrMode, 0));
-        }
-        if (obtainStyledAttributes.hasValue(R.styleable.PullToRefresh_ptrAnimationStyle)) {
-            this.mLoadingAnimationStyle = AnimationStyle.mapIntToValue(obtainStyledAttributes.getInteger(R.styleable.PullToRefresh_ptrAnimationStyle, 0));
-        }
-        this.mRefreshableView = createRefreshableView(context, attributeSet);
-        addRefreshableView(context, this.mRefreshableView);
-        this.mHeaderLayout = createLoadingLayout(context, Mode.PULL_FROM_START, obtainStyledAttributes);
-        this.mFooterLayout = createLoadingLayout(context, Mode.PULL_FROM_END, obtainStyledAttributes);
-        if (obtainStyledAttributes.hasValue(R.styleable.PullToRefresh_ptrRefreshableViewBackground)) {
-            Drawable drawable = obtainStyledAttributes.getDrawable(R.styleable.PullToRefresh_ptrRefreshableViewBackground);
-            if (drawable != null) {
-                this.mRefreshableView.setBackgroundDrawable(drawable);
-            }
-        } else if (obtainStyledAttributes.hasValue(R.styleable.PullToRefresh_ptrAdapterViewBackground)) {
-            Utils.warnDeprecation("ptrAdapterViewBackground", "ptrRefreshableViewBackground");
-            Drawable drawable2 = obtainStyledAttributes.getDrawable(R.styleable.PullToRefresh_ptrAdapterViewBackground);
-            if (drawable2 != null) {
-                this.mRefreshableView.setBackgroundDrawable(drawable2);
-            }
-        }
-        if (obtainStyledAttributes.hasValue(R.styleable.PullToRefresh_ptrOverScroll)) {
-            this.mOverScrollEnabled = obtainStyledAttributes.getBoolean(R.styleable.PullToRefresh_ptrOverScroll, true);
-        }
-        if (obtainStyledAttributes.hasValue(R.styleable.PullToRefresh_ptrScrollingWhileRefreshingEnabled)) {
-            this.mScrollingWhileRefreshingEnabled = obtainStyledAttributes.getBoolean(R.styleable.PullToRefresh_ptrScrollingWhileRefreshingEnabled, false);
-        }
-        handleStyledAttributes(obtainStyledAttributes);
-        obtainStyledAttributes.recycle();
-        updateUIForMode();
-    }
-
-    private boolean isReadyForPull() {
-        boolean z = false;
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mMode.ordinal()]) {
-            case 2:
-                z = isReadyForPullStart();
-                break;
-            case 3:
-                z = isReadyForPullEnd();
-                break;
-            case 4:
-                if (isReadyForPullEnd() || isReadyForPullStart()) {
-                    z = true;
-                    break;
-                }
-                break;
-        }
-        return z;
-    }
-
-    private void pullEvent() {
-        float f;
-        float f2;
-        int round;
-        int footerSize;
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
-            case 2:
-                f = this.mInitialMotionX;
-                f2 = this.mLastMotionX;
-                break;
-            default:
-                f = this.mInitialMotionY;
-                f2 = this.mLastMotionY;
-                break;
-        }
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
-            case 3:
-                round = Math.round(Math.max(f - f2, 0.0f) / FRICTION);
-                footerSize = getFooterSize();
-                break;
-            default:
-                round = Math.round(Math.min(f - f2, 0.0f) / FRICTION);
-                footerSize = getHeaderSize();
-                break;
-        }
-        setHeaderScroll(round);
-        if (round == 0 || isRefreshing()) {
-            return;
-        }
-        float abs = Math.abs(round) / footerSize;
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
-            case 3:
-                this.mFooterLayout.onPull(abs);
-                break;
-            default:
-                this.mHeaderLayout.onPull(abs);
-                break;
-        }
-        if (this.mState != State.PULL_TO_REFRESH && footerSize >= Math.abs(round)) {
-            setState(State.PULL_TO_REFRESH, new boolean[0]);
-        } else if (this.mState != State.PULL_TO_REFRESH || footerSize >= Math.abs(round)) {
-        } else {
-            setState(State.RELEASE_TO_REFRESH, new boolean[0]);
-        }
-    }
-
-    private final void smoothScrollTo(int i, long j) {
-        smoothScrollTo(i, j, 0L, null);
-    }
-
-    public final void smoothScrollTo(int i, long j, long j2, OnSmoothScrollFinishedListener onSmoothScrollFinishedListener) {
-        int scrollX;
-        if (this.mCurrentSmoothScrollRunnable != null) {
-            this.mCurrentSmoothScrollRunnable.stop();
-        }
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
-            case 2:
-                scrollX = getScrollX();
-                break;
-            default:
-                scrollX = getScrollY();
-                break;
-        }
-        if (scrollX != i) {
-            if (this.mScrollAnimationInterpolator == null) {
-                this.mScrollAnimationInterpolator = new DecelerateInterpolator();
-            }
-            this.mCurrentSmoothScrollRunnable = new SmoothScrollRunnable(scrollX, i, j, onSmoothScrollFinishedListener);
-            if (j2 > 0) {
-                postDelayed(this.mCurrentSmoothScrollRunnable, j2);
-            } else {
-                post(this.mCurrentSmoothScrollRunnable);
-            }
-        }
-    }
-
-    private final void smoothScrollToAndBack(int i) {
-        smoothScrollTo(i, 200L, 0L, new OnSmoothScrollFinishedListener() { // from class: com.handmark.pulltorefresh.library.PullToRefreshBase.3
-            @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnSmoothScrollFinishedListener
-            public void onSmoothScrollFinished() {
-                PullToRefreshBase.this.smoothScrollTo(0, 200L, 225L, null);
-            }
-        });
-    }
-
     @Override // android.view.ViewGroup
-    public void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
-        Log.d(LOG_TAG, "addView: " + view.getClass().getSimpleName());
+    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+        Log.d(LOG_TAG, "addView: " + child.getClass().getSimpleName());
         T refreshableView = getRefreshableView();
         if (refreshableView instanceof ViewGroup) {
-            ((ViewGroup) refreshableView).addView(view, i, layoutParams);
+            ((ViewGroup) refreshableView).addView(child, index, params);
             return;
         }
         throw new UnsupportedOperationException("Refreshable View is not a ViewGroup so can't addView");
     }
 
-    protected final void addViewInternal(View view, int i, ViewGroup.LayoutParams layoutParams) {
-        super.addView(view, i, layoutParams);
-    }
-
-    protected final void addViewInternal(View view, ViewGroup.LayoutParams layoutParams) {
-        super.addView(view, -1, layoutParams);
-    }
-
-    protected LoadingLayout createLoadingLayout(Context context, Mode mode, TypedArray typedArray) {
-        LoadingLayout createLoadingLayout = this.mLoadingAnimationStyle.createLoadingLayout(context, mode, getPullToRefreshScrollDirection(), typedArray);
-        createLoadingLayout.setVisibility(4);
-        return createLoadingLayout;
-    }
-
-    protected LoadingLayoutProxy createLoadingLayoutProxy(boolean z, boolean z2) {
-        LoadingLayoutProxy loadingLayoutProxy = new LoadingLayoutProxy();
-        if (z && this.mMode.showHeaderLoadingLayout()) {
-            loadingLayoutProxy.addLayout(this.mHeaderLayout);
-        }
-        if (z2 && this.mMode.showFooterLoadingLayout()) {
-            loadingLayoutProxy.addLayout(this.mFooterLayout);
-        }
-        return loadingLayoutProxy;
-    }
-
-    protected abstract T createRefreshableView(Context context, AttributeSet attributeSet);
-
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
     public final boolean demo() {
-        boolean z = true;
         if (this.mMode.showHeaderLoadingLayout() && isReadyForPullStart()) {
             smoothScrollToAndBack((-getHeaderSize()) * 2);
-        } else if (!this.mMode.showFooterLoadingLayout() || !isReadyForPullEnd()) {
-            z = false;
-        } else {
+            return true;
+        } else if (this.mMode.showFooterLoadingLayout() && isReadyForPullEnd()) {
             smoothScrollToAndBack(getFooterSize() * 2);
+            return true;
+        } else {
+            return false;
         }
-        return z;
-    }
-
-    protected final void disableLoadingLayoutVisibilityChanges() {
-        this.mLayoutVisibilityChangesEnabled = false;
     }
 
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
@@ -692,30 +281,14 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         return this.mFilterTouchEvents;
     }
 
-    protected final LoadingLayout getFooterLayout() {
-        return this.mFooterLayout;
-    }
-
-    protected final int getFooterSize() {
-        return this.mFooterLayout.getContentSize();
-    }
-
-    protected final LoadingLayout getHeaderLayout() {
-        return this.mHeaderLayout;
-    }
-
-    protected final int getHeaderSize() {
-        return this.mHeaderLayout.getContentSize();
-    }
-
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
     public final ILoadingLayout getLoadingLayoutProxy() {
         return getLoadingLayoutProxy(true, true);
     }
 
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final ILoadingLayout getLoadingLayoutProxy(boolean z, boolean z2) {
-        return createLoadingLayoutProxy(z, z2);
+    public final ILoadingLayout getLoadingLayoutProxy(boolean includeStart, boolean includeEnd) {
+        return createLoadingLayoutProxy(includeStart, includeEnd);
     }
 
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
@@ -723,23 +296,9 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         return this.mMode;
     }
 
-    public abstract Orientation getPullToRefreshScrollDirection();
-
-    protected int getPullToRefreshScrollDuration() {
-        return 200;
-    }
-
-    protected int getPullToRefreshScrollDurationLonger() {
-        return SMOOTH_SCROLL_LONG_DURATION_MS;
-    }
-
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
     public final T getRefreshableView() {
         return this.mRefreshableView;
-    }
-
-    protected FrameLayout getRefreshableViewWrapper() {
-        return this.mRefreshableViewWrapper;
     }
 
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
@@ -750,9 +309,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
     public final State getState() {
         return this.mState;
-    }
-
-    protected void handleStyledAttributes(TypedArray typedArray) {
     }
 
     public final boolean isDisableScrollingWhileRefreshing() {
@@ -769,10 +325,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         return Build.VERSION.SDK_INT >= 9 && this.mOverScrollEnabled && OverscrollHelper.isAndroidOverScrollEnabled(this.mRefreshableView);
     }
 
-    protected abstract boolean isReadyForPullEnd();
-
-    protected abstract boolean isReadyForPullStart();
-
     @Override // com.handmark.pulltorefresh.library.IPullToRefresh
     public final boolean isRefreshing() {
         return this.mState == State.REFRESHING || this.mState == State.MANUAL_REFRESHING;
@@ -783,90 +335,338 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         return this.mScrollingWhileRefreshingEnabled;
     }
 
-    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
     @Override // android.view.ViewGroup
-    public final boolean onInterceptTouchEvent(MotionEvent motionEvent) {
-        float f;
-        float f2;
-        boolean z = false;
-        if (isPullToRefreshEnabled()) {
-            int action = motionEvent.getAction();
-            if (action == 3 || action == 1) {
-                this.mIsBeingDragged = false;
-            } else if (action == 0 || !this.mIsBeingDragged) {
-                switch (action) {
-                    case 0:
-                        if (isReadyForPull()) {
-                            float y = motionEvent.getY();
-                            this.mInitialMotionY = y;
-                            this.mLastMotionY = y;
-                            float x = motionEvent.getX();
-                            this.mInitialMotionX = x;
-                            this.mLastMotionX = x;
-                            this.mIsBeingDragged = false;
+    public final boolean onInterceptTouchEvent(MotionEvent event) {
+        float diff;
+        float oppositeDiff;
+        if (!isPullToRefreshEnabled()) {
+            return false;
+        }
+        int action = event.getAction();
+        if (action == 3 || action == 1) {
+            this.mIsBeingDragged = false;
+            return false;
+        } else if (action != 0 && this.mIsBeingDragged) {
+            return true;
+        } else {
+            switch (action) {
+                case 0:
+                    if (isReadyForPull()) {
+                        float y = event.getY();
+                        this.mInitialMotionY = y;
+                        this.mLastMotionY = y;
+                        float x = event.getX();
+                        this.mInitialMotionX = x;
+                        this.mLastMotionX = x;
+                        this.mIsBeingDragged = false;
+                        break;
+                    }
+                    break;
+                case 2:
+                    if (!this.mScrollingWhileRefreshingEnabled && isRefreshing()) {
+                        return true;
+                    }
+                    if (isReadyForPull()) {
+                        float y2 = event.getY();
+                        float x2 = event.getX();
+                        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
+                            case 2:
+                                diff = x2 - this.mLastMotionX;
+                                oppositeDiff = y2 - this.mLastMotionY;
+                                break;
+                            default:
+                                diff = y2 - this.mLastMotionY;
+                                oppositeDiff = x2 - this.mLastMotionX;
+                                break;
                         }
-                        z = this.mIsBeingDragged;
-                        break;
-                    case 1:
-                    default:
-                        z = this.mIsBeingDragged;
-                        break;
-                    case 2:
-                        if (!this.mScrollingWhileRefreshingEnabled && isRefreshing()) {
-                            z = true;
-                            break;
-                        } else {
-                            if (isReadyForPull()) {
-                                float y2 = motionEvent.getY();
-                                float x2 = motionEvent.getX();
-                                switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
-                                    case 2:
-                                        f = x2 - this.mLastMotionX;
-                                        f2 = y2 - this.mLastMotionY;
-                                        break;
-                                    default:
-                                        f = y2 - this.mLastMotionY;
-                                        f2 = x2 - this.mLastMotionX;
-                                        break;
+                        float absDiff = Math.abs(diff);
+                        if (absDiff > this.mTouchSlop && (!this.mFilterTouchEvents || absDiff > Math.abs(oppositeDiff))) {
+                            if (this.mMode.showHeaderLoadingLayout() && diff >= 1.0f && isReadyForPullStart()) {
+                                this.mLastMotionY = y2;
+                                this.mLastMotionX = x2;
+                                this.mIsBeingDragged = true;
+                                if (this.mMode == Mode.BOTH) {
+                                    this.mCurrentMode = Mode.PULL_FROM_START;
+                                    break;
                                 }
-                                float abs = Math.abs(f);
-                                if (abs > this.mTouchSlop && (!this.mFilterTouchEvents || abs > Math.abs(f2))) {
-                                    if (this.mMode.showHeaderLoadingLayout() && f >= 1.0f && isReadyForPullStart()) {
-                                        this.mLastMotionY = y2;
-                                        this.mLastMotionX = x2;
-                                        this.mIsBeingDragged = true;
-                                        if (this.mMode == Mode.BOTH) {
-                                            this.mCurrentMode = Mode.PULL_FROM_START;
-                                        }
-                                    } else if (this.mMode.showFooterLoadingLayout() && f <= -1.0f && isReadyForPullEnd()) {
-                                        this.mLastMotionY = y2;
-                                        this.mLastMotionX = x2;
-                                        this.mIsBeingDragged = true;
-                                        if (this.mMode == Mode.BOTH) {
-                                            this.mCurrentMode = Mode.PULL_FROM_END;
-                                        }
-                                    }
+                            } else if (this.mMode.showFooterLoadingLayout() && diff <= -1.0f && isReadyForPullEnd()) {
+                                this.mLastMotionY = y2;
+                                this.mLastMotionX = x2;
+                                this.mIsBeingDragged = true;
+                                if (this.mMode == Mode.BOTH) {
+                                    this.mCurrentMode = Mode.PULL_FROM_END;
+                                    break;
                                 }
                             }
-                            z = this.mIsBeingDragged;
-                            break;
                         }
-                        break;
-                }
-            } else {
-                z = true;
+                    }
+                    break;
             }
+            return this.mIsBeingDragged;
         }
-        return z;
     }
 
-    protected void onPtrRestoreInstanceState(Bundle bundle) {
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void onRefreshComplete() {
+        if (isRefreshing()) {
+            setState(State.RESET, new boolean[0]);
+        }
     }
 
-    protected void onPtrSaveInstanceState(Bundle bundle) {
+    @Override // android.view.View
+    public final boolean onTouchEvent(MotionEvent event) {
+        if (!isPullToRefreshEnabled()) {
+            return false;
+        }
+        if (!this.mScrollingWhileRefreshingEnabled && isRefreshing()) {
+            return true;
+        }
+        if (event.getAction() == 0 && event.getEdgeFlags() != 0) {
+            return false;
+        }
+        switch (event.getAction()) {
+            case 0:
+                if (!isReadyForPull()) {
+                    return false;
+                }
+                float y = event.getY();
+                this.mInitialMotionY = y;
+                this.mLastMotionY = y;
+                float x = event.getX();
+                this.mInitialMotionX = x;
+                this.mLastMotionX = x;
+                return true;
+            case 1:
+            case 3:
+                if (!this.mIsBeingDragged) {
+                    return false;
+                }
+                this.mIsBeingDragged = false;
+                if (this.mState == State.RELEASE_TO_REFRESH && (this.mOnRefreshListener != null || this.mOnRefreshListener2 != null)) {
+                    setState(State.REFRESHING, true);
+                    return true;
+                } else if (isRefreshing()) {
+                    smoothScrollTo(0);
+                    return true;
+                } else {
+                    setState(State.RESET, new boolean[0]);
+                    return true;
+                }
+            case 2:
+                if (!this.mIsBeingDragged) {
+                    return false;
+                }
+                this.mLastMotionY = event.getY();
+                this.mLastMotionX = event.getX();
+                pullEvent();
+                return true;
+            default:
+                return false;
+        }
     }
 
-    protected void onPullToRefresh() {
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setScrollingWhileRefreshingEnabled(boolean allowScrollingWhileRefreshing) {
+        this.mScrollingWhileRefreshingEnabled = allowScrollingWhileRefreshing;
+    }
+
+    public void setDisableScrollingWhileRefreshing(boolean disableScrollingWhileRefreshing) {
+        setScrollingWhileRefreshingEnabled(!disableScrollingWhileRefreshing);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setFilterTouchEvents(boolean filterEvents) {
+        this.mFilterTouchEvents = filterEvents;
+    }
+
+    public void setLastUpdatedLabel(CharSequence label) {
+        getLoadingLayoutProxy().setLastUpdatedLabel(label);
+    }
+
+    public void setLoadingDrawable(Drawable drawable) {
+        getLoadingLayoutProxy().setLoadingDrawable(drawable);
+    }
+
+    public void setLoadingDrawable(Drawable drawable, Mode mode) {
+        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setLoadingDrawable(drawable);
+    }
+
+    @Override // android.view.View
+    public void setLongClickable(boolean longClickable) {
+        getRefreshableView().setLongClickable(longClickable);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setMode(Mode mode) {
+        if (mode != this.mMode) {
+            Log.d(LOG_TAG, "Setting mode to: " + mode);
+            this.mMode = mode;
+            updateUIForMode();
+        }
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public void setOnPullEventListener(OnPullEventListener<T> listener) {
+        this.mOnPullEventListener = listener;
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setOnRefreshListener(OnRefreshListener<T> listener) {
+        this.mOnRefreshListener = listener;
+        this.mOnRefreshListener2 = null;
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setOnRefreshListener(OnRefreshListener2<T> listener) {
+        this.mOnRefreshListener2 = listener;
+        this.mOnRefreshListener = null;
+    }
+
+    public void setPullLabel(CharSequence pullLabel) {
+        getLoadingLayoutProxy().setPullLabel(pullLabel);
+    }
+
+    public void setPullLabel(CharSequence pullLabel, Mode mode) {
+        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setPullLabel(pullLabel);
+    }
+
+    public final void setPullToRefreshEnabled(boolean enable) {
+        setMode(enable ? Mode.getDefault() : Mode.DISABLED);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setPullToRefreshOverScrollEnabled(boolean enabled) {
+        this.mOverScrollEnabled = enabled;
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setRefreshing() {
+        setRefreshing(true);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setRefreshing(boolean doScroll) {
+        if (!isRefreshing()) {
+            setState(State.MANUAL_REFRESHING, doScroll);
+        }
+    }
+
+    public void setRefreshingLabel(CharSequence refreshingLabel) {
+        getLoadingLayoutProxy().setRefreshingLabel(refreshingLabel);
+    }
+
+    public void setRefreshingLabel(CharSequence refreshingLabel, Mode mode) {
+        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setRefreshingLabel(refreshingLabel);
+    }
+
+    public void setReleaseLabel(CharSequence releaseLabel) {
+        setReleaseLabel(releaseLabel, Mode.BOTH);
+    }
+
+    public void setReleaseLabel(CharSequence releaseLabel, Mode mode) {
+        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setReleaseLabel(releaseLabel);
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public void setScrollAnimationInterpolator(Interpolator interpolator) {
+        this.mScrollAnimationInterpolator = interpolator;
+    }
+
+    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
+    public final void setShowViewWhileRefreshing(boolean showView) {
+        this.mShowViewWhileRefreshing = showView;
+    }
+
+    public final void setState(State state, boolean... params) {
+        this.mState = state;
+        Log.d(LOG_TAG, "State: " + this.mState.name());
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$State()[this.mState.ordinal()]) {
+            case 1:
+                onReset();
+                break;
+            case 2:
+                onPullToRefresh();
+                break;
+            case 3:
+                onReleaseToRefresh();
+                break;
+            case 4:
+            case 5:
+                onRefreshing(params[0]);
+                break;
+        }
+        if (this.mOnPullEventListener != null) {
+            this.mOnPullEventListener.onPullEvent(this, this.mState, this.mCurrentMode);
+        }
+    }
+
+    protected final void addViewInternal(View child, int index, ViewGroup.LayoutParams params) {
+        super.addView(child, index, params);
+    }
+
+    protected final void addViewInternal(View child, ViewGroup.LayoutParams params) {
+        super.addView(child, -1, params);
+    }
+
+    public LoadingLayout createLoadingLayout(Context context, Mode mode, TypedArray attrs) {
+        LoadingLayout layout = this.mLoadingAnimationStyle.createLoadingLayout(context, mode, getPullToRefreshScrollDirection(), attrs);
+        layout.setVisibility(4);
+        return layout;
+    }
+
+    public LoadingLayoutProxy createLoadingLayoutProxy(boolean includeStart, boolean includeEnd) {
+        LoadingLayoutProxy proxy = new LoadingLayoutProxy();
+        if (includeStart && this.mMode.showHeaderLoadingLayout()) {
+            proxy.addLayout(this.mHeaderLayout);
+        }
+        if (includeEnd && this.mMode.showFooterLoadingLayout()) {
+            proxy.addLayout(this.mFooterLayout);
+        }
+        return proxy;
+    }
+
+    public final void disableLoadingLayoutVisibilityChanges() {
+        this.mLayoutVisibilityChangesEnabled = false;
+    }
+
+    public final LoadingLayout getFooterLayout() {
+        return this.mFooterLayout;
+    }
+
+    public final int getFooterSize() {
+        return this.mFooterLayout.getContentSize();
+    }
+
+    public final LoadingLayout getHeaderLayout() {
+        return this.mHeaderLayout;
+    }
+
+    public final int getHeaderSize() {
+        return this.mHeaderLayout.getContentSize();
+    }
+
+    protected int getPullToRefreshScrollDuration() {
+        return 200;
+    }
+
+    protected int getPullToRefreshScrollDurationLonger() {
+        return SMOOTH_SCROLL_LONG_DURATION_MS;
+    }
+
+    public FrameLayout getRefreshableViewWrapper() {
+        return this.mRefreshableViewWrapper;
+    }
+
+    protected void handleStyledAttributes(TypedArray a) {
+    }
+
+    public void onPtrRestoreInstanceState(Bundle savedInstanceState) {
+    }
+
+    public void onPtrSaveInstanceState(Bundle saveState) {
+    }
+
+    public void onPullToRefresh() {
         switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
             case 2:
                 this.mHeaderLayout.pullToRefresh();
@@ -879,45 +679,47 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         }
     }
 
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void onRefreshComplete() {
-        if (isRefreshing()) {
-            setState(State.RESET, new boolean[0]);
-        }
-    }
-
-    protected void onRefreshing(boolean z) {
+    public void onRefreshing(boolean doScroll) {
         if (this.mMode.showHeaderLoadingLayout()) {
             this.mHeaderLayout.refreshing();
         }
         if (this.mMode.showFooterLoadingLayout()) {
             this.mFooterLayout.refreshing();
         }
-        if (!z) {
-            callRefreshListener();
-        } else if (!this.mShowViewWhileRefreshing) {
-            smoothScrollTo(0);
-        } else {
-            OnSmoothScrollFinishedListener onSmoothScrollFinishedListener = new OnSmoothScrollFinishedListener() { // from class: com.handmark.pulltorefresh.library.PullToRefreshBase.1
-                @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnSmoothScrollFinishedListener
-                public void onSmoothScrollFinished() {
-                    PullToRefreshBase.this.callRefreshListener();
+        if (doScroll) {
+            if (this.mShowViewWhileRefreshing) {
+                OnSmoothScrollFinishedListener listener = new AnonymousClass1();
+                switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
+                    case 3:
+                    case 5:
+                        smoothScrollTo(getFooterSize(), listener);
+                        return;
+                    case 4:
+                    default:
+                        smoothScrollTo(-getHeaderSize(), listener);
+                        return;
                 }
-            };
-            switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
-                case 3:
-                case 5:
-                    smoothScrollTo(getFooterSize(), onSmoothScrollFinishedListener);
-                    return;
-                case 4:
-                default:
-                    smoothScrollTo(-getHeaderSize(), onSmoothScrollFinishedListener);
-                    return;
             }
+            smoothScrollTo(0);
+            return;
+        }
+        callRefreshListener();
+    }
+
+    /* renamed from: com.handmark.pulltorefresh.library.PullToRefreshBase$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 implements OnSmoothScrollFinishedListener {
+        AnonymousClass1() {
+            PullToRefreshBase.this = r1;
+        }
+
+        @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnSmoothScrollFinishedListener
+        public void onSmoothScrollFinished() {
+            PullToRefreshBase.access$4(PullToRefreshBase.this);
         }
     }
 
-    protected void onReleaseToRefresh() {
+    public void onReleaseToRefresh() {
         switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
             case 2:
                 this.mHeaderLayout.releaseToRefresh();
@@ -930,7 +732,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         }
     }
 
-    protected void onReset() {
+    public void onReset() {
         this.mIsBeingDragged = false;
         this.mLayoutVisibilityChangesEnabled = true;
         this.mHeaderLayout.reset();
@@ -939,22 +741,22 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     }
 
     @Override // android.view.View
-    protected final void onRestoreInstanceState(Parcelable parcelable) {
-        if (!(parcelable instanceof Bundle)) {
-            super.onRestoreInstanceState(parcelable);
+    protected final void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
+            Bundle bundle = (Bundle) state;
+            setMode(Mode.mapIntToValue(bundle.getInt(STATE_MODE, 0)));
+            this.mCurrentMode = Mode.mapIntToValue(bundle.getInt(STATE_CURRENT_MODE, 0));
+            this.mScrollingWhileRefreshingEnabled = bundle.getBoolean(STATE_SCROLLING_REFRESHING_ENABLED, false);
+            this.mShowViewWhileRefreshing = bundle.getBoolean(STATE_SHOW_REFRESHING_VIEW, true);
+            super.onRestoreInstanceState(bundle.getParcelable(STATE_SUPER));
+            State viewState = State.mapIntToValue(bundle.getInt(STATE_STATE, 0));
+            if (viewState == State.REFRESHING || viewState == State.MANUAL_REFRESHING) {
+                setState(viewState, true);
+            }
+            onPtrRestoreInstanceState(bundle);
             return;
         }
-        Bundle bundle = (Bundle) parcelable;
-        setMode(Mode.mapIntToValue(bundle.getInt(STATE_MODE, 0)));
-        this.mCurrentMode = Mode.mapIntToValue(bundle.getInt(STATE_CURRENT_MODE, 0));
-        this.mScrollingWhileRefreshingEnabled = bundle.getBoolean(STATE_SCROLLING_REFRESHING_ENABLED, false);
-        this.mShowViewWhileRefreshing = bundle.getBoolean(STATE_SHOW_REFRESHING_VIEW, true);
-        super.onRestoreInstanceState(bundle.getParcelable(STATE_SUPER));
-        State mapIntToValue = State.mapIntToValue(bundle.getInt(STATE_STATE, 0));
-        if (mapIntToValue == State.REFRESHING || mapIntToValue == State.MANUAL_REFRESHING) {
-            setState(mapIntToValue, true);
-        }
-        onPtrRestoreInstanceState(bundle);
+        super.onRestoreInstanceState(state);
     }
 
     @Override // android.view.View
@@ -971,178 +773,99 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     }
 
     @Override // android.view.View
-    protected final void onSizeChanged(int i, int i2, int i3, int i4) {
-        Log.d(LOG_TAG, String.format("onSizeChanged. W: %d, H: %d", Integer.valueOf(i), Integer.valueOf(i2)));
-        super.onSizeChanged(i, i2, i3, i4);
+    protected final void onSizeChanged(int w, int h, int oldw, int oldh) {
+        Log.d(LOG_TAG, String.format("onSizeChanged. W: %d, H: %d", Integer.valueOf(w), Integer.valueOf(h)));
+        super.onSizeChanged(w, h, oldw, oldh);
         refreshLoadingViewsSize();
-        refreshRefreshableViewSize(i, i2);
-        post(new Runnable() { // from class: com.handmark.pulltorefresh.library.PullToRefreshBase.2
-            @Override // java.lang.Runnable
-            public void run() {
-                PullToRefreshBase.this.requestLayout();
-            }
-        });
+        refreshRefreshableViewSize(w, h);
+        post(new AnonymousClass2());
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:15:0x002d, code lost:
-        if (r8.getEdgeFlags() == 0) goto L16;
-     */
-    @Override // android.view.View
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    public final boolean onTouchEvent(MotionEvent motionEvent) {
-        boolean z;
-        if (!isPullToRefreshEnabled()) {
-            z = false;
-        } else if (this.mScrollingWhileRefreshingEnabled || !isRefreshing()) {
-            if (motionEvent.getAction() == 0) {
-                z = false;
-            }
-            switch (motionEvent.getAction()) {
-                case 0:
-                    z = false;
-                    if (isReadyForPull()) {
-                        float y = motionEvent.getY();
-                        this.mInitialMotionY = y;
-                        this.mLastMotionY = y;
-                        float x = motionEvent.getX();
-                        this.mInitialMotionX = x;
-                        this.mLastMotionX = x;
-                        z = true;
-                        break;
-                    }
-                    break;
-                case 1:
-                case 3:
-                    z = false;
-                    if (this.mIsBeingDragged) {
-                        this.mIsBeingDragged = false;
-                        if (this.mState == State.RELEASE_TO_REFRESH && (this.mOnRefreshListener != null || this.mOnRefreshListener2 != null)) {
-                            setState(State.REFRESHING, true);
-                            z = true;
-                            break;
-                        } else if (!isRefreshing()) {
-                            setState(State.RESET, new boolean[0]);
-                            z = true;
-                            break;
-                        } else {
-                            smoothScrollTo(0);
-                            z = true;
-                            break;
-                        }
-                    }
-                    break;
-                case 2:
-                    z = false;
-                    if (this.mIsBeingDragged) {
-                        this.mLastMotionY = motionEvent.getY();
-                        this.mLastMotionX = motionEvent.getX();
-                        pullEvent();
-                        z = true;
-                        break;
-                    }
-                    break;
-                default:
-                    z = false;
-                    break;
-            }
-        } else {
-            z = true;
+    /* renamed from: com.handmark.pulltorefresh.library.PullToRefreshBase$2 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass2 implements Runnable {
+        AnonymousClass2() {
+            PullToRefreshBase.this = r1;
         }
-        return z;
+
+        @Override // java.lang.Runnable
+        public void run() {
+            PullToRefreshBase.this.requestLayout();
+        }
     }
 
     protected final void refreshLoadingViewsSize() {
-        int i;
-        int i2;
         int maximumPullScroll = (int) (getMaximumPullScroll() * 1.2f);
-        int paddingLeft = getPaddingLeft();
-        int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingRight();
-        int paddingBottom = getPaddingBottom();
+        int pLeft = getPaddingLeft();
+        int pTop = getPaddingTop();
+        int pRight = getPaddingRight();
+        int pBottom = getPaddingBottom();
         switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
             case 1:
                 if (this.mMode.showHeaderLoadingLayout()) {
                     this.mHeaderLayout.setHeight(maximumPullScroll);
-                    i = -maximumPullScroll;
+                    pTop = -maximumPullScroll;
                 } else {
-                    i = 0;
+                    pTop = 0;
                 }
-                if (!this.mMode.showFooterLoadingLayout()) {
-                    paddingBottom = 0;
+                if (this.mMode.showFooterLoadingLayout()) {
+                    this.mFooterLayout.setHeight(maximumPullScroll);
+                    pBottom = -maximumPullScroll;
                     break;
                 } else {
-                    this.mFooterLayout.setHeight(maximumPullScroll);
-                    paddingBottom = -maximumPullScroll;
+                    pBottom = 0;
                     break;
                 }
             case 2:
                 if (this.mMode.showHeaderLoadingLayout()) {
                     this.mHeaderLayout.setWidth(maximumPullScroll);
-                    i2 = -maximumPullScroll;
+                    pLeft = -maximumPullScroll;
                 } else {
-                    i2 = 0;
+                    pLeft = 0;
                 }
-                if (!this.mMode.showFooterLoadingLayout()) {
-                    paddingRight = 0;
-                    paddingLeft = i2;
-                    i = paddingTop;
-                    break;
-                } else {
+                if (this.mMode.showFooterLoadingLayout()) {
                     this.mFooterLayout.setWidth(maximumPullScroll);
-                    paddingRight = -maximumPullScroll;
-                    paddingLeft = i2;
-                    i = paddingTop;
+                    pRight = -maximumPullScroll;
+                    break;
+                } else {
+                    pRight = 0;
                     break;
                 }
-            default:
-                i = paddingTop;
-                break;
         }
-        Log.d(LOG_TAG, String.format("Setting Padding. L: %d, T: %d, R: %d, B: %d", Integer.valueOf(paddingLeft), Integer.valueOf(i), Integer.valueOf(paddingRight), Integer.valueOf(paddingBottom)));
-        setPadding(paddingLeft, i, paddingRight, paddingBottom);
+        Log.d(LOG_TAG, String.format("Setting Padding. L: %d, T: %d, R: %d, B: %d", Integer.valueOf(pLeft), Integer.valueOf(pTop), Integer.valueOf(pRight), Integer.valueOf(pBottom)));
+        setPadding(pLeft, pTop, pRight, pBottom);
     }
 
-    protected final void refreshRefreshableViewSize(int i, int i2) {
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.mRefreshableViewWrapper.getLayoutParams();
+    protected final void refreshRefreshableViewSize(int width, int height) {
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) this.mRefreshableViewWrapper.getLayoutParams();
         switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
             case 1:
-                if (layoutParams.height == i2) {
+                if (lp.height != height) {
+                    lp.height = height;
+                    this.mRefreshableViewWrapper.requestLayout();
                     return;
                 }
-                layoutParams.height = i2;
-                this.mRefreshableViewWrapper.requestLayout();
                 return;
             case 2:
-                if (layoutParams.width == i) {
+                if (lp.width != width) {
+                    lp.width = width;
+                    this.mRefreshableViewWrapper.requestLayout();
                     return;
                 }
-                layoutParams.width = i;
-                this.mRefreshableViewWrapper.requestLayout();
                 return;
             default:
                 return;
         }
     }
 
-    public void setDisableScrollingWhileRefreshing(boolean z) {
-        setScrollingWhileRefreshingEnabled(!z);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setFilterTouchEvents(boolean z) {
-        this.mFilterTouchEvents = z;
-    }
-
-    protected final void setHeaderScroll(int i) {
-        Log.d(LOG_TAG, "setHeaderScroll: " + i);
+    public final void setHeaderScroll(int value) {
+        Log.d(LOG_TAG, "setHeaderScroll: " + value);
         int maximumPullScroll = getMaximumPullScroll();
-        int min = Math.min(maximumPullScroll, Math.max(-maximumPullScroll, i));
+        int value2 = Math.min(maximumPullScroll, Math.max(-maximumPullScroll, value));
         if (this.mLayoutVisibilityChangesEnabled) {
-            if (min < 0) {
+            if (value2 < 0) {
                 this.mHeaderLayout.setVisibility(0);
-            } else if (min > 0) {
+            } else if (value2 > 0) {
                 this.mFooterLayout.setVisibility(0);
             } else {
                 this.mHeaderLayout.setVisibility(4);
@@ -1151,169 +874,404 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         }
         switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
             case 1:
-                scrollTo(0, min);
+                scrollTo(0, value2);
                 return;
             case 2:
-                scrollTo(min, 0);
+                scrollTo(value2, 0);
                 return;
             default:
                 return;
         }
     }
 
-    public void setLastUpdatedLabel(CharSequence charSequence) {
-        getLoadingLayoutProxy().setLastUpdatedLabel(charSequence);
+    public final void smoothScrollTo(int scrollValue) {
+        smoothScrollTo(scrollValue, getPullToRefreshScrollDuration());
     }
 
-    public void setLoadingDrawable(Drawable drawable) {
-        getLoadingLayoutProxy().setLoadingDrawable(drawable);
+    protected final void smoothScrollTo(int scrollValue, OnSmoothScrollFinishedListener listener) {
+        smoothScrollTo(scrollValue, getPullToRefreshScrollDuration(), 0L, listener);
     }
 
-    public void setLoadingDrawable(Drawable drawable, Mode mode) {
-        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setLoadingDrawable(drawable);
+    protected final void smoothScrollToLonger(int scrollValue) {
+        smoothScrollTo(scrollValue, getPullToRefreshScrollDurationLonger());
     }
 
-    @Override // android.view.View
-    public void setLongClickable(boolean z) {
-        getRefreshableView().setLongClickable(z);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setMode(Mode mode) {
-        if (mode != this.mMode) {
-            Log.d(LOG_TAG, "Setting mode to: " + mode);
-            this.mMode = mode;
-            updateUIForMode();
-        }
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public void setOnPullEventListener(OnPullEventListener<T> onPullEventListener) {
-        this.mOnPullEventListener = onPullEventListener;
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setOnRefreshListener(OnRefreshListener2<T> onRefreshListener2) {
-        this.mOnRefreshListener2 = onRefreshListener2;
-        this.mOnRefreshListener = null;
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setOnRefreshListener(OnRefreshListener<T> onRefreshListener) {
-        this.mOnRefreshListener = onRefreshListener;
-        this.mOnRefreshListener2 = null;
-    }
-
-    public void setPullLabel(CharSequence charSequence) {
-        getLoadingLayoutProxy().setPullLabel(charSequence);
-    }
-
-    public void setPullLabel(CharSequence charSequence, Mode mode) {
-        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setPullLabel(charSequence);
-    }
-
-    public final void setPullToRefreshEnabled(boolean z) {
-        setMode(z ? Mode.getDefault() : Mode.DISABLED);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setPullToRefreshOverScrollEnabled(boolean z) {
-        this.mOverScrollEnabled = z;
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setRefreshing() {
-        setRefreshing(true);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setRefreshing(boolean z) {
-        if (!isRefreshing()) {
-            setState(State.MANUAL_REFRESHING, z);
-        }
-    }
-
-    public void setRefreshingLabel(CharSequence charSequence) {
-        getLoadingLayoutProxy().setRefreshingLabel(charSequence);
-    }
-
-    public void setRefreshingLabel(CharSequence charSequence, Mode mode) {
-        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setRefreshingLabel(charSequence);
-    }
-
-    public void setReleaseLabel(CharSequence charSequence) {
-        setReleaseLabel(charSequence, Mode.BOTH);
-    }
-
-    public void setReleaseLabel(CharSequence charSequence, Mode mode) {
-        getLoadingLayoutProxy(mode.showHeaderLoadingLayout(), mode.showFooterLoadingLayout()).setReleaseLabel(charSequence);
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public void setScrollAnimationInterpolator(Interpolator interpolator) {
-        this.mScrollAnimationInterpolator = interpolator;
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setScrollingWhileRefreshingEnabled(boolean z) {
-        this.mScrollingWhileRefreshingEnabled = z;
-    }
-
-    @Override // com.handmark.pulltorefresh.library.IPullToRefresh
-    public final void setShowViewWhileRefreshing(boolean z) {
-        this.mShowViewWhileRefreshing = z;
-    }
-
-    final void setState(State state, boolean... zArr) {
-        this.mState = state;
-        Log.d(LOG_TAG, "State: " + this.mState.name());
-        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$State()[this.mState.ordinal()]) {
-            case 1:
-                onReset();
-                break;
-            case 2:
-                onPullToRefresh();
-                break;
-            case 3:
-                onReleaseToRefresh();
-                break;
-            case 4:
-            case 5:
-                onRefreshing(zArr[0]);
-                break;
-        }
-        if (this.mOnPullEventListener != null) {
-            this.mOnPullEventListener.onPullEvent(this, this.mState, this.mCurrentMode);
-        }
-    }
-
-    protected final void smoothScrollTo(int i) {
-        smoothScrollTo(i, getPullToRefreshScrollDuration());
-    }
-
-    protected final void smoothScrollTo(int i, OnSmoothScrollFinishedListener onSmoothScrollFinishedListener) {
-        smoothScrollTo(i, getPullToRefreshScrollDuration(), 0L, onSmoothScrollFinishedListener);
-    }
-
-    protected final void smoothScrollToLonger(int i) {
-        smoothScrollTo(i, getPullToRefreshScrollDurationLonger());
-    }
-
-    protected void updateUIForMode() {
-        LinearLayout.LayoutParams loadingLayoutLayoutParams = getLoadingLayoutLayoutParams();
+    public void updateUIForMode() {
+        LinearLayout.LayoutParams lp = getLoadingLayoutLayoutParams();
         if (this == this.mHeaderLayout.getParent()) {
             removeView(this.mHeaderLayout);
         }
         if (this.mMode.showHeaderLoadingLayout()) {
-            addViewInternal(this.mHeaderLayout, 0, loadingLayoutLayoutParams);
+            addViewInternal(this.mHeaderLayout, 0, lp);
         }
         if (this == this.mFooterLayout.getParent()) {
             removeView(this.mFooterLayout);
         }
         if (this.mMode.showFooterLoadingLayout()) {
-            addViewInternal(this.mFooterLayout, loadingLayoutLayoutParams);
+            addViewInternal(this.mFooterLayout, lp);
         }
         refreshLoadingViewsSize();
         this.mCurrentMode = this.mMode != Mode.BOTH ? this.mMode : Mode.PULL_FROM_START;
+    }
+
+    private void addRefreshableView(Context context, T refreshableView) {
+        this.mRefreshableViewWrapper = new FrameLayout(context);
+        this.mRefreshableViewWrapper.addView(refreshableView, -1, -1);
+        addViewInternal(this.mRefreshableViewWrapper, new LinearLayout.LayoutParams(-1, -1));
+    }
+
+    static /* synthetic */ void access$4(PullToRefreshBase pullToRefreshBase) {
+        pullToRefreshBase.callRefreshListener();
+    }
+
+    private void callRefreshListener() {
+        if (this.mOnRefreshListener != null) {
+            this.mOnRefreshListener.onRefresh(this);
+        } else if (this.mOnRefreshListener2 != null) {
+            if (this.mCurrentMode == Mode.PULL_FROM_START) {
+                this.mOnRefreshListener2.onPullDownToRefresh(this);
+            } else if (this.mCurrentMode == Mode.PULL_FROM_END) {
+                this.mOnRefreshListener2.onPullUpToRefresh(this);
+            }
+        }
+    }
+
+    private void init(Context context, AttributeSet attrs) {
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
+            case 2:
+                setOrientation(0);
+                break;
+            default:
+                setOrientation(1);
+                break;
+        }
+        setGravity(17);
+        ViewConfiguration config = ViewConfiguration.get(context);
+        this.mTouchSlop = config.getScaledTouchSlop();
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PullToRefresh);
+        if (a.hasValue(R.styleable.PullToRefresh_ptrMode)) {
+            this.mMode = Mode.mapIntToValue(a.getInteger(R.styleable.PullToRefresh_ptrMode, 0));
+        }
+        if (a.hasValue(R.styleable.PullToRefresh_ptrAnimationStyle)) {
+            this.mLoadingAnimationStyle = AnimationStyle.mapIntToValue(a.getInteger(R.styleable.PullToRefresh_ptrAnimationStyle, 0));
+        }
+        this.mRefreshableView = createRefreshableView(context, attrs);
+        addRefreshableView(context, this.mRefreshableView);
+        this.mHeaderLayout = createLoadingLayout(context, Mode.PULL_FROM_START, a);
+        this.mFooterLayout = createLoadingLayout(context, Mode.PULL_FROM_END, a);
+        if (a.hasValue(R.styleable.PullToRefresh_ptrRefreshableViewBackground)) {
+            Drawable background = a.getDrawable(R.styleable.PullToRefresh_ptrRefreshableViewBackground);
+            if (background != null) {
+                this.mRefreshableView.setBackgroundDrawable(background);
+            }
+        } else if (a.hasValue(R.styleable.PullToRefresh_ptrAdapterViewBackground)) {
+            Utils.warnDeprecation("ptrAdapterViewBackground", "ptrRefreshableViewBackground");
+            Drawable background2 = a.getDrawable(R.styleable.PullToRefresh_ptrAdapterViewBackground);
+            if (background2 != null) {
+                this.mRefreshableView.setBackgroundDrawable(background2);
+            }
+        }
+        if (a.hasValue(R.styleable.PullToRefresh_ptrOverScroll)) {
+            this.mOverScrollEnabled = a.getBoolean(R.styleable.PullToRefresh_ptrOverScroll, true);
+        }
+        if (a.hasValue(R.styleable.PullToRefresh_ptrScrollingWhileRefreshingEnabled)) {
+            this.mScrollingWhileRefreshingEnabled = a.getBoolean(R.styleable.PullToRefresh_ptrScrollingWhileRefreshingEnabled, false);
+        }
+        handleStyledAttributes(a);
+        a.recycle();
+        updateUIForMode();
+    }
+
+    private boolean isReadyForPull() {
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mMode.ordinal()]) {
+            case 2:
+                return isReadyForPullStart();
+            case 3:
+                return isReadyForPullEnd();
+            case 4:
+                return isReadyForPullEnd() || isReadyForPullStart();
+            default:
+                return false;
+        }
+    }
+
+    private void pullEvent() {
+        float initialMotionValue;
+        float lastMotionValue;
+        int newScrollValue;
+        int itemDimension;
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
+            case 2:
+                initialMotionValue = this.mInitialMotionX;
+                lastMotionValue = this.mLastMotionX;
+                break;
+            default:
+                initialMotionValue = this.mInitialMotionY;
+                lastMotionValue = this.mLastMotionY;
+                break;
+        }
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
+            case 3:
+                newScrollValue = Math.round(Math.max(initialMotionValue - lastMotionValue, 0.0f) / FRICTION);
+                itemDimension = getFooterSize();
+                break;
+            default:
+                newScrollValue = Math.round(Math.min(initialMotionValue - lastMotionValue, 0.0f) / FRICTION);
+                itemDimension = getHeaderSize();
+                break;
+        }
+        setHeaderScroll(newScrollValue);
+        if (newScrollValue != 0 && !isRefreshing()) {
+            float scale = Math.abs(newScrollValue) / itemDimension;
+            switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Mode()[this.mCurrentMode.ordinal()]) {
+                case 3:
+                    this.mFooterLayout.onPull(scale);
+                    break;
+                default:
+                    this.mHeaderLayout.onPull(scale);
+                    break;
+            }
+            if (this.mState != State.PULL_TO_REFRESH && itemDimension >= Math.abs(newScrollValue)) {
+                setState(State.PULL_TO_REFRESH, new boolean[0]);
+            } else if (this.mState == State.PULL_TO_REFRESH && itemDimension < Math.abs(newScrollValue)) {
+                setState(State.RELEASE_TO_REFRESH, new boolean[0]);
+            }
+        }
+    }
+
+    private LinearLayout.LayoutParams getLoadingLayoutLayoutParams() {
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
+            case 2:
+                return new LinearLayout.LayoutParams(-2, -1);
+            default:
+                return new LinearLayout.LayoutParams(-1, -2);
+        }
+    }
+
+    private int getMaximumPullScroll() {
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
+            case 2:
+                return Math.round(getWidth() / FRICTION);
+            default:
+                return Math.round(getHeight() / FRICTION);
+        }
+    }
+
+    private final void smoothScrollTo(int scrollValue, long duration) {
+        smoothScrollTo(scrollValue, duration, 0L, null);
+    }
+
+    static /* synthetic */ void access$5(PullToRefreshBase pullToRefreshBase, int i, long j, long j2, OnSmoothScrollFinishedListener onSmoothScrollFinishedListener) {
+        pullToRefreshBase.smoothScrollTo(i, j, j2, onSmoothScrollFinishedListener);
+    }
+
+    private final void smoothScrollTo(int newScrollValue, long duration, long delayMillis, OnSmoothScrollFinishedListener listener) {
+        int oldScrollValue;
+        if (this.mCurrentSmoothScrollRunnable != null) {
+            this.mCurrentSmoothScrollRunnable.stop();
+        }
+        switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$Orientation()[getPullToRefreshScrollDirection().ordinal()]) {
+            case 2:
+                oldScrollValue = getScrollX();
+                break;
+            default:
+                oldScrollValue = getScrollY();
+                break;
+        }
+        if (oldScrollValue != newScrollValue) {
+            if (this.mScrollAnimationInterpolator == null) {
+                this.mScrollAnimationInterpolator = new DecelerateInterpolator();
+            }
+            this.mCurrentSmoothScrollRunnable = new SmoothScrollRunnable(oldScrollValue, newScrollValue, duration, listener);
+            if (delayMillis > 0) {
+                postDelayed(this.mCurrentSmoothScrollRunnable, delayMillis);
+            } else {
+                post(this.mCurrentSmoothScrollRunnable);
+            }
+        }
+    }
+
+    private final void smoothScrollToAndBack(int y) {
+        smoothScrollTo(y, 200L, 0L, new AnonymousClass3());
+    }
+
+    /* renamed from: com.handmark.pulltorefresh.library.PullToRefreshBase$3 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass3 implements OnSmoothScrollFinishedListener {
+        AnonymousClass3() {
+            PullToRefreshBase.this = r1;
+        }
+
+        @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnSmoothScrollFinishedListener
+        public void onSmoothScrollFinished() {
+            PullToRefreshBase.access$5(PullToRefreshBase.this, 0, 200L, 225L, null);
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    public enum AnimationStyle {
+        ROTATE,
+        FLIP;
+        
+        private static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle;
+
+        static /* synthetic */ int[] $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle() {
+            int[] iArr = $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle;
+            if (iArr == null) {
+                iArr = new int[values().length];
+                try {
+                    iArr[FLIP.ordinal()] = 2;
+                } catch (NoSuchFieldError e) {
+                }
+                try {
+                    iArr[ROTATE.ordinal()] = 1;
+                } catch (NoSuchFieldError e2) {
+                }
+                $SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle = iArr;
+            }
+            return iArr;
+        }
+
+        static AnimationStyle getDefault() {
+            return ROTATE;
+        }
+
+        static AnimationStyle mapIntToValue(int modeInt) {
+            switch (modeInt) {
+                case 1:
+                    return FLIP;
+                default:
+                    return ROTATE;
+            }
+        }
+
+        LoadingLayout createLoadingLayout(Context context, Mode mode, Orientation scrollDirection, TypedArray attrs) {
+            switch ($SWITCH_TABLE$com$handmark$pulltorefresh$library$PullToRefreshBase$AnimationStyle()[ordinal()]) {
+                case 2:
+                    return new FlipLoadingLayout(context, mode, scrollDirection, attrs);
+                default:
+                    return new RotateLoadingLayout(context, mode, scrollDirection, attrs);
+            }
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    public enum Mode {
+        DISABLED(0),
+        PULL_FROM_START(1),
+        PULL_FROM_END(2),
+        BOTH(3),
+        MANUAL_REFRESH_ONLY(4);
+        
+        private int mIntValue;
+        public static Mode PULL_DOWN_TO_REFRESH = PULL_FROM_START;
+        public static Mode PULL_UP_TO_REFRESH = PULL_FROM_END;
+
+        static Mode mapIntToValue(int modeInt) {
+            Mode[] values;
+            for (Mode value : values()) {
+                if (modeInt == value.getIntValue()) {
+                    return value;
+                }
+            }
+            return getDefault();
+        }
+
+        static Mode getDefault() {
+            return PULL_FROM_START;
+        }
+
+        Mode(int modeInt) {
+            this.mIntValue = modeInt;
+        }
+
+        public boolean permitsPullToRefresh() {
+            return (this == DISABLED || this == MANUAL_REFRESH_ONLY) ? false : true;
+        }
+
+        public boolean showHeaderLoadingLayout() {
+            return this == PULL_FROM_START || this == BOTH;
+        }
+
+        public boolean showFooterLoadingLayout() {
+            return this == PULL_FROM_END || this == BOTH || this == MANUAL_REFRESH_ONLY;
+        }
+
+        int getIntValue() {
+            return this.mIntValue;
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    public enum State {
+        RESET(0),
+        PULL_TO_REFRESH(1),
+        RELEASE_TO_REFRESH(2),
+        REFRESHING(8),
+        MANUAL_REFRESHING(9),
+        OVERSCROLLING(16);
+        
+        private int mIntValue;
+
+        static State mapIntToValue(int stateInt) {
+            State[] values;
+            for (State value : values()) {
+                if (stateInt == value.getIntValue()) {
+                    return value;
+                }
+            }
+            return RESET;
+        }
+
+        State(int intValue) {
+            this.mIntValue = intValue;
+        }
+
+        int getIntValue() {
+            return this.mIntValue;
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    final class SmoothScrollRunnable implements Runnable {
+        private final long mDuration;
+        private final Interpolator mInterpolator;
+        private OnSmoothScrollFinishedListener mListener;
+        private final int mScrollFromY;
+        private final int mScrollToY;
+        private boolean mContinueRunning = true;
+        private long mStartTime = -1;
+        private int mCurrentY = -1;
+
+        public SmoothScrollRunnable(int fromY, int toY, long duration, OnSmoothScrollFinishedListener listener) {
+            PullToRefreshBase.this = r3;
+            this.mScrollFromY = fromY;
+            this.mScrollToY = toY;
+            this.mInterpolator = PullToRefreshBase.access$0(r3);
+            this.mDuration = duration;
+            this.mListener = listener;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            if (this.mStartTime == -1) {
+                this.mStartTime = System.currentTimeMillis();
+            } else {
+                long normalizedTime = ((System.currentTimeMillis() - this.mStartTime) * 1000) / this.mDuration;
+                int deltaY = Math.round((this.mScrollFromY - this.mScrollToY) * this.mInterpolator.getInterpolation(((float) Math.max(Math.min(normalizedTime, 1000L), 0L)) / 1000.0f));
+                this.mCurrentY = this.mScrollFromY - deltaY;
+                PullToRefreshBase.this.setHeaderScroll(this.mCurrentY);
+            }
+            if (this.mContinueRunning && this.mScrollToY != this.mCurrentY) {
+                ViewCompat.postOnAnimation(PullToRefreshBase.this, this);
+            } else if (this.mListener != null) {
+                this.mListener.onSmoothScrollFinished();
+            }
+        }
+
+        public void stop() {
+            this.mContinueRunning = false;
+            PullToRefreshBase.this.removeCallbacks(this);
+        }
     }
 }

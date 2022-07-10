@@ -2,8 +2,8 @@ package com.mining.app.zxing.camera;
 
 import android.graphics.Bitmap;
 import com.google.zxing.LuminanceSource;
-
-/* loaded from: classes.jar:com/mining/app/zxing/camera/PlanarYUVLuminanceSource.class */
+import org.bson.BSON;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class PlanarYUVLuminanceSource extends LuminanceSource {
     private final int dataHeight;
     private final int dataWidth;
@@ -11,78 +11,53 @@ public final class PlanarYUVLuminanceSource extends LuminanceSource {
     private final int top;
     private final byte[] yuvData;
 
-    public PlanarYUVLuminanceSource(byte[] bArr, int i, int i2, int i3, int i4, int i5, int i6) {
-        super(i5, i6);
-        if (i3 + i5 > i || i4 + i6 > i2) {
+    public PlanarYUVLuminanceSource(byte[] yuvData, int dataWidth, int dataHeight, int left, int top, int width, int height) {
+        super(width, height);
+        if (left + width > dataWidth || top + height > dataHeight) {
             throw new IllegalArgumentException("Crop rectangle does not fit within image data.");
         }
-        this.yuvData = bArr;
-        this.dataWidth = i;
-        this.dataHeight = i2;
-        this.left = i3;
-        this.top = i4;
+        this.yuvData = yuvData;
+        this.dataWidth = dataWidth;
+        this.dataHeight = dataHeight;
+        this.left = left;
+        this.top = top;
     }
 
-    public int getDataHeight() {
-        return this.dataHeight;
-    }
-
-    public int getDataWidth() {
-        return this.dataWidth;
+    @Override // com.google.zxing.LuminanceSource
+    public byte[] getRow(int y, byte[] row) {
+        if (y < 0 || y >= getHeight()) {
+            throw new IllegalArgumentException("Requested row is outside the image: " + y);
+        }
+        int width = getWidth();
+        if (row == null || row.length < width) {
+            row = new byte[width];
+        }
+        int offset = ((this.top + y) * this.dataWidth) + this.left;
+        System.arraycopy(this.yuvData, offset, row, 0, width);
+        return row;
     }
 
     @Override // com.google.zxing.LuminanceSource
     public byte[] getMatrix() {
-        byte[] bArr;
         int width = getWidth();
         int height = getHeight();
-        if (width != this.dataWidth || height != this.dataHeight) {
-            int i = width * height;
-            byte[] bArr2 = new byte[i];
-            int i2 = (this.top * this.dataWidth) + this.left;
-            if (width != this.dataWidth) {
-                byte[] bArr3 = this.yuvData;
-                int i3 = 0;
-                while (true) {
-                    bArr = bArr2;
-                    if (i3 >= height) {
-                        break;
-                    }
-                    System.arraycopy(bArr3, i2, bArr2, i3 * width, width);
-                    i2 += this.dataWidth;
-                    i3++;
-                }
-            } else {
-                System.arraycopy(this.yuvData, i2, bArr2, 0, i);
-                bArr = bArr2;
-            }
-        } else {
-            bArr = this.yuvData;
+        if (width == this.dataWidth && height == this.dataHeight) {
+            return this.yuvData;
         }
-        return bArr;
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:11:0x0033, code lost:
-        if (r8.length < r0) goto L12;
-     */
-    @Override // com.google.zxing.LuminanceSource
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    public byte[] getRow(int i, byte[] bArr) {
-        byte[] bArr2;
-        if (i < 0 || i >= getHeight()) {
-            throw new IllegalArgumentException("Requested row is outside the image: " + i);
+        int area = width * height;
+        byte[] matrix = new byte[area];
+        int inputOffset = (this.top * this.dataWidth) + this.left;
+        if (width == this.dataWidth) {
+            System.arraycopy(this.yuvData, inputOffset, matrix, 0, area);
+            return matrix;
         }
-        int width = getWidth();
-        if (bArr != null) {
-            bArr2 = bArr;
+        byte[] yuv = this.yuvData;
+        for (int y = 0; y < height; y++) {
+            int outputOffset = y * width;
+            System.arraycopy(yuv, inputOffset, matrix, outputOffset, width);
+            inputOffset += this.dataWidth;
         }
-        bArr2 = new byte[width];
-        int i2 = this.top;
-        int i3 = this.dataWidth;
-        System.arraycopy(this.yuvData, ((i2 + i) * i3) + this.left, bArr2, 0, width);
-        return bArr2;
+        return matrix;
     }
 
     @Override // com.google.zxing.LuminanceSource
@@ -90,20 +65,30 @@ public final class PlanarYUVLuminanceSource extends LuminanceSource {
         return true;
     }
 
+    public int getDataWidth() {
+        return this.dataWidth;
+    }
+
+    public int getDataHeight() {
+        return this.dataHeight;
+    }
+
     public Bitmap renderCroppedGreyscaleBitmap() {
         int width = getWidth();
         int height = getHeight();
-        int[] iArr = new int[width * height];
-        byte[] bArr = this.yuvData;
-        int i = (this.top * this.dataWidth) + this.left;
-        for (int i2 = 0; i2 < height; i2++) {
-            for (int i3 = 0; i3 < width; i3++) {
-                iArr[(i2 * width) + i3] = (-16777216) | (65793 * (bArr[i + i3] & 255));
+        int[] pixels = new int[width * height];
+        byte[] yuv = this.yuvData;
+        int inputOffset = (this.top * this.dataWidth) + this.left;
+        for (int y = 0; y < height; y++) {
+            int outputOffset = y * width;
+            for (int x = 0; x < width; x++) {
+                int grey = yuv[inputOffset + x] & BSON.MINKEY;
+                pixels[outputOffset + x] = (-16777216) | (65793 * grey);
             }
-            i += this.dataWidth;
+            inputOffset += this.dataWidth;
         }
-        Bitmap createBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        createBitmap.setPixels(iArr, 0, width, 0, 0, width, height);
-        return createBitmap;
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bitmap;
     }
 }

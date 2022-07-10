@@ -1,6 +1,5 @@
 package com.google.zxing.qrcode.decoder;
-
-/* loaded from: classes.jar:com/google/zxing/qrcode/decoder/ErrorCorrectionLevel.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public enum ErrorCorrectionLevel {
     L(1),
     M(0),
@@ -10,18 +9,18 @@ public enum ErrorCorrectionLevel {
     private final int bits;
     private static final ErrorCorrectionLevel[] FOR_BITS = {M, L, H, Q};
 
-    ErrorCorrectionLevel(int i) {
-        this.bits = i;
-    }
-
-    public static ErrorCorrectionLevel forBits(int i) {
-        if (i < 0 || i >= FOR_BITS.length) {
-            throw new IllegalArgumentException();
-        }
-        return FOR_BITS[i];
+    ErrorCorrectionLevel(int bits) {
+        this.bits = bits;
     }
 
     public int getBits() {
         return this.bits;
+    }
+
+    public static ErrorCorrectionLevel forBits(int bits) {
+        if (bits < 0 || bits >= FOR_BITS.length) {
+            throw new IllegalArgumentException();
+        }
+        return FOR_BITS[bits];
     }
 }

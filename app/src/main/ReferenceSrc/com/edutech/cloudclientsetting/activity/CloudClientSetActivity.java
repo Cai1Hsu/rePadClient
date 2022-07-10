@@ -53,6 +53,7 @@ import com.edutech.cloudclientsetting.activity.IPListAdapter;
 import com.edutech.cloudclientsetting.activity.NameListAdapter;
 import com.edutech.idauthentication.AESSet;
 import com.edutech.idauthentication.Aduth;
+import com.edutech.idauthentication.FileUtils;
 import com.edutech.idauthentication.MainActivity;
 import com.edutech.idauthentication.MySSLSocketFactory;
 import com.edutech.mobilestudyclient.ApkUpdateBean;
@@ -108,32 +109,35 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.commons.net.imap.IMAPSClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.cookie.ClientCookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.tools.ant.taskdefs.SQLExec;
-import org.apache.tools.ant.util.FileUtils;
+import org.bson.BSON;
 import org.jivesoftware.smackx.workgroup.packet.UserID;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -141,8 +145,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
-
-/* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class CloudClientSetActivity extends Activity implements View.OnClickListener, IPListAdapter.IpInterface, NameListAdapter.NameHistoryInterface {
     private static final int START_PROGRESS = 4115;
     private static final String TAG = "CloudClientSetActivity";
@@ -242,82 +245,357 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     private String modifiedIP = "";
     private String modifiedName = "";
     private String timeStamp = "";
-    private Handler mHandler = new Handler() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.1
+    private Handler mHandler = new AnonymousClass1();
+    private Handler installHandler = new AnonymousClass2();
+    private Handler resultHandler = new AnonymousClass3();
+    View.OnTouchListener nameListener = new AnonymousClass4();
+    View.OnTouchListener ipListener = new AnonymousClass5();
+    TextWatcher ipWatcher = new AnonymousClass6();
+    TextWatcher nameWatcher = new AnonymousClass7();
+    TextWatcher pwdWatcher = new AnonymousClass8();
+    DialogInterface.OnKeyListener keylistenerDialog = new AnonymousClass9();
+    public Runnable downloadRun = new AnonymousClass10();
+    public Runnable updatepwdRun = new AnonymousClass11();
+    Runnable runnable_GetConfig_Infor = new AnonymousClass12();
+
+    static /* synthetic */ void access$56(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.Name = str;
+    }
+
+    static /* synthetic */ String access$58(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.Name;
+    }
+
+    static /* synthetic */ void access$57(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.Pwd = str;
+    }
+
+    static /* synthetic */ EditText access$0(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.ip_edit;
+    }
+
+    static /* synthetic */ EditText access$52(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.ptfw_edit;
+    }
+
+    static /* synthetic */ EditText access$24(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.username_edit;
+    }
+
+    static /* synthetic */ EditText access$19(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.password_edit;
+    }
+
+    static /* synthetic */ Button access$17(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.ok_btn;
+    }
+
+    static /* synthetic */ Button access$16(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.btnTitleBack;
+    }
+
+    static /* synthetic */ CustomProgressDialog access$9(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.webprogressdialog;
+    }
+
+    static /* synthetic */ com.edutech.mobilestudyclient.view.CustomProgressDialog access$13(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.progressDialog;
+    }
+
+    static /* synthetic */ List access$14(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.apkUpdateList;
+    }
+
+    static /* synthetic */ void access$69(CloudClientSetActivity cloudClientSetActivity, List list) {
+        cloudClientSetActivity.apkUpdateList = list;
+    }
+
+    static /* synthetic */ Context access$82(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.mContext;
+    }
+
+    static /* synthetic */ String access$18(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.updatePassword;
+    }
+
+    static /* synthetic */ void access$53(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.updatePassword = str;
+    }
+
+    static /* synthetic */ TextView access$4(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.tvUpdateNow;
+    }
+
+    static /* synthetic */ void access$75(CloudClientSetActivity cloudClientSetActivity, boolean z) {
+        cloudClientSetActivity.reseting = z;
+    }
+
+    static /* synthetic */ boolean access$84(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.reseting;
+    }
+
+    static /* synthetic */ void access$65(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.launcherPath = str;
+    }
+
+    static /* synthetic */ String access$72(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.launcherPath;
+    }
+
+    static /* synthetic */ String access$1(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.JXHD_Ip;
+    }
+
+    static /* synthetic */ void access$21(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.JXHD_Ip = str;
+    }
+
+    static /* synthetic */ void access$74(CloudClientSetActivity cloudClientSetActivity, List list) {
+        cloudClientSetActivity.apkList = list;
+    }
+
+    static /* synthetic */ boolean access$10(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.isover;
+    }
+
+    static /* synthetic */ int access$61(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.updateTime;
+    }
+
+    static /* synthetic */ long access$11(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.currentCacheLength;
+    }
+
+    static /* synthetic */ void access$66(CloudClientSetActivity cloudClientSetActivity, long j) {
+        cloudClientSetActivity.currentCacheLength = j;
+    }
+
+    static /* synthetic */ long access$12(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.currentCachePosition;
+    }
+
+    static /* synthetic */ void access$67(CloudClientSetActivity cloudClientSetActivity, long j) {
+        cloudClientSetActivity.currentCachePosition = j;
+    }
+
+    static /* synthetic */ void access$23(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.ipOrigal = str;
+    }
+
+    static /* synthetic */ String access$27(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.ipOrigal;
+    }
+
+    static /* synthetic */ void access$25(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.nameOrigal = str;
+    }
+
+    static /* synthetic */ String access$29(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.nameOrigal;
+    }
+
+    static /* synthetic */ void access$26(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.pwdOrigal = str;
+    }
+
+    static /* synthetic */ String access$49(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.pwdOrigal;
+    }
+
+    static /* synthetic */ void access$33(CloudClientSetActivity cloudClientSetActivity, HostPwd hostPwd) {
+        cloudClientSetActivity.threadPwd = hostPwd;
+    }
+
+    static /* synthetic */ HostPwd access$46(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.threadPwd;
+    }
+
+    static /* synthetic */ void access$79(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.superPwd1 = str;
+    }
+
+    static /* synthetic */ String access$88(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.superPwd1;
+    }
+
+    static /* synthetic */ void access$81(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.superPwd2 = str;
+    }
+
+    static /* synthetic */ String access$89(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.superPwd2;
+    }
+
+    static /* synthetic */ void access$32(CloudClientSetActivity cloudClientSetActivity, boolean z) {
+        cloudClientSetActivity.allChangeSettings = z;
+    }
+
+    static /* synthetic */ boolean access$47(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.allChangeSettings;
+    }
+
+    static /* synthetic */ AlertDialog access$87(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.pwdConfirmDialog;
+    }
+
+    static /* synthetic */ ListPopupWindow access$35(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.listpop;
+    }
+
+    static /* synthetic */ List access$37(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.ips;
+    }
+
+    static /* synthetic */ IPListAdapter access$36(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.ipAdpter;
+    }
+
+    static /* synthetic */ String access$22(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.saveErrorInfo;
+    }
+
+    static /* synthetic */ void access$54(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.saveErrorInfo = str;
+    }
+
+    static /* synthetic */ AlertDialog access$85(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.registerDialog;
+    }
+
+    static /* synthetic */ void access$86(CloudClientSetActivity cloudClientSetActivity, AlertDialog alertDialog) {
+        cloudClientSetActivity.registerDialog = alertDialog;
+    }
+
+    static /* synthetic */ ArrayList access$63(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.addApksList;
+    }
+
+    static /* synthetic */ void access$64(CloudClientSetActivity cloudClientSetActivity, ArrayList arrayList) {
+        cloudClientSetActivity.addApksList = arrayList;
+    }
+
+    static /* synthetic */ void access$20(CloudClientSetActivity cloudClientSetActivity, boolean z) {
+        cloudClientSetActivity.isResetPwd = z;
+    }
+
+    static /* synthetic */ void access$28(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.modifiedIP = str;
+    }
+
+    static /* synthetic */ void access$30(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.modifiedName = str;
+    }
+
+    static /* synthetic */ String access$38(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.stu_name;
+    }
+
+    static /* synthetic */ JSONArray access$39(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.history_array;
+    }
+
+    static /* synthetic */ void access$41(CloudClientSetActivity cloudClientSetActivity, JSONArray jSONArray) {
+        cloudClientSetActivity.history_array = jSONArray;
+    }
+
+    static /* synthetic */ Handler access$55(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.mHandler;
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 extends Handler {
+        AnonymousClass1() {
+            CloudClientSetActivity.this = r1;
+        }
+
         @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            if (message.what != 4) {
-                if (message.what == 10) {
+        public void handleMessage(Message msg) {
+            if (msg.what != 4) {
+                if (msg.what == 10) {
                     CloudClientSetActivity.this.finish();
-                } else if (message.what == 101) {
-                    CloudClientSetActivity.this.ip_edit.setText(CloudClientSetActivity.this.JXHD_Ip);
+                } else if (msg.what == 101) {
+                    CloudClientSetActivity.access$0(CloudClientSetActivity.this).setText(CloudClientSetActivity.access$1(CloudClientSetActivity.this));
                     CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_serverurlerror));
-                } else if (message.what == 102) {
+                } else if (msg.what == 102) {
                     LanguageUtils.SetLanguage(CloudClientSetActivity.this, "chinese");
-                    CloudClientSetActivity.this.writeXmlLanguage("chinese");
+                    CloudClientSetActivity.access$2(CloudClientSetActivity.this, "chinese");
                     XmlLoadHelper.createLanuage("chinese");
                     CloudClientSetActivity.this.finish();
                     System.exit(0);
-                } else if (message.what == 103) {
+                } else if (msg.what == 103) {
                     LanguageUtils.SetLanguage(CloudClientSetActivity.this, "en");
-                    CloudClientSetActivity.this.writeXmlLanguage("english");
+                    CloudClientSetActivity.access$2(CloudClientSetActivity.this, "english");
                     XmlLoadHelper.createLanuage("en");
                     CloudClientSetActivity.this.finish();
                     System.exit(0);
                 }
             }
-            super.handleMessage(message);
+            super.handleMessage(msg);
         }
-    };
-    private Handler installHandler = new Handler() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.2
+    }
+
+    static /* synthetic */ Handler access$62(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.installHandler;
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$2 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass2 extends Handler {
+        AnonymousClass2() {
+            CloudClientSetActivity.this = r1;
+        }
+
         @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            switch (message.what) {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
                 case 1:
-                    CloudClientSetActivity.this.installNewApk();
+                    CloudClientSetActivity.access$3(CloudClientSetActivity.this);
                     break;
                 case 2:
-                    CloudClientSetActivity.this.tvUpdateNow.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_startupdating));
-                    CloudClientSetActivity.this.tvUpdateNow.setEnabled(true);
-                    CloudClientSetActivity.this.tvUpdateNow.setTextColor(CloudClientSetActivity.this.getResources().getColor(R.color.blue));
+                    CloudClientSetActivity.access$4(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_startupdating));
+                    CloudClientSetActivity.access$4(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$4(CloudClientSetActivity.this).setTextColor(CloudClientSetActivity.this.getResources().getColor(R.color.blue));
                     break;
                 case 3:
                     CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_latestversion));
-                    CloudClientSetActivity.this.closeProgressDialog();
-                    CloudClientSetActivity.this.resetUpdateInfo();
+                    CloudClientSetActivity.access$5(CloudClientSetActivity.this);
+                    CloudClientSetActivity.access$6(CloudClientSetActivity.this);
                     break;
                 case 4:
-                    CloudClientSetActivity.this.startAssistanApk();
+                    CloudClientSetActivity.access$7(CloudClientSetActivity.this);
                     if (!CloudClientSetActivity.this.isFinishing()) {
-                        CloudClientSetActivity.this.showProgressDialog();
+                        CloudClientSetActivity.access$8(CloudClientSetActivity.this);
                         break;
                     }
                     break;
                 case PointerIconCompat.TYPE_CONTEXT_MENU /* 1001 */:
-                    if (CloudClientSetActivity.this.webprogressdialog != null && !CloudClientSetActivity.this.isover && !AppEnvironment.isNewUpdate) {
-                        DecimalFormat decimalFormat = new DecimalFormat("##0.00");
-                        String str = String.valueOf(decimalFormat.format(((CloudClientSetActivity.this.currentCachePosition * 1.0d) / 1024.0d) / 1024.0d)) + "MB/" + decimalFormat.format(((CloudClientSetActivity.this.currentCacheLength * 1.0d) / 1024.0d) / 1024.0d) + "MB";
-                        if (CloudClientSetActivity.this.currentCacheLength != 0) {
-                            int i = (int) ((CloudClientSetActivity.this.currentCachePosition * 100) / CloudClientSetActivity.this.currentCacheLength);
-                            int i2 = i;
-                            if (i >= 100) {
-                                i2 = 100;
-                            }
-                            CloudClientSetActivity.this.webprogressdialog.setMessage(String.valueOf(CloudClientSetActivity.this.getString(R.string.updatingapk)) + "  " + i2 + "%  " + str);
+                    if (CloudClientSetActivity.access$9(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$10(CloudClientSetActivity.this) && !AppEnvironment.isNewUpdate) {
+                        DecimalFormat df = new DecimalFormat("##0.00");
+                        String alllength = df.format(((CloudClientSetActivity.access$11(CloudClientSetActivity.this) * 1.0d) / 1024.0d) / 1024.0d);
+                        String currentPosition = df.format(((CloudClientSetActivity.access$12(CloudClientSetActivity.this) * 1.0d) / 1024.0d) / 1024.0d);
+                        String allStateString = String.valueOf(currentPosition) + "MB/" + alllength + "MB";
+                        if (CloudClientSetActivity.access$11(CloudClientSetActivity.this) == 0) {
+                            CloudClientSetActivity.access$9(CloudClientSetActivity.this).setMessage(String.valueOf(CloudClientSetActivity.this.getString(R.string.updatingapk)) + "  0%");
                             break;
                         } else {
-                            CloudClientSetActivity.this.webprogressdialog.setMessage(String.valueOf(CloudClientSetActivity.this.getString(R.string.updatingapk)) + "  0%");
+                            int percent = (int) ((CloudClientSetActivity.access$12(CloudClientSetActivity.this) * 100) / CloudClientSetActivity.access$11(CloudClientSetActivity.this));
+                            if (percent >= 100) {
+                                percent = 100;
+                            }
+                            CloudClientSetActivity.access$9(CloudClientSetActivity.this).setMessage(String.valueOf(CloudClientSetActivity.this.getString(R.string.updatingapk)) + "  " + percent + "%  " + allStateString);
                             break;
                         }
                     }
                     break;
                 case CloudClientSetActivity.UPDATE_PROGRESS /* 4113 */:
                     try {
-                        Long l = (Long) message.obj;
-                        int i3 = message.arg1;
-                        ApkUpdateBean apkUpdateBean = (ApkUpdateBean) CloudClientSetActivity.this.apkUpdateList.get(i3);
-                        apkUpdateBean.setApkDownloadSize(l.longValue());
-                        CloudClientSetActivity.this.apkUpdateList.set(i3, apkUpdateBean);
-                        CloudClientSetActivity.this.progressDialog.updateProgress(i3);
+                        Long downsize = (Long) msg.obj;
+                        int position = msg.arg1;
+                        ApkUpdateBean bean = (ApkUpdateBean) CloudClientSetActivity.access$14(CloudClientSetActivity.this).get(position);
+                        bean.setApkDownloadSize(downsize.longValue());
+                        CloudClientSetActivity.access$14(CloudClientSetActivity.this).set(position, bean);
+                        CloudClientSetActivity.access$13(CloudClientSetActivity.this).updateProgress(position);
                         break;
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -325,12 +603,12 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     }
                 case CloudClientSetActivity.UPDATE_INSTALLSTATE /* 4114 */:
                     try {
-                        int intValue = ((Integer) message.obj).intValue();
-                        int i4 = message.arg1;
-                        ApkUpdateBean apkUpdateBean2 = (ApkUpdateBean) CloudClientSetActivity.this.apkUpdateList.get(i4);
-                        apkUpdateBean2.setInstallState(intValue);
-                        CloudClientSetActivity.this.apkUpdateList.set(i4, apkUpdateBean2);
-                        CloudClientSetActivity.this.progressDialog.updateProgress(i4);
+                        int state = ((Integer) msg.obj).intValue();
+                        int position2 = msg.arg1;
+                        ApkUpdateBean bean2 = (ApkUpdateBean) CloudClientSetActivity.access$14(CloudClientSetActivity.this).get(position2);
+                        bean2.setInstallState(state);
+                        CloudClientSetActivity.access$14(CloudClientSetActivity.this).set(position2, bean2);
+                        CloudClientSetActivity.access$13(CloudClientSetActivity.this).updateProgress(position2);
                         break;
                     } catch (Exception e2) {
                         e2.printStackTrace();
@@ -338,23 +616,56 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     }
                 case CloudClientSetActivity.START_PROGRESS /* 4115 */:
                     try {
-                        CloudClientSetActivity.this.progressDialog.setData(CloudClientSetActivity.this.apkUpdateList);
+                        CloudClientSetActivity.access$13(CloudClientSetActivity.this).setData(CloudClientSetActivity.access$14(CloudClientSetActivity.this));
                         break;
                     } catch (Exception e3) {
                         break;
                     }
                 case CloudClientSetActivity.UPDATE_INSTALLSINGLE /* 4116 */:
-                    CloudClientSetActivity.this.installSingleApk((String) message.obj);
+                    String path = (String) msg.obj;
+                    CloudClientSetActivity.access$15(CloudClientSetActivity.this, path);
                     break;
             }
-            super.handleMessage(message);
+            super.handleMessage(msg);
         }
-    };
-    private Handler resultHandler = new Handler() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.3
+    }
+
+    static /* synthetic */ void access$7(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.startAssistanApk();
+    }
+
+    private void startAssistanApk() {
+        PackageInfo packageInfo2;
+        Intent intent2 = new Intent("android.intent.action.MAIN");
+        intent2.addFlags(268435456);
+        ComponentName cn = new ComponentName("com.edutech.assistantdemo", "com.edutech.assistantdemo.MainActivity");
+        intent2.setComponent(cn);
+        try {
+            packageInfo2 = this.mContext.getPackageManager().getPackageInfo("com.edutech.assistantdemo", 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            packageInfo2 = null;
+            e.printStackTrace();
+        }
+        if (packageInfo2 != null) {
+            startActivity(intent2);
+        }
+    }
+
+    static /* synthetic */ Handler access$31(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.resultHandler;
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$3 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass3 extends Handler {
+        AnonymousClass3() {
+            CloudClientSetActivity.this = r1;
+        }
+
         @Override // android.os.Handler
         @SuppressLint({"NewApi"})
-        public void handleMessage(Message message) {
-            switch (message.what) {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
                 case 0:
                     CloudClientSetActivity.this.idauth_edit.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_signfailed1));
                     break;
@@ -380,20 +691,20 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     CloudClientSetActivity.this.idauth_edit.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_signfailed6));
                     break;
                 case 11:
-                    if (!"".equals(CloudClientSetActivity.this.updatePassword)) {
-                        CloudClientSetActivity.this.password_edit.setText(CloudClientSetActivity.this.updatePassword);
+                    if (!"".equals(CloudClientSetActivity.access$18(CloudClientSetActivity.this))) {
+                        CloudClientSetActivity.access$19(CloudClientSetActivity.this).setText(CloudClientSetActivity.access$18(CloudClientSetActivity.this));
                     }
                     CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_cpok));
-                    CloudClientSetActivity.this.isResetPwd = false;
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(false);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(false);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_saving));
-                    CloudClientSetActivity.this.JXHD_Ip = CloudClientSetActivity.this.ip_edit.getText().toString().trim();
+                    CloudClientSetActivity.access$20(CloudClientSetActivity.this, false);
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(false);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(false);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_saving));
+                    CloudClientSetActivity.access$21(CloudClientSetActivity.this, CloudClientSetActivity.access$0(CloudClientSetActivity.this).getText().toString().trim());
                     new Thread(CloudClientSetActivity.this.runnable_GetConfig_Infor).start();
                     break;
                 case 12:
-                    if (CloudClientSetActivity.this.saveErrorInfo != null && !CloudClientSetActivity.this.saveErrorInfo.equals("")) {
-                        CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.saveErrorInfo);
+                    if (CloudClientSetActivity.access$22(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$22(CloudClientSetActivity.this).equals("")) {
+                        CloudClientSetActivity.this.showToast(CloudClientSetActivity.access$22(CloudClientSetActivity.this));
                         break;
                     } else {
                         CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_cpfailed));
@@ -414,63 +725,64 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     break;
                 case 20:
                     Toast.makeText(CloudClientSetActivity.this, CloudClientSetActivity.this.getResources().getString(R.string.setting_saveok), 1).show();
-                    CloudClientSetActivity.this.ipOrigal = CloudClientSetActivity.this.ip_edit.getText().toString();
-                    CloudClientSetActivity.this.nameOrigal = CloudClientSetActivity.this.username_edit.getText().toString();
-                    CloudClientSetActivity.this.pwdOrigal = CloudClientSetActivity.this.password_edit.getText().toString();
-                    CloudClientSetActivity.this.modifiedIP = CloudClientSetActivity.this.ipOrigal;
-                    CloudClientSetActivity.this.modifiedName = CloudClientSetActivity.this.nameOrigal;
-                    CloudClientSetActivity.this.resultHandler.sendEmptyMessageDelayed(24, 3000L);
-                    CloudClientSetActivity.this.allChangeSettings = false;
-                    CloudClientSetActivity.this.threadPwd = null;
-                    SharedPreferences sharedPreferences = CloudClientSetActivity.this.getSharedPreferences("privatekey", 0);
-                    String string = sharedPreferences.getString("schoolid", "");
-                    String string2 = sharedPreferences.getString("name", "");
-                    String string3 = sharedPreferences.getString("apihost", "");
-                    CloudClientSetActivity.this.startFireWall(string3, sharedPreferences.getString("key", ""), string2, string);
-                    SharedPreferences sharedPreferences2 = CloudClientSetActivity.this.getSharedPreferences("loginhistory", 4);
-                    String string4 = sharedPreferences2.getString("iphistoryString", "");
-                    String str = string4;
-                    if (!string4.contains(string3)) {
-                        str = String.valueOf(string4) + string3 + ",:,";
+                    CloudClientSetActivity.access$23(CloudClientSetActivity.this, CloudClientSetActivity.access$0(CloudClientSetActivity.this).getText().toString());
+                    CloudClientSetActivity.access$25(CloudClientSetActivity.this, CloudClientSetActivity.access$24(CloudClientSetActivity.this).getText().toString());
+                    CloudClientSetActivity.access$26(CloudClientSetActivity.this, CloudClientSetActivity.access$19(CloudClientSetActivity.this).getText().toString());
+                    CloudClientSetActivity.access$28(CloudClientSetActivity.this, CloudClientSetActivity.access$27(CloudClientSetActivity.this));
+                    CloudClientSetActivity.access$30(CloudClientSetActivity.this, CloudClientSetActivity.access$29(CloudClientSetActivity.this));
+                    CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendEmptyMessageDelayed(24, 3000L);
+                    CloudClientSetActivity.access$32(CloudClientSetActivity.this, false);
+                    CloudClientSetActivity.access$33(CloudClientSetActivity.this, null);
+                    SharedPreferences sharePre = CloudClientSetActivity.this.getSharedPreferences("privatekey", 0);
+                    String schoolid = sharePre.getString("schoolid", "");
+                    String name = sharePre.getString("name", "");
+                    String ip = sharePre.getString("apihost", "");
+                    String privatekey = sharePre.getString("key", "");
+                    CloudClientSetActivity.access$34(CloudClientSetActivity.this, ip, privatekey, name, schoolid);
+                    SharedPreferences loginSp = CloudClientSetActivity.this.getSharedPreferences("loginhistory", 4);
+                    String tempips = loginSp.getString("iphistoryString", "");
+                    if (!tempips.contains(ip)) {
+                        tempips = String.valueOf(tempips) + ip + ",:,";
                     }
-                    sharedPreferences2.edit().putString("iphistoryString", str).commit();
-                    if (CloudClientSetActivity.this.listpop != null && CloudClientSetActivity.this.ipAdpter != null && CloudClientSetActivity.this.ips != null && !CloudClientSetActivity.this.ips.contains(string3)) {
-                        CloudClientSetActivity.this.ips.add(string3);
-                        CloudClientSetActivity.this.ipAdpter.setIps(CloudClientSetActivity.this.ips);
-                        CloudClientSetActivity.this.ipAdpter.notifyDataSetChanged();
+                    loginSp.edit().putString("iphistoryString", tempips).commit();
+                    if (CloudClientSetActivity.access$35(CloudClientSetActivity.this) != null && CloudClientSetActivity.access$36(CloudClientSetActivity.this) != null && CloudClientSetActivity.access$37(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$37(CloudClientSetActivity.this).contains(ip)) {
+                        CloudClientSetActivity.access$37(CloudClientSetActivity.this).add(ip);
+                        CloudClientSetActivity.access$36(CloudClientSetActivity.this).setIps(CloudClientSetActivity.access$37(CloudClientSetActivity.this));
+                        CloudClientSetActivity.access$36(CloudClientSetActivity.this).notifyDataSetChanged();
                     }
                     try {
-                        CloudClientSetActivity.this.history_array = CloudClientSetActivity.this.nameHistoryAdd(CloudClientSetActivity.this.stu_name, CloudClientSetActivity.this.ipOrigal, CloudClientSetActivity.this.nameOrigal, CloudClientSetActivity.this.history_array);
+                        CloudClientSetActivity.access$41(CloudClientSetActivity.this, CloudClientSetActivity.access$40(CloudClientSetActivity.this, CloudClientSetActivity.access$38(CloudClientSetActivity.this), CloudClientSetActivity.access$27(CloudClientSetActivity.this), CloudClientSetActivity.access$29(CloudClientSetActivity.this), CloudClientSetActivity.access$39(CloudClientSetActivity.this)));
                         break;
                     } catch (Exception e) {
                         break;
                     }
+                    break;
                 case 21:
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
-                    if (CloudClientSetActivity.this.saveErrorInfo != null && !CloudClientSetActivity.this.saveErrorInfo.equals("")) {
-                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.saveErrorInfo, 0).show();
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    if (CloudClientSetActivity.access$22(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$22(CloudClientSetActivity.this).equals("")) {
+                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.access$22(CloudClientSetActivity.this), 0).show();
                         break;
-                    } else if (CloudClientSetActivity.this.getInternetState()) {
-                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.getResources().getString(R.string.setting_errorsetting), 0).show();
+                    } else if (!CloudClientSetActivity.access$42(CloudClientSetActivity.this)) {
+                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.getResources().getString(R.string.setting_errornetwork), 0).show();
                         break;
                     } else {
-                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.getResources().getString(R.string.setting_errornetwork), 0).show();
+                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.getResources().getString(R.string.setting_errorsetting), 0).show();
                         break;
                     }
                     break;
                 case 24:
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
                     break;
                 case 31:
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
-                    if (CloudClientSetActivity.this.saveErrorInfo != null && !CloudClientSetActivity.this.saveErrorInfo.equals("")) {
-                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.saveErrorInfo, 0).show();
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    if (CloudClientSetActivity.access$22(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$22(CloudClientSetActivity.this).equals("")) {
+                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.access$22(CloudClientSetActivity.this), 0).show();
                         break;
                     } else {
                         Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpwd), 0).show();
@@ -478,11 +790,11 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     }
                     break;
                 case 32:
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
-                    if (CloudClientSetActivity.this.saveErrorInfo != null && !CloudClientSetActivity.this.saveErrorInfo.equals("")) {
-                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.saveErrorInfo, 0).show();
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    if (CloudClientSetActivity.access$22(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$22(CloudClientSetActivity.this).equals("")) {
+                        Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.access$22(CloudClientSetActivity.this), 0).show();
                         break;
                     } else {
                         Toast.makeText(CloudClientSetActivity.this.getApplicationContext(), CloudClientSetActivity.this.getResources().getString(R.string.setting_erroracctype), 0).show();
@@ -496,516 +808,92 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     CloudClientSetActivity.this.idauth_edit.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_signing));
                     break;
                 case PointerIconCompat.TYPE_HAND /* 1002 */:
-                    CloudClientSetActivity.this.isResetPwd = true;
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
-                    CloudClientSetActivity.this.modifiedIP = CloudClientSetActivity.this.ip_edit.getText().toString();
-                    CloudClientSetActivity.this.modifiedName = CloudClientSetActivity.this.username_edit.getText().toString();
-                    CloudClientSetActivity.this.updatePassword();
+                    CloudClientSetActivity.access$20(CloudClientSetActivity.this, true);
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    CloudClientSetActivity.access$28(CloudClientSetActivity.this, CloudClientSetActivity.access$0(CloudClientSetActivity.this).getText().toString());
+                    CloudClientSetActivity.access$30(CloudClientSetActivity.this, CloudClientSetActivity.access$24(CloudClientSetActivity.this).getText().toString());
+                    CloudClientSetActivity.access$43(CloudClientSetActivity.this);
                     break;
                 case PointerIconCompat.TYPE_HELP /* 1003 */:
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
                     CloudClientSetActivity.this.showToast("地址最后一位不能为'/'");
                     break;
                 case 1005:
-                    CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                    CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                    CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                    CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
                     CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.checksum_failed));
                     break;
                 default:
                     CloudClientSetActivity.this.idauth_edit.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_signfailed));
                     break;
             }
-            super.handleMessage(message);
+            super.handleMessage(msg);
         }
-    };
-    View.OnTouchListener nameListener = new View.OnTouchListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.4
-        @Override // android.view.View.OnTouchListener
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-                case 1:
-                    CloudClientSetActivity.this.showPopNameList();
-                    return false;
-                default:
-                    return false;
-            }
-        }
-    };
-    View.OnTouchListener ipListener = new View.OnTouchListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.5
-        @Override // android.view.View.OnTouchListener
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-                case 1:
-                    CloudClientSetActivity.this.showPopList();
-                    return false;
-                default:
-                    return false;
-            }
-        }
-    };
-    TextWatcher ipWatcher = new TextWatcher() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.6
-        @Override // android.text.TextWatcher
-        public void afterTextChanged(Editable editable) {
-            String editable2 = CloudClientSetActivity.this.ip_edit.getText().toString();
-            if (editable2 != null && !CloudClientSetActivity.this.ipOrigal.equals("") && !editable2.equals(CloudClientSetActivity.this.ipOrigal)) {
-                if (CloudClientSetActivity.this.threadPwd == null) {
-                    CloudClientSetActivity.this.threadPwd = new HostPwd();
-                    CloudClientSetActivity.this.threadPwd.start();
+    }
+
+    static /* synthetic */ void access$34(CloudClientSetActivity cloudClientSetActivity, String str, String str2, String str3, String str4) {
+        cloudClientSetActivity.startFireWall(str, str2, str3, str4);
+    }
+
+    private void startFireWall(String ip, String privatekey, String name, String schoolid) {
+        Intent in = new Intent();
+        in.setAction("com.edutech.intent.TrafficStatsService");
+        in.setClassName("com.edutech.firewall", "eu.faircode.netguard.TrafficStatsService");
+        in.putExtra("ip", ip);
+        in.putExtra("privatekey", privatekey);
+        in.putExtra("name", name);
+        in.putExtra("schoolid", schoolid);
+        startService(in);
+    }
+
+    public void apkUpdate() {
+        if (this.tvUpdateNow == null || this.tvUpdateNow.isEnabled()) {
+            this.tvUpdateNow.setEnabled(false);
+            this.tvUpdateNow.setText(getResources().getString(R.string.setting_updating));
+            this.tvUpdateNow.setTextColor(getResources().getColor(R.color.gray));
+            getWindow().addFlags(128);
+            if (this.updateThread == null) {
+                Message msg = new Message();
+                msg.what = 4;
+                this.installHandler.sendMessage(msg);
+                this.updateThread = new UpdateThread();
+                this.updateThread.start();
+                if (this.updateprogressThread == null && AppEnvironment.isNewUpdate) {
+                    this.updateprogressThread = new UpdateProgressThread();
+                    this.updateprogressThread.start();
                 }
-                if (CloudClientSetActivity.this.allChangeSettings) {
+                if (this.progressDialog != null) {
+                    isupdating = true;
+                    this.updateTime = 0;
+                    this.apkUpdateList = new ArrayList();
                     return;
                 }
-                CloudClientSetActivity.this.ip_edit.setText(CloudClientSetActivity.this.ipOrigal);
-                CloudClientSetActivity.this.showConfirmPwdDialog();
-            }
-            CloudClientSetActivity.this.ip_edit.setSelection(CloudClientSetActivity.this.ip_edit.getText().length());
-        }
-
-        @Override // android.text.TextWatcher
-        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-
-        @Override // android.text.TextWatcher
-        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-    };
-    TextWatcher nameWatcher = new TextWatcher() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.7
-        @Override // android.text.TextWatcher
-        public void afterTextChanged(Editable editable) {
-            String editable2 = CloudClientSetActivity.this.username_edit.getText().toString();
-            if (editable2 != null && !CloudClientSetActivity.this.nameOrigal.equals("") && !editable2.equals(CloudClientSetActivity.this.nameOrigal)) {
-                if (CloudClientSetActivity.this.threadPwd == null) {
-                    CloudClientSetActivity.this.threadPwd = new HostPwd();
-                    CloudClientSetActivity.this.threadPwd.start();
-                }
-                if (CloudClientSetActivity.this.allChangeSettings) {
-                    return;
-                }
-                CloudClientSetActivity.this.username_edit.setText(CloudClientSetActivity.this.nameOrigal);
-                CloudClientSetActivity.this.showConfirmPwdDialog();
-            }
-            CloudClientSetActivity.this.username_edit.setSelection(CloudClientSetActivity.this.username_edit.getText().length());
-        }
-
-        @Override // android.text.TextWatcher
-        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-
-        @Override // android.text.TextWatcher
-        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-    };
-    TextWatcher pwdWatcher = new TextWatcher() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.8
-        @Override // android.text.TextWatcher
-        public void afterTextChanged(Editable editable) {
-            String editable2 = CloudClientSetActivity.this.password_edit.getText().toString();
-            if (editable2 != null && !CloudClientSetActivity.this.pwdOrigal.equals("") && !editable2.equals(CloudClientSetActivity.this.pwdOrigal)) {
-                if (CloudClientSetActivity.this.threadPwd == null) {
-                    CloudClientSetActivity.this.threadPwd = new HostPwd();
-                    CloudClientSetActivity.this.threadPwd.start();
-                }
-                if (CloudClientSetActivity.this.allChangeSettings) {
-                    return;
-                }
-                CloudClientSetActivity.this.password_edit.setText(CloudClientSetActivity.this.pwdOrigal);
-                CloudClientSetActivity.this.showConfirmPwdDialog();
-            }
-            CloudClientSetActivity.this.password_edit.setSelection(CloudClientSetActivity.this.password_edit.getText().length());
-        }
-
-        @Override // android.text.TextWatcher
-        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-
-        @Override // android.text.TextWatcher
-        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-    };
-    DialogInterface.OnKeyListener keylistenerDialog = new DialogInterface.OnKeyListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.9
-        @Override // android.content.DialogInterface.OnKeyListener
-        public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
-            boolean z;
-            if (i == 4 && keyEvent.getRepeatCount() == 0) {
-                CloudClientSetActivity.this.closeProgressDialog();
-                CloudClientSetActivity.this.resetUpdateInfo();
-                z = true;
-            } else {
-                z = false;
-            }
-            return z;
-        }
-    };
-    public Runnable downloadRun = new Runnable() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.10
-        @Override // java.lang.Runnable
-        public void run() {
-            if (CloudClientSetActivity.this.id.getText().toString().length() < 10) {
-                CloudClientSetActivity.this.showToast("授权码格式不对！");
-            } else if (Build.VERSION.SDK_INT >= 24) {
-                CloudClientSetActivity.this.sslConnect();
-            } else {
-                HttpClient sslClient = CloudClientSetActivity.this.sslClient(new DefaultHttpClient());
-                HttpPost httpPost = new HttpPost("https://www.icontrol365.com/regmac.aspx");
-                StringBuilder sb = new StringBuilder();
-                sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                sb.append("<ApplyAuth><strAuthID>" + CloudClientSetActivity.this.id.getText().toString() + "</strAuthID>");
-                sb.append("<strMacAddr>" + CloudClientSetActivity.this.GetMachineID() + "</strMacAddr>");
-                sb.append("<strSystemInfo>" + Build.MODEL + "</strSystemInfo></ApplyAuth>");
-                try {
-                    httpPost.setHeader("Content-Type", "application/xml;charset=UTF-8");
-                    httpPost.setEntity(new StringEntity(sb.toString()));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    HttpResponse execute = sslClient.execute(httpPost);
-                    if (execute.getStatusLine().getStatusCode() != 200) {
-                        Log.d("SSL", "HTTP error, invalid server status code: " + execute.getStatusLine());
-                        return;
-                    }
-                    new ByteArrayOutputStream();
-                    Element documentElement = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(execute.getEntity().getContent()).getDocumentElement();
-                    int parseInt = Integer.parseInt(documentElement.getElementsByTagName("AuthResult").item(0).getFirstChild().getNodeValue());
-                    if (parseInt == 4 || parseInt == 5) {
-                        NodeList elementsByTagName = documentElement.getElementsByTagName("AuthTimes");
-                        String nodeValue = (elementsByTagName.getLength() <= 0 || elementsByTagName.item(0).getFirstChild().getNodeValue().length() <= 0) ? "0" : elementsByTagName.item(0).getFirstChild().getNodeValue();
-                        NodeList elementsByTagName2 = documentElement.getElementsByTagName("AuthValidDate");
-                        String nodeValue2 = (elementsByTagName2.getLength() <= 0 || elementsByTagName2.item(0).getFirstChild().getNodeValue().length() <= 0) ? "0" : elementsByTagName2.item(0).getFirstChild().getNodeValue();
-                        int i = Build.VERSION.SDK_INT;
-                        CloudClientSetActivity.this.idauth.writeidFile(CloudClientSetActivity.this.id.getText().toString(), parseInt, nodeValue, nodeValue2, "0");
-                    }
-                    Message message = new Message();
-                    message.what = parseInt;
-                    CloudClientSetActivity.this.resultHandler.sendMessageDelayed(message, 1000L);
-                } catch (IOException e2) {
-                    e2.printStackTrace();
-                } catch (IllegalStateException e3) {
-                    e3.printStackTrace();
-                } catch (ParserConfigurationException e4) {
-                    e4.printStackTrace();
-                } catch (ClientProtocolException e5) {
-                    e5.printStackTrace();
-                } catch (SAXException e6) {
-                    e6.printStackTrace();
-                }
-            }
-        }
-    };
-    public Runnable updatepwdRun = new Runnable() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.11
-        @Override // java.lang.Runnable
-        public void run() {
-            if (CloudClientSetActivity.this.newpwd.getText().toString().length() < 6 || CloudClientSetActivity.this.oldpwd.getText().toString().length() < 6) {
-                Message message = new Message();
-                message.what = 13;
-                CloudClientSetActivity.this.resultHandler.sendMessageDelayed(message, 1000L);
-            } else if (CloudClientSetActivity.this.ptfw_edit == null || "".equals(CloudClientSetActivity.this.ptfw_edit.getText().toString())) {
-                Message message2 = new Message();
-                message2.what = 16;
-                CloudClientSetActivity.this.resultHandler.sendMessageDelayed(message2, 1000L);
-            } else if (CloudClientSetActivity.this.username_edit == null || CloudClientSetActivity.this.oldpwd == null || "".equals(CloudClientSetActivity.this.username_edit.getText().toString()) || "".equals(CloudClientSetActivity.this.oldpwd.getText().toString())) {
-            } else {
-                final String string = CloudClientSetActivity.this.getSharedPreferences("privatekey", 0).getString("name", "");
-                if (!TextUtils.isEmpty(string)) {
-                    CloudClientSetActivity.this.runOnUiThread(new Runnable() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.11.1
-                        @Override // java.lang.Runnable
-                        public void run() {
-                            CloudClientSetActivity.this.username_edit.setText(string);
-                        }
-                    });
-                }
-                if (string.equals("")) {
-                    return;
-                }
-                CloudClientSetActivity.this.updatePassword = CloudClientSetActivity.this.newpwd.getText().toString();
-                String ModifyPassword = CloudClientSetActivity.this.ModifyPassword(string, CloudClientSetActivity.this.oldpwd.getText().toString(), CloudClientSetActivity.this.newpwd.getText().toString());
-                Message message3 = new Message();
-                try {
-                } catch (JSONException e) {
-                    message3.what = 12;
-                    e.printStackTrace();
-                }
-                if (ModifyPassword.equals("")) {
-                    CloudClientSetActivity.this.saveErrorInfo = CloudClientSetActivity.this.getResources().getString(R.string.setting_errornetwork);
-                    message3.what = 12;
-                    CloudClientSetActivity.this.resultHandler.sendMessageDelayed(message3, 500L);
-                    return;
-                }
-                JSONObject jSONObject = new JSONObject(ModifyPassword);
-                if (!jSONObject.getBoolean("status")) {
-                    CloudClientSetActivity.this.saveErrorInfo = jSONObject.getString("errorInfo");
-                    message3.what = 12;
-                } else {
-                    File file = new File(AppEnvironment.URLFILEPATH);
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                    message3.what = 11;
-                }
-                CloudClientSetActivity.this.resultHandler.sendMessageDelayed(message3, 500L);
-            }
-        }
-    };
-    Runnable runnable_GetConfig_Infor = new Runnable() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.12
-        /* JADX WARN: Can't wrap try/catch for region: R(13:27|(12:29|(1:31)|34|(2:36|(1:38))|39|65|40|41|42|(2:44|(1:46))|47|(2:49|69)(2:52|(2:54|70)(2:55|(2:57|71)(2:58|(2:60|72)(2:61|(2:63|73)(2:64|74))))))|33|34|(0)|39|65|40|41|42|(0)|47|(0)(0)) */
-        /* JADX WARN: Code restructure failed: missing block: B:32:0x0170, code lost:
-            if (r6.length() <= 0) goto L33;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:50:0x0246, code lost:
-            r9 = move-exception;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:51:0x0248, code lost:
-            r9.printStackTrace();
-         */
-        /* JADX WARN: Removed duplicated region for block: B:36:0x01aa  */
-        /* JADX WARN: Removed duplicated region for block: B:44:0x0200  */
-        /* JADX WARN: Removed duplicated region for block: B:49:0x021d  */
-        /* JADX WARN: Removed duplicated region for block: B:52:0x0250  */
-        @Override // java.lang.Runnable
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-        */
-        public void run() {
-            String str;
-            String macAddress;
-            String str2;
-            int i;
-            CloudClientSetActivity.this.JXHD_Ip = CloudClientSetActivity.this.JXHD_Ip.replaceAll(" ", "");
-            if (CloudClientSetActivity.this.JXHD_Ip.length() > 7 && CloudClientSetActivity.this.JXHD_Ip.substring(0, 7).equals("http://")) {
-                CloudClientSetActivity.this.JXHD_Ip = CloudClientSetActivity.this.JXHD_Ip.substring(7);
-                Message obtainMessage = CloudClientSetActivity.this.mHandler.obtainMessage();
-                obtainMessage.what = HttpStatus.SC_SWITCHING_PROTOCOLS;
-                CloudClientSetActivity.this.mHandler.sendMessage(obtainMessage);
-            }
-            try {
-                String editable = CloudClientSetActivity.this.username_edit.getText().toString();
-                String editable2 = CloudClientSetActivity.this.password_edit.getText().toString();
-                String str3 = editable2;
-                String str4 = editable;
-                if (editable != null) {
-                    str3 = editable2;
-                    str4 = editable;
-                    if (editable2 != null) {
-                        str4 = editable.replaceAll(" ", "");
-                        str3 = editable2.replaceAll(" ", "");
-                    }
-                }
-                CloudClientSetActivity.this.Name = str4;
-                CloudClientSetActivity.this.Pwd = str3;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Log.i(CloudClientSetActivity.TAG, "writeXml");
-            Log.i(CloudClientSetActivity.TAG, "2152");
-            String editable3 = CloudClientSetActivity.this.ip_edit.getText().toString();
-            AppEnvironment.MOBILESTUDYSERVERIP = editable3;
-            String replaceAll = editable3.replaceAll(" ", "");
-            String str5 = replaceAll;
-            if (replaceAll.length() > 7) {
-                str5 = replaceAll;
-                if (replaceAll.substring(0, 7).equals("http://")) {
-                    str5 = replaceAll.substring(7);
-                    CloudClientSetActivity.this.ptfw_edit.setText(str5);
-                    CloudClientSetActivity.this.ip_edit.setText(str5);
-                }
-            }
-            if (str5.endsWith("/")) {
-                Message obtainMessage2 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                obtainMessage2.what = PointerIconCompat.TYPE_HELP;
-                CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage2);
                 return;
             }
-            if (str5 != null) {
-                str = str5;
-                if (str5 != null) {
-                    str = str5;
-                }
-                String str6 = "http://" + str + "/api/config";
-                macAddress = ((WifiManager) CloudClientSetActivity.this.getSystemService("wifi")).getConnectionInfo().getMacAddress();
-                String str7 = macAddress;
-                if (macAddress != null) {
-                    str7 = macAddress;
-                    if (macAddress.equals("02:00:00:00:00:00")) {
-                        str7 = CloudClientSetActivity.this.getMacAddr();
-                    }
-                }
-                String str8 = String.valueOf(str6) + "/mac/" + str7;
-                str2 = null;
-                str2 = CloudClientSetActivity.this.Get_Config_Json(str8, CloudClientSetActivity.this.Name);
-                CloudClientSetActivity.this.saveErrorInfo = "";
-                i = -1;
-                if (str2 != null) {
-                    i = -1;
-                    if (!str2.equals("")) {
-                        i = CloudClientSetActivity.this.jsonToConfig(str2);
-                    }
-                }
-                if (i != 1) {
-                    Message obtainMessage3 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                    obtainMessage3.what = 20;
-                    obtainMessage3.obj = str2;
-                    CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage3);
-                    return;
-                } else if (i == 0) {
-                    Message obtainMessage4 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                    obtainMessage4.what = 31;
-                    obtainMessage4.obj = str2;
-                    CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage4);
-                    return;
-                } else if (i == 2) {
-                    Message obtainMessage5 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                    obtainMessage5.what = 32;
-                    obtainMessage5.obj = str2;
-                    CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage5);
-                    return;
-                } else if (i == -2) {
-                    Message obtainMessage6 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                    obtainMessage6.what = PointerIconCompat.TYPE_HAND;
-                    obtainMessage6.obj = str2;
-                    CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage6);
-                    return;
-                } else if (i == -100) {
-                    Message obtainMessage7 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                    obtainMessage7.what = 1005;
-                    obtainMessage7.obj = str2;
-                    CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage7);
-                    return;
-                } else {
-                    Message obtainMessage8 = CloudClientSetActivity.this.resultHandler.obtainMessage();
-                    obtainMessage8.what = 21;
-                    obtainMessage8.obj = str2;
-                    CloudClientSetActivity.this.resultHandler.sendMessage(obtainMessage8);
-                    return;
-                }
-            }
-            str = "192.168.0.88";
-            String str62 = "http://" + str + "/api/config";
-            macAddress = ((WifiManager) CloudClientSetActivity.this.getSystemService("wifi")).getConnectionInfo().getMacAddress();
-            String str72 = macAddress;
-            if (macAddress != null) {
-            }
-            String str82 = String.valueOf(str62) + "/mac/" + str72;
-            str2 = null;
-            str2 = CloudClientSetActivity.this.Get_Config_Json(str82, CloudClientSetActivity.this.Name);
-            CloudClientSetActivity.this.saveErrorInfo = "";
-            i = -1;
-            if (str2 != null) {
-            }
-            if (i != 1) {
-            }
-        }
-    };
-
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$HostPwd.class */
-    class HostPwd extends Thread {
-        HostPwd() {
-        }
-
-        @Override // java.lang.Thread, java.lang.Runnable
-        public void run() {
-            try {
-                CloudClientSetActivity.this.superPwd1 = CloudClientSetActivity.this.getManagerPwd();
-                CloudClientSetActivity.this.superPwd2 = CloudClientSetActivity.this.getUserPwd();
-            } catch (Exception e) {
-            }
+            this.updateprogressThread = null;
+            this.updateThread = null;
+            isupdating = false;
+            this.updateTime = HttpStatus.SC_MULTIPLE_CHOICES;
         }
     }
 
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$InstallReceiver.class */
-    class InstallReceiver extends BroadcastReceiver {
-        InstallReceiver() {
-        }
-
-        @Override // android.content.BroadcastReceiver
-        public void onReceive(Context context, Intent intent) {
-            if (!intent.getAction().equals("android.intent.action.PACKAGE_ADDED") || !AppEnvironment.isNewUpdate || CloudClientSetActivity.this.apkUpdateList == null || CloudClientSetActivity.this.apkUpdateList.size() <= 0) {
-                return;
-            }
-            boolean z = true;
-            ArrayList arrayList = new ArrayList();
-            String replace = intent.getDataString().replace("package:", "");
-            for (int i = 0; i < CloudClientSetActivity.this.apkUpdateList.size(); i++) {
-                ApkUpdateBean apkUpdateBean = (ApkUpdateBean) CloudClientSetActivity.this.apkUpdateList.get(i);
-                if (replace.equals(apkUpdateBean.getPackagename())) {
-                    CloudClientSetActivity.this.sendInstallMessage(i, 1, CloudClientSetActivity.UPDATE_INSTALLSTATE);
-                } else if (apkUpdateBean.getInstallState() != 1) {
-                    z = false;
-                    arrayList.add(apkUpdateBean);
-                }
-            }
-            if (z && !"com.launcher.activity".equals(replace)) {
-                CloudClientSetActivity.this.closeProgressDialog();
-                CloudClientSetActivity.this.resetUpdateInfo();
-            } else if (arrayList.size() == 1 && "com.launcher.activity".equals(((ApkUpdateBean) arrayList.get(0)).getPackagename()) && !TextUtils.isEmpty(CloudClientSetActivity.this.launcherPath)) {
-                CloudClientSetActivity.this.sendInstallMessage(-1, ((ApkUpdateBean) arrayList.get(0)).getApkLocalPath(), CloudClientSetActivity.UPDATE_INSTALLSINGLE);
-            }
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$MyHostnameVerifier.class */
-    private class MyHostnameVerifier implements HostnameVerifier {
-        private MyHostnameVerifier() {
-        }
-
-        /* synthetic */ MyHostnameVerifier(CloudClientSetActivity cloudClientSetActivity, MyHostnameVerifier myHostnameVerifier) {
-            this();
-        }
-
-        @Override // javax.net.ssl.HostnameVerifier
-        public boolean verify(String str, SSLSession sSLSession) {
-            return true;
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$MyTrustManager.class */
-    private class MyTrustManager implements X509TrustManager {
-        private MyTrustManager() {
-        }
-
-        @Override // javax.net.ssl.X509TrustManager
-        public void checkClientTrusted(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
-        }
-
-        @Override // javax.net.ssl.X509TrustManager
-        public void checkServerTrusted(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
-        }
-
-        @Override // javax.net.ssl.X509TrustManager
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$ResetThread.class */
-    class ResetThread extends Thread {
-        ResetThread() {
-        }
-
-        @Override // java.lang.Thread, java.lang.Runnable
-        public void run() {
-            CloudClientSetActivity.this.reseting = true;
-            CloudClientSetActivity.this.deleteAPks();
-            CloudClientSetActivity.this.deleteOtherFiles();
-            CloudClientSetActivity.this.reseting = false;
-            Message obtainMessage = CloudClientSetActivity.this.resultHandler.obtainMessage();
-            obtainMessage.what = 112;
-            obtainMessage.sendToTarget();
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$UpdateProgressThread.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     class UpdateProgressThread extends Thread {
         UpdateProgressThread() {
+            CloudClientSetActivity.this = r1;
         }
 
         @Override // java.lang.Thread, java.lang.Runnable
         public void run() {
-            while (CloudClientSetActivity.this.updateTime < 300 && CloudClientSetActivity.isupdating) {
-                Message message = new Message();
-                message.what = PointerIconCompat.TYPE_CONTEXT_MENU;
-                CloudClientSetActivity.this.installHandler.sendMessage(message);
+            while (CloudClientSetActivity.access$61(CloudClientSetActivity.this) < 300 && CloudClientSetActivity.isupdating) {
+                Message msg = new Message();
+                msg.what = PointerIconCompat.TYPE_CONTEXT_MENU;
+                CloudClientSetActivity.access$62(CloudClientSetActivity.this).sendMessage(msg);
                 try {
                     Thread.sleep(1000L);
                 } catch (InterruptedException e) {
@@ -1015,3267 +903,528 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
         }
     }
 
-    /* loaded from: classes.jar:com/edutech/cloudclientsetting/activity/CloudClientSetActivity$UpdateThread.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     class UpdateThread extends Thread {
         UpdateThread() {
+            CloudClientSetActivity.this = r1;
         }
 
-        /* JADX WARN: Code restructure failed: missing block: B:10:0x008a, code lost:
-            if (r0.equals("") != false) goto L11;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:26:0x01ab, code lost:
-            if (r0 == 0) goto L27;
-         */
-        /* JADX WARN: Multi-variable type inference failed */
-        /* JADX WARN: Type inference failed for: r0v146, types: [java.util.List] */
-        /* JADX WARN: Type inference failed for: r0v170, types: [java.util.List] */
         @Override // java.lang.Thread, java.lang.Runnable
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-        */
         public void run() {
-            String str;
-            ArrayList arrayList;
-            ArrayList parseDownload_new;
-            long j;
-            boolean z;
-            if (CloudClientSetActivity.this.addApksList != null) {
-                CloudClientSetActivity.this.addApksList.clear();
+            if (CloudClientSetActivity.access$63(CloudClientSetActivity.this) != null) {
+                CloudClientSetActivity.access$63(CloudClientSetActivity.this).clear();
             } else {
-                CloudClientSetActivity.this.addApksList = new ArrayList();
+                CloudClientSetActivity.access$64(CloudClientSetActivity.this, new ArrayList());
             }
-            CloudClientSetActivity.this.launcherPath = "";
+            CloudClientSetActivity.access$65(CloudClientSetActivity.this, "");
             CloudClientSetActivity.isupdating = true;
-            CloudClientSetActivity.this.currentCacheLength = 0L;
-            CloudClientSetActivity.this.currentCachePosition = 0L;
-            SharedPreferences sharedPreferences = CloudClientSetActivity.this.getSharedPreferences("privatekey", 0);
-            String string = sharedPreferences.getString("key", "");
-            String string2 = sharedPreferences.getString("apihost", "");
-            String string3 = sharedPreferences.getString("name", "");
-            HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
-            String str2 = string2;
-            String str3 = string;
-            String str4 = string3;
-            if (loadXml != null) {
-                if (!string2.equals("")) {
-                    str2 = string2;
-                    str3 = string;
-                    str4 = string3;
-                }
-                str2 = loadXml.get("ip");
-                str4 = loadXml.get("usercode");
-                str3 = loadXml.get("privatekey");
+            CloudClientSetActivity.access$66(CloudClientSetActivity.this, 0L);
+            CloudClientSetActivity.access$67(CloudClientSetActivity.this, 0L);
+            SharedPreferences sharePre = CloudClientSetActivity.this.getSharedPreferences("privatekey", 0);
+            String privatekey = sharePre.getString("key", "");
+            String ip = sharePre.getString("apihost", "");
+            String username = sharePre.getString("name", "");
+            HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
+            if (hashmap != null && (ip.equals("") || username.equals(""))) {
+                ip = hashmap.get("ip");
+                username = hashmap.get("usercode");
+                privatekey = hashmap.get("privatekey");
             }
-            HttpPost httpPost = new HttpPost("http://" + str2 + "/api/app/projectcode/ebag/os/android/");
-            httpPost.addHeader("X-Edutech-Entity", str4);
-            Log.e("updateresult", String.valueOf(str) + "," + str4 + "," + str3);
-            long currentTimeMillis = System.currentTimeMillis();
-            httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str4 + str3));
-            DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
-            ArrayList arrayList2 = new ArrayList();
-            ArrayList arrayList3 = new ArrayList();
+            String url = "http://" + ip + "/api/app/projectcode/ebag/os/android/";
+            HttpPost post = new HttpPost(url);
+            post.addHeader("X-Edutech-Entity", username);
+            Log.e("updateresult", String.valueOf(url) + "," + username + "," + privatekey);
+            long imestamp = System.currentTimeMillis();
+            String sign = My_md5.Md5(String.valueOf(imestamp) + username + privatekey);
+            post.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
+            DefaultHttpClient client = new DefaultHttpClient();
+            List<String> resultList = new ArrayList<>();
+            List<ApkUpdateBean> apksTemp = new ArrayList<>();
             try {
-                JSONObject jSONObject = new JSONObject(CloudClientSetActivity.this.getJsonStringFromGZIP(defaultHttpClient.execute(httpPost)));
-                boolean z2 = jSONObject.getBoolean("status");
-                int i = jSONObject.getInt("errorNum");
-                if (!z2) {
-                    arrayList = arrayList2;
-                }
-                JSONArray jSONArray = jSONObject.getJSONArray("data");
-                if (jSONArray == null || jSONArray.length() <= 0) {
-                    Utils.clearUpdateAPks(CloudClientSetActivity.this, str2);
-                    arrayList = arrayList2;
-                } else {
-                    ArrayList<HashMap<String, String>> systemInfo = SystemInfoHelper.getSystemInfo(new ArrayList(), CloudClientSetActivity.this);
-                    CloudClientSetActivity.this.apkUpdateList = new ArrayList();
-                    for (int i2 = 0; i2 < jSONArray.length() && CloudClientSetActivity.isupdating; i2++) {
-                        JSONObject jSONObject2 = jSONArray.getJSONObject(i2);
-                        long j2 = jSONObject2.getLong("appsize");
-                        String string4 = jSONObject2.getString("versionname");
-                        String string5 = jSONObject2.getString("packagename");
-                        String string6 = jSONObject2.getString("versioncode");
-                        try {
-                            j = Long.parseLong(string6);
-                        } catch (NumberFormatException e) {
-                            j = 1;
-                        } catch (Exception e2) {
-                            j = 1;
-                        }
-                        Iterator<HashMap<String, String>> it = systemInfo.iterator();
-                        while (true) {
-                            z = false;
-                            if (!it.hasNext()) {
-                                break;
+                HttpResponse response = client.execute(post);
+                String result = CloudClientSetActivity.access$68(CloudClientSetActivity.this, response);
+                JSONObject jobj = new JSONObject(result);
+                boolean status = jobj.getBoolean("status");
+                int errorNum = jobj.getInt("errorNum");
+                if (status || errorNum == 0) {
+                    JSONArray data = jobj.getJSONArray("data");
+                    if (data != null && data.length() > 0) {
+                        ArrayList<HashMap<String, String>> localAppInfoList = SystemInfoHelper.getSystemInfo(new ArrayList<>(), CloudClientSetActivity.this);
+                        CloudClientSetActivity.access$69(CloudClientSetActivity.this, new ArrayList());
+                        for (int i = 0; i < data.length() && CloudClientSetActivity.isupdating; i++) {
+                            JSONObject json = data.getJSONObject(i);
+                            long size = json.getLong("appsize");
+                            String version = json.getString("versionname");
+                            String packagename = json.getString("packagename");
+                            String versionCode = json.getString("versioncode");
+                            long vercodeLong = 1;
+                            try {
+                                vercodeLong = Long.parseLong(versionCode);
+                            } catch (NumberFormatException e) {
+                            } catch (Exception e2) {
                             }
-                            HashMap<String, String> next = it.next();
-                            if (next.get("packagename") != null && string5.equals(next.get("packagename"))) {
-                                long j3 = 1;
-                                try {
-                                    j3 = Long.parseLong(next.get("versioncode"));
-                                } catch (NumberFormatException e3) {
-                                } catch (Exception e4) {
+                            boolean isInstall = false;
+                            Iterator<HashMap<String, String>> it = localAppInfoList.iterator();
+                            while (true) {
+                                if (!it.hasNext()) {
+                                    break;
                                 }
-                                z = next.get("versioncode") == null || next.get("versionname") == null || j <= j3;
+                                HashMap<String, String> localTempApp = it.next();
+                                if (localTempApp.get("packagename") != null && packagename.equals(localTempApp.get("packagename"))) {
+                                    long tempcode = 1;
+                                    try {
+                                        tempcode = Long.parseLong(localTempApp.get("versioncode"));
+                                    } catch (NumberFormatException e3) {
+                                    } catch (Exception e4) {
+                                    }
+                                    if (localTempApp.get("versioncode") != null && localTempApp.get("versionname") != null && vercodeLong > tempcode) {
+                                        isInstall = false;
+                                    } else {
+                                        isInstall = true;
+                                    }
+                                } else {
+                                    isInstall = false;
+                                }
+                            }
+                            if (!isInstall) {
+                                CloudClientSetActivity cloudClientSetActivity = CloudClientSetActivity.this;
+                                CloudClientSetActivity.access$66(cloudClientSetActivity, CloudClientSetActivity.access$11(cloudClientSetActivity) + size);
+                                ApkUpdateBean apkUpdateBean = new ApkUpdateBean();
+                                apkUpdateBean.setPackagename(packagename);
+                                apkUpdateBean.setApkDownloadSize(0L);
+                                apkUpdateBean.setApkSize(size);
+                                apkUpdateBean.setInstallState(-1);
+                                apkUpdateBean.setApkLocalPath("");
+                                apkUpdateBean.setApkUrl(json.getString("appwebpath"));
+                                apkUpdateBean.setAppName(json.getString("apkname"));
+                                apkUpdateBean.setVersioncode(versionCode);
+                                apkUpdateBean.setVersionname(version);
+                                CloudClientSetActivity.access$14(CloudClientSetActivity.this).add(apkUpdateBean);
+                                apksTemp.add(apkUpdateBean);
                             }
                         }
-                        if (!z) {
-                            CloudClientSetActivity.this.currentCacheLength += j2;
-                            ApkUpdateBean apkUpdateBean = new ApkUpdateBean();
-                            apkUpdateBean.setPackagename(string5);
-                            apkUpdateBean.setApkDownloadSize(0L);
-                            apkUpdateBean.setApkSize(j2);
-                            apkUpdateBean.setInstallState(-1);
-                            apkUpdateBean.setApkLocalPath("");
-                            apkUpdateBean.setApkUrl(jSONObject2.getString("appwebpath"));
-                            apkUpdateBean.setAppName(jSONObject2.getString("apkname"));
-                            apkUpdateBean.setVersioncode(string6);
-                            apkUpdateBean.setVersionname(string4);
-                            CloudClientSetActivity.this.apkUpdateList.add(apkUpdateBean);
-                            arrayList3.add(apkUpdateBean);
+                        if (!AppEnvironment.isNewUpdate) {
+                            resultList = CloudClientSetActivity.access$70(CloudClientSetActivity.this, data, localAppInfoList, resultList);
+                        } else {
+                            Message msg = new Message();
+                            msg.what = CloudClientSetActivity.START_PROGRESS;
+                            CloudClientSetActivity.access$62(CloudClientSetActivity.this).sendMessage(msg);
+                            Utils.saveUpdateApks(CloudClientSetActivity.access$14(CloudClientSetActivity.this), CloudClientSetActivity.this, ip);
+                            resultList = CloudClientSetActivity.access$71(CloudClientSetActivity.this, resultList, apksTemp);
                         }
-                    }
-                    if (!AppEnvironment.isNewUpdate) {
-                        parseDownload_new = CloudClientSetActivity.this.parseDownload_Old(jSONArray, systemInfo, arrayList2);
+                        if (CloudClientSetActivity.access$72(CloudClientSetActivity.this) != null && !CloudClientSetActivity.access$72(CloudClientSetActivity.this).equals("")) {
+                            resultList.add(CloudClientSetActivity.access$72(CloudClientSetActivity.this));
+                            CloudClientSetActivity.access$63(CloudClientSetActivity.this).add("com.launcher.activity");
+                        }
                     } else {
-                        Message message = new Message();
-                        message.what = CloudClientSetActivity.START_PROGRESS;
-                        CloudClientSetActivity.this.installHandler.sendMessage(message);
-                        Utils.saveUpdateApks(CloudClientSetActivity.this.apkUpdateList, CloudClientSetActivity.this, str2);
-                        parseDownload_new = CloudClientSetActivity.this.parseDownload_new(arrayList2, arrayList3);
-                    }
-                    arrayList = parseDownload_new;
-                    if (CloudClientSetActivity.this.launcherPath != null) {
-                        arrayList = parseDownload_new;
-                        if (!CloudClientSetActivity.this.launcherPath.equals("")) {
-                            ArrayList arrayList4 = parseDownload_new;
-                            parseDownload_new.add(CloudClientSetActivity.this.launcherPath);
-                            ArrayList arrayList5 = parseDownload_new;
-                            CloudClientSetActivity.this.addApksList.add("com.launcher.activity");
-                            arrayList = parseDownload_new;
-                        }
+                        Utils.clearUpdateAPks(CloudClientSetActivity.this, ip);
                     }
                 }
             } catch (Exception e5) {
                 e5.printStackTrace();
-                arrayList = arrayList2;
             }
-            if (CloudClientSetActivity.this.addApksList != null && CloudClientSetActivity.this.addApksList.size() > 0) {
+            if (CloudClientSetActivity.access$63(CloudClientSetActivity.this) != null && CloudClientSetActivity.access$63(CloudClientSetActivity.this).size() > 0) {
                 Intent intent = new Intent();
                 intent.setAction(sysProtectService.ADDINSTALL);
-                intent.putStringArrayListExtra("packages", CloudClientSetActivity.this.addApksList);
+                intent.putStringArrayListExtra("packages", CloudClientSetActivity.access$63(CloudClientSetActivity.this));
                 CloudClientSetActivity.this.sendBroadcast(intent);
             }
             CloudClientSetActivity.isupdating = false;
-            CloudClientSetActivity.this.sendInstallMessage(2, 2, 2);
+            CloudClientSetActivity.access$73(CloudClientSetActivity.this, 2, 2, 2);
             if (AppEnvironment.isNewUpdate) {
-                if (arrayList3 != null && arrayList3.size() > 0) {
-                    return;
+                if (apksTemp == null || apksTemp.size() <= 0) {
+                    CloudClientSetActivity.access$73(CloudClientSetActivity.this, 3, 3, 3);
                 }
-                CloudClientSetActivity.this.sendInstallMessage(3, 3, 3);
-            } else if (arrayList == null || arrayList.size() <= 0) {
-                CloudClientSetActivity.this.sendInstallMessage(3, 3, 3);
+            } else if (resultList == null || resultList.size() <= 0) {
+                CloudClientSetActivity.access$73(CloudClientSetActivity.this, 3, 3, 3);
             } else {
-                CloudClientSetActivity.this.apkList = arrayList;
-                CloudClientSetActivity.this.sendInstallMessage(1, 1, 1);
+                CloudClientSetActivity.access$74(CloudClientSetActivity.this, resultList);
+                CloudClientSetActivity.access$73(CloudClientSetActivity.this, 1, 1, 1);
             }
         }
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public String Get_Config_Json(String str, String str2) {
-        String str3;
-        if (str.equals("") || str == null || str2.equals("") || str2 == null) {
-            Log.e(TAG, "Get_Config_Json 入参有问题。。。");
-            str3 = null;
-        } else {
-            Log.e(TAG, "Get_Config_Json 入参有问题。。。" + str);
-            try {
-                HttpResponse Get_http_addheader = Get_http_addheader(str, str2, true);
-                if (Get_http_addheader.getStatusLine().getStatusCode() == 200) {
-                    StringBuilder sb = new StringBuilder();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Get_http_addheader.getEntity().getContent(), "UTF-8"));
-                    for (String readLine = bufferedReader.readLine(); readLine != null; readLine = bufferedReader.readLine()) {
-                        sb.append(readLine);
-                    }
-                    str3 = sb.toString();
-                    Log.e(TAG, "学校和用户个人信息获取完成。。。" + str3);
-                } else {
-                    Log.e(TAG, "学校和用户个人信息获取完成。。。" + Get_http_addheader.getStatusLine().getStatusCode());
-                    str3 = null;
+    static /* synthetic */ List access$71(CloudClientSetActivity cloudClientSetActivity, List list, List list2) {
+        return cloudClientSetActivity.parseDownload_new(list, list2);
+    }
+
+    private List<String> parseDownload_new(List<String> resultList, List<ApkUpdateBean> apks) {
+        int length;
+        for (int i = 0; i < apks.size(); i++) {
+            ApkUpdateBean bean = apks.get(i);
+            String packagename = bean.getPackagename();
+            String apkUrl = bean.getApkUrl();
+            String name = bean.getAppName();
+            long size = bean.getApkSize();
+            File dir = new File(AppEnvironment.ASSETS_DIR);
+            if (dir.isDirectory()) {
+                File file = new File(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
+                if (file.exists()) {
+                    file.delete();
                 }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-                str3 = null;
-                return str3;
-            } catch (IOException e2) {
-                e2.printStackTrace();
-                str3 = null;
-                return str3;
+                byte[] bys = new byte[10240];
+                long getsize = 0;
+                HttpURLConnection urlConnection = null;
+                try {
+                    URL url2 = new URL(apkUrl);
+                    urlConnection = (HttpURLConnection) url2.openConnection();
+                    urlConnection.connect();
+                    InputStream in = urlConnection.getInputStream();
+                    FileOutputStream out = new FileOutputStream(file);
+                    int num = 0;
+                    while (getsize < size && isupdating && (length = in.read(bys)) != -1) {
+                        getsize += length;
+                        this.currentCachePosition += length;
+                        out.write(bys, 0, length);
+                        num++;
+                        if (num % 10 == 0) {
+                            sendInstallMessage(i, Long.valueOf(getsize), UPDATE_PROGRESS);
+                        }
+                    }
+                    sendInstallMessage(i, Long.valueOf(getsize), UPDATE_PROGRESS);
+                    out.close();
+                    in.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                } catch (Exception e3) {
+                }
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (getsize == size) {
+                    if (!packagename.equals("com.launcher.activity")) {
+                        resultList.add(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
+                        sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + name, UPDATE_INSTALLSINGLE);
+                        sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
+                        this.addApksList.add(packagename);
+                    } else {
+                        try {
+                            ApkUpdateBean apkBean = this.apkUpdateList.get(i);
+                            apkBean.setApkLocalPath(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
+                            this.apkUpdateList.set(i, apkBean);
+                        } catch (Exception e4) {
+                        }
+                        if (apks.size() == 1) {
+                            sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + name, UPDATE_INSTALLSINGLE);
+                            sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
+                        }
+                        this.launcherPath = String.valueOf(AppEnvironment.ASSETS_DIR) + name;
+                    }
+                } else {
+                    sendInstallMessage(i, -2, UPDATE_INSTALLSTATE);
+                }
             }
         }
-        return str3;
+        return resultList;
     }
 
-    private HttpResponse Get_http_addheader(String str, String str2, boolean z) throws IOException, ClientProtocolException {
-        HttpGet httpGet = new HttpGet(str);
-        httpGet.addHeader("X-Edutech-Entity", str2);
-        long currentTimeMillis = System.currentTimeMillis();
-        if (z) {
-            this.timeStamp = new StringBuilder(String.valueOf(currentTimeMillis)).toString();
+    static /* synthetic */ void access$73(CloudClientSetActivity cloudClientSetActivity, int i, Object obj, int i2) {
+        cloudClientSetActivity.sendInstallMessage(i, obj, i2);
+    }
+
+    private void sendInstallMessage(int arg1, Object obj, int what) {
+        Message msgInstall = new Message();
+        msgInstall.arg1 = arg1;
+        msgInstall.what = what;
+        msgInstall.obj = obj;
+        this.installHandler.sendMessage(msgInstall);
+    }
+
+    static /* synthetic */ List access$70(CloudClientSetActivity cloudClientSetActivity, JSONArray jSONArray, ArrayList arrayList, List list) {
+        return cloudClientSetActivity.parseDownload_Old(jSONArray, arrayList, list);
+    }
+
+    private List<String> parseDownload_Old(JSONArray data, ArrayList<HashMap<String, String>> localAppInfoList, List<String> resultList) {
+        int length;
+        for (int i = 0; i < data.length() && isupdating; i++) {
+            try {
+                JSONObject json = data.getJSONObject(i);
+                String apkUrl = json.getString("appwebpath");
+                long size = json.getLong("appsize");
+                String name = json.getString("apkname");
+                json.getString("versionname");
+                String packagename = json.getString("packagename");
+                String versionCode = json.getString("versioncode");
+                long vercodeLong = 1;
+                try {
+                    vercodeLong = Long.parseLong(versionCode);
+                } catch (NumberFormatException e) {
+                } catch (Exception e2) {
+                }
+                boolean isInstall = false;
+                Iterator<HashMap<String, String>> it = localAppInfoList.iterator();
+                while (true) {
+                    if (!it.hasNext()) {
+                        break;
+                    }
+                    HashMap<String, String> localTempApp = it.next();
+                    if (localTempApp.get("packagename") != null && packagename.equals(localTempApp.get("packagename"))) {
+                        long tempcode = 1;
+                        try {
+                            tempcode = Long.parseLong(localTempApp.get("versioncode"));
+                        } catch (NumberFormatException e3) {
+                        } catch (Exception e4) {
+                        }
+                        if (localTempApp.get("versioncode") != null && localTempApp.get("versionname") != null && vercodeLong > tempcode) {
+                            isInstall = false;
+                        } else {
+                            isInstall = true;
+                        }
+                    } else {
+                        isInstall = false;
+                    }
+                }
+                if (!isInstall) {
+                    URL url2 = new URL(apkUrl);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url2.openConnection();
+                    urlConnection.connect();
+                    InputStream in = urlConnection.getInputStream();
+                    File dir = new File(AppEnvironment.ASSETS_DIR);
+                    if (dir.isDirectory()) {
+                        File file = new File(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        FileOutputStream out = new FileOutputStream(file);
+                        byte[] bys = new byte[10240];
+                        int getsize = 0;
+                        while (getsize < size && isupdating && (length = in.read(bys)) != -1) {
+                            getsize += length;
+                            this.currentCachePosition += length;
+                            out.write(bys, 0, length);
+                        }
+                        out.close();
+                        in.close();
+                        urlConnection.disconnect();
+                        if (getsize == size) {
+                            if (!packagename.equals("com.launcher.activity")) {
+                                resultList.add(String.valueOf(AppEnvironment.ASSETS_DIR) + name);
+                                this.addApksList.add(packagename);
+                            } else {
+                                this.launcherPath = String.valueOf(AppEnvironment.ASSETS_DIR) + name;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e5) {
+            }
         }
-        httpGet.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str2));
-        HttpResponse httpResponse = null;
+        return resultList;
+    }
+
+    static /* synthetic */ void access$15(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.installSingleApk(str);
+    }
+
+    private void installSingleApk(String path) {
+        if (!TextUtils.isEmpty(path) && path.lastIndexOf(".apk") != -1) {
+            boolean boo = false;
+            this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
+            try {
+                boo = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (boo) {
+                try {
+                    this.mHwPDM.installPackage(this.cn, path);
+                } catch (Exception e2) {
+                }
+            } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
+                this.mMiaMdmPolicyManager.silentInstall(path);
+            } else {
+                try {
+                    if (this.mContext != null) {
+                        if (Build.DISPLAY.indexOf("M1016Pro") < 0 && Build.DISPLAY.indexOf("P990S.V") < 0 && Build.DISPLAY.indexOf("S1016PRO") < 0 && Build.DISPLAY.indexOf("D13B") < 0 && Build.DISPLAY.indexOf("QC80A") < 0 && Build.DISPLAY.indexOf("N5110ZB") < 0 && Build.DISPLAY.indexOf(".T360Z") < 0 && Build.DISPLAY.indexOf("P350") < 0 && Build.DISPLAY.indexOf("P550") < 0 && Build.DISPLAY.indexOf("M856.V") < 0 && Build.DISPLAY.indexOf("S1016.V1") < 0 && Build.DISPLAY.indexOf("S106.V1") < 0 && Build.DISPLAY.indexOf("S1016E") < 0 && Build.DISPLAY.indexOf("P583") < 0) {
+                            Intent intent = new Intent();
+                            intent.setAction(sysProtectService.INSTALL);
+                            sendBroadcast(intent);
+                            apkinstall(path);
+                        } else {
+                            apkinstall_samsung(path);
+                        }
+                    }
+                } catch (Exception e3) {
+                }
+            }
+        }
+    }
+
+    static /* synthetic */ void access$3(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.installNewApk();
+    }
+
+    private void installNewApk() {
+        if (this.apkList != null && this.apkList.size() > 0) {
+            boolean boo = false;
+            this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
+            try {
+                boo = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < this.apkList.size(); i++) {
+                String path = this.apkList.get(i);
+                if (path.lastIndexOf(".apk") != -1) {
+                    if (boo) {
+                        try {
+                            this.mHwPDM.installPackage(this.cn, this.apkList.get(i));
+                        } catch (Exception e2) {
+                        }
+                    } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
+                        this.mMiaMdmPolicyManager.silentInstall(this.apkList.get(i));
+                    } else {
+                        try {
+                            if (this.mContext != null) {
+                                if (Build.DISPLAY.indexOf("M1016Pro") < 0 && Build.DISPLAY.indexOf("P990S.V") < 0 && Build.DISPLAY.indexOf("S1016PRO") < 0 && Build.DISPLAY.indexOf("D13B") < 0 && Build.DISPLAY.indexOf("QC80A") < 0 && Build.DISPLAY.indexOf("N5110ZB") < 0 && Build.DISPLAY.indexOf(".T360Z") < 0 && Build.DISPLAY.indexOf("P350") < 0 && Build.DISPLAY.indexOf("P550") < 0 && Build.DISPLAY.indexOf("M856.V") < 0 && Build.DISPLAY.indexOf("S1016.V1") < 0 && Build.DISPLAY.indexOf("S106.V1") < 0 && Build.DISPLAY.indexOf("S1016E") < 0 && Build.DISPLAY.indexOf("P583") < 0) {
+                                    Intent intent = new Intent();
+                                    intent.setAction(sysProtectService.INSTALL);
+                                    sendBroadcast(intent);
+                                    apkinstall(this.apkList.get(i));
+                                } else {
+                                    apkinstall_samsung(this.apkList.get(i));
+                                }
+                            }
+                        } catch (Exception e3) {
+                        }
+                    }
+                }
+            }
+            finish();
+        }
+    }
+
+    private void apkinstall_samsung(String apkpath) {
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.SILENCE_INSTALL");
+        if (Build.DISPLAY.contains("M1016Pro")) {
+            intent.putExtra("uri", apkpath);
+        } else {
+            intent.setDataAndType(Uri.fromFile(new File(apkpath)), "application/vnd.android.package-archive");
+        }
+        sendBroadcast(intent);
+    }
+
+    private void apkinstall(String apkpath) {
         try {
-            httpResponse = new DefaultHttpClient().execute(httpGet);
+            if (!InstallApkUtil.SlientInstall(apkpath)) {
+                if (!InstallApkUtil.SuSlientInstall(apkpath)) {
+                    apkIntentInstall(apkpath);
+                } else {
+                    Log.d("sysService", String.valueOf(apkpath) + ":SuSlientInstall安装成功！");
+                }
+            } else {
+                Log.d("sysService", String.valueOf(apkpath) + ":SlientInstall安装成功！");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                if (!InstallApkUtil.SuSlientInstall(apkpath)) {
+                    apkIntentInstall(apkpath);
+                } else {
+                    Log.d("sysService", String.valueOf(apkpath) + ":SuSlientInstall安装成功！");
+                }
+            } catch (Exception e2) {
+                apkIntentInstall(apkpath);
+                Log.d("sysService", String.valueOf(apkpath) + ":InstallApk安装成功！");
+            }
         }
-        return httpResponse;
     }
 
-    public static boolean SlientInstall(String str) throws IOException {
-        Process exec = Runtime.getRuntime().exec("pm install -r " + str);
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(exec.getInputStream()));
+    private void apkIntentInstall(String apkpath) {
+        Intent installIntent = new Intent("android.intent.action.VIEW");
+        installIntent.setDataAndType(Uri.fromFile(new File(apkpath)), "application/vnd.android.package-archive");
+        installIntent.setFlags(268435456);
+        startActivity(installIntent);
+    }
+
+    private static boolean clientInstall(String apkPath) {
+        Throwable th;
+        Exception e;
+        PrintWriter PrintWriter;
+        Process process = null;
+        try {
+            try {
+                process = Runtime.getRuntime().exec(ShellUtils.COMMAND_SU);
+                PrintWriter = new PrintWriter(process.getOutputStream());
+            } catch (Throwable th2) {
+                th = th2;
+            }
+        } catch (Exception e2) {
+            e = e2;
+        }
+        try {
+            PrintWriter.println("chmod 777 " + apkPath);
+            PrintWriter.println("export LD_LIBRARY_PATH=/vendor/lib:/system/lib");
+            PrintWriter.println("pm install -r " + apkPath);
+            PrintWriter.flush();
+            PrintWriter.close();
+            int value = process.waitFor();
+            boolean returnResult = returnResult(value);
+            if (process != null) {
+                process.destroy();
+            }
+            return returnResult;
+        } catch (Exception e3) {
+            e = e3;
+            e.printStackTrace();
+            if (process != null) {
+                process.destroy();
+            }
+            return false;
+        } catch (Throwable th3) {
+            th = th3;
+            if (process != null) {
+                process.destroy();
+            }
+            throw th;
+        }
+    }
+
+    private static boolean returnResult(int value) {
+        if (value == 0) {
+            return true;
+        }
+        return value == 1 ? false : false;
+    }
+
+    public static boolean SlientInstall(String apkPath) throws IOException {
+        Runtime runtime = Runtime.getRuntime();
+        Process proc = runtime.exec("pm install -r " + apkPath);
+        InputStream inputstream = proc.getInputStream();
+        InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
+        BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
         StringBuilder sb = new StringBuilder("");
         while (true) {
-            String readLine = bufferedReader.readLine();
-            if (readLine == null) {
+            String line = bufferedreader.readLine();
+            if (line != null) {
+                sb.append(line);
+            } else {
                 try {
                     break;
                 } catch (InterruptedException e) {
                     System.err.println(e);
                 }
-            } else {
-                sb.append(readLine);
             }
         }
-        if (exec.waitFor() != 0) {
-            System.err.println("exit value = " + exec.exitValue());
+        if (proc.waitFor() != 0) {
+            System.err.println("exit value = " + proc.exitValue());
         }
-        return sb.toString().equals("Success");
-    }
-
-    private void apkIntentInstall(String str) {
-        Intent intent = new Intent("android.intent.action.VIEW");
-        intent.setDataAndType(Uri.fromFile(new File(str)), "application/vnd.android.package-archive");
-        intent.setFlags(268435456);
-        startActivity(intent);
-    }
-
-    private void apkinstall(String str) {
-        try {
-            if (InstallApkUtil.SlientInstall(str)) {
-                Log.d("sysService", String.valueOf(str) + ":SlientInstall安装成功！");
-            } else if (!InstallApkUtil.SuSlientInstall(str)) {
-                apkIntentInstall(str);
-            } else {
-                Log.d("sysService", String.valueOf(str) + ":SuSlientInstall安装成功！");
-            }
-        } catch (Exception e) {
-            try {
-                if (!InstallApkUtil.SuSlientInstall(str)) {
-                    apkIntentInstall(str);
-                } else {
-                    Log.d("sysService", String.valueOf(str) + ":SuSlientInstall安装成功！");
-                }
-            } catch (Exception e2) {
-                apkIntentInstall(str);
-                Log.d("sysService", String.valueOf(str) + ":InstallApk安装成功！");
-            }
-        }
-    }
-
-    private void apkinstall_samsung(String str) {
-        Intent intent = new Intent();
-        intent.setAction("android.intent.action.SILENCE_INSTALL");
-        if (Build.DISPLAY.contains("M1016Pro")) {
-            intent.putExtra("uri", str);
-        } else {
-            intent.setDataAndType(Uri.fromFile(new File(str)), "application/vnd.android.package-archive");
-        }
-        sendBroadcast(intent);
-    }
-
-    private void appendUserInfo(String str, String str2) {
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(str, "rw");
-            randomAccessFile.seek(randomAccessFile.length());
-            randomAccessFile.writeBytes(String.valueOf(str2) + "\r\n");
-            randomAccessFile.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e2) {
-        }
-    }
-
-    private boolean checkConfig(String str, String str2) {
-        boolean z;
-        String string;
-        try {
-            JSONObject jSONObject = new JSONObject(str);
-            if (jSONObject.has("checksum")) {
-                JSONObject jSONObject2 = jSONObject.getJSONObject("data");
-                jSONObject2.toString();
-                String string2 = jSONObject.getString("checksum");
-                String Md5 = My_md5.Md5(AESUtils.encrypt(jSONObject2.getString("privatekey"), String.valueOf(string) + jSONObject2.getString("apihost") + str2));
-                z = false;
-                if (Md5 != null) {
-                    z = false;
-                    if (string2 != null) {
-                        z = false;
-                        if (Md5.equals(string2)) {
-                            z = true;
-                        }
-                    }
-                }
-            } else {
-                z = true;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            z = false;
-        } catch (Exception e2) {
-            e2.printStackTrace();
-            z = false;
-        }
-        return z;
-    }
-
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:30:0x0004 */
-    /* JADX DEBUG: Multi-variable search result rejected for r5v7, resolved type: java.lang.StringBuilder */
-    /* JADX WARN: Multi-variable type inference failed */
-    private static boolean clientInstall(String str) {
-        Process process;
-        Throwable th;
-        Exception e;
-        boolean z;
-        PrintWriter printWriter;
-        Process process2 = null;
-        Process process3 = null;
-        try {
-            try {
-                process = Runtime.getRuntime().exec(ShellUtils.COMMAND_SU);
-                process3 = process;
-                printWriter = new PrintWriter(process.getOutputStream());
-            } catch (Throwable th2) {
-                th = th2;
-                process = process2 == 1 ? 1 : 0;
-            }
-        } catch (Exception e2) {
-            e = e2;
-            process = process3;
-        }
-        try {
-            printWriter.println("chmod 777 " + str);
-            printWriter.println("export LD_LIBRARY_PATH=/vendor/lib:/system/lib");
-            StringBuilder sb = new StringBuilder("pm install -r ");
-            printWriter.println(sb.append(str).toString());
-            printWriter.flush();
-            printWriter.close();
-            z = returnResult(process.waitFor());
-            process2 = sb;
-            if (process != null) {
-                process.destroy();
-                process2 = sb;
-            }
-        } catch (Exception e3) {
-            e = e3;
-            process2 = process;
-            e.printStackTrace();
-            if (process != null) {
-                process.destroy();
-            }
-            z = false;
-            return z;
-        } catch (Throwable th3) {
-            th = th3;
-            if (process != null) {
-                process.destroy();
-            }
-            throw th;
-        }
-        return z;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void closeProgressDialog() {
-        try {
-            this.tvUpdateNow.setEnabled(true);
-            this.tvUpdateNow.setTextColor(getResources().getColor(R.color.blue));
-            this.tvUpdateNow.setText(getResources().getString(R.string.setting_startupdating));
-            if (!AppEnvironment.isNewUpdate) {
-                if (this.webprogressdialog == null || this.isover) {
-                    return;
-                }
-                this.webprogressdialog.dismiss();
-                this.webprogressdialog = null;
-                return;
-            }
-            if (this.progressDialog != null && !this.isover) {
-                this.progressDialog.resetData();
-                this.progressDialog.dismiss();
-                this.progressDialog = null;
-            }
-            this.apkUpdateList.clear();
-            isupdating = false;
-        } catch (Exception e) {
-        }
-    }
-
-    private void delete(String str) {
-        File[] listFiles;
-        File file = new File(str);
-        if (file.isDirectory() && (listFiles = file.listFiles()) != null) {
-            for (File file2 : listFiles) {
-                if (!file2.isDirectory() || !file2.getName().equals("HTML")) {
-                    deleteFiles(file2.getAbsolutePath());
-                }
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void deleteAPks() {
-        File[] listFiles;
-        File file = new File(AppEnvironment.ASSETS_DIR);
-        if (!file.isDirectory() || (listFiles = file.listFiles()) == null) {
-            return;
-        }
-        for (File file2 : listFiles) {
-            Log.e("apk", String.valueOf(file2.getAbsolutePath()) + "," + file2.getAbsolutePath().endsWith(".apk"));
-            if (file2.getAbsolutePath().endsWith(".apk")) {
-                file2.delete();
-            }
-        }
-    }
-
-    public static void deleteFiles(String str) {
-        File file = new File(str);
-        if (file.isDirectory()) {
-            for (File file2 : file.listFiles()) {
-                deleteFiles(file2.getAbsolutePath());
-            }
-        } else if (file.exists()) {
-            file.delete();
-        }
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void deleteOtherFiles() {
-        delete(String.valueOf(AppEnvironment.ASSETS_DIR) + "HomeWork/");
-        delete(String.valueOf(AppEnvironment.ASSETS_DIR) + "ZuoYeFuDao/");
-        delete(String.valueOf(AppEnvironment.ASSETS_DIR) + "DaoXueBen/");
-        delete(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/EBag/.System/offline/");
-    }
-
-    private void downLoadImage(ArrayList<String> arrayList) {
-        for (int i = 0; i < arrayList.size(); i++) {
-            try {
-                HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(arrayList.get(i)).openConnection();
-                if (httpURLConnection.getResponseCode() == 200) {
-                    savePic(httpURLConnection.getInputStream(), arrayList.get(i));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.i("liu", "downLoadImage:" + e);
-            }
-        }
-    }
-
-    private void exit() {
-        startActivity(new Intent(this, CloudClientActivity.class));
-        finish();
-    }
-
-    private void getCurrApkInfo() {
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            Log.e("packageName", getPackageName());
-            this.versionName = packageInfo.versionName;
-            this.versionCode = packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        this.tvCurrVersion.setText(String.valueOf(getResources().getString(R.string.setting_version)) + this.versionName);
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public boolean getInternetState() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService("connectivity");
-        boolean z = false;
-        if (connectivityManager != null) {
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            z = false;
-            if (activeNetworkInfo != null) {
-                z = false;
-                if (activeNetworkInfo.isConnected()) {
-                    z = false;
-                    if (activeNetworkInfo.getState() == NetworkInfo.State.CONNECTED) {
-                        z = true;
-                    }
-                }
-            }
-        }
-        return z;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public String getJsonStringFromGZIP(HttpResponse httpResponse) {
-        String str;
-        InputStream inputStream;
-        try {
-            if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                BufferedInputStream bufferedInputStream = new BufferedInputStream(httpResponse.getEntity().getContent());
-                bufferedInputStream.mark(2);
-                byte[] bArr = new byte[2];
-                int read = bufferedInputStream.read(bArr);
-                bufferedInputStream.reset();
-                int i = getShort(bArr);
-                if (read == -1 || i != 8075) {
-                    Log.d(TAG, " not use GZIPInputStream");
-                    inputStream = bufferedInputStream;
-                } else {
-                    Log.d(TAG, " use GZIPInputStream  ");
-                    inputStream = new GZIPInputStream(bufferedInputStream);
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-                char[] cArr = new char[100];
-                StringBuffer stringBuffer = new StringBuffer();
-                while (true) {
-                    int read2 = inputStreamReader.read(cArr);
-                    if (read2 <= 0) {
-                        break;
-                    }
-                    stringBuffer.append(cArr, 0, read2);
-                }
-                str = stringBuffer.toString();
-                bufferedInputStream.close();
-                inputStreamReader.close();
-            } else {
-                Log.e(TAG, "与服务端连接失败。。。");
-                Log.e(TAG, "ddddd=" + httpResponse.getStatusLine().getStatusCode());
-                str = "";
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.toString(), e);
-            str = "";
-        }
-        return str;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* JADX WARN: Code restructure failed: missing block: B:9:0x006c, code lost:
-        if (r0.equals("") != false) goto L10;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    public String getManagerPwd() {
-        String str;
-        SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
-        String string = sharedPreferences.getString("key", "");
-        String string2 = sharedPreferences.getString("apihost", "");
-        String string3 = sharedPreferences.getString("name", "");
-        HashMap<String, String> loadXml = XmlLoadHelper.loadXml();
-        String str2 = string2;
-        String str3 = string;
-        String str4 = string3;
-        if (loadXml != null) {
-            if (string2 != null && !string2.equals("")) {
-                str2 = string2;
-                str3 = string;
-                str4 = string3;
-            }
-            str2 = loadXml.get("ip");
-            str4 = loadXml.get("usercode");
-            str3 = loadXml.get("privatekey");
-        }
-        Log.e("pwd", "start get pwd");
-        HttpPost httpPost = new HttpPost("http://" + str2 + "/api/padpwd");
-        httpPost.addHeader("X-Edutech-Entity", str4);
-        long currentTimeMillis = System.currentTimeMillis();
-        httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str4 + str3));
-        try {
-            byte[] decrypt = new AESSet().decrypt(new JSONObject(getJsonStringFromGZIP(new DefaultHttpClient().execute(httpPost))).getString("data"));
-            str = new String(decrypt, 0, decrypt.length);
-        } catch (Exception e) {
-            e.printStackTrace();
-            str = "ayjedutechyx@123456z";
-        }
-        return str;
-    }
-
-    private int getShort(byte[] bArr) {
-        return (bArr[0] << 8) | (bArr[1] & 255);
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public String getUserPwd() {
-        String str;
-        String str2 = this.pwdOrigal;
-        try {
-            JSONObject jSONObject = new JSONObject(Get_Config_Json("http://" + this.ipOrigal + "/api/config", this.nameOrigal));
-            JSONObject jSONObject2 = null;
-            JSONObject jSONObject3 = null;
-            if (jSONObject != null) {
-                jSONObject2 = jSONObject.getJSONObject("data");
-            }
-            if (jSONObject2 != null) {
-                jSONObject3 = jSONObject2.getJSONObject(UserID.ELEMENT_NAME);
-            }
-            str = str2;
-            if (jSONObject3 != null) {
-                try {
-                    str = BZip2Utils.Base64DecodeToString(jSONObject3.getString("pubkey"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    str = str2;
-                }
-            }
-        } catch (JSONException e2) {
-            e2.printStackTrace();
-            str = str2;
-        }
-        return str;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void installNewApk() {
-        boolean z;
-        if (this.apkList == null || this.apkList.size() <= 0) {
-            return;
-        }
-        this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
-        try {
-            z = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
-        } catch (Exception e) {
-            e.printStackTrace();
-            z = false;
-        }
-        for (int i = 0; i < this.apkList.size(); i++) {
-            if (this.apkList.get(i).lastIndexOf(".apk") != -1) {
-                if (z) {
-                    try {
-                        this.mHwPDM.installPackage(this.cn, this.apkList.get(i));
-                    } catch (Exception e2) {
-                    }
-                } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
-                    this.mMiaMdmPolicyManager.silentInstall(this.apkList.get(i));
-                } else {
-                    try {
-                        if (this.mContext != null) {
-                            if (Build.DISPLAY.indexOf("M1016Pro") >= 0 || Build.DISPLAY.indexOf("P990S.V") >= 0 || Build.DISPLAY.indexOf("S1016PRO") >= 0 || Build.DISPLAY.indexOf("D13B") >= 0 || Build.DISPLAY.indexOf("QC80A") >= 0 || Build.DISPLAY.indexOf("N5110ZB") >= 0 || Build.DISPLAY.indexOf(".T360Z") >= 0 || Build.DISPLAY.indexOf("P350") >= 0 || Build.DISPLAY.indexOf("P550") >= 0 || Build.DISPLAY.indexOf("M856.V") >= 0 || Build.DISPLAY.indexOf("S1016.V1") >= 0 || Build.DISPLAY.indexOf("S106.V1") >= 0 || Build.DISPLAY.indexOf("S1016E") >= 0 || Build.DISPLAY.indexOf("P583") >= 0) {
-                                apkinstall_samsung(this.apkList.get(i));
-                            } else {
-                                Intent intent = new Intent();
-                                intent.setAction(sysProtectService.INSTALL);
-                                sendBroadcast(intent);
-                                apkinstall(this.apkList.get(i));
-                            }
-                        }
-                    } catch (Exception e3) {
-                    }
-                }
-            }
-        }
-        finish();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void installSingleApk(String str) {
-        boolean z;
-        if (TextUtils.isEmpty(str) || str.lastIndexOf(".apk") == -1) {
-            return;
-        }
-        this.mMiaMdmPolicyManager = new MiaMdmPolicyManager(this);
-        try {
-            z = this.mHwPDM.isRecentTaskButtonDisabled(this.cn);
-        } catch (Exception e) {
-            e.printStackTrace();
-            z = false;
-        }
-        if (z) {
-            try {
-                this.mHwPDM.installPackage(this.cn, str);
-            } catch (Exception e2) {
-            }
-        } else if (Build.DISPLAY.contains("A10-70LC") || Build.DISPLAY.contains("TB-8703N") || Build.DISPLAY.contains("TB-8604F") || Build.DISPLAY.contains("A10-70F") || Build.DISPLAY.contains("YiJiao") || Build.DISPLAY.contains("YOGATablet2-1050LC")) {
-            this.mMiaMdmPolicyManager.silentInstall(str);
-        } else {
-            try {
-                if (this.mContext != null) {
-                    if (Build.DISPLAY.indexOf("M1016Pro") >= 0 || Build.DISPLAY.indexOf("P990S.V") >= 0 || Build.DISPLAY.indexOf("S1016PRO") >= 0 || Build.DISPLAY.indexOf("D13B") >= 0 || Build.DISPLAY.indexOf("QC80A") >= 0 || Build.DISPLAY.indexOf("N5110ZB") >= 0 || Build.DISPLAY.indexOf(".T360Z") >= 0 || Build.DISPLAY.indexOf("P350") >= 0 || Build.DISPLAY.indexOf("P550") >= 0 || Build.DISPLAY.indexOf("M856.V") >= 0 || Build.DISPLAY.indexOf("S1016.V1") >= 0 || Build.DISPLAY.indexOf("S106.V1") >= 0 || Build.DISPLAY.indexOf("S1016E") >= 0 || Build.DISPLAY.indexOf("P583") >= 0) {
-                        apkinstall_samsung(str);
-                    } else {
-                        Intent intent = new Intent();
-                        intent.setAction(sysProtectService.INSTALL);
-                        sendBroadcast(intent);
-                        apkinstall(str);
-                    }
-                }
-            } catch (Exception e3) {
-            }
-        }
-    }
-
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:299:0x03ce */
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:307:0x028a */
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:313:0x0314 */
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:336:0x0337 */
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:351:0x0349 */
-    /* JADX INFO: Access modifiers changed from: private */
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r26v9, types: [java.lang.Exception] */
-    /* JADX WARN: Type inference failed for: r30v7, types: [java.lang.Exception] */
-    /* JADX WARN: Type inference failed for: r37v3 */
-    /* JADX WARN: Type inference failed for: r37v38 */
-    /* JADX WARN: Type inference failed for: r37v39 */
-    /* JADX WARN: Type inference failed for: r37v4 */
-    /* JADX WARN: Type inference failed for: r37v40 */
-    /* JADX WARN: Type inference failed for: r37v42 */
-    /* JADX WARN: Type inference failed for: r37v43 */
-    /* JADX WARN: Type inference failed for: r37v44, types: [java.lang.String] */
-    /* JADX WARN: Type inference failed for: r37v45 */
-    /* JADX WARN: Type inference failed for: r37v46, types: [org.json.JSONArray] */
-    /* JADX WARN: Type inference failed for: r37v47 */
-    /* JADX WARN: Type inference failed for: r37v50 */
-    /* JADX WARN: Type inference failed for: r37v51, types: [java.lang.String] */
-    /* JADX WARN: Type inference failed for: r37v62 */
-    /* JADX WARN: Type inference failed for: r37v63 */
-    /* JADX WARN: Type inference failed for: r37v64 */
-    /* JADX WARN: Type inference failed for: r37v65 */
-    /* JADX WARN: Type inference failed for: r37v66 */
-    public int jsonToConfig(String str) {
-        int i;
-        JSONObject jSONObject;
-        String str2;
-        String str3;
-        String str4;
-        String str5;
-        String str6;
-        String str7;
-        JSONObject jSONObject2;
-        SharedPreferences.Editor editor;
-        String str8;
-        String str9;
-        SharedPreferences.Editor editor2;
-        String str10;
-        if (str == null || str.equals("")) {
-            i = -1;
-        } else {
-            String str11 = "0";
-            String str12 = "0";
-            if (!checkConfig(str, this.timeStamp)) {
-                i = -100;
-            } else {
-                try {
-                    JSONObject jSONObject3 = new JSONObject(str);
-                    jSONObject3.getString("status");
-                    this.saveErrorInfo = jSONObject3.getString("errorInfo");
-                    String string = jSONObject3.getString("errorNum");
-                    if (string.equals("-2")) {
-                        i = -2;
-                    } else if (string.equals("0")) {
-                        JSONObject jSONObject4 = jSONObject3.getJSONObject("data");
-                        String string2 = jSONObject4.getString("privatekey");
-                        String string3 = jSONObject4.getString("encrypt");
-                        String string4 = jSONObject4.getString("apihost");
-                        try {
-                            str11 = jSONObject4.getString("guidelearncomment");
-                        } catch (Exception e) {
-                        }
-                        try {
-                            str12 = jSONObject4.getString("guidenotes");
-                        } catch (Exception e2) {
-                        }
-                        JSONObject jSONObject5 = jSONObject4.getJSONObject(UserID.ELEMENT_NAME);
-                        String string5 = jSONObject5.getString("pubkey");
-                        String string6 = jSONObject5.getString("type");
-                        if (string6.equals("03") || string6.equals(LogHelp.TYPE_HWHELP)) {
-                            String str13 = "-1";
-                            try {
-                                str13 = jSONObject5.getString("id");
-                            } catch (Exception e3) {
-                                e3.printStackTrace();
-                            }
-                            if (!My_md5.Md5(this.Pwd).equals(string5)) {
-                                i = 0;
-                            } else {
-                                SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
-                                SharedPreferences.Editor edit = sharedPreferences.edit();
-                                edit.putString("key", string2);
-                                edit.putString("name", jSONObject5.getString("usercode"));
-                                edit.putString("apihost", string4);
-                                JSONObject jSONObject6 = null;
-                                try {
-                                    JSONObject jSONObject7 = jSONObject4.getJSONObject("ebag");
-                                    jSONObject = jSONObject7;
-                                    if (jSONObject7 != null) {
-                                        jSONObject = jSONObject7;
-                                        if (!sharedPreferences.getString("updatetime", "").equals(jSONObject7.getString("updatetime"))) {
-                                            Log.i("liu", "save time:" + sharedPreferences.getString("updatetime", ""));
-                                            Log.i("liu", "request time:" + jSONObject7.getString("updatetime"));
-                                            this.isUpdate = true;
-                                            jSONObject6 = jSONObject7;
-                                            edit.putString("updatetime", jSONObject7.getString("updatetime"));
-                                            jSONObject = jSONObject7;
-                                        }
-                                    }
-                                } catch (Exception e4) {
-                                    e4.printStackTrace();
-                                    jSONObject = jSONObject6;
-                                }
-                                edit.putString("userid", str13);
-                                edit.commit();
-                                String str14 = "";
-                                String str15 = "";
-                                String str16 = "";
-                                try {
-                                    JSONObject jSONObject8 = jSONObject4.getJSONObject("tigase");
-                                    String str17 = "";
-                                    String str18 = "";
-                                    try {
-                                        str14 = jSONObject8.getString(ClientCookie.DOMAIN_ATTR);
-                                        str17 = str14;
-                                    } catch (Exception e5) {
-                                        str14 = str17;
-                                        str15 = str18;
-                                        e5.printStackTrace();
-                                    }
-                                    try {
-                                        str14 = jSONObject8.getString(ClientCookie.PORT_ATTR);
-                                        str18 = str14;
-                                    } catch (Exception e6) {
-                                        str14 = str17;
-                                        str15 = str18;
-                                        e6.printStackTrace();
-                                    }
-                                    try {
-                                        str14 = jSONObject8.getString("ip");
-                                        str16 = str14;
-                                        str3 = str18;
-                                        str2 = str17;
-                                    } catch (Exception e7) {
-                                        str14 = str17;
-                                        str15 = str18;
-                                        e7.printStackTrace();
-                                        str2 = str17;
-                                        str3 = str18;
-                                    }
-                                } catch (Exception e8) {
-                                    e8.printStackTrace();
-                                    str2 = str14;
-                                    str3 = str15;
-                                }
-                                String str19 = "";
-                                String str20 = "";
-                                String str21 = "";
-                                String str22 = str21;
-                                try {
-                                    JSONObject jSONObject9 = jSONObject4.getJSONObject("mongo");
-                                    String str23 = "";
-                                    String str24 = "";
-                                    String str25 = "";
-                                    str21 = "";
-                                    str4 = str21;
-                                    try {
-                                        str20 = jSONObject9.getString(ClientCookie.DOMAIN_ATTR);
-                                        String str26 = str20;
-                                        str23 = str26;
-                                        str21 = str26;
-                                    } catch (Exception e9) {
-                                        str19 = str23;
-                                        str20 = str24;
-                                        str22 = str25;
-                                        Exception exc = e9;
-                                        exc.printStackTrace();
-                                        str21 = exc;
-                                    }
-                                    try {
-                                        str20 = jSONObject9.getString(ClientCookie.PORT_ATTR);
-                                        String str27 = str20;
-                                        str24 = str27;
-                                        str21 = str27;
-                                    } catch (Exception e10) {
-                                        str19 = str23;
-                                        str20 = str24;
-                                        str22 = str25;
-                                        Exception exc2 = e10;
-                                        exc2.printStackTrace();
-                                        str21 = exc2;
-                                    }
-                                    try {
-                                        str20 = jSONObject9.getString(UserID.ELEMENT_NAME);
-                                        String str28 = str20;
-                                        str25 = str28;
-                                        str21 = str28;
-                                    } catch (Exception e11) {
-                                        str19 = str23;
-                                        str20 = str24;
-                                        str22 = str25;
-                                        Exception exc3 = e11;
-                                        exc3.printStackTrace();
-                                        str21 = exc3;
-                                    }
-                                    try {
-                                        str20 = jSONObject9.getString("pwd");
-                                        str4 = str20;
-                                        str7 = str25;
-                                        str6 = str24;
-                                        str5 = str23;
-                                    } catch (Exception e12) {
-                                        str19 = str23;
-                                        str20 = str24;
-                                        str22 = str25;
-                                        e12.printStackTrace();
-                                        str5 = str23;
-                                        str6 = str24;
-                                        str7 = str25;
-                                    }
-                                } catch (Exception unused) {
-                                    str4 = "";
-                                    str21.printStackTrace();
-                                    str5 = str19;
-                                    str6 = str20;
-                                    str7 = str22;
-                                }
-                                String str29 = "";
-                                SharedPreferences.Editor editor3 = "";
-                                String str30 = "";
-                                JSONObject jSONObject10 = str29;
-                                SharedPreferences.Editor editor4 = editor3;
-                                String str31 = "";
-                                String str32 = "";
-                                String str33 = str30;
-                                try {
-                                    JSONObject jSONObject11 = jSONObject4.getJSONObject(UserID.ELEMENT_NAME);
-                                    try {
-                                        String string7 = jSONObject11.getString("type");
-                                        try {
-                                            str29 = string7.equals("02") ? "0" : string7.equals("03") ? LogHelp.TYPE_MYWORK : string7.equals("05") ? LogHelp.TYPE_GUIDANCE : "7";
-                                        } catch (Exception e13) {
-                                            e13.printStackTrace();
-                                            str29 = LogHelp.TYPE_MYWORK;
-                                        }
-                                    } catch (Exception e14) {
-                                        e14.printStackTrace();
-                                        str29 = "7";
-                                        jSONObject10 = str29;
-                                        editor4 = editor3;
-                                        str31 = "";
-                                        str32 = "";
-                                        str33 = str30;
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.setting_noneusererror), 0).show();
-                                    }
-                                    try {
-                                        editor4 = jSONObject11.getJSONArray("school");
-                                        editor2 = editor3;
-                                        try {
-                                            jSONObject10 = editor4.getJSONObject(0);
-                                            try {
-                                                editor4 = jSONObject10.getString("id");
-                                                editor2 = getSharedPreferences("privatekey", 0).edit();
-                                                editor2.putString("schoolid", editor4);
-                                                editor3 = editor4;
-                                                editor2.commit();
-                                                editor4 = editor4;
-                                            } catch (Exception e15) {
-                                                editor2 = editor3;
-                                                e15.printStackTrace();
-                                                editor4 = editor3;
-                                            }
-                                            try {
-                                                str9 = jSONObject10.getString("name");
-                                                editor2 = editor4;
-                                                editor4 = editor4;
-                                            } catch (Exception e16) {
-                                                editor2 = editor4;
-                                                e16.printStackTrace();
-                                                editor2 = editor4;
-                                                str9 = "";
-                                                editor4 = editor4;
-                                            }
-                                        } catch (Exception e17) {
-                                            e17.printStackTrace();
-                                            str9 = "";
-                                            editor4 = editor4;
-                                        }
-                                    } catch (Exception e18) {
-                                        jSONObject10 = str29;
-                                        editor4 = editor3;
-                                        str31 = "";
-                                        str32 = "";
-                                        str33 = str30;
-                                        e18.printStackTrace();
-                                        editor2 = editor3;
-                                        str9 = "";
-                                    }
-                                    try {
-                                        str10 = jSONObject11.getString("usercode");
-                                        editor4 = editor4;
-                                    } catch (Exception e19) {
-                                        jSONObject10 = str29;
-                                        editor4 = editor2;
-                                        str31 = str9;
-                                        str32 = "";
-                                        str33 = str30;
-                                        e19.printStackTrace();
-                                        str10 = "";
-                                    }
-                                    try {
-                                        editor4 = jSONObject11.getString("name");
-                                        str30 = editor4;
-                                        this.stu_name = editor4;
-                                        str30 = editor4;
-                                        str32 = str10;
-                                        str31 = str9;
-                                        editor = editor2;
-                                        jSONObject2 = str29;
-                                    } catch (Exception e20) {
-                                        jSONObject10 = str29;
-                                        editor4 = editor2;
-                                        str31 = str9;
-                                        str32 = str10;
-                                        str33 = str30;
-                                        e20.printStackTrace();
-                                        jSONObject2 = str29;
-                                        editor = editor2;
-                                        str31 = str9;
-                                        str32 = str10;
-                                    }
-                                } catch (Exception e21) {
-                                    e21.printStackTrace();
-                                    jSONObject2 = jSONObject10;
-                                    editor = editor4;
-                                    str30 = str33;
-                                }
-                                String str34 = "";
-                                String str35 = str34;
-                                try {
-                                    JSONObject jSONObject12 = jSONObject4.getJSONObject("cloud");
-                                    String str36 = "";
-                                    str34 = "";
-                                    str8 = str34;
-                                    try {
-                                        str34 = jSONObject12.getString("scheme");
-                                    } catch (Exception e22) {
-                                        str35 = str36;
-                                        e22.printStackTrace();
-                                    }
-                                    try {
-                                        str35 = jSONObject12.getString(ClientCookie.DOMAIN_ATTR);
-                                        String str37 = str35;
-                                        str36 = str37;
-                                        str34 = str37;
-                                    } catch (Exception e23) {
-                                        str35 = str36;
-                                        Exception exc4 = e23;
-                                        exc4.printStackTrace();
-                                        str34 = exc4;
-                                    }
-                                    try {
-                                        str35 = jSONObject12.getString(ClientCookie.PORT_ATTR);
-                                        str8 = str35;
-                                        str35 = str36;
-                                    } catch (Exception e24) {
-                                        str35 = str36;
-                                        e24.printStackTrace();
-                                        str35 = str36;
-                                    }
-                                } catch (Exception unused2) {
-                                    str8 = "";
-                                    str34.printStackTrace();
-                                }
-                                ArrayList<AppBean> arrayList = new ArrayList<>();
-                                String str38 = null;
-                                String str39 = null;
-                                String str40 = null;
-                                String str41 = null;
-                                String str42 = null;
-                                try {
-                                    JSONObject jSONObject13 = jSONObject.getJSONObject("desktopicon");
-                                    String string8 = jSONObject13.getString("wifi");
-                                    String string9 = jSONObject13.getString("setting");
-                                    JSONObject jSONObject14 = jSONObject13.getJSONObject("background");
-                                    String string10 = jSONObject14.getString("large");
-                                    String string11 = jSONObject14.getString(SQLExec.DelimiterType.NORMAL);
-                                    String string12 = jSONObject14.getString("small");
-                                    JSONArray jSONArray = jSONObject.getJSONArray("app");
-                                    int i2 = 0;
-                                    while (true) {
-                                        str38 = string8;
-                                        str39 = string9;
-                                        str40 = string10;
-                                        str41 = string11;
-                                        str42 = string12;
-                                        if (i2 >= jSONArray.length()) {
-                                            break;
-                                        }
-                                        HashMap hashMap = new HashMap();
-                                        String string13 = jSONArray.getJSONObject(i2).getString("code");
-                                        String string14 = jSONArray.getJSONObject(i2).getString("name");
-                                        String string15 = jSONArray.getJSONObject(i2).getString("color");
-                                        String string16 = jSONArray.getJSONObject(i2).getString("icon");
-                                        String str43 = String.valueOf(AppEnvironment.icon) + string16.substring(string16.lastIndexOf("/") + 1);
-                                        str38 = string8;
-                                        str39 = string9;
-                                        str40 = string10;
-                                        str41 = string11;
-                                        str42 = string12;
-                                        int i3 = jSONArray.getJSONObject(i2).getInt("enable");
-                                        try {
-                                            str42 = new StringBuilder(String.valueOf(jSONArray.getJSONObject(i2).getJSONObject("config").getInt(ClientCookie.COMMENT_ATTR))).toString();
-                                            str41 = new StringBuilder(String.valueOf(jSONArray.getJSONObject(i2).getJSONObject("config").getInt("download"))).toString();
-                                            hashMap.put(ClientCookie.COMMENT_ATTR, str42);
-                                            hashMap.put("download", str41);
-                                        } catch (Exception e25) {
-                                            hashMap.put(ClientCookie.COMMENT_ATTR, "-1");
-                                            hashMap.put("download", "-1");
-                                            e25.printStackTrace();
-                                        }
-                                        arrayList.add(new AppBean(string13, string14, string15, string16, i3, hashMap, str43));
-                                        i2++;
-                                    }
-                                    str42 = string12;
-                                    str41 = string11;
-                                    str40 = string10;
-                                    str39 = string9;
-                                    str38 = string8;
-                                } catch (Exception e26) {
-                                    e26.printStackTrace();
-                                    Log.i("liu", "Exception :" + e26);
-                                }
-                                if (str8 == null || str8.equals("") || !str8.equals("80")) {
-                                    str35 = String.valueOf(str35) + ":" + str8;
-                                }
-                                writeXml_config(string2, string3, string4, str2, str3, str16, str5, str6, str7, str4, jSONObject2, editor, str31, str35, str32, str13, str11, str30, null, str38, str39, arrayList, str12);
-                                ArrayList arrayList2 = new ArrayList();
-                                arrayList2.add(str38);
-                                arrayList2.add(str39);
-                                arrayList2.add(str40);
-                                arrayList2.add(str41);
-                                arrayList2.add(str42);
-                                for (int i4 = 0; i4 < arrayList.size(); i4++) {
-                                    arrayList2.add(arrayList.get(i4).getIcon());
-                                }
-                                i = 1;
-                            }
-                        } else {
-                            i = 2;
-                        }
-                    } else {
-                        i = -1;
-                    }
-                } catch (JSONException e27) {
-                    e27.printStackTrace();
-                    i = -1;
-                }
-            }
-        }
-        return i;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* JADX WARN: Removed duplicated region for block: B:26:0x00ab  */
-    /* JADX WARN: Removed duplicated region for block: B:29:0x00ba  */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    public JSONArray nameHistoryAdd(String str, String str2, String str3, JSONArray jSONArray) {
-        JSONArray jSONArray2;
-        JSONObject jSONObject;
-        JSONException e;
-        JSONException e2;
-        JSONObject jSONObject2;
-        boolean z;
-        JSONArray jSONArray3 = new JSONArray();
-        if (str3 == null || str2 == null) {
-            jSONArray2 = jSONArray;
-        } else {
-            JSONObject jSONObject3 = null;
-            boolean z2 = false;
-            if (jSONArray != null) {
-                jSONObject3 = null;
-                z2 = false;
-                if (jSONArray.length() >= 0) {
-                    int i = 0;
-                    z2 = false;
-                    jSONObject3 = null;
-                    while (i < jSONArray.length()) {
-                        boolean z3 = z2;
-                        try {
-                            JSONObject jSONObject4 = jSONArray.getJSONObject(i);
-                            if (!jSONObject4.has("ip")) {
-                                boolean z4 = z2;
-                                jSONArray3.put(jSONObject4);
-                                z = z2;
-                                jSONObject2 = jSONObject3;
-                            } else {
-                                JSONArray jSONArray4 = null;
-                                if (jSONObject4.has("ip")) {
-                                    jSONArray4 = null;
-                                    if (str2.equals(jSONObject4.getString("ip"))) {
-                                        jSONArray4 = null;
-                                        if (jSONObject4.has("students")) {
-                                            boolean z5 = z2;
-                                            jSONArray4 = jSONObject4.getJSONArray("students");
-                                        }
-                                    }
-                                }
-                                jSONObject2 = jSONObject3;
-                                z = z2;
-                                if (jSONArray4 != null) {
-                                    jSONObject2 = jSONObject3;
-                                    z = z2;
-                                    if (jSONArray4.length() > 0) {
-                                        int i2 = 0;
-                                        while (true) {
-                                            if (i2 >= jSONArray4.length()) {
-                                                break;
-                                            }
-                                            JSONObject jSONObject5 = jSONArray4.getJSONObject(i2);
-                                            if (jSONObject5 != null && jSONObject5.has("code")) {
-                                                boolean z6 = z2;
-                                                if (jSONObject5.getString("code").equals(str3)) {
-                                                    z2 = true;
-                                                    break;
-                                                }
-                                            }
-                                            i2++;
-                                        }
-                                        jSONObject2 = jSONObject3;
-                                        z = z2;
-                                        if (!z2) {
-                                            boolean z7 = z2;
-                                            JSONObject jSONObject6 = new JSONObject();
-                                            boolean z8 = z2;
-                                            jSONObject6.put("code", str3);
-                                            boolean z9 = z2;
-                                            jSONObject6.put("name", str);
-                                            boolean z10 = z2;
-                                            jSONArray4.put(jSONObject6);
-                                            boolean z11 = z2;
-                                            jSONObject2 = new JSONObject();
-                                            try {
-                                                jSONObject2.put("ip", str2);
-                                                jSONObject2.put("students", jSONArray4);
-                                                z = z2;
-                                            } catch (JSONException e3) {
-                                                e2 = e3;
-                                                jSONObject3 = jSONObject2;
-                                                e2.printStackTrace();
-                                                jSONObject2 = jSONObject3;
-                                                z = z2;
-                                                i++;
-                                                jSONObject3 = jSONObject2;
-                                                z2 = z;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (JSONException e4) {
-                            e2 = e4;
-                            z2 = z3;
-                        }
-                        i++;
-                        jSONObject3 = jSONObject2;
-                        z2 = z;
-                    }
-                }
-            }
-            if (jSONObject3 != null || z2) {
-                jSONObject = jSONObject3;
-            } else {
-                JSONArray jSONArray5 = new JSONArray();
-                JSONObject jSONObject7 = new JSONObject();
-                try {
-                    jSONObject7.put("code", str3);
-                    jSONObject7.put("name", str);
-                    jSONArray5.put(jSONObject7);
-                    jSONObject = new JSONObject();
-                } catch (JSONException e5) {
-                    e = e5;
-                    jSONObject = jSONObject3;
-                }
-                try {
-                    jSONObject.put("ip", str2);
-                    jSONObject.put("students", jSONArray5);
-                } catch (JSONException e6) {
-                    e = e6;
-                    e.printStackTrace();
-                    if (jSONObject != null) {
-                    }
-                    jSONArray2 = jSONArray3;
-                    if (jSONArray3 != null) {
-                    }
-                    return jSONArray2;
-                }
-            }
-            if (jSONObject != null) {
-                jSONArray3.put(jSONObject);
-            }
-            jSONArray2 = jSONArray3;
-            if (jSONArray3 != null) {
-                jSONArray2 = jSONArray3;
-                if (jSONArray3.length() > 0) {
-                    getSharedPreferences("loginhistory", 4).edit().putString("namehistorystring", jSONArray3.toString()).commit();
-                    jSONArray2 = jSONArray3;
-                }
-            }
-        }
-        return jSONArray2;
-    }
-
-    private JSONArray nameHistoryDelete(String str, String str2, JSONArray jSONArray) {
-        JSONArray jSONArray2;
-        JSONException e;
-        JSONArray jSONArray3 = new JSONArray();
-        if (jSONArray == null || str2 == null || str == null || jSONArray.length() <= 0) {
-            jSONArray2 = jSONArray;
-        } else {
-            if (jSONArray != null && jSONArray.length() >= 0) {
-                for (int i = 0; i < jSONArray.length(); i++) {
-                    try {
-                        JSONObject jSONObject = jSONArray.getJSONObject(i);
-                        if (!jSONObject.has("ip")) {
-                            jSONArray3.put(jSONObject);
-                        } else {
-                            JSONArray jSONArray4 = null;
-                            if (jSONObject.has("ip")) {
-                                jSONArray4 = null;
-                                if (str.equals(jSONObject.getString("ip"))) {
-                                    jSONArray4 = null;
-                                    if (jSONObject.has("students")) {
-                                        jSONArray4 = jSONObject.getJSONArray("students");
-                                    }
-                                }
-                            }
-                            if (jSONArray4 != null && jSONArray4.length() > 0) {
-                                JSONArray jSONArray5 = new JSONArray();
-                                for (int i2 = 0; i2 < jSONArray4.length(); i2++) {
-                                    JSONObject jSONObject2 = jSONArray4.getJSONObject(i2);
-                                    if (jSONObject2 != null && jSONObject2.has("code") && !str2.equals(jSONObject2.getString("code"))) {
-                                        jSONArray5.put(jSONObject2);
-                                    }
-                                }
-                                JSONObject jSONObject3 = new JSONObject();
-                                try {
-                                    jSONObject3.put("ip", str);
-                                    jSONObject3.put("students", jSONArray5);
-                                    jSONArray3.put(jSONObject3);
-                                } catch (JSONException e2) {
-                                    e = e2;
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    } catch (JSONException e3) {
-                        e = e3;
-                    }
-                }
-            }
-            jSONArray2 = jSONArray3;
-            if (jSONArray3 != null) {
-                getSharedPreferences("loginhistory", 4).edit().putString("namehistorystring", jSONArray3.toString()).commit();
-                jSONArray2 = jSONArray3;
-            }
-        }
-        return jSONArray2;
-    }
-
-    private JSONArray nameHistoryDeleteByIP(String str, JSONArray jSONArray) {
-        JSONArray jSONArray2;
-        JSONArray jSONArray3 = new JSONArray();
-        if (jSONArray == null || str == null || jSONArray.length() <= 0) {
-            jSONArray2 = jSONArray;
-        } else {
-            if (jSONArray != null && jSONArray.length() >= 0) {
-                for (int i = 0; i < jSONArray.length(); i++) {
-                    try {
-                        JSONObject jSONObject = jSONArray.getJSONObject(i);
-                        if (!jSONObject.has("ip")) {
-                            jSONArray3.put(jSONObject);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            jSONArray2 = jSONArray3;
-            if (jSONArray3 != null) {
-                getSharedPreferences("loginhistory", 4).edit().putString("namehistorystring", jSONArray3.toString()).commit();
-                jSONArray2 = jSONArray3;
-            }
-        }
-        return jSONArray2;
-    }
-
-    private JSONArray nameHistoryParser() {
-        JSONArray jSONArray;
-        SharedPreferences sharedPreferences = getSharedPreferences("loginhistory", 4);
-        if (!sharedPreferences.contains("namehistorystring")) {
-            jSONArray = null;
-        } else {
-            String string = sharedPreferences.getString("namehistorystring", "");
-            if (string == null || string.equals("")) {
-                jSONArray = null;
-            } else {
-                try {
-                    jSONArray = new JSONArray(string);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    jSONArray = null;
-                }
-            }
-        }
-        return jSONArray;
-    }
-
-    private ArrayList<HashMap<String, String>> nameHistoryQuery(String str, JSONArray jSONArray) {
-        ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
-        if (jSONArray != null && str != null && jSONArray.length() > 0) {
-            for (int i = 0; i < jSONArray.length(); i++) {
-                try {
-                    JSONObject jSONObject = jSONArray.getJSONObject(i);
-                    JSONArray jSONArray2 = null;
-                    if (jSONObject.has("ip")) {
-                        jSONArray2 = null;
-                        if (str.equals(jSONObject.getString("ip"))) {
-                            jSONArray2 = null;
-                            if (jSONObject.has("students")) {
-                                jSONArray2 = jSONObject.getJSONArray("students");
-                            }
-                        }
-                    }
-                    if (jSONArray2 != null && jSONArray2.length() > 0) {
-                        for (int i2 = 0; i2 < jSONArray2.length(); i2++) {
-                            JSONObject jSONObject2 = jSONArray2.getJSONObject(i2);
-                            if (jSONObject2 != null && jSONObject2.has("code") && jSONObject2.has("name")) {
-                                HashMap<String, String> hashMap = new HashMap<>();
-                                String string = jSONObject2.getString("code");
-                                String string2 = jSONObject2.getString("name");
-                                hashMap.put("code", string);
-                                hashMap.put("name", string2);
-                                arrayList.add(hashMap);
-                            }
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return arrayList;
-    }
-
-    private boolean needPwdDialog() {
-        return (!AppEnvironment.isXF || TextUtils.isEmpty(this.JXHD_Ip)) ? (!AppEnvironment.isNLEZ || TextUtils.isEmpty(this.JXHD_Ip)) ? (!AppEnvironment.isNL || TextUtils.isEmpty(this.JXHD_Ip)) ? (!AppEnvironment.isHT || TextUtils.isEmpty(this.JXHD_Ip)) ? (!AppEnvironment.isGQ || TextUtils.isEmpty(this.JXHD_Ip)) ? false : !this.JXHD_Ip.contains("117.132.10.37:81") : !this.JXHD_Ip.contains("222.134.89.202:89") && !this.JXHD_Ip.contains("yj.htsz.net:89") && !this.JXHD_Ip.contains("192.168.0.5") : !this.JXHD_Ip.contains("192.168.3.253:81") && !this.JXHD_Ip.contains("111.59.6.120:81") : !this.JXHD_Ip.contains("10.164.150.53") && !this.JXHD_Ip.contains("10.164.150.54") && !this.JXHD_Ip.contains("10.164.150.52") && !this.JXHD_Ip.contains("111.12.58.6:8000") : !this.JXHD_Ip.contains("10.70.12.27") && !this.JXHD_Ip.contains("202.107.231.160:8081");
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public List<String> parseDownload_Old(JSONArray jSONArray, ArrayList<HashMap<String, String>> arrayList, List<String> list) {
-        long j;
-        boolean z;
-        for (int i = 0; i < jSONArray.length() && isupdating; i++) {
-            try {
-                JSONObject jSONObject = jSONArray.getJSONObject(i);
-                String string = jSONObject.getString("appwebpath");
-                long j2 = jSONObject.getLong("appsize");
-                String string2 = jSONObject.getString("apkname");
-                jSONObject.getString("versionname");
-                String string3 = jSONObject.getString("packagename");
-                try {
-                    j = Long.parseLong(jSONObject.getString("versioncode"));
-                } catch (NumberFormatException e) {
-                    j = 1;
-                } catch (Exception e2) {
-                    j = 1;
-                }
-                Iterator<HashMap<String, String>> it = arrayList.iterator();
-                while (true) {
-                    z = false;
-                    if (!it.hasNext()) {
-                        break;
-                    }
-                    HashMap<String, String> next = it.next();
-                    if (next.get("packagename") != null && string3.equals(next.get("packagename"))) {
-                        long j3 = 1;
-                        try {
-                            j3 = Long.parseLong(next.get("versioncode"));
-                        } catch (NumberFormatException e3) {
-                        } catch (Exception e4) {
-                        }
-                        z = next.get("versioncode") == null || next.get("versionname") == null || j <= j3;
-                    }
-                }
-                if (!z) {
-                    HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(string).openConnection();
-                    httpURLConnection.connect();
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    if (new File(AppEnvironment.ASSETS_DIR).isDirectory()) {
-                        File file = new File(String.valueOf(AppEnvironment.ASSETS_DIR) + string2);
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                        FileOutputStream fileOutputStream = new FileOutputStream(file);
-                        byte[] bArr = new byte[10240];
-                        int i2 = 0;
-                        while (i2 < j2 && isupdating) {
-                            int read = inputStream.read(bArr);
-                            if (read == -1) {
-                                break;
-                            }
-                            i2 += read;
-                            this.currentCachePosition += read;
-                            fileOutputStream.write(bArr, 0, read);
-                        }
-                        fileOutputStream.close();
-                        inputStream.close();
-                        httpURLConnection.disconnect();
-                        if (i2 == j2) {
-                            if (!string3.equals("com.launcher.activity")) {
-                                list.add(String.valueOf(AppEnvironment.ASSETS_DIR) + string2);
-                                this.addApksList.add(string3);
-                            } else {
-                                this.launcherPath = String.valueOf(AppEnvironment.ASSETS_DIR) + string2;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e5) {
-            }
-        }
-        return list;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public List<String> parseDownload_new(List<String> list, List<ApkUpdateBean> list2) {
-        HttpURLConnection httpURLConnection;
-        for (int i = 0; i < list2.size(); i++) {
-            ApkUpdateBean apkUpdateBean = list2.get(i);
-            String packagename = apkUpdateBean.getPackagename();
-            String apkUrl = apkUpdateBean.getApkUrl();
-            String appName = apkUpdateBean.getAppName();
-            long apkSize = apkUpdateBean.getApkSize();
-            if (new File(AppEnvironment.ASSETS_DIR).isDirectory()) {
-                File file = new File(String.valueOf(AppEnvironment.ASSETS_DIR) + appName);
-                if (file.exists()) {
-                    file.delete();
-                }
-                byte[] bArr = new byte[10240];
-                long j = 0;
-                try {
-                    httpURLConnection = (HttpURLConnection) new URL(apkUrl).openConnection();
-                    httpURLConnection.connect();
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    FileOutputStream fileOutputStream = new FileOutputStream(file);
-                    int i2 = 0;
-                    while (j < apkSize && isupdating) {
-                        int read = inputStream.read(bArr);
-                        if (read == -1) {
-                            break;
-                        }
-                        long j2 = j + read;
-                        this.currentCachePosition += read;
-                        fileOutputStream.write(bArr, 0, read);
-                        int i3 = i2 + 1;
-                        j = j2;
-                        i2 = i3;
-                        if (i3 % 10 == 0) {
-                            sendInstallMessage(i, Long.valueOf(j2), UPDATE_PROGRESS);
-                            j = j2;
-                            i2 = i3;
-                        }
-                    }
-                    long j3 = j;
-                    sendInstallMessage(i, Long.valueOf(j), UPDATE_PROGRESS);
-                    long j4 = j;
-                    fileOutputStream.close();
-                    long j5 = j;
-                    inputStream.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    j = 0;
-                    httpURLConnection = null;
-                } catch (IOException e2) {
-                    e2.printStackTrace();
-                    j = 0;
-                    httpURLConnection = null;
-                } catch (Exception e3) {
-                    j = 0;
-                    httpURLConnection = null;
-                }
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-                if (j != apkSize) {
-                    sendInstallMessage(i, -2, UPDATE_INSTALLSTATE);
-                } else if (!packagename.equals("com.launcher.activity")) {
-                    list.add(String.valueOf(AppEnvironment.ASSETS_DIR) + appName);
-                    sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + appName, UPDATE_INSTALLSINGLE);
-                    sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
-                    this.addApksList.add(packagename);
-                } else {
-                    try {
-                        ApkUpdateBean apkUpdateBean2 = this.apkUpdateList.get(i);
-                        apkUpdateBean2.setApkLocalPath(String.valueOf(AppEnvironment.ASSETS_DIR) + appName);
-                        this.apkUpdateList.set(i, apkUpdateBean2);
-                    } catch (Exception e4) {
-                    }
-                    if (list2.size() == 1) {
-                        sendInstallMessage(-1, String.valueOf(AppEnvironment.ASSETS_DIR) + appName, UPDATE_INSTALLSINGLE);
-                        sendInstallMessage(i, 0, UPDATE_INSTALLSTATE);
-                    }
-                    this.launcherPath = String.valueOf(AppEnvironment.ASSETS_DIR) + appName;
-                }
-            }
-        }
-        return list;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void resetUpdateInfo() {
-        if (this.apkUpdateList != null) {
-            this.apkUpdateList.clear();
-        }
-        isupdating = false;
-        this.updateTime = HttpStatus.SC_MULTIPLE_CHOICES;
-        if (this.updateThread != null) {
-            this.updateThread = null;
-        }
-        if (this.updateprogressThread != null) {
-            this.updateprogressThread = null;
-        }
-    }
-
-    private static boolean returnResult(int i) {
-        boolean z = true;
-        if (i != 0) {
-            z = i == 1 ? false : false;
-        }
-        return z;
-    }
-
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r0v12, types: [java.io.FileOutputStream] */
-    private void savePic(InputStream inputStream, String str) {
-        Throwable th;
-        FileOutputStream fileOutputStream;
-        FileOutputStream fileOutputStream2;
-        File file = FileInOutHelper.setupOrOpenFile(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/MobileStudyClient/.System/icon", str.substring(str.lastIndexOf("/") + 1));
-        byte[] bArr = null;
-        try {
-            try {
-                fileOutputStream2 = new FileOutputStream(file);
-            } catch (Throwable th2) {
-                th = th2;
-                fileOutputStream = bArr;
-            }
-        } catch (Exception e) {
-            e = e;
-            fileOutputStream2 = null;
-        }
-        try {
-            bArr = new byte[1024];
-            while (true) {
-                int read = inputStream.read(bArr);
-                if (read == -1) {
-                    try {
-                        inputStream.close();
-                        fileOutputStream2.close();
-                        return;
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                        Log.i("liu", "close stream:" + e2);
-                        return;
-                    }
-                }
-                fileOutputStream2.write(bArr, 0, read);
-            }
-        } catch (Exception e3) {
-            e = e3;
-            e.printStackTrace();
-            FileOutputStream fileOutputStream3 = fileOutputStream2;
-            FileOutputStream fileOutputStream4 = fileOutputStream2;
-            FileOutputStream fileOutputStream5 = fileOutputStream2;
-            Log.i("liu", "savePic:" + e);
-            try {
-                inputStream.close();
-                fileOutputStream2.close();
-            } catch (Exception e4) {
-                e4.printStackTrace();
-                Log.i("liu", "close stream:" + e4);
-            }
-        } catch (Throwable th3) {
-            fileOutputStream = fileOutputStream2;
-            th = th3;
-            try {
-                inputStream.close();
-                fileOutputStream.close();
-            } catch (Exception e5) {
-                e5.printStackTrace();
-                Log.i("liu", "close stream:" + e5);
-            }
-            throw th;
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void sendInstallMessage(int i, Object obj, int i2) {
-        Message message = new Message();
-        message.arg1 = i;
-        message.what = i2;
-        message.obj = obj;
-        this.installHandler.sendMessage(message);
-    }
-
-    private void showClearDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.notifymessage));
-        builder.setMessage(getResources().getString(R.string.clearmsg));
-        builder.setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.16
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (dialogInterface != null) {
-                    dialogInterface.dismiss();
-                }
-            }
-        }).setNegativeButton(R.string.ok_button, new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.17
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (!CloudClientSetActivity.this.reseting) {
-                    new ResetThread().start();
-                }
-                if (dialogInterface != null) {
-                    dialogInterface.dismiss();
-                }
-            }
-        });
-        builder.setCancelable(true);
-        builder.create().show();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showConfirmPwdDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.confirm_pwd);
-        View inflate = LayoutInflater.from(this).inflate(R.layout.confirmpwd, (ViewGroup) null);
-        final EditText editText = (EditText) inflate.findViewById(R.id.edt_pwd);
-        builder.setView(inflate);
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.24
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
-                if (CloudClientSetActivity.this.pwdConfirmDialog != null) {
-                    CloudClientSetActivity.this.pwdConfirmDialog.dismiss();
-                }
-            }
-        }).setPositiveButton(R.string.appmanager_ok, new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.25
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (editText != null) {
-                    String editable = editText.getText().toString() != null ? editText.getText().toString() : "";
-                    if (AppEnvironment.isXF || AppEnvironment.isNL || AppEnvironment.isNLEZ || AppEnvironment.isHT || AppEnvironment.isGQ) {
-                        if (editable.equals(CloudClientSetActivity.this.superPwd1.trim())) {
-                            new Thread(CloudClientSetActivity.this.runnable_GetConfig_Infor).start();
-                        } else {
-                            CloudClientSetActivity.this.btnTitleBack.setEnabled(true);
-                            CloudClientSetActivity.this.ok_btn.setEnabled(true);
-                            CloudClientSetActivity.this.ok_btn.setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
-                            Toast.makeText(CloudClientSetActivity.this, "密码验证不通过！", 0).show();
-                        }
-                    } else if (editable.equals(CloudClientSetActivity.this.superPwd1.trim()) || editable.equals(CloudClientSetActivity.this.superPwd2.trim())) {
-                        CloudClientSetActivity.this.allChangeSettings = true;
-                    } else {
-                        CloudClientSetActivity.this.allChangeSettings = false;
-                    }
-                }
-                if (CloudClientSetActivity.this.pwdConfirmDialog != null) {
-                    CloudClientSetActivity.this.pwdConfirmDialog.dismiss();
-                }
-            }
-        });
-        this.pwdConfirmDialog = null;
-        try {
-            this.pwdConfirmDialog = builder.create();
-            this.pwdConfirmDialog.show();
-        } catch (Exception e) {
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showLanguageChooseDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setTitle(getResources().getString(R.string.language_t));
-        builder.setItems(new String[]{getResources().getString(R.string.setchinese), getResources().getString(R.string.setenglish)}, new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.15
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                SharedPreferences sharedPreferences = CloudClientSetActivity.this.getSharedPreferences("language", 0);
-                if (i == 0) {
-                    LanguageUtils.SetLanguage(CloudClientSetActivity.this, "chinese");
-                    sharedPreferences.edit().putString("language", "chinese").commit();
-                    Message obtainMessage = CloudClientSetActivity.this.mHandler.obtainMessage();
-                    obtainMessage.what = HttpStatus.SC_PROCESSING;
-                    CloudClientSetActivity.this.mHandler.sendMessage(obtainMessage);
-                    return;
-                }
-                LanguageUtils.SetLanguage(CloudClientSetActivity.this, "en");
-                sharedPreferences.edit().putString("language", "en").commit();
-                Message obtainMessage2 = CloudClientSetActivity.this.mHandler.obtainMessage();
-                obtainMessage2.what = TarConstants.LF_PAX_GLOBAL_EXTENDED_HEADER;
-                CloudClientSetActivity.this.mHandler.sendMessage(obtainMessage2);
-            }
-        });
-        builder.create().show();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showPopList() {
-        String[] split;
-        String string = getSharedPreferences("loginhistory", 4).getString("iphistoryString", "");
-        if (string == null || string.equals("") || this.ip_edit == null || (split = string.split(",:,")) == null || split.length <= 0) {
-            return;
-        }
-        Log.e("ip", string);
-        this.ips = new ArrayList();
-        for (String str : split) {
-            if (str != null && !str.equals("")) {
-                this.ips.add(str);
-            }
-        }
-        if (this.ips == null || this.ips.size() <= 0) {
-            return;
-        }
-        if (this.listpop == null) {
-            this.listpop = new ListPopupWindow(this);
-            this.ipAdpter = new IPListAdapter(this.ips, this, this);
-            this.listpop.setAdapter(this.ipAdpter);
-            this.listpop.setWidth(-2);
-            this.listpop.setHeight(-2);
-            this.listpop.setInputMethodMode(2);
-            this.listpop.setModal(true);
-        } else if (this.ipAdpter != null) {
-            this.ipAdpter.setIps(this.ips);
-            this.ipAdpter.notifyDataSetChanged();
-        }
-        this.listpop.setAnchorView(this.ip_edit);
-        this.listpop.show();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showPopNameList() {
-        this.history_nameList = new ArrayList();
-        String editable = this.ip_edit != null ? this.ip_edit.getText().toString() : "";
-        if (editable.equals("") || this.history_array == null || this.history_array.length() <= 0) {
-            return;
-        }
-        this.history_nameList = nameHistoryQuery(editable, this.history_array);
-        if (this.history_nameList == null || this.history_nameList.size() <= 0) {
-            return;
-        }
-        if (this.nameListpop == null) {
-            this.nameListpop = new ListPopupWindow(this);
-            this.nameListAdapter = new NameListAdapter(this.history_nameList, this, this);
-            this.nameListpop.setAdapter(this.nameListAdapter);
-            this.nameListpop.setWidth(-2);
-            this.nameListpop.setHeight(-2);
-            this.nameListpop.setInputMethodMode(2);
-            this.nameListpop.setModal(true);
-        } else if (this.nameListAdapter != null) {
-            this.nameListAdapter.setIps(this.history_nameList);
-            this.nameListAdapter.notifyDataSetChanged();
-        }
-        this.nameListpop.setAnchorView(this.username_edit);
-        this.nameListpop.show();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showProgressDialog() {
-        if (AppEnvironment.isNewUpdate) {
-            if (this.progressDialog != null || this.isover) {
-                return;
-            }
-            this.apkUpdateList = new ArrayList();
-            this.progressDialog = new com.edutech.mobilestudyclient.view.CustomProgressDialog(this, this.apkUpdateList);
-            this.progressDialog.setOnKeyListener(this.keylistenerDialog);
-            this.progressDialog.show();
-        } else if (this.webprogressdialog != null || this.isover) {
-        } else {
-            this.webprogressdialog = CustomProgressDialog.createDialog(this);
-            this.webprogressdialog.setMessage(getResources().getString(R.string.setting_loading));
-            this.webprogressdialog.setOnKeyListener(this.keylistenerDialog);
-            this.webprogressdialog.show();
-        }
-    }
-
-    private void showServiceDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.notifymessage));
-        builder.setMessage(getResources().getString(R.string.feedbackmsg));
-        builder.setPositiveButton(getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.18
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (dialogInterface != null) {
-                    dialogInterface.dismiss();
-                }
-            }
-        });
-        builder.setCancelable(true);
-        builder.create().show();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public HttpClient sslClient(HttpClient httpClient) {
-        DefaultHttpClient defaultHttpClient;
-        try {
-            X509TrustManager x509TrustManager = new X509TrustManager() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.23
-                @Override // javax.net.ssl.X509TrustManager
-                public void checkClientTrusted(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
-                }
-
-                @Override // javax.net.ssl.X509TrustManager
-                public void checkServerTrusted(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
-                }
-
-                @Override // javax.net.ssl.X509TrustManager
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-            SSLContext sSLContext = SSLContext.getInstance(IMAPSClient.DEFAULT_PROTOCOL);
-            sSLContext.init(null, new TrustManager[]{x509TrustManager}, null);
-            MySSLSocketFactory mySSLSocketFactory = new MySSLSocketFactory(sSLContext);
-            mySSLSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            ClientConnectionManager connectionManager = httpClient.getConnectionManager();
-            connectionManager.getSchemeRegistry().register(new Scheme("https", mySSLSocketFactory, 443));
-            defaultHttpClient = new DefaultHttpClient(connectionManager, httpClient.getParams());
-        } catch (Exception e) {
-            defaultHttpClient = null;
-        }
-        return defaultHttpClient;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:36:0x0263 -> B:26:0x020b). Please submit an issue!!! */
-    public void sslConnect() {
-        MalformedURLException e;
-        try {
-            URL url = new URL("https://www.icontrol365.com/regmac.aspx");
-            try {
-                X509TrustManager x509TrustManager = new X509TrustManager() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.22
-                    @Override // javax.net.ssl.X509TrustManager
-                    public void checkClientTrusted(X509Certificate[] x509CertificateArr, String str) {
-                    }
-
-                    @Override // javax.net.ssl.X509TrustManager
-                    public void checkServerTrusted(X509Certificate[] x509CertificateArr, String str) {
-                    }
-
-                    @Override // javax.net.ssl.X509TrustManager
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-                };
-                HttpsURLConnection.setDefaultHostnameVerifier(new MyHostnameVerifier(this, null));
-                SSLContext.getInstance(IMAPSClient.DEFAULT_PROTOCOL).init(null, new TrustManager[]{x509TrustManager}, null);
-                SSLSocketFactoryExtended sSLSocketFactoryExtended = new SSLSocketFactoryExtended();
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                httpsURLConnection.setSSLSocketFactory(sSLSocketFactoryExtended);
-                httpsURLConnection.setDoInput(true);
-                httpsURLConnection.setDoOutput(true);
-                httpsURLConnection.setRequestMethod(HttpPost.METHOD_NAME);
-                httpsURLConnection.addRequestProperty("Content-Type", "application/xml;charset=UTF-8");
-                httpsURLConnection.connect();
-                StringBuilder sb = new StringBuilder();
-                sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                sb.append("<ApplyAuth><strAuthID>" + this.id.getText().toString() + "</strAuthID>");
-                sb.append("<strMacAddr>" + GetMachineID() + "</strMacAddr>");
-                sb.append("<strSystemInfo>" + Build.MODEL + "</strSystemInfo></ApplyAuth>");
-                DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
-                dataOutputStream.writeBytes(sb.toString());
-                dataOutputStream.flush();
-                dataOutputStream.close();
-                if (200 != httpsURLConnection.getResponseCode()) {
-                    return;
-                }
-                new StringBuffer();
-                new String();
-                Element documentElement = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(httpsURLConnection.getInputStream()).getDocumentElement();
-                int parseInt = Integer.parseInt(documentElement.getElementsByTagName("AuthResult").item(0).getFirstChild().getNodeValue());
-                if (parseInt == 4 || parseInt == 5) {
-                    NodeList elementsByTagName = documentElement.getElementsByTagName("AuthTimes");
-                    String nodeValue = (elementsByTagName.getLength() <= 0 || elementsByTagName.item(0).getFirstChild().getNodeValue().length() <= 0) ? "0" : elementsByTagName.item(0).getFirstChild().getNodeValue();
-                    NodeList elementsByTagName2 = documentElement.getElementsByTagName("AuthValidDate");
-                    String nodeValue2 = (elementsByTagName2.getLength() <= 0 || elementsByTagName2.item(0).getFirstChild().getNodeValue().length() <= 0) ? "0" : elementsByTagName2.item(0).getFirstChild().getNodeValue();
-                    int i = Build.VERSION.SDK_INT;
-                    this.idauth.writeidFile(this.id.getText().toString(), parseInt, nodeValue, nodeValue2, "0");
-                    try {
-                        new Aduth(this).writeidFile(this.id.getText().toString(), parseInt, nodeValue, nodeValue2, "0");
-                    } catch (Exception e2) {
-                    }
-                }
-                Log.e("HHH", "result:" + parseInt);
-                Message message = new Message();
-                message.what = parseInt;
-                this.resultHandler.sendMessageDelayed(message, 1000L);
-            } catch (MalformedURLException e3) {
-                e = e3;
-                e.printStackTrace();
-            } catch (Exception e4) {
-            }
-        } catch (MalformedURLException e5) {
-            e = e5;
-        } catch (Exception e6) {
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void startAssistanApk() {
-        PackageInfo packageInfo;
-        Intent intent = new Intent("android.intent.action.MAIN");
-        intent.addFlags(268435456);
-        intent.setComponent(new ComponentName("com.edutech.assistantdemo", "com.edutech.assistantdemo.MainActivity"));
-        try {
-            packageInfo = this.mContext.getPackageManager().getPackageInfo("com.edutech.assistantdemo", 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            packageInfo = null;
-            e.printStackTrace();
-        }
-        if (packageInfo != null) {
-            startActivity(intent);
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void startFireWall(String str, String str2, String str3, String str4) {
-        Intent intent = new Intent();
-        intent.setAction("com.edutech.intent.TrafficStatsService");
-        intent.setClassName("com.edutech.firewall", "eu.faircode.netguard.TrafficStatsService");
-        intent.putExtra("ip", str);
-        intent.putExtra("privatekey", str2);
-        intent.putExtra("name", str3);
-        intent.putExtra("schoolid", str4);
-        startService(intent);
-    }
-
-    public static String toHexString(byte[] bArr, String str) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bArr) {
-            sb.append(Integer.toHexString(b & 255)).append(str);
-        }
-        return sb.toString();
-    }
-
-    public static byte[] toMd5(byte[] bArr) {
-        byte[] bArr2;
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.reset();
-            messageDigest.update(bArr);
-            bArr2 = messageDigest.digest();
-        } catch (NoSuchAlgorithmException e) {
-            bArr2 = null;
-        }
-        return bArr2;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public void updatePassword() {
-        View inflate = getLayoutInflater().inflate(R.layout.update_pwd_dialog_setting, (ViewGroup) findViewById(R.id.update_pwd_dialog));
-        this.oldpwd = (EditText) inflate.findViewById(R.id.update_pwd_dialog_oldpwd);
-        this.newpwd = (EditText) inflate.findViewById(R.id.update_pwd_dialog_newpwd);
-        this.confirmpwd = (EditText) inflate.findViewById(R.id.update_pwd_dialog_confirmpwd);
-        new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.setting_cp)).setInverseBackgroundForced(true).setView(inflate).setPositiveButton(getResources().getString(R.string.setting_submit), new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.26
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (CloudClientSetActivity.this.oldpwd.getText().toString().length() < 6) {
-                    CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpw3));
-                } else if (CloudClientSetActivity.this.newpwd.getText().toString().length() < 6) {
-                    CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpw2));
-                } else if (!CloudClientSetActivity.this.newpwd.getText().toString().equals(CloudClientSetActivity.this.confirmpwd.getText().toString())) {
-                    CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpw1));
-                } else {
-                    CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_submiting));
-                    new Thread(CloudClientSetActivity.this.updatepwdRun).start();
-                }
-            }
-        }).setNegativeButton(getResources().getString(R.string.setting_cancel), new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.27
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (dialogInterface != null) {
-                    dialogInterface.dismiss();
-                }
-            }
-        }).show();
-    }
-
-    /* JADX WARN: Can't wrap try/catch for region: R(39:2|(1:4)|5|(2:7|(1:9))|10|(4:(36:12|(1:14)|17|70|18|19|20|21|(2:23|(4:25|26|27|28))|29|30|31|32|33|34|35|36|37|(16:39|(2:41|42)|47|(10:49|(2:51|52)|58|72|59|60|61|74|62|63)|54|55|56|57|58|72|59|60|61|74|62|63)|44|45|46|47|(0)|54|55|56|57|58|72|59|60|61|74|62|63)|74|62|63)|16|17|70|18|19|20|21|(0)|29|30|31|32|33|34|35|36|37|(0)|44|45|46|47|(0)|54|55|56|57|58|72|59|60|61|(1:(0))) */
-    /* JADX WARN: Code restructure failed: missing block: B:15:0x00a4, code lost:
-        if (r6.length() <= 0) goto L16;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:43:0x0169, code lost:
-        if (r14.length() <= 0) goto L44;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:53:0x019b, code lost:
-        if (r13.length() <= 0) goto L54;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:64:0x02a8, code lost:
-        r7 = move-exception;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:65:0x02a9, code lost:
-        r7.printStackTrace();
-        r14 = r8;
-        r10 = r6;
-     */
-    /* JADX WARN: Code restructure failed: missing block: B:67:0x02b7, code lost:
-        android.util.Log.e("FileNotFoundException", "can't create FileOutputStream");
-     */
-    /* JADX WARN: Removed duplicated region for block: B:23:0x00ef  */
-    /* JADX WARN: Removed duplicated region for block: B:39:0x0153  */
-    /* JADX WARN: Removed duplicated region for block: B:49:0x017e  */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:67:0x02b7 -> B:60:0x01c4). Please submit an issue!!! */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    private void writeXml() {
-        String str;
-        String str2;
-        String str3;
-        String string;
-        String str4;
-        String str5;
-        String str6;
-        Log.i(TAG, "writeXml");
-        if (this.tempfile.exists()) {
-            this.tempfile.delete();
-        }
-        String editable = this.ip_edit.getText().toString();
-        AppEnvironment.MOBILESTUDYSERVERIP = editable;
-        String replaceAll = editable.replaceAll(" ", "");
-        String str7 = replaceAll;
-        if (replaceAll.length() > 7) {
-            String substring = replaceAll.substring(0, 7);
-            Log.i(TAG, "subhttp" + substring);
-            str7 = replaceAll;
-            if (substring.equals("http://")) {
-                str7 = replaceAll.substring(7);
-                this.ptfw_edit.setText(str7);
-                this.ip_edit.setText(str7);
-                showToast(getResources().getString(R.string.setting_serverurlerror));
-            }
-        }
-        try {
-            if (str7 != null) {
-                str = str7;
-                if (str7 != null) {
-                    str = str7;
-                }
-                String str8 = "";
-                String str9 = "";
-                string = getSharedPreferences("privatekey", 0).getString("name", "");
-                String editable2 = this.password_edit.getText().toString();
-                str4 = editable2;
-                str5 = string;
-                if (string != null) {
-                    str4 = editable2;
-                    str5 = string;
-                    if (editable2 != null) {
-                        str5 = string.replaceAll(" ", "");
-                        str4 = editable2.replaceAll(" ", "");
-                    }
-                }
-                this.Name = str5;
-                this.Pwd = str4;
-                String StringEncodeToBase64 = BZip2Utils.StringEncodeToBase64(str5);
-                String StringEncodeToBase642 = BZip2Utils.StringEncodeToBase64(str4);
-                if (str5 != null) {
-                    str6 = StringEncodeToBase64;
-                    if (str5 != null) {
-                        str6 = StringEncodeToBase64;
-                    }
-                    if (str4 != null) {
-                        str2 = StringEncodeToBase642;
-                        str3 = str6;
-                        if (str4 != null) {
-                            str2 = StringEncodeToBase642;
-                            str3 = str6;
-                        }
-                        this.fileos = new FileOutputStream(FileInOutHelper.setupOrOpenFile(this.urlfilepath));
-                        XmlSerializer newSerializer = Xml.newSerializer();
-                        newSerializer.setOutput(this.fileos, "UTF-8");
-                        newSerializer.startDocument(null, true);
-                        newSerializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-                        newSerializer.startTag(null, "urlpath");
-                        newSerializer.startTag(null, "ip");
-                        newSerializer.text(str);
-                        newSerializer.endTag(null, "ip");
-                        newSerializer.startTag(null, "showDemo");
-                        newSerializer.text(this.setDemoShow);
-                        newSerializer.endTag(null, "showDemo");
-                        newSerializer.endTag(null, "urlpath");
-                        newSerializer.startTag(null, "student");
-                        newSerializer.startTag(null, "username");
-                        newSerializer.text(str3);
-                        newSerializer.endTag(null, "username");
-                        newSerializer.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                        newSerializer.text(str2);
-                        newSerializer.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                        newSerializer.endTag(null, "student");
-                        newSerializer.endDocument();
-                        newSerializer.flush();
-                        this.fileos.close();
-                        return;
-                    }
-                    str8 = StringEncodeToBase642;
-                    str9 = str6;
-                    str2 = BZip2Utils.StringEncodeToBase64(LogHelp.TYPE_GUIDANCE);
-                    str3 = str6;
-                    this.fileos = new FileOutputStream(FileInOutHelper.setupOrOpenFile(this.urlfilepath));
-                    XmlSerializer newSerializer2 = Xml.newSerializer();
-                    newSerializer2.setOutput(this.fileos, "UTF-8");
-                    newSerializer2.startDocument(null, true);
-                    newSerializer2.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-                    newSerializer2.startTag(null, "urlpath");
-                    newSerializer2.startTag(null, "ip");
-                    newSerializer2.text(str);
-                    newSerializer2.endTag(null, "ip");
-                    newSerializer2.startTag(null, "showDemo");
-                    newSerializer2.text(this.setDemoShow);
-                    newSerializer2.endTag(null, "showDemo");
-                    newSerializer2.endTag(null, "urlpath");
-                    newSerializer2.startTag(null, "student");
-                    newSerializer2.startTag(null, "username");
-                    newSerializer2.text(str3);
-                    newSerializer2.endTag(null, "username");
-                    newSerializer2.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                    newSerializer2.text(str2);
-                    newSerializer2.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                    newSerializer2.endTag(null, "student");
-                    newSerializer2.endDocument();
-                    newSerializer2.flush();
-                    this.fileos.close();
-                    return;
-                }
-                str6 = BZip2Utils.StringEncodeToBase64("02");
-                if (str4 != null) {
-                }
-                str8 = StringEncodeToBase642;
-                str9 = str6;
-                str2 = BZip2Utils.StringEncodeToBase64(LogHelp.TYPE_GUIDANCE);
-                str3 = str6;
-                this.fileos = new FileOutputStream(FileInOutHelper.setupOrOpenFile(this.urlfilepath));
-                XmlSerializer newSerializer22 = Xml.newSerializer();
-                newSerializer22.setOutput(this.fileos, "UTF-8");
-                newSerializer22.startDocument(null, true);
-                newSerializer22.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-                newSerializer22.startTag(null, "urlpath");
-                newSerializer22.startTag(null, "ip");
-                newSerializer22.text(str);
-                newSerializer22.endTag(null, "ip");
-                newSerializer22.startTag(null, "showDemo");
-                newSerializer22.text(this.setDemoShow);
-                newSerializer22.endTag(null, "showDemo");
-                newSerializer22.endTag(null, "urlpath");
-                newSerializer22.startTag(null, "student");
-                newSerializer22.startTag(null, "username");
-                newSerializer22.text(str3);
-                newSerializer22.endTag(null, "username");
-                newSerializer22.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                newSerializer22.text(str2);
-                newSerializer22.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                newSerializer22.endTag(null, "student");
-                newSerializer22.endDocument();
-                newSerializer22.flush();
-                this.fileos.close();
-                return;
-            }
-            newSerializer22.setOutput(this.fileos, "UTF-8");
-            newSerializer22.startDocument(null, true);
-            newSerializer22.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-            newSerializer22.startTag(null, "urlpath");
-            newSerializer22.startTag(null, "ip");
-            newSerializer22.text(str);
-            newSerializer22.endTag(null, "ip");
-            newSerializer22.startTag(null, "showDemo");
-            newSerializer22.text(this.setDemoShow);
-            newSerializer22.endTag(null, "showDemo");
-            newSerializer22.endTag(null, "urlpath");
-            newSerializer22.startTag(null, "student");
-            newSerializer22.startTag(null, "username");
-            newSerializer22.text(str3);
-            newSerializer22.endTag(null, "username");
-            newSerializer22.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-            newSerializer22.text(str2);
-            newSerializer22.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-            newSerializer22.endTag(null, "student");
-            newSerializer22.endDocument();
-            newSerializer22.flush();
-            this.fileos.close();
-            return;
-        } catch (Exception e) {
-            Log.e(TAG, "error occurred while creating xml file");
-            return;
-        }
-        str = "192.168.0.88";
-        String str82 = "";
-        String str92 = "";
-        string = getSharedPreferences("privatekey", 0).getString("name", "");
-        String editable22 = this.password_edit.getText().toString();
-        str4 = editable22;
-        str5 = string;
-        if (string != null) {
-        }
-        this.Name = str5;
-        this.Pwd = str4;
-        String StringEncodeToBase643 = BZip2Utils.StringEncodeToBase64(str5);
-        String StringEncodeToBase6422 = BZip2Utils.StringEncodeToBase64(str4);
-        if (str5 != null) {
-        }
-        str6 = BZip2Utils.StringEncodeToBase64("02");
-        if (str4 != null) {
-        }
-        str82 = StringEncodeToBase6422;
-        str92 = str6;
-        str2 = BZip2Utils.StringEncodeToBase64(LogHelp.TYPE_GUIDANCE);
-        str3 = str6;
-        this.fileos = new FileOutputStream(FileInOutHelper.setupOrOpenFile(this.urlfilepath));
-        XmlSerializer newSerializer222 = Xml.newSerializer();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:16:0x00a8 -> B:9:0x003c). Please submit an issue!!! */
-    public void writeXmlLanguage(String str) {
-        Log.i(TAG, "writeXml");
-        File file = new File(this.LANGUAGEPATH);
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            file.createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            this.fileos = new FileOutputStream(FileInOutHelper.setupOrOpenFile(this.LANGUAGEPATH));
-        } catch (FileNotFoundException e2) {
-            Log.e("FileNotFoundException", "can't create FileOutputStream");
-        }
-        XmlSerializer newSerializer = Xml.newSerializer();
-        try {
-            newSerializer.setOutput(this.fileos, "UTF-8");
-            newSerializer.startDocument(null, true);
-            newSerializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-            newSerializer.startTag(null, "urlpath");
-            newSerializer.startTag(null, "language");
-            newSerializer.text(str);
-            newSerializer.endTag(null, "language");
-            newSerializer.endDocument();
-            newSerializer.flush();
-            this.fileos.close();
-        } catch (Exception e3) {
-            Log.e(TAG, "error occurred while creating xml file");
-        }
-    }
-
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:132:0x10b2 -> B:82:0x0ba4). Please submit an issue!!! */
-    private void writeXml_config(String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, String str9, String str10, String str11, String str12, String str13, String str14, String str15, String str16, String str17, String str18, String str19, String str20, String str21, ArrayList<AppBean> arrayList, String str22) {
-        String str23;
-        String str24;
-        String str25;
-        String str26;
-        String str27;
-        String str28;
-        String str29;
-        String str30;
-        String str31;
-        String str32;
-        String str33;
-        String str34;
-        String str35;
-        String str36;
-        Log.i(TAG, "writeXml");
-        if (str == null || str.equals("")) {
-            return;
-        }
-        String editable = this.ip_edit.getText().toString();
-        AppEnvironment.MOBILESTUDYSERVERIP = editable;
-        String replaceAll = editable.replaceAll(" ", "");
-        String str37 = replaceAll;
-        if (replaceAll.length() > 7) {
-            str37 = replaceAll;
-            if (replaceAll.substring(0, 7).equals("http://")) {
-                str37 = replaceAll.substring(7);
-                this.ptfw_edit.setText(str37);
-                this.ip_edit.setText(str37);
-                showToast(getResources().getString(R.string.setting_serverurlerror));
-                getResources().getString(R.string.setting_signing);
-            }
-        }
-        if (str37 != null && str37 != null) {
-            str37.length();
-        }
-        String replaceAll2 = str3.replaceAll(" ", "");
-        String str38 = replaceAll2;
-        if (replaceAll2.length() > 7) {
-            str38 = replaceAll2;
-            if (replaceAll2.substring(0, 7).equals("http://")) {
-                str38 = replaceAll2.substring(7);
-                Log.i("Test2", getResources().getString(R.string.setting_serverurlerror));
-            }
-        }
-        String str39 = String.valueOf(str37) + ":" + str15;
-        String str40 = "";
-        String str41 = "";
-        String str42 = "";
-        String str43 = "";
-        String str44 = "";
-        String str45 = "";
-        String str46 = str;
-        String str47 = str38;
-        String str48 = str4;
-        String str49 = str5;
-        String str50 = str6;
-        String str51 = str7;
-        String str52 = str8;
-        String str53 = str9;
-        String str54 = str10;
-        String str55 = str11;
-        String str56 = str12;
-        String str57 = str13;
-        String str58 = str14;
-        String str59 = str15;
-        String str60 = str19;
-        String str61 = str20;
-        String str62 = str21;
-        try {
-            String str63 = this.Name;
-            String str64 = this.Pwd;
-            String StringEncodeToBase64 = BZip2Utils.StringEncodeToBase64(str63);
-            String StringEncodeToBase642 = BZip2Utils.StringEncodeToBase64(str64);
-            str25 = str2.toString().trim().equals("md5") ? My_md5.Md5(str64) : BZip2Utils.StringEncodeToBase64(str64);
-            String StringEncodeToBase643 = BZip2Utils.StringEncodeToBase64(str);
-            String StringEncodeToBase644 = BZip2Utils.StringEncodeToBase64(str38);
-            str29 = BZip2Utils.StringEncodeToBase64(str5);
-            str28 = BZip2Utils.StringEncodeToBase64(str4);
-            str30 = BZip2Utils.StringEncodeToBase64(str6);
-            str31 = BZip2Utils.StringEncodeToBase64(str7);
-            String StringEncodeToBase645 = BZip2Utils.StringEncodeToBase64(str8);
-            String StringEncodeToBase646 = BZip2Utils.StringEncodeToBase64(str9);
-            str32 = BZip2Utils.StringEncodeToBase64(str10);
-            String StringEncodeToBase647 = BZip2Utils.StringEncodeToBase64(str11);
-            str33 = BZip2Utils.StringEncodeToBase64(str12);
-            str34 = BZip2Utils.StringEncodeToBase64(str13);
-            str35 = BZip2Utils.StringEncodeToBase64(str14);
-            str36 = BZip2Utils.StringEncodeToBase64(str15);
-            str26 = BZip2Utils.StringEncodeToBase64(str16);
-            str23 = BZip2Utils.StringEncodeToBase64(str17);
-            str27 = BZip2Utils.StringEncodeToBase64(str18);
-            String StringEncodeToBase648 = BZip2Utils.StringEncodeToBase64(str19);
-            String StringEncodeToBase649 = BZip2Utils.StringEncodeToBase64(str20);
-            String StringEncodeToBase6410 = BZip2Utils.StringEncodeToBase64(str21);
-            str40 = str23;
-            str41 = str25;
-            str42 = StringEncodeToBase642;
-            str43 = str26;
-            str44 = str27;
-            str45 = StringEncodeToBase64;
-            str46 = StringEncodeToBase643;
-            str47 = StringEncodeToBase644;
-            str48 = str28;
-            str49 = str29;
-            str50 = str30;
-            str51 = str31;
-            str52 = StringEncodeToBase645;
-            str53 = StringEncodeToBase646;
-            str54 = str32;
-            str55 = StringEncodeToBase647;
-            str56 = str33;
-            str57 = str34;
-            str58 = str35;
-            str59 = str36;
-            str60 = StringEncodeToBase648;
-            str61 = StringEncodeToBase649;
-            str62 = StringEncodeToBase6410;
-            str62 = StringEncodeToBase6410;
-            str61 = StringEncodeToBase649;
-            str60 = StringEncodeToBase648;
-            str55 = StringEncodeToBase647;
-            str53 = StringEncodeToBase646;
-            str52 = StringEncodeToBase645;
-            str47 = StringEncodeToBase644;
-            str46 = StringEncodeToBase643;
-            str45 = StringEncodeToBase64;
-            str42 = StringEncodeToBase642;
-            str24 = BZip2Utils.StringEncodeToBase64(str22);
-        } catch (Exception e) {
-            e.printStackTrace();
-            str23 = str40;
-            str24 = "";
-            str25 = str41;
-            str26 = str43;
-            str27 = str44;
-            str28 = str48;
-            str29 = str49;
-            str30 = str50;
-            str31 = str51;
-            str32 = str54;
-            str33 = str56;
-            str34 = str57;
-            str35 = str58;
-            str36 = str59;
-        }
-        try {
-            this.fileos = new FileOutputStream(FileInOutHelper.setupOrOpenFile(this.urlfilepath));
-        } catch (FileNotFoundException e2) {
-            Log.e("FileNotFoundException", "can't create FileOutputStream");
-        }
-        XmlSerializer newSerializer = Xml.newSerializer();
-        try {
-            newSerializer.setOutput(this.fileos, "UTF-8");
-            newSerializer.startDocument(null, true);
-            newSerializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-            try {
-                newSerializer.startTag(null, "urlpath");
-                try {
-                    newSerializer.startTag(null, "ip");
-                    newSerializer.text(str37);
-                    newSerializer.endTag(null, "ip");
-                } catch (Exception e3) {
-                    e3.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "showDemo");
-                    newSerializer.text(this.setDemoShow);
-                    newSerializer.endTag(null, "showDemo");
-                } catch (Exception e4) {
-                    e4.printStackTrace();
-                }
-                newSerializer.endTag(null, "urlpath");
-            } catch (Exception e5) {
-                e5.printStackTrace();
-            }
-            try {
-                newSerializer.startTag(null, "student");
-                try {
-                    newSerializer.startTag(null, "stuid");
-                    newSerializer.text(str26);
-                    newSerializer.endTag(null, "stuid");
-                    newSerializer.startTag(null, "usercode");
-                    newSerializer.text(str36);
-                    newSerializer.endTag(null, "usercode");
-                    newSerializer.startTag(null, "username");
-                    newSerializer.text(str45);
-                    newSerializer.endTag(null, "username");
-                    newSerializer.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                    newSerializer.text(str25);
-                    newSerializer.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
-                    newSerializer.startTag(null, "pwd");
-                    newSerializer.text(str42);
-                    newSerializer.endTag(null, "pwd");
-                    newSerializer.startTag(null, "stuname");
-                    newSerializer.text(str27);
-                    newSerializer.endTag(null, "stuname");
-                } catch (Exception e6) {
-                    e6.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "privatekey");
-                    newSerializer.text(str46);
-                    newSerializer.endTag(null, "privatekey");
-                    newSerializer.startTag(null, "encrypt");
-                    newSerializer.text(str2);
-                    newSerializer.endTag(null, "encrypt");
-                    newSerializer.startTag(null, "apihost");
-                    newSerializer.text(str47);
-                    newSerializer.endTag(null, "apihost");
-                    newSerializer.startTag(null, ClientCookie.DOMAIN_ATTR);
-                    newSerializer.text(str28);
-                    newSerializer.endTag(null, ClientCookie.DOMAIN_ATTR);
-                    newSerializer.startTag(null, ClientCookie.PORT_ATTR);
-                    newSerializer.text(str29);
-                    newSerializer.endTag(null, ClientCookie.PORT_ATTR);
-                    newSerializer.startTag(null, "tigase_ip");
-                    newSerializer.text(str30);
-                    newSerializer.endTag(null, "tigase_ip");
-                } catch (Exception e7) {
-                    e7.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "mongo_domain");
-                    newSerializer.text(str31);
-                    newSerializer.endTag(null, "mongo_domain");
-                    newSerializer.startTag(null, "mongo_port");
-                    newSerializer.text(str52);
-                    newSerializer.endTag(null, "mongo_port");
-                    newSerializer.startTag(null, "mongo_user");
-                    newSerializer.text(str53);
-                    newSerializer.endTag(null, "mongo_user");
-                    newSerializer.startTag(null, "mongo_pwd");
-                    newSerializer.text(str32);
-                    newSerializer.endTag(null, "mongo_pwd");
-                } catch (Exception e8) {
-                    e8.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "user_type");
-                    newSerializer.text(str55);
-                    newSerializer.endTag(null, "user_type");
-                    newSerializer.startTag(null, "schoolid");
-                    newSerializer.text(str33);
-                    newSerializer.endTag(null, "schoolid");
-                    newSerializer.startTag(null, "schoolname");
-                    newSerializer.text(str34);
-                    newSerializer.endTag(null, "schoolname");
-                } catch (Exception e9) {
-                    e9.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "owncloudip");
-                    newSerializer.text(str35);
-                    newSerializer.endTag(null, "owncloudip");
-                } catch (Exception e10) {
-                    e10.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "gdstate");
-                    newSerializer.text(str23);
-                    newSerializer.endTag(null, "gdstate");
-                } catch (Exception e11) {
-                    e11.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "guidenotes");
-                    newSerializer.text(str24);
-                    newSerializer.endTag(null, "guidenotes");
-                } catch (Exception e12) {
-                    e12.printStackTrace();
-                }
-                try {
-                    newSerializer.startTag(null, "guidelearndownload");
-                    newSerializer.text(new StringBuilder(String.valueOf(str60)).toString());
-                    newSerializer.endTag(null, "guidelearndownload");
-                } catch (Exception e13) {
-                }
-                try {
-                    newSerializer.startTag(null, "wifi");
-                    newSerializer.text(new StringBuilder(String.valueOf(str61)).toString());
-                    newSerializer.endTag(null, "wifi");
-                } catch (Exception e14) {
-                }
-                try {
-                    newSerializer.startTag(null, "setting");
-                    newSerializer.text(new StringBuilder(String.valueOf(str62)).toString());
-                    newSerializer.endTag(null, "setting");
-                } catch (Exception e15) {
-                }
-                newSerializer.endTag(null, "student");
-            } catch (Exception e16) {
-                e16.printStackTrace();
-            }
-            try {
-                newSerializer.startTag(null, "apps");
-                for (int i = 0; i < arrayList.size(); i++) {
-                    newSerializer.startTag(null, "app");
-                    newSerializer.startTag(null, "code");
-                    newSerializer.text(arrayList.get(i).getCode());
-                    newSerializer.endTag(null, "code");
-                    newSerializer.startTag(null, "name");
-                    newSerializer.text(arrayList.get(i).getName());
-                    newSerializer.endTag(null, "name");
-                    newSerializer.startTag(null, "color");
-                    newSerializer.text(arrayList.get(i).getColor());
-                    newSerializer.endTag(null, "color");
-                    newSerializer.startTag(null, "icon");
-                    newSerializer.text(arrayList.get(i).getIcon());
-                    newSerializer.endTag(null, "icon");
-                    newSerializer.startTag(null, "iconLocal");
-                    newSerializer.text(arrayList.get(i).getIconLocal());
-                    newSerializer.endTag(null, "iconLocal");
-                    newSerializer.startTag(null, "enable");
-                    newSerializer.text(new StringBuilder(String.valueOf(arrayList.get(i).getEnable())).toString());
-                    newSerializer.endTag(null, "enable");
-                    newSerializer.startTag(null, "config");
-                    newSerializer.startTag(null, "download");
-                    newSerializer.text(arrayList.get(i).getConfig().get("download"));
-                    newSerializer.endTag(null, "download");
-                    newSerializer.startTag(null, ClientCookie.COMMENT_ATTR);
-                    newSerializer.text(arrayList.get(i).getConfig().get(ClientCookie.COMMENT_ATTR));
-                    newSerializer.endTag(null, ClientCookie.COMMENT_ATTR);
-                    newSerializer.endTag(null, "config");
-                    newSerializer.endTag(null, "app");
-                }
-                newSerializer.endTag(null, "apps");
-            } catch (Exception e17) {
-                e17.printStackTrace();
-                Log.e(TAG, "write to  xml file" + e17.toString());
-            }
-            newSerializer.endDocument();
-            newSerializer.flush();
-            this.fileos.close();
-            appendUserInfo(this.settingHistory, str39);
-        } catch (Exception e18) {
-            e18.printStackTrace();
-        }
-    }
-
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:25:0x013b -> B:22:0x0131). Please submit an issue!!! */
-    @SuppressLint({"NewApi"})
-    public final String GetMachineID() {
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService("phone");
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nModel = " + Build.MODEL);
-        sb.append("\nSerialNumber = " + Build.SERIAL);
-        sb.append("\nDeviceId(IMEI) = " + telephonyManager.getDeviceId());
-        sb.append("\nAndroidID = " + Settings.Secure.getString(getContentResolver(), "android_id"));
-        WifiManager wifiManager = (WifiManager) getSystemService("wifi");
-        String macAddress = wifiManager.getConnectionInfo().getMacAddress();
-        String str = macAddress;
-        if (macAddress == null) {
-            int i = 0;
-            while (true) {
-                str = macAddress;
-                if (i > 5) {
-                    break;
-                }
-                macAddress = wifiManager.getConnectionInfo().getMacAddress();
-                if (macAddress != null) {
-                    str = macAddress;
-                    if (macAddress.length() > 0) {
-                        break;
-                    }
-                }
-                try {
-                    Thread.sleep(FileUtils.FAT_FILE_TIMESTAMP_GRANULARITY);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                i++;
-            }
-        }
-        String str2 = str;
-        if (str != null) {
-            str2 = str;
-            if (str.equals("02:00:00:00:00:00")) {
-                str2 = getMacAddr();
-            }
-        }
-        String str3 = str2;
-        if (str2 == null) {
-            str3 = "";
-        }
-        sb.append("\nMACAddress = " + str3);
-        return String.valueOf(toHexString(toMd5(sb.toString().getBytes()), "")) + ":" + str3.replaceAll(":", "");
-    }
-
-    public String ModifyPassword(String str, String str2, String str3) {
-        String str4 = "";
-        SharedPreferences sharedPreferences = getSharedPreferences("privatekey", 0);
-        String string = sharedPreferences.getString("key", "");
-        sharedPreferences.getString("apihost", "");
-        String str5 = this.modifiedName;
-        try {
-            HttpPost httpPost = new HttpPost(JsonHelper.Update_Pwd_HTTPPOST_URL(this.modifiedIP));
-            httpPost.addHeader("X-Edutech-Entity", str5);
-            long currentTimeMillis = System.currentTimeMillis();
-            httpPost.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + My_md5.Md5(String.valueOf(currentTimeMillis) + str5 + string));
-            httpPost.addHeader("Accept-Encoding", "gzip,deflate");
-            MultipartEntity multipartEntity = new MultipartEntity();
-            multipartEntity.addPart("newPassWord", new StringBody(str3));
-            multipartEntity.addPart("oldPassWord", new StringBody(str2));
-            httpPost.setEntity(multipartEntity);
-            str4 = getJsonStringFromGZIP(new DefaultHttpClient().execute(httpPost));
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e2) {
-            e2.printStackTrace();
-        }
-        return str4;
-    }
-
-    public void apkUpdate() {
-        if (this.tvUpdateNow == null || this.tvUpdateNow.isEnabled()) {
-            this.tvUpdateNow.setEnabled(false);
-            this.tvUpdateNow.setText(getResources().getString(R.string.setting_updating));
-            this.tvUpdateNow.setTextColor(getResources().getColor(R.color.gray));
-            getWindow().addFlags(128);
-            if (this.updateThread != null) {
-                this.updateprogressThread = null;
-                this.updateThread = null;
-                isupdating = false;
-                this.updateTime = HttpStatus.SC_MULTIPLE_CHOICES;
-                return;
-            }
-            Message message = new Message();
-            message.what = 4;
-            this.installHandler.sendMessage(message);
-            this.updateThread = new UpdateThread();
-            this.updateThread.start();
-            if (this.updateprogressThread == null && AppEnvironment.isNewUpdate) {
-                this.updateprogressThread = new UpdateProgressThread();
-                this.updateprogressThread.start();
-            }
-            if (this.progressDialog == null) {
-                return;
-            }
-            isupdating = true;
-            this.updateTime = 0;
-            this.apkUpdateList = new ArrayList();
-        }
-    }
-
-    @Override // android.app.Activity, android.view.ContextThemeWrapper, android.content.ContextWrapper
-    protected void attachBaseContext(Context context) {
-        super.attachBaseContext(LanguageUtils.attachBaseContext(context, context.getSharedPreferences("language", 0).getString("language", "chinese")));
-    }
-
-    @Override // com.edutech.cloudclientsetting.activity.IPListAdapter.IpInterface
-    public void deleteIp(String str) {
-        if (this.ips == null) {
-            return;
-        }
-        if (this.listpop != null && this.ipAdpter != null) {
-            if (this.ips != null && this.ips.contains(str)) {
-                this.ips.remove(str);
-                this.ipAdpter.setIps(this.ips);
-                this.ipAdpter.notifyDataSetChanged();
-            }
-            SharedPreferences sharedPreferences = getSharedPreferences("loginhistory", 4);
-            sharedPreferences.edit().putString("iphistoryString", sharedPreferences.getString("iphistoryString", "").replace(String.valueOf(str) + ",:,", "").replace(str, "")).commit();
-        }
-        this.history_array = nameHistoryDeleteByIP(str, this.history_array);
-    }
-
-    @Override // com.edutech.cloudclientsetting.activity.NameListAdapter.NameHistoryInterface
-    public void deleteName(String str) {
-        String editable = this.ip_edit != null ? this.ip_edit.getText().toString() : "";
-        if (editable.equals("") || this.history_array == null) {
-            return;
-        }
-        this.history_array = nameHistoryDelete(editable, str, this.history_array);
-        this.history_nameList = nameHistoryQuery(editable, this.history_array);
-        if (this.nameListAdapter == null || this.history_nameList == null) {
-            return;
-        }
-        this.nameListAdapter.setIps(this.history_nameList);
-        this.nameListAdapter.notifyDataSetChanged();
-    }
-
-    @Override // android.app.Activity, android.view.Window.Callback
-    public boolean dispatchTouchEvent(MotionEvent motionEvent) {
-        View currentFocus = getCurrentFocus();
-        boolean dispatchTouchEvent = super.dispatchTouchEvent(motionEvent);
-        if (currentFocus instanceof EditText) {
-            View currentFocus2 = getCurrentFocus();
-            int[] iArr = new int[2];
-            currentFocus2.getLocationOnScreen(iArr);
-            float rawX = (motionEvent.getRawX() + currentFocus2.getLeft()) - iArr[0];
-            float rawY = (motionEvent.getRawY() + currentFocus2.getTop()) - iArr[1];
-            if (motionEvent.getAction() == 1 && (rawX < currentFocus2.getLeft() || rawX >= currentFocus2.getRight() || rawY < currentFocus2.getTop() || rawY > currentFocus2.getBottom())) {
-                ((InputMethodManager) getSystemService("input_method")).hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
-            }
+        String result = sb.toString();
+        if (result.equals("Success")) {
+            return true;
         }
-        return dispatchTouchEvent;
+        return false;
     }
 
     @Override // android.app.Activity
-    public void finish() {
-        super.finish();
-    }
-
-    @SuppressLint({"NewApi"})
-    public String getMacAddr() {
-        String str;
-        Iterator it;
-        NetworkInterface networkInterface;
-        try {
-            it = Collections.list(NetworkInterface.getNetworkInterfaces()).iterator();
-        } catch (Exception e) {
-        }
-        do {
-            if (!it.hasNext()) {
-                str = "";
-                break;
-            }
-            networkInterface = (NetworkInterface) it.next();
-        } while (!networkInterface.getName().equalsIgnoreCase("wlan0"));
-        byte[] hardwareAddress = networkInterface.getHardwareAddress();
-        if (hardwareAddress == null) {
-            str = "";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            int length = hardwareAddress.length;
-            for (int i = 0; i < length; i++) {
-                sb.append(String.valueOf(Integer.toHexString(hardwareAddress[i] & 255)) + ":");
-            }
-            if (sb.length() > 0) {
-                sb.deleteCharAt(sb.length() - 1);
-            }
-            str = sb.toString();
-        }
-        return str;
-    }
-
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:14:0x004f -> B:49:0x001f). Please submit an issue!!! */
-    public void loadXml() {
-        Log.i(TAG, "loadXml");
-        try {
-            this.filein = new FileInputStream(FileInOutHelper.setupOrOpenFile(this.urlfilepath));
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "FileNotFoundException");
-            e.printStackTrace();
-        }
-        try {
-            XmlPullParser newPullParser = XmlPullParserFactory.newInstance().newPullParser();
-            newPullParser.setInput(this.filein, "UTF-8");
-            for (int eventType = newPullParser.getEventType(); eventType != 1; eventType = newPullParser.next()) {
-                String name = newPullParser.getName();
-                switch (eventType) {
-                    case 2:
-                        if ("ip".equals(name)) {
-                            this.ipOrigal = newPullParser.nextText();
-                            this.ip_edit.setText(this.ipOrigal);
-                            this.modifiedIP = this.ipOrigal;
-                        }
-                        if ("username".equals(name)) {
-                            try {
-                                this.nameOrigal = BZip2Utils.Base64DecodeToString(newPullParser.nextText());
-                                this.username_edit.setText(this.nameOrigal);
-                                this.modifiedName = this.nameOrigal;
-                            } catch (Exception e2) {
-                                e2.printStackTrace();
-                            }
-                        }
-                        if ("pwd".equals(name)) {
-                            try {
-                                this.pwdOrigal = BZip2Utils.Base64DecodeToString(newPullParser.nextText());
-                                this.password_edit.setText(this.pwdOrigal);
-                                break;
-                            } catch (Exception e3) {
-                                e3.printStackTrace();
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                }
-            }
-        } catch (IOException e4) {
-            e4.printStackTrace();
-        } catch (IllegalArgumentException e5) {
-        } catch (XmlPullParserException e6) {
-            e6.printStackTrace();
-        } catch (Exception e7) {
-        }
-        if (this.filein != null) {
-            try {
-                this.filein.close();
-            } catch (IOException e8) {
-                e8.printStackTrace();
-            }
-        }
-    }
-
-    public void loadidXml() {
-        int i = Build.VERSION.SDK_INT;
-        loadidXml1();
-    }
-
-    public void loadidXml1() {
-        List<String> readIDFile;
-        Log.i(TAG, "loadidXml");
-        if (FileInOutHelper.setupOrOpenFile(idfilepath).length() > 0 && (readIDFile = ActivityBase.readIDFile()) != null) {
-            String str = readIDFile.get(0);
-            String str2 = readIDFile.get(1);
-            String str3 = readIDFile.get(2);
-            String str4 = readIDFile.get(3);
-            String str5 = readIDFile.get(4);
-            String str6 = readIDFile.get(5);
-            if (str != null) {
-                getSharedPreferences("idauthstring", 0).edit().putString("key", str).commit();
-                this.idAuth_btn.setText(getResources().getString(R.string.registeragain));
-            }
-            if (str3.length() == 0 || str.length() == 0 || str2.length() == 0) {
-                return;
-            }
-            int parseInt = Integer.parseInt(str3);
-            StringBuilder sb = new StringBuilder();
-            if (parseInt == 4) {
-                sb.append("正式版:");
-            } else if (parseInt == 5) {
-                sb.append("测试版:");
-            } else {
-                sb.append("未注册");
-            }
-            if (parseInt == 4 || parseInt == 5) {
-                sb.append(str);
-            }
-            if (str5.length() > 2) {
-                sb.append("\n有效期限：" + str5);
-            } else if (str5.length() == 1 && Integer.parseInt(str5) == 0) {
-                sb.append("\n有效期限：无限制");
-            }
-            if (str4.length() > 0 && Integer.parseInt(str4) > 0) {
-                if (str6.length() <= 0 || Integer.parseInt(str6) < 0) {
-                    sb.append("\n授权次数：" + str4);
-                } else {
-                    sb.append("\n使用/授权次数：" + str6 + "/" + str4);
-                }
-            }
-            this.idauth_edit.setHeight(50);
-            String[] split = sb.toString().split("\n");
-            if (split == null) {
-                this.idauth_edit.setTextSize(18.0f);
-            } else if (split.length == 1) {
-                this.idauth_edit.setTextSize(15.0f);
-            } else {
-                this.idauth_edit.setTextSize(12.0f);
-            }
-            this.idauth_edit.setText(sb);
-        }
-    }
-
-    public void loadidXml2() {
-        File file = new File(Aduth.filepathMobileStudyClient_NEW);
-        Log.e("setting", "auth:" + ((Object) null));
-        if (!file.exists() || file.length() > 0) {
-            List<String> readIDFile = com.edutech.idauthentication.FileUtils.readIDFile();
-            Log.e("setting", "auth:" + readIDFile);
-            if (readIDFile == null || readIDFile.size() <= 0) {
-                return;
-            }
-            String str = readIDFile.get(0);
-            String str2 = readIDFile.get(1);
-            String str3 = readIDFile.get(2);
-            String str4 = readIDFile.get(3);
-            String str5 = readIDFile.get(4);
-            String str6 = readIDFile.get(5);
-            if (str != null) {
-                getSharedPreferences("idauthstring", 0).edit().putString("key", str).commit();
-                this.idAuth_btn.setText(getResources().getString(R.string.registeragain));
-            }
-            if (str3 == null || str == null || str3.length() == 0 || str.length() == 0 || str2.length() == 0) {
-                return;
-            }
-            int parseInt = Integer.parseInt(str3);
-            StringBuilder sb = new StringBuilder();
-            if (parseInt == 4) {
-                sb.append("正式版:");
-            } else if (parseInt == 5) {
-                sb.append("测试版:");
-            } else {
-                sb.append("未注册");
-            }
-            if (parseInt == 4 || parseInt == 5) {
-                sb.append(str);
-            }
-            if (str5.length() > 2) {
-                sb.append("\n有效期限：" + str5);
-            } else if (str5.length() == 1 && Integer.parseInt(str5) == 0) {
-                sb.append("\n有效期限：无限制");
-            }
-            if (str4.length() > 0 && Integer.parseInt(str4) > 0) {
-                if (str6.length() <= 0 || Integer.parseInt(str6) < 0) {
-                    sb.append("\n授权次数：" + str4);
-                } else {
-                    sb.append("\n使用/授权次数：" + str6 + "/" + str4);
-                }
-            }
-            this.idauth_edit.setHeight(50);
-            String[] split = sb.toString().split("\n");
-            if (split == null) {
-                this.idauth_edit.setTextSize(14.0f);
-            } else if (split.length == 1) {
-                this.idauth_edit.setTextSize(12.0f);
-            } else {
-                this.idauth_edit.setTextSize(10.0f);
-            }
-            this.idauth_edit.setSingleLine(false);
-            this.idauth_edit.setText(sb.toString());
-        }
-    }
-
-    @Override // com.edutech.cloudclientsetting.activity.IPListAdapter.IpInterface
-    public void okIp(String str) {
-        if (this.listpop != null) {
-            this.listpop.dismiss();
-        }
-        if (this.ip_edit != null) {
-            this.ip_edit.setText(str);
-        }
-    }
-
-    @Override // com.edutech.cloudclientsetting.activity.NameListAdapter.NameHistoryInterface
-    public void okName(String str) {
-        if (this.nameListpop != null) {
-            this.nameListpop.dismiss();
-        }
-        if (this.username_edit != null) {
-            this.username_edit.setText(str);
-        }
-    }
-
-    @Override // android.app.Activity
-    public void onActivityResult(int i, int i2, Intent intent) {
-        boolean z = false;
-        super.onActivityResult(i, i2, intent);
-        if (i != 3) {
-            Toast.makeText(this, "ZXING_SCAN<>3", 0).show();
-        } else if (i2 != -1) {
-            Toast.makeText(this, "RESULT_NOT_OK", 0).show();
-        } else {
-            String stringExtra = intent.getStringExtra(Intents.Scan.RESULT);
-            intent.getStringExtra(Intents.Scan.RESULT_FORMAT);
-            if (this.id == null) {
-                z = true;
-            }
-            Log.e("id", String.valueOf(z) + "," + (stringExtra == null ? "null" : stringExtra));
-            if (stringExtra == null || this.id == null) {
-                return;
-            }
-            this.id.setText(stringExtra);
-        }
-    }
-
-    @Override // android.app.Activity
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override // android.view.View.OnClickListener
-    public void onClick(View view) {
-        PackageInfo packageInfo;
-        Log.i(TAG, "onClick");
-        switch (view.getId()) {
-            case R.id.wifi_btn /* 2131362141 */:
-                try {
-                    packageInfo = getPackageManager().getPackageInfo(AppEnvironment.WIFI_PACKNAME, 0);
-                } catch (PackageManager.NameNotFoundException e) {
-                    packageInfo = null;
-                    e.printStackTrace();
-                }
-                if (packageInfo == null) {
-                    return;
-                }
-                ComponentName componentName = new ComponentName(AppEnvironment.WIFI_PACKNAME, "zte.com.wilink.wifi.WifiSettingActivity");
-                Intent intent = new Intent();
-                intent.setComponent(componentName);
-                intent.addFlags(268435456);
-                intent.setAction("android.intent.action.MAIN");
-                intent.addCategory("android.intent.category.LAUNCHER");
-                startActivity(intent);
-                return;
-            case R.id.btnTitleBack /* 2131362312 */:
-                exit();
-                return;
-            case R.id.btnServiceControl /* 2131362313 */:
-                showServiceDialog();
-                return;
-            case R.id.btnAppControl /* 2131362314 */:
-                startActivity(new Intent(this, AppControlActivity.class));
-                return;
-            case R.id.btnReset /* 2131362315 */:
-                showClearDialog();
-                return;
-            case R.id.back_btn /* 2131362317 */:
-                this.back_btn.setVisibility(8);
-                return;
-            case R.id.btnUpdate /* 2131362320 */:
-            case R.id.password_update /* 2131362324 */:
-            case R.id.password_reset /* 2131362325 */:
-            default:
-                return;
-            case R.id.idauth_btn /* 2131362327 */:
-                if (this.registerDialog == null) {
-                    View inflate = getLayoutInflater().inflate(R.layout.idauth_dialog_setting, (ViewGroup) findViewById(R.id.idauth_dialog));
-                    this.id = (EditText) inflate.findViewById(R.id.idauth_dialog_id);
-                    SharedPreferences sharedPreferences = getSharedPreferences("idauthstring", 0);
-                    if (sharedPreferences.contains("key")) {
-                        this.id.setText(sharedPreferences.getString("key", ""));
-                    }
-                    AlertDialog.Builder negativeButton = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.setting_sign)).setInverseBackgroundForced(true).setView(inflate).setPositiveButton(getResources().getString(R.string.setting_sign), new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.19
-                        @Override // android.content.DialogInterface.OnClickListener
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (CloudClientSetActivity.this.id.getText().toString().length() >= 16) {
-                                new Thread(CloudClientSetActivity.this.downloadRun).start();
-                                Message message = new Message();
-                                message.what = 1000;
-                                CloudClientSetActivity.this.resultHandler.sendMessageDelayed(message, 0L);
-                            }
-                            if (CloudClientSetActivity.this.registerDialog != null) {
-                                CloudClientSetActivity.this.registerDialog.dismiss();
-                                CloudClientSetActivity.this.registerDialog = null;
-                            }
-                        }
-                    }).setNegativeButton(getResources().getString(R.string.setting_cancel), new DialogInterface.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.20
-                        @Override // android.content.DialogInterface.OnClickListener
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (CloudClientSetActivity.this.registerDialog != null) {
-                                CloudClientSetActivity.this.registerDialog.dismiss();
-                                CloudClientSetActivity.this.registerDialog = null;
-                            }
-                        }
-                    });
-                    ((Button) inflate.findViewById(R.id.idscan_btn)).setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.21
-                        @Override // android.view.View.OnClickListener
-                        public void onClick(View view2) {
-                            switch (view2.getId()) {
-                                case R.id.idscan_btn /* 2131361940 */:
-                                    Intent intent2 = new Intent(CloudClientSetActivity.this, MipcaActivityCapture.class);
-                                    intent2.setFlags(67108864);
-                                    CloudClientSetActivity.this.startActivityForResult(intent2, 3);
-                                    return;
-                                default:
-                                    return;
-                            }
-                        }
-                    });
-                    this.registerDialog = negativeButton.create();
-                }
-                if (this.registerDialog == null) {
-                    return;
-                }
-                this.registerDialog.show();
-                return;
-            case R.id.ok_btn /* 2131362330 */:
-                this.btnTitleBack.setEnabled(false);
-                this.ok_btn.setEnabled(false);
-                this.ok_btn.setText(getResources().getString(R.string.setting_saving));
-                this.JXHD_Ip = this.ip_edit.getText().toString().trim();
-                if (!needPwdDialog()) {
-                    new Thread(this.runnable_GetConfig_Infor).start();
-                    return;
-                }
-                if (this.threadPwd == null) {
-                    this.threadPwd = new HostPwd();
-                    this.threadPwd.start();
-                }
-                showConfirmPwdDialog();
-                return;
-            case R.id.tvUpdatePass /* 2131362331 */:
-                updatePassword();
-                return;
-            case R.id.tvUpdateNow /* 2131362334 */:
-                apkUpdate();
-                return;
-            case R.id.cancel_btn /* 2131362336 */:
-                exit();
-                return;
-        }
-    }
-
-    @Override // android.app.Activity
-    public void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         getWindow().setFlags(1024, 1024);
-        String string = getSharedPreferences("language", 0).getString("language", "chinese");
-        if (!string.equals("en")) {
+        SharedPreferences sp = getSharedPreferences("language", 0);
+        String type = sp.getString("language", "chinese");
+        if (!type.equals("en")) {
             LanguageUtils.SetLanguage(this, "chinese");
         } else {
             LanguageUtils.SetLanguage(this, "en");
@@ -4307,20 +1456,12 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
         this.btnServiceControl.setOnClickListener(this);
         this.mBluetooth = BluetoothAdapter.getDefaultAdapter();
         this.btnbluetoothControl = (Button) findViewById(R.id.btnbluetoothControl);
-        if (this.mBluetooth == null || !this.mBluetooth.isEnabled()) {
-            this.btnbluetoothControl.setText("开启蓝牙");
-        } else {
+        if (this.mBluetooth != null && this.mBluetooth.isEnabled()) {
             this.btnbluetoothControl.setText("关闭蓝牙");
+        } else {
+            this.btnbluetoothControl.setText("开启蓝牙");
         }
-        this.btnbluetoothControl.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.13
-            @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
-                Intent intent = new Intent("/");
-                intent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings$DeviceInfoSettingsActivity"));
-                intent.setAction("android.intent.action.VIEW");
-                CloudClientSetActivity.this.mContext.startActivity(intent);
-            }
-        });
+        this.btnbluetoothControl.setOnClickListener(new AnonymousClass13());
         this.tvUpdatePass = (TextView) findViewById(R.id.tvUpdatePass);
         this.tvUpdateNow = (TextView) findViewById(R.id.tvUpdateNow);
         this.tvUpdatePass.setOnClickListener(this);
@@ -4342,17 +1483,12 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
         this.idauth_edit.setTextColor(SupportMenu.CATEGORY_MASK);
         this.languageSw = (LinearLayout) findViewById(R.id.sw_language);
         this.language_t = (TextView) findViewById(R.id.language_txt);
-        if (string.equals("en")) {
+        if (type.equals("en")) {
             this.language_t.setText(getResources().getString(R.string.setenglish));
         } else {
             this.language_t.setText(getResources().getString(R.string.setchinese));
         }
-        this.languageSw.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.cloudclientsetting.activity.CloudClientSetActivity.14
-            @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
-                CloudClientSetActivity.this.showLanguageChooseDialog();
-            }
-        });
+        this.languageSw.setOnClickListener(new AnonymousClass14());
         getWindow().setSoftInputMode(3);
         this.ptfw_edit.setSelection(this.ptfw_edit.getText().toString().length());
         getCurrApkInfo();
@@ -4372,10 +1508,442 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
         }
         this.username_edit.setOnTouchListener(this.nameListener);
         this.installReceiver = new InstallReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.intent.action.PACKAGE_ADDED");
-        intentFilter.addDataScheme("package");
-        registerReceiver(this.installReceiver, intentFilter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.intent.action.PACKAGE_ADDED");
+        filter.addDataScheme("package");
+        registerReceiver(this.installReceiver, filter);
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$13 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass13 implements View.OnClickListener {
+        AnonymousClass13() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            Intent intent = new Intent("/");
+            ComponentName cm = new ComponentName("com.android.settings", "com.android.settings.Settings$DeviceInfoSettingsActivity");
+            intent.setComponent(cm);
+            intent.setAction("android.intent.action.VIEW");
+            CloudClientSetActivity.access$82(CloudClientSetActivity.this).startActivity(intent);
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$14 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass14 implements View.OnClickListener {
+        AnonymousClass14() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View arg0) {
+            CloudClientSetActivity.access$83(CloudClientSetActivity.this);
+        }
+    }
+
+    static /* synthetic */ boolean access$42(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.getInternetState();
+    }
+
+    private boolean getInternetState() {
+        NetworkInfo info;
+        ConnectivityManager connect = (ConnectivityManager) getSystemService("connectivity");
+        if (connect == null || (info = connect.getActiveNetworkInfo()) == null || !info.isConnected() || info.getState() != NetworkInfo.State.CONNECTED) {
+            return false;
+        }
+        return true;
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$4 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass4 implements View.OnTouchListener {
+        AnonymousClass4() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnTouchListener
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case 1:
+                    CloudClientSetActivity.access$44(CloudClientSetActivity.this);
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    static /* synthetic */ void access$44(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.showPopNameList();
+    }
+
+    private void showPopNameList() {
+        this.history_nameList = new ArrayList();
+        String ip = this.ip_edit != null ? this.ip_edit.getText().toString() : "";
+        if (!ip.equals("") && this.history_array != null && this.history_array.length() > 0) {
+            this.history_nameList = nameHistoryQuery(ip, this.history_array);
+            if (this.history_nameList != null && this.history_nameList.size() > 0) {
+                if (this.nameListpop == null) {
+                    this.nameListpop = new ListPopupWindow(this);
+                    this.nameListAdapter = new NameListAdapter(this.history_nameList, this, this);
+                    this.nameListpop.setAdapter(this.nameListAdapter);
+                    this.nameListpop.setWidth(-2);
+                    this.nameListpop.setHeight(-2);
+                    this.nameListpop.setInputMethodMode(2);
+                    this.nameListpop.setModal(true);
+                } else if (this.nameListAdapter != null) {
+                    this.nameListAdapter.setIps(this.history_nameList);
+                    this.nameListAdapter.notifyDataSetChanged();
+                }
+                this.nameListpop.setAnchorView(this.username_edit);
+                this.nameListpop.show();
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$5 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass5 implements View.OnTouchListener {
+        AnonymousClass5() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnTouchListener
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case 1:
+                    CloudClientSetActivity.access$45(CloudClientSetActivity.this);
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    static /* synthetic */ void access$45(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.showPopList();
+    }
+
+    private void showPopList() {
+        String[] strs;
+        SharedPreferences loginSp = getSharedPreferences("loginhistory", 4);
+        String ipHistorys = loginSp.getString("iphistoryString", "");
+        if (ipHistorys != null && !ipHistorys.equals("") && this.ip_edit != null && (strs = ipHistorys.split(",:,")) != null && strs.length > 0) {
+            Log.e("ip", ipHistorys);
+            this.ips = new ArrayList();
+            for (String ip : strs) {
+                if (ip != null && !ip.equals("")) {
+                    this.ips.add(ip);
+                }
+            }
+            if (this.ips != null && this.ips.size() > 0) {
+                if (this.listpop == null) {
+                    this.listpop = new ListPopupWindow(this);
+                    this.ipAdpter = new IPListAdapter(this.ips, this, this);
+                    this.listpop.setAdapter(this.ipAdpter);
+                    this.listpop.setWidth(-2);
+                    this.listpop.setHeight(-2);
+                    this.listpop.setInputMethodMode(2);
+                    this.listpop.setModal(true);
+                } else if (this.ipAdpter != null) {
+                    this.ipAdpter.setIps(this.ips);
+                    this.ipAdpter.notifyDataSetChanged();
+                }
+                this.listpop.setAnchorView(this.ip_edit);
+                this.listpop.show();
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$6 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass6 implements TextWatcher {
+        AnonymousClass6() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.text.TextWatcher
+        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void afterTextChanged(Editable arg0) {
+            String ip = CloudClientSetActivity.access$0(CloudClientSetActivity.this).getText().toString();
+            if (ip != null && !CloudClientSetActivity.access$27(CloudClientSetActivity.this).equals("") && !ip.equals(CloudClientSetActivity.access$27(CloudClientSetActivity.this))) {
+                if (CloudClientSetActivity.access$46(CloudClientSetActivity.this) == null) {
+                    CloudClientSetActivity.access$33(CloudClientSetActivity.this, new HostPwd());
+                    CloudClientSetActivity.access$46(CloudClientSetActivity.this).start();
+                }
+                if (!CloudClientSetActivity.access$47(CloudClientSetActivity.this)) {
+                    CloudClientSetActivity.access$0(CloudClientSetActivity.this).setText(CloudClientSetActivity.access$27(CloudClientSetActivity.this));
+                    CloudClientSetActivity.access$48(CloudClientSetActivity.this);
+                } else {
+                    return;
+                }
+            }
+            CloudClientSetActivity.access$0(CloudClientSetActivity.this).setSelection(CloudClientSetActivity.access$0(CloudClientSetActivity.this).getText().length());
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$7 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass7 implements TextWatcher {
+        AnonymousClass7() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.text.TextWatcher
+        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void afterTextChanged(Editable arg0) {
+            String username = CloudClientSetActivity.access$24(CloudClientSetActivity.this).getText().toString();
+            if (username != null && !CloudClientSetActivity.access$29(CloudClientSetActivity.this).equals("") && !username.equals(CloudClientSetActivity.access$29(CloudClientSetActivity.this))) {
+                if (CloudClientSetActivity.access$46(CloudClientSetActivity.this) == null) {
+                    CloudClientSetActivity.access$33(CloudClientSetActivity.this, new HostPwd());
+                    CloudClientSetActivity.access$46(CloudClientSetActivity.this).start();
+                }
+                if (!CloudClientSetActivity.access$47(CloudClientSetActivity.this)) {
+                    CloudClientSetActivity.access$24(CloudClientSetActivity.this).setText(CloudClientSetActivity.access$29(CloudClientSetActivity.this));
+                    CloudClientSetActivity.access$48(CloudClientSetActivity.this);
+                } else {
+                    return;
+                }
+            }
+            CloudClientSetActivity.access$24(CloudClientSetActivity.this).setSelection(CloudClientSetActivity.access$24(CloudClientSetActivity.this).getText().length());
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$8 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass8 implements TextWatcher {
+        AnonymousClass8() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.text.TextWatcher
+        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void afterTextChanged(Editable arg0) {
+            String pwd = CloudClientSetActivity.access$19(CloudClientSetActivity.this).getText().toString();
+            if (pwd != null && !CloudClientSetActivity.access$49(CloudClientSetActivity.this).equals("") && !pwd.equals(CloudClientSetActivity.access$49(CloudClientSetActivity.this))) {
+                if (CloudClientSetActivity.access$46(CloudClientSetActivity.this) == null) {
+                    CloudClientSetActivity.access$33(CloudClientSetActivity.this, new HostPwd());
+                    CloudClientSetActivity.access$46(CloudClientSetActivity.this).start();
+                }
+                if (!CloudClientSetActivity.access$47(CloudClientSetActivity.this)) {
+                    CloudClientSetActivity.access$19(CloudClientSetActivity.this).setText(CloudClientSetActivity.access$49(CloudClientSetActivity.this));
+                    CloudClientSetActivity.access$48(CloudClientSetActivity.this);
+                } else {
+                    return;
+                }
+            }
+            CloudClientSetActivity.access$19(CloudClientSetActivity.this).setSelection(CloudClientSetActivity.access$19(CloudClientSetActivity.this).getText().length());
+        }
+    }
+
+    static /* synthetic */ void access$83(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.showLanguageChooseDialog();
+    }
+
+    private void showLanguageChooseDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(getResources().getString(R.string.language_t));
+        String[] items = {getResources().getString(R.string.setchinese), getResources().getString(R.string.setenglish)};
+        builder.setItems(items, new AnonymousClass15());
+        builder.create().show();
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$15 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass15 implements DialogInterface.OnClickListener {
+        AnonymousClass15() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface arg0, int arg1) {
+            SharedPreferences sp = CloudClientSetActivity.this.getSharedPreferences("language", 0);
+            if (arg1 == 0) {
+                LanguageUtils.SetLanguage(CloudClientSetActivity.this, "chinese");
+                sp.edit().putString("language", "chinese").commit();
+                Message message = CloudClientSetActivity.access$55(CloudClientSetActivity.this).obtainMessage();
+                message.what = HttpStatus.SC_PROCESSING;
+                CloudClientSetActivity.access$55(CloudClientSetActivity.this).sendMessage(message);
+                return;
+            }
+            LanguageUtils.SetLanguage(CloudClientSetActivity.this, "en");
+            sp.edit().putString("language", "en").commit();
+            Message message2 = CloudClientSetActivity.access$55(CloudClientSetActivity.this).obtainMessage();
+            message2.what = 103;
+            CloudClientSetActivity.access$55(CloudClientSetActivity.this).sendMessage(message2);
+        }
+    }
+
+    private void getCurrApkInfo() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            Log.e("packageName", getPackageName());
+            this.versionName = info.versionName;
+            this.versionCode = info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        this.tvCurrVersion.setText(String.valueOf(getResources().getString(R.string.setting_version)) + this.versionName);
+    }
+
+    @Override // android.app.Activity
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override // android.app.Activity, android.view.ContextThemeWrapper, android.content.ContextWrapper
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sp = newBase.getSharedPreferences("language", 0);
+        String type = sp.getString("language", "chinese");
+        super.attachBaseContext(LanguageUtils.attachBaseContext(newBase, type));
+    }
+
+    @Override // android.app.Activity, android.view.KeyEvent.Callback
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == 4) {
+            closeProgressDialog();
+            resetUpdateInfo();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    static /* synthetic */ void access$8(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.showProgressDialog();
+    }
+
+    private void showProgressDialog() {
+        if (AppEnvironment.isNewUpdate) {
+            if (this.progressDialog == null && !this.isover) {
+                this.apkUpdateList = new ArrayList();
+                this.progressDialog = new com.edutech.mobilestudyclient.view.CustomProgressDialog(this, this.apkUpdateList);
+                this.progressDialog.setOnKeyListener(this.keylistenerDialog);
+                this.progressDialog.show();
+            }
+        } else if (this.webprogressdialog == null && !this.isover) {
+            this.webprogressdialog = CustomProgressDialog.createDialog(this);
+            this.webprogressdialog.setMessage(getResources().getString(R.string.setting_loading));
+            this.webprogressdialog.setOnKeyListener(this.keylistenerDialog);
+            this.webprogressdialog.show();
+        }
+    }
+
+    static /* synthetic */ void access$5(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.closeProgressDialog();
+    }
+
+    private void closeProgressDialog() {
+        try {
+            this.tvUpdateNow.setEnabled(true);
+            this.tvUpdateNow.setTextColor(getResources().getColor(R.color.blue));
+            this.tvUpdateNow.setText(getResources().getString(R.string.setting_startupdating));
+            if (AppEnvironment.isNewUpdate) {
+                if (this.progressDialog != null && !this.isover) {
+                    this.progressDialog.resetData();
+                    this.progressDialog.dismiss();
+                    this.progressDialog = null;
+                }
+                this.apkUpdateList.clear();
+                isupdating = false;
+            } else if (this.webprogressdialog != null && !this.isover) {
+                this.webprogressdialog.dismiss();
+                this.webprogressdialog = null;
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    static /* synthetic */ void access$6(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.resetUpdateInfo();
+    }
+
+    private void resetUpdateInfo() {
+        if (this.apkUpdateList != null) {
+            this.apkUpdateList.clear();
+        }
+        isupdating = false;
+        this.updateTime = HttpStatus.SC_MULTIPLE_CHOICES;
+        if (this.updateThread != null) {
+            this.updateThread = null;
+        }
+        if (this.updateprogressThread != null) {
+            this.updateprogressThread = null;
+        }
+    }
+
+    @Override // android.app.Activity, android.view.Window.Callback
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        View v = getCurrentFocus();
+        boolean ret = super.dispatchTouchEvent(event);
+        if (v instanceof EditText) {
+            View w = getCurrentFocus();
+            int[] scrcoords = new int[2];
+            w.getLocationOnScreen(scrcoords);
+            float x = (event.getRawX() + w.getLeft()) - scrcoords[0];
+            float y = (event.getRawY() + w.getTop()) - scrcoords[1];
+            if (event.getAction() == 1 && (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w.getBottom())) {
+                InputMethodManager imm = (InputMethodManager) getSystemService("input_method");
+                imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+            }
+        }
+        return ret;
+    }
+
+    @Override // android.app.Activity
+    protected void onResume() {
+        super.onResume();
+        loadXml();
+        loadidXml();
+        this.isover = false;
+        Log.e("onresume", "onresume");
+        if (this.progressDialog != null && this.apkUpdateList != null && this.apkUpdateList.size() > 0) {
+            try {
+                this.progressDialog.setData(this.apkUpdateList);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$9 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass9 implements DialogInterface.OnKeyListener {
+        AnonymousClass9() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnKeyListener
+        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+            if (keyCode == 4 && event.getRepeatCount() == 0) {
+                CloudClientSetActivity.access$5(CloudClientSetActivity.this);
+                CloudClientSetActivity.access$6(CloudClientSetActivity.this);
+                return true;
+            }
+            return false;
+        }
     }
 
     @Override // android.app.Activity
@@ -4388,36 +1956,2489 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
         }
     }
 
-    @Override // android.app.Activity, android.view.KeyEvent.Callback
-    public boolean onKeyDown(int i, KeyEvent keyEvent) {
-        if (i == 4) {
-            closeProgressDialog();
-            resetUpdateInfo();
+    @Override // android.app.Activity
+    public void finish() {
+        super.finish();
+    }
+
+    static /* synthetic */ void access$76(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.deleteAPks();
+    }
+
+    private void deleteAPks() {
+        File[] files;
+        File file = new File(AppEnvironment.ASSETS_DIR);
+        if (file.isDirectory() && (files = file.listFiles()) != null) {
+            for (File tempFile : files) {
+                Log.e("apk", String.valueOf(tempFile.getAbsolutePath()) + "," + tempFile.getAbsolutePath().endsWith(".apk"));
+                if (tempFile.getAbsolutePath().endsWith(".apk")) {
+                    tempFile.delete();
+                }
+            }
         }
-        return super.onKeyDown(i, keyEvent);
+    }
+
+    static /* synthetic */ void access$77(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.deleteOtherFiles();
+    }
+
+    private void deleteOtherFiles() {
+        String daoxueben = String.valueOf(AppEnvironment.ASSETS_DIR) + "DaoXueBen/";
+        String zuoyefudao = String.valueOf(AppEnvironment.ASSETS_DIR) + "ZuoYeFuDao/";
+        String homework = String.valueOf(AppEnvironment.ASSETS_DIR) + "HomeWork/";
+        String newOffline = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/EBag/.System/offline/";
+        delete(homework);
+        delete(zuoyefudao);
+        delete(daoxueben);
+        delete(newOffline);
+    }
+
+    private void delete(String path) {
+        File[] files;
+        File dir = new File(path);
+        if (dir.isDirectory() && (files = dir.listFiles()) != null) {
+            for (File tempFile : files) {
+                if (!tempFile.isDirectory() || !tempFile.getName().equals("HTML")) {
+                    deleteFiles(tempFile.getAbsolutePath());
+                }
+            }
+        }
+    }
+
+    public static void deleteFiles(String path) {
+        File file = new File(path);
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File file2 : files) {
+                String newPath = file2.getAbsolutePath();
+                deleteFiles(newPath);
+            }
+        } else if (file.exists()) {
+            file.delete();
+        }
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class ResetThread extends Thread {
+        ResetThread() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public void run() {
+            CloudClientSetActivity.access$75(CloudClientSetActivity.this, true);
+            CloudClientSetActivity.access$76(CloudClientSetActivity.this);
+            CloudClientSetActivity.access$77(CloudClientSetActivity.this);
+            CloudClientSetActivity.access$75(CloudClientSetActivity.this, false);
+            Message msg = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+            msg.what = 112;
+            msg.sendToTarget();
+        }
+    }
+
+    private void showClearDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.notifymessage));
+        builder.setMessage(getResources().getString(R.string.clearmsg));
+        builder.setPositiveButton(R.string.cancel, new AnonymousClass16()).setNegativeButton(R.string.ok_button, new AnonymousClass17());
+        builder.setCancelable(true);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$16 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass16 implements DialogInterface.OnClickListener {
+        AnonymousClass16() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$17 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass17 implements DialogInterface.OnClickListener {
+        AnonymousClass17() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (!CloudClientSetActivity.access$84(CloudClientSetActivity.this)) {
+                new ResetThread().start();
+            }
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    private void showServiceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.notifymessage));
+        builder.setMessage(getResources().getString(R.string.feedbackmsg));
+        builder.setPositiveButton(getResources().getString(R.string.confirm), new AnonymousClass18());
+        builder.setCancelable(true);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$18 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass18 implements DialogInterface.OnClickListener {
+        AnonymousClass18() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    @Override // android.view.View.OnClickListener
+    public void onClick(View v) {
+        PackageInfo packageInfo;
+        Log.i(TAG, "onClick");
+        switch (v.getId()) {
+            case R.id.wifi_btn /* 2131362141 */:
+                try {
+                    packageInfo = getPackageManager().getPackageInfo(AppEnvironment.WIFI_PACKNAME, 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    packageInfo = null;
+                    e.printStackTrace();
+                }
+                if (packageInfo != null) {
+                    ComponentName componet = new ComponentName(AppEnvironment.WIFI_PACKNAME, "zte.com.wilink.wifi.WifiSettingActivity");
+                    Intent intent = new Intent();
+                    intent.setComponent(componet);
+                    intent.addFlags(268435456);
+                    intent.setAction("android.intent.action.MAIN");
+                    intent.addCategory("android.intent.category.LAUNCHER");
+                    startActivity(intent);
+                    return;
+                }
+                return;
+            case R.id.btnTitleBack /* 2131362312 */:
+                exit();
+                return;
+            case R.id.btnServiceControl /* 2131362313 */:
+                showServiceDialog();
+                return;
+            case R.id.btnAppControl /* 2131362314 */:
+                Intent appControlIntent = new Intent(this, AppControlActivity.class);
+                startActivity(appControlIntent);
+                return;
+            case R.id.btnReset /* 2131362315 */:
+                showClearDialog();
+                return;
+            case R.id.back_btn /* 2131362317 */:
+                this.back_btn.setVisibility(8);
+                return;
+            case R.id.btnUpdate /* 2131362320 */:
+            case R.id.password_update /* 2131362324 */:
+            case R.id.password_reset /* 2131362325 */:
+            default:
+                return;
+            case R.id.idauth_btn /* 2131362327 */:
+                if (this.registerDialog == null) {
+                    LayoutInflater inflater = getLayoutInflater();
+                    View layout = inflater.inflate(R.layout.idauth_dialog_setting, (ViewGroup) findViewById(R.id.idauth_dialog));
+                    this.id = (EditText) layout.findViewById(R.id.idauth_dialog_id);
+                    SharedPreferences sp = getSharedPreferences("idauthstring", 0);
+                    if (sp.contains("key")) {
+                        String key = sp.getString("key", "");
+                        this.id.setText(key);
+                    }
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.setting_sign)).setInverseBackgroundForced(true).setView(layout).setPositiveButton(getResources().getString(R.string.setting_sign), new AnonymousClass19()).setNegativeButton(getResources().getString(R.string.setting_cancel), new AnonymousClass20());
+                    Button dialogButton = (Button) layout.findViewById(R.id.idscan_btn);
+                    dialogButton.setOnClickListener(new AnonymousClass21());
+                    this.registerDialog = alertDialog.create();
+                }
+                if (this.registerDialog != null) {
+                    this.registerDialog.show();
+                    return;
+                }
+                return;
+            case R.id.ok_btn /* 2131362330 */:
+                this.btnTitleBack.setEnabled(false);
+                this.ok_btn.setEnabled(false);
+                this.ok_btn.setText(getResources().getString(R.string.setting_saving));
+                this.JXHD_Ip = this.ip_edit.getText().toString().trim();
+                if (needPwdDialog()) {
+                    if (this.threadPwd == null) {
+                        this.threadPwd = new HostPwd();
+                        this.threadPwd.start();
+                    }
+                    showConfirmPwdDialog();
+                    return;
+                }
+                new Thread(this.runnable_GetConfig_Infor).start();
+                return;
+            case R.id.tvUpdatePass /* 2131362331 */:
+                updatePassword();
+                return;
+            case R.id.tvUpdateNow /* 2131362334 */:
+                apkUpdate();
+                return;
+            case R.id.cancel_btn /* 2131362336 */:
+                exit();
+                return;
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$19 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass19 implements DialogInterface.OnClickListener {
+        AnonymousClass19() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (CloudClientSetActivity.this.id.getText().toString().length() >= 16) {
+                new Thread(CloudClientSetActivity.this.downloadRun).start();
+                Message msg = new Message();
+                msg.what = 1000;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessageDelayed(msg, 0L);
+            }
+            if (CloudClientSetActivity.access$85(CloudClientSetActivity.this) != null) {
+                CloudClientSetActivity.access$85(CloudClientSetActivity.this).dismiss();
+                CloudClientSetActivity.access$86(CloudClientSetActivity.this, null);
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$20 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass20 implements DialogInterface.OnClickListener {
+        AnonymousClass20() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (CloudClientSetActivity.access$85(CloudClientSetActivity.this) != null) {
+                CloudClientSetActivity.access$85(CloudClientSetActivity.this).dismiss();
+                CloudClientSetActivity.access$86(CloudClientSetActivity.this, null);
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$21 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass21 implements View.OnClickListener {
+        AnonymousClass21() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.idscan_btn /* 2131361940 */:
+                    Intent intent = new Intent(CloudClientSetActivity.this, MipcaActivityCapture.class);
+                    intent.setFlags(67108864);
+                    CloudClientSetActivity.this.startActivityForResult(intent, 3);
+                    return;
+                default:
+                    return;
+            }
+        }
+    }
+
+    private boolean needPwdDialog() {
+        if (AppEnvironment.isXF && !TextUtils.isEmpty(this.JXHD_Ip)) {
+            if (this.JXHD_Ip.contains("10.70.12.27") || this.JXHD_Ip.contains("202.107.231.160:8081")) {
+                return false;
+            }
+            return true;
+        } else if (AppEnvironment.isNLEZ && !TextUtils.isEmpty(this.JXHD_Ip)) {
+            if (this.JXHD_Ip.contains("10.164.150.53") || this.JXHD_Ip.contains("10.164.150.54") || this.JXHD_Ip.contains("10.164.150.52") || this.JXHD_Ip.contains("111.12.58.6:8000")) {
+                return false;
+            }
+            return true;
+        } else if (AppEnvironment.isNL && !TextUtils.isEmpty(this.JXHD_Ip)) {
+            if (this.JXHD_Ip.contains("192.168.3.253:81") || this.JXHD_Ip.contains("111.59.6.120:81")) {
+                return false;
+            }
+            return true;
+        } else if (AppEnvironment.isHT && !TextUtils.isEmpty(this.JXHD_Ip)) {
+            if (this.JXHD_Ip.contains("222.134.89.202:89") || this.JXHD_Ip.contains("yj.htsz.net:89") || this.JXHD_Ip.contains("192.168.0.5")) {
+                return false;
+            }
+            return true;
+        } else if (!AppEnvironment.isGQ || TextUtils.isEmpty(this.JXHD_Ip) || this.JXHD_Ip.contains("117.132.10.37:81")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void exit() {
+        Intent intent = new Intent(this, CloudClientActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    static /* synthetic */ void access$2(CloudClientSetActivity cloudClientSetActivity, String str) {
+        cloudClientSetActivity.writeXmlLanguage(str);
+    }
+
+    private void writeXmlLanguage(String type) {
+        Log.i(TAG, "writeXml");
+        File file = new File(this.LANGUAGEPATH);
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            file.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File xmlFile = FileInOutHelper.setupOrOpenFile(this.LANGUAGEPATH);
+        try {
+            this.fileos = new FileOutputStream(xmlFile);
+        } catch (FileNotFoundException e2) {
+            Log.e("FileNotFoundException", "can't create FileOutputStream");
+        }
+        XmlSerializer serializer = Xml.newSerializer();
+        try {
+            serializer.setOutput(this.fileos, "UTF-8");
+            serializer.startDocument(null, true);
+            serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+            serializer.startTag(null, "urlpath");
+            serializer.startTag(null, "language");
+            serializer.text(type);
+            serializer.endTag(null, "language");
+            serializer.endDocument();
+            serializer.flush();
+            this.fileos.close();
+        } catch (Exception e3) {
+            Log.e(TAG, "error occurred while creating xml file");
+        }
+    }
+
+    private void writeXml() {
+        Log.i(TAG, "writeXml");
+        if (this.tempfile.exists()) {
+            this.tempfile.delete();
+        }
+        String ip = this.ip_edit.getText().toString();
+        AppEnvironment.MOBILESTUDYSERVERIP = ip;
+        String ip2 = ip.replaceAll(" ", "");
+        if (ip2.length() > 7) {
+            String subhttp = ip2.substring(0, 7);
+            Log.i(TAG, "subhttp" + subhttp);
+            if (subhttp.equals("http://")) {
+                ip2 = ip2.substring(7);
+                this.ptfw_edit.setText(ip2);
+                this.ip_edit.setText(ip2);
+                showToast(getResources().getString(R.string.setting_serverurlerror));
+            }
+        }
+        if (ip2 == null || (ip2 != null && ip2.length() <= 0)) {
+            ip2 = "192.168.0.88";
+        }
+        String username = "";
+        String password = "";
+        try {
+            SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
+            String struserName = sharePre.getString("name", "");
+            String strpassWord = this.password_edit.getText().toString();
+            if (struserName != null && strpassWord != null) {
+                struserName = struserName.replaceAll(" ", "");
+                strpassWord = strpassWord.replaceAll(" ", "");
+            }
+            this.Name = struserName;
+            this.Pwd = strpassWord;
+            username = BZip2Utils.StringEncodeToBase64(struserName);
+            password = BZip2Utils.StringEncodeToBase64(strpassWord);
+            if (struserName == null || (struserName != null && struserName.length() <= 0)) {
+                username = BZip2Utils.StringEncodeToBase64("02");
+            }
+            if (strpassWord == null || (strpassWord != null && strpassWord.length() <= 0)) {
+                password = BZip2Utils.StringEncodeToBase64(LogHelp.TYPE_GUIDANCE);
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        File xmlFile = FileInOutHelper.setupOrOpenFile(this.urlfilepath);
+        try {
+            this.fileos = new FileOutputStream(xmlFile);
+        } catch (FileNotFoundException e) {
+            Log.e("FileNotFoundException", "can't create FileOutputStream");
+        }
+        XmlSerializer serializer = Xml.newSerializer();
+        try {
+            serializer.setOutput(this.fileos, "UTF-8");
+            serializer.startDocument(null, true);
+            serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+            serializer.startTag(null, "urlpath");
+            serializer.startTag(null, "ip");
+            serializer.text(ip2);
+            serializer.endTag(null, "ip");
+            serializer.startTag(null, "showDemo");
+            serializer.text(this.setDemoShow);
+            serializer.endTag(null, "showDemo");
+            serializer.endTag(null, "urlpath");
+            serializer.startTag(null, "student");
+            serializer.startTag(null, "username");
+            serializer.text(username);
+            serializer.endTag(null, "username");
+            serializer.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
+            serializer.text(password);
+            serializer.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
+            serializer.endTag(null, "student");
+            serializer.endDocument();
+            serializer.flush();
+            this.fileos.close();
+        } catch (Exception e2) {
+            Log.e(TAG, "error occurred while creating xml file");
+        }
+    }
+
+    public void loadXml() {
+        Log.i(TAG, "loadXml");
+        File xmlFile = FileInOutHelper.setupOrOpenFile(this.urlfilepath);
+        try {
+            this.filein = new FileInputStream(xmlFile);
+        } catch (FileNotFoundException e1) {
+            Log.e(TAG, "FileNotFoundException");
+            e1.printStackTrace();
+        }
+        try {
+            XmlPullParserFactory pullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser xmlPullParser = pullParserFactory.newPullParser();
+            xmlPullParser.setInput(this.filein, "UTF-8");
+            for (int eventType = xmlPullParser.getEventType(); eventType != 1; eventType = xmlPullParser.next()) {
+                String nodeName = xmlPullParser.getName();
+                switch (eventType) {
+                    case 2:
+                        if ("ip".equals(nodeName)) {
+                            this.ipOrigal = xmlPullParser.nextText();
+                            this.ip_edit.setText(this.ipOrigal);
+                            this.modifiedIP = this.ipOrigal;
+                        }
+                        if ("username".equals(nodeName)) {
+                            try {
+                                this.nameOrigal = BZip2Utils.Base64DecodeToString(xmlPullParser.nextText());
+                                this.username_edit.setText(this.nameOrigal);
+                                this.modifiedName = this.nameOrigal;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if ("pwd".equals(nodeName)) {
+                            try {
+                                this.pwdOrigal = BZip2Utils.Base64DecodeToString(xmlPullParser.nextText());
+                                this.password_edit.setText(this.pwdOrigal);
+                                continue;
+                            } catch (Exception e2) {
+                                e2.printStackTrace();
+                                continue;
+                            }
+                        } else {
+                            continue;
+                        }
+                }
+            }
+        } catch (IOException e3) {
+            e3.printStackTrace();
+        } catch (IllegalArgumentException e4) {
+        } catch (XmlPullParserException e5) {
+            e5.printStackTrace();
+        } catch (Exception e6) {
+        }
+        if (this.filein != null) {
+            try {
+                this.filein.close();
+            } catch (IOException e7) {
+                e7.printStackTrace();
+            }
+        }
+    }
+
+    public void loadidXml() {
+        int i = Build.VERSION.SDK_INT;
+        loadidXml1();
+    }
+
+    public void loadidXml1() {
+        List<String> idInfo;
+        Log.i(TAG, "loadidXml");
+        File xmlFile = FileInOutHelper.setupOrOpenFile(idfilepath);
+        if (xmlFile.length() > 0 && (idInfo = ActivityBase.readIDFile()) != null) {
+            String idString = idInfo.get(0);
+            String machineID = idInfo.get(1);
+            String machineID2 = machineID;
+            String resultString = idInfo.get(2);
+            String times = idInfo.get(3);
+            String date = idInfo.get(4);
+            String usedTimes = idInfo.get(5);
+            if (idString != null) {
+                SharedPreferences sp = getSharedPreferences("idauthstring", 0);
+                sp.edit().putString("key", idString).commit();
+                this.idAuth_btn.setText(getResources().getString(R.string.registeragain));
+            }
+            if (resultString.length() != 0 && idString.length() != 0 && machineID2.length() != 0) {
+                int result = Integer.parseInt(resultString);
+                StringBuilder idauth_value = new StringBuilder();
+                if (result == 4) {
+                    idauth_value.append("正式版:");
+                } else if (result == 5) {
+                    idauth_value.append("测试版:");
+                } else {
+                    idauth_value.append("未注册");
+                }
+                if (result == 4 || result == 5) {
+                    idauth_value.append(idString);
+                }
+                if (date.length() > 2) {
+                    idauth_value.append("\n有效期限：" + date);
+                } else if (date.length() == 1 && Integer.parseInt(date) == 0) {
+                    idauth_value.append("\n有效期限：无限制");
+                }
+                if (times.length() > 0 && Integer.parseInt(times) > 0) {
+                    if (usedTimes.length() > 0 && Integer.parseInt(usedTimes) >= 0) {
+                        idauth_value.append("\n使用/授权次数：" + usedTimes + "/" + times);
+                    } else {
+                        idauth_value.append("\n授权次数：" + times);
+                    }
+                }
+                this.idauth_edit.setHeight(50);
+                String[] items = idauth_value.toString().split("\n");
+                if (items == null) {
+                    this.idauth_edit.setTextSize(18.0f);
+                } else if (items.length == 1) {
+                    this.idauth_edit.setTextSize(15.0f);
+                } else {
+                    this.idauth_edit.setTextSize(12.0f);
+                }
+                this.idauth_edit.setText(idauth_value);
+            }
+        }
+    }
+
+    public void loadidXml2() {
+        File xmlFile = new File(Aduth.filepathMobileStudyClient_NEW);
+        Log.e("setting", "auth:" + ((Object) null));
+        if (!xmlFile.exists() || xmlFile.length() > 0) {
+            List<String> idInfo = FileUtils.readIDFile();
+            Log.e("setting", "auth:" + idInfo);
+            if (idInfo != null && idInfo.size() > 0) {
+                String idString = idInfo.get(0);
+                String machineID = idInfo.get(1);
+                String machineID2 = machineID;
+                String resultString = idInfo.get(2);
+                String times = idInfo.get(3);
+                String date = idInfo.get(4);
+                String usedTimes = idInfo.get(5);
+                if (idString != null) {
+                    SharedPreferences sp = getSharedPreferences("idauthstring", 0);
+                    sp.edit().putString("key", idString).commit();
+                    this.idAuth_btn.setText(getResources().getString(R.string.registeragain));
+                }
+                if (resultString != null && idString != null && resultString.length() != 0 && idString.length() != 0 && machineID2.length() != 0) {
+                    int result = Integer.parseInt(resultString);
+                    StringBuilder idauth_value = new StringBuilder();
+                    if (result == 4) {
+                        idauth_value.append("正式版:");
+                    } else if (result == 5) {
+                        idauth_value.append("测试版:");
+                    } else {
+                        idauth_value.append("未注册");
+                    }
+                    if (result == 4 || result == 5) {
+                        idauth_value.append(idString);
+                    }
+                    if (date.length() > 2) {
+                        idauth_value.append("\n有效期限：" + date);
+                    } else if (date.length() == 1 && Integer.parseInt(date) == 0) {
+                        idauth_value.append("\n有效期限：无限制");
+                    }
+                    if (times.length() > 0 && Integer.parseInt(times) > 0) {
+                        if (usedTimes.length() > 0 && Integer.parseInt(usedTimes) >= 0) {
+                            idauth_value.append("\n使用/授权次数：" + usedTimes + "/" + times);
+                        } else {
+                            idauth_value.append("\n授权次数：" + times);
+                        }
+                    }
+                    this.idauth_edit.setHeight(50);
+                    String[] items = idauth_value.toString().split("\n");
+                    if (items == null) {
+                        this.idauth_edit.setTextSize(14.0f);
+                    } else if (items.length == 1) {
+                        this.idauth_edit.setTextSize(12.0f);
+                    } else {
+                        this.idauth_edit.setTextSize(10.0f);
+                    }
+                    this.idauth_edit.setSingleLine(false);
+                    this.idauth_edit.setText(idauth_value.toString());
+                }
+            }
+        }
     }
 
     @Override // android.app.Activity
-    protected void onResume() {
-        super.onResume();
-        loadXml();
-        loadidXml();
-        this.isover = false;
-        Log.e("onresume", "onresume");
-        if (this.progressDialog == null || this.apkUpdateList == null || this.apkUpdateList.size() <= 0) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        boolean z = false;
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == 3) {
+            if (resultCode == -1) {
+                String contents = intent.getStringExtra(Intents.Scan.RESULT);
+                intent.getStringExtra(Intents.Scan.RESULT_FORMAT);
+                if (this.id == null) {
+                    z = true;
+                }
+                Log.e("id", String.valueOf(z) + "," + (contents == null ? "null" : contents));
+                if (contents != null && this.id != null) {
+                    this.id.setText(contents);
+                    return;
+                }
+                return;
+            }
+            Toast.makeText(this, "RESULT_NOT_OK", 0).show();
             return;
         }
+        Toast.makeText(this, "ZXING_SCAN<>3", 0).show();
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$10 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass10 implements Runnable {
+        AnonymousClass10() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            String times;
+            String date;
+            if (CloudClientSetActivity.this.id.getText().toString().length() < 10) {
+                CloudClientSetActivity.this.showToast("授权码格式不对！");
+            } else if (Build.VERSION.SDK_INT >= 24) {
+                CloudClientSetActivity.access$50(CloudClientSetActivity.this);
+            } else {
+                HttpClient httpClient = CloudClientSetActivity.access$51(CloudClientSetActivity.this, new DefaultHttpClient());
+                HttpPost httpPost = new HttpPost("https://www.icontrol365.com/regmac.aspx");
+                StringBuilder xml = new StringBuilder();
+                xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                xml.append("<ApplyAuth><strAuthID>" + CloudClientSetActivity.this.id.getText().toString() + "</strAuthID>");
+                xml.append("<strMacAddr>" + CloudClientSetActivity.this.GetMachineID() + "</strMacAddr>");
+                xml.append("<strSystemInfo>" + Build.MODEL + "</strSystemInfo></ApplyAuth>");
+                try {
+                    httpPost.setHeader("Content-Type", "application/xml;charset=UTF-8");
+                    httpPost.setEntity(new StringEntity(xml.toString()));
+                } catch (UnsupportedEncodingException e3) {
+                    e3.printStackTrace();
+                }
+                try {
+                    HttpResponse response = httpClient.execute(httpPost);
+                    StatusLine status = response.getStatusLine();
+                    if (status.getStatusCode() != 200) {
+                        Log.d("SSL", "HTTP error, invalid server status code: " + response.getStatusLine());
+                        return;
+                    }
+                    new ByteArrayOutputStream();
+                    InputStream in = response.getEntity().getContent();
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = factory.newDocumentBuilder();
+                    Document doc = builder.parse(in);
+                    Element root = doc.getDocumentElement();
+                    int result = Integer.parseInt(root.getElementsByTagName("AuthResult").item(0).getFirstChild().getNodeValue());
+                    if (result == 4 || result == 5) {
+                        NodeList tmpnode = root.getElementsByTagName("AuthTimes");
+                        if (tmpnode.getLength() > 0 && tmpnode.item(0).getFirstChild().getNodeValue().length() > 0) {
+                            times = tmpnode.item(0).getFirstChild().getNodeValue();
+                        } else {
+                            times = "0";
+                        }
+                        NodeList tmpnode2 = root.getElementsByTagName("AuthValidDate");
+                        if (tmpnode2.getLength() > 0 && tmpnode2.item(0).getFirstChild().getNodeValue().length() > 0) {
+                            date = tmpnode2.item(0).getFirstChild().getNodeValue();
+                        } else {
+                            date = "0";
+                        }
+                        int i = Build.VERSION.SDK_INT;
+                        CloudClientSetActivity.this.idauth.writeidFile(CloudClientSetActivity.this.id.getText().toString(), result, times, date, "0");
+                    }
+                    Message msg = new Message();
+                    msg.what = result;
+                    CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessageDelayed(msg, 1000L);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (IllegalStateException e2) {
+                    e2.printStackTrace();
+                } catch (ParserConfigurationException e1) {
+                    e1.printStackTrace();
+                } catch (ClientProtocolException e4) {
+                    e4.printStackTrace();
+                } catch (SAXException e5) {
+                    e5.printStackTrace();
+                }
+            }
+        }
+    }
+
+    static /* synthetic */ void access$50(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.sslConnect();
+    }
+
+    private void sslConnect() {
+        MalformedURLException e6;
+        String times;
+        String date;
         try {
-            this.progressDialog.setData(this.apkUpdateList);
+            URL urls = new URL("https://www.icontrol365.com/regmac.aspx");
+            try {
+                TrustManager[] trustAllCerts = {new AnonymousClass22()};
+                HttpsURLConnection.setDefaultHostnameVerifier(new MyHostnameVerifier(this, null));
+                SSLContext context = SSLContext.getInstance(IMAPSClient.DEFAULT_PROTOCOL);
+                context.init(null, trustAllCerts, null);
+                SSLSocketFactory preferredCipherSuiteSSLSocketFactory = new SSLSocketFactoryExtended();
+                HttpsURLConnection urlconnection = (HttpsURLConnection) urls.openConnection();
+                urlconnection.setSSLSocketFactory(preferredCipherSuiteSSLSocketFactory);
+                urlconnection.setDoInput(true);
+                urlconnection.setDoOutput(true);
+                urlconnection.setRequestMethod(HttpPost.METHOD_NAME);
+                urlconnection.addRequestProperty("Content-Type", "application/xml;charset=UTF-8");
+                urlconnection.connect();
+                StringBuilder xml = new StringBuilder();
+                xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                xml.append("<ApplyAuth><strAuthID>" + this.id.getText().toString() + "</strAuthID>");
+                xml.append("<strMacAddr>" + GetMachineID() + "</strMacAddr>");
+                xml.append("<strSystemInfo>" + Build.MODEL + "</strSystemInfo></ApplyAuth>");
+                DataOutputStream dos = new DataOutputStream(urlconnection.getOutputStream());
+                dos.writeBytes(xml.toString());
+                dos.flush();
+                dos.close();
+                if (200 == urlconnection.getResponseCode()) {
+                    new StringBuffer();
+                    new String();
+                    InputStream in = urlconnection.getInputStream();
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = factory.newDocumentBuilder();
+                    Document doc = builder.parse(in);
+                    Element root = doc.getDocumentElement();
+                    int result = Integer.parseInt(root.getElementsByTagName("AuthResult").item(0).getFirstChild().getNodeValue());
+                    if (result == 4 || result == 5) {
+                        NodeList tmpnode = root.getElementsByTagName("AuthTimes");
+                        if (tmpnode.getLength() > 0 && tmpnode.item(0).getFirstChild().getNodeValue().length() > 0) {
+                            times = tmpnode.item(0).getFirstChild().getNodeValue();
+                        } else {
+                            times = "0";
+                        }
+                        NodeList tmpnode2 = root.getElementsByTagName("AuthValidDate");
+                        if (tmpnode2.getLength() > 0 && tmpnode2.item(0).getFirstChild().getNodeValue().length() > 0) {
+                            date = tmpnode2.item(0).getFirstChild().getNodeValue();
+                        } else {
+                            date = "0";
+                        }
+                        int i = Build.VERSION.SDK_INT;
+                        this.idauth.writeidFile(this.id.getText().toString(), result, times, date, "0");
+                        try {
+                            new Aduth(this).writeidFile(this.id.getText().toString(), result, times, date, "0");
+                        } catch (Exception e) {
+                        }
+                    }
+                    Log.e("HHH", "result:" + result);
+                    Message msg = new Message();
+                    msg.what = result;
+                    this.resultHandler.sendMessageDelayed(msg, 1000L);
+                }
+            } catch (MalformedURLException e2) {
+                e6 = e2;
+                e6.printStackTrace();
+            } catch (Exception e3) {
+            }
+        } catch (MalformedURLException e4) {
+            e6 = e4;
+        } catch (Exception e5) {
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$22 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass22 implements X509TrustManager {
+        AnonymousClass22() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public X509Certificate[] getAcceptedIssuers() {
+            X509Certificate[] myTrustedAnchors = new X509Certificate[0];
+            return myTrustedAnchors;
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$11 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass11 implements Runnable {
+        AnonymousClass11() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        static /* synthetic */ CloudClientSetActivity access$0(AnonymousClass11 anonymousClass11) {
+            return CloudClientSetActivity.this;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            if (CloudClientSetActivity.this.newpwd.getText().toString().length() < 6 || CloudClientSetActivity.this.oldpwd.getText().toString().length() < 6) {
+                Message msg = new Message();
+                msg.what = 13;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessageDelayed(msg, 1000L);
+            } else if (CloudClientSetActivity.access$52(CloudClientSetActivity.this) != null && !"".equals(CloudClientSetActivity.access$52(CloudClientSetActivity.this).getText().toString())) {
+                if (CloudClientSetActivity.access$24(CloudClientSetActivity.this) != null && CloudClientSetActivity.this.oldpwd != null && !"".equals(CloudClientSetActivity.access$24(CloudClientSetActivity.this).getText().toString()) && !"".equals(CloudClientSetActivity.this.oldpwd.getText().toString())) {
+                    SharedPreferences sharePre = CloudClientSetActivity.this.getSharedPreferences("privatekey", 0);
+                    String userName = sharePre.getString("name", "");
+                    if (!TextUtils.isEmpty(userName)) {
+                        CloudClientSetActivity.this.runOnUiThread(new AnonymousClass1(userName));
+                    }
+                    if (!userName.equals("")) {
+                        CloudClientSetActivity.access$53(CloudClientSetActivity.this, CloudClientSetActivity.this.newpwd.getText().toString());
+                        String result = CloudClientSetActivity.this.ModifyPassword(userName, CloudClientSetActivity.this.oldpwd.getText().toString(), CloudClientSetActivity.this.newpwd.getText().toString());
+                        Message msg2 = new Message();
+                        try {
+                        } catch (JSONException e) {
+                            msg2.what = 12;
+                            e.printStackTrace();
+                        }
+                        if (result.equals("")) {
+                            CloudClientSetActivity.access$54(CloudClientSetActivity.this, CloudClientSetActivity.this.getResources().getString(R.string.setting_errornetwork));
+                            msg2.what = 12;
+                            CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessageDelayed(msg2, 500L);
+                            return;
+                        }
+                        JSONObject jobj = new JSONObject(result);
+                        boolean status = jobj.getBoolean("status");
+                        if (!status) {
+                            CloudClientSetActivity.access$54(CloudClientSetActivity.this, jobj.getString("errorInfo"));
+                            msg2.what = 12;
+                        } else {
+                            File file = new File(AppEnvironment.URLFILEPATH);
+                            if (file.exists()) {
+                                file.delete();
+                            }
+                            msg2.what = 11;
+                        }
+                        CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessageDelayed(msg2, 500L);
+                    }
+                }
+            } else {
+                Message msg3 = new Message();
+                msg3.what = 16;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessageDelayed(msg3, 1000L);
+            }
+        }
+
+        /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$11$1 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass1 implements Runnable {
+            private final /* synthetic */ String val$userName;
+
+            AnonymousClass1(String str) {
+                AnonymousClass11.this = r1;
+                this.val$userName = str;
+            }
+
+            @Override // java.lang.Runnable
+            public void run() {
+                CloudClientSetActivity.access$24(AnonymousClass11.access$0(AnonymousClass11.this)).setText(this.val$userName);
+            }
+        }
+    }
+
+    public String ModifyPassword(String username, String oldpw, String password) {
+        SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
+        String privatekey = sharePre.getString("key", "");
+        sharePre.getString("apihost", "");
+        String username2 = this.modifiedName;
+        String ip = this.modifiedIP;
+        String url = JsonHelper.Update_Pwd_HTTPPOST_URL(ip);
+        try {
+            HttpPost post = new HttpPost(url);
+            post.addHeader("X-Edutech-Entity", username2);
+            long imestamp = System.currentTimeMillis();
+            String sign = My_md5.Md5(String.valueOf(imestamp) + username2 + privatekey);
+            post.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
+            post.addHeader("Accept-Encoding", "gzip,deflate");
+            MultipartEntity entity = new MultipartEntity();
+            entity.addPart("newPassWord", new StringBody(password));
+            entity.addPart("oldPassWord", new StringBody(oldpw));
+            post.setEntity(entity);
+            DefaultHttpClient client = new DefaultHttpClient();
+            HttpResponse response = client.execute(post);
+            String result = getJsonStringFromGZIP(response);
+            return result;
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+            return "";
+        } catch (IOException e2) {
+            e2.printStackTrace();
+            return "";
+        }
+    }
+
+    static /* synthetic */ String access$68(CloudClientSetActivity cloudClientSetActivity, HttpResponse httpResponse) {
+        return cloudClientSetActivity.getJsonStringFromGZIP(httpResponse);
+    }
+
+    private String getJsonStringFromGZIP(HttpResponse response) {
+        InputStream is;
+        try {
+            if (response.getStatusLine().getStatusCode() == 200) {
+                InputStream is2 = response.getEntity().getContent();
+                BufferedInputStream bis = new BufferedInputStream(is2);
+                bis.mark(2);
+                byte[] header = new byte[2];
+                int result = bis.read(header);
+                bis.reset();
+                int headerData = getShort(header);
+                if (result != -1 && headerData == 8075) {
+                    Log.d(TAG, " use GZIPInputStream  ");
+                    is = new GZIPInputStream(bis);
+                } else {
+                    Log.d(TAG, " not use GZIPInputStream");
+                    is = bis;
+                }
+                InputStreamReader reader = new InputStreamReader(is, "utf-8");
+                char[] data = new char[100];
+                StringBuffer sb = new StringBuffer();
+                while (true) {
+                    int readSize = reader.read(data);
+                    if (readSize > 0) {
+                        sb.append(data, 0, readSize);
+                    } else {
+                        String jsonString = sb.toString();
+                        bis.close();
+                        reader.close();
+                        return jsonString;
+                    }
+                }
+            } else {
+                Log.e(TAG, "与服务端连接失败。。。");
+                Log.e(TAG, "ddddd=" + response.getStatusLine().getStatusCode());
+                return "";
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString(), e);
+            return "";
+        }
+    }
+
+    private int getShort(byte[] data) {
+        return (data[0] << 8) | (data[1] & BSON.MINKEY);
+    }
+
+    @SuppressLint({"NewApi"})
+    public final String GetMachineID() {
+        TelephonyManager tm = (TelephonyManager) getSystemService("phone");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nModel = " + Build.MODEL);
+        sb.append("\nSerialNumber = " + Build.SERIAL);
+        sb.append("\nDeviceId(IMEI) = " + tm.getDeviceId());
+        String android_id = Settings.Secure.getString(getContentResolver(), "android_id");
+        sb.append("\nAndroidID = " + android_id);
+        WifiManager wm = (WifiManager) getSystemService("wifi");
+        String m_szWLANMAC = wm.getConnectionInfo().getMacAddress();
+        if (m_szWLANMAC == null) {
+            for (int i = 0; i <= 5 && ((m_szWLANMAC = wm.getConnectionInfo().getMacAddress()) == null || m_szWLANMAC.length() <= 0); i++) {
+                try {
+                    Thread.sleep(org.apache.tools.ant.util.FileUtils.FAT_FILE_TIMESTAMP_GRANULARITY);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (m_szWLANMAC != null && m_szWLANMAC.equals("02:00:00:00:00:00")) {
+            m_szWLANMAC = getMacAddr();
+        }
+        if (m_szWLANMAC == null) {
+            m_szWLANMAC = "";
+        }
+        sb.append("\nMACAddress = " + m_szWLANMAC);
+        return String.valueOf(toHexString(toMd5(sb.toString().getBytes()), "")) + ":" + m_szWLANMAC.replaceAll(":", "");
+    }
+
+    @SuppressLint({"NewApi"})
+    public String getMacAddr() {
+        try {
+            List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface nif : all) {
+                if (nif.getName().equalsIgnoreCase("wlan0")) {
+                    byte[] macBytes = nif.getHardwareAddress();
+                    if (macBytes == null) {
+                        return "";
+                    }
+                    StringBuilder res1 = new StringBuilder();
+                    for (byte b : macBytes) {
+                        res1.append(String.valueOf(Integer.toHexString(b & BSON.MINKEY)) + ":");
+                    }
+                    if (res1.length() > 0) {
+                        res1.deleteCharAt(res1.length() - 1);
+                    }
+                    return res1.toString();
+                }
+            }
+        } catch (Exception e) {
+        }
+        return "";
+    }
+
+    public static byte[] toMd5(byte[] bytes) {
+        try {
+            MessageDigest algorithm = MessageDigest.getInstance("MD5");
+            algorithm.reset();
+            algorithm.update(bytes);
+            return algorithm.digest();
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+    }
+
+    public static String toHexString(byte[] bytes, String separator) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            hexString.append(Integer.toHexString(b & BSON.MINKEY)).append(separator);
+        }
+        return hexString.toString();
+    }
+
+    static /* synthetic */ HttpClient access$51(CloudClientSetActivity cloudClientSetActivity, HttpClient httpClient) {
+        return cloudClientSetActivity.sslClient(httpClient);
+    }
+
+    private HttpClient sslClient(HttpClient client) {
+        try {
+            X509TrustManager tm = new AnonymousClass23();
+            SSLContext ctx = SSLContext.getInstance(IMAPSClient.DEFAULT_PROTOCOL);
+            ctx.init(null, new TrustManager[]{tm}, null);
+            org.apache.http.conn.ssl.SSLSocketFactory ssf = new MySSLSocketFactory(ctx);
+            ssf.setHostnameVerifier(org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            ClientConnectionManager ccm = client.getConnectionManager();
+            SchemeRegistry sr = ccm.getSchemeRegistry();
+            sr.register(new Scheme("https", ssf, 443));
+            return new DefaultHttpClient(ccm, client.getParams());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$23 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass23 implements X509TrustManager {
+        AnonymousClass23() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }
+
+    public void showToast(String text) {
+        if (this.mToast != null) {
+            this.mToast.cancel();
+        }
+        this.mToast = Toast.makeText(this, text, 1);
+        this.mToast.show();
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$12 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass12 implements Runnable {
+        AnonymousClass12() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            CloudClientSetActivity.access$21(CloudClientSetActivity.this, CloudClientSetActivity.access$1(CloudClientSetActivity.this).replaceAll(" ", ""));
+            if (CloudClientSetActivity.access$1(CloudClientSetActivity.this).length() > 7) {
+                String subhttp = CloudClientSetActivity.access$1(CloudClientSetActivity.this).substring(0, 7);
+                if (subhttp.equals("http://")) {
+                    CloudClientSetActivity.access$21(CloudClientSetActivity.this, CloudClientSetActivity.access$1(CloudClientSetActivity.this).substring(7));
+                    Message message = CloudClientSetActivity.access$55(CloudClientSetActivity.this).obtainMessage();
+                    message.what = HttpStatus.SC_SWITCHING_PROTOCOLS;
+                    CloudClientSetActivity.access$55(CloudClientSetActivity.this).sendMessage(message);
+                }
+            }
+            try {
+                String struserName = CloudClientSetActivity.access$24(CloudClientSetActivity.this).getText().toString();
+                String strpassWord = CloudClientSetActivity.access$19(CloudClientSetActivity.this).getText().toString();
+                if (struserName != null && strpassWord != null) {
+                    struserName = struserName.replaceAll(" ", "");
+                    strpassWord = strpassWord.replaceAll(" ", "");
+                }
+                CloudClientSetActivity.access$56(CloudClientSetActivity.this, struserName);
+                CloudClientSetActivity.access$57(CloudClientSetActivity.this, strpassWord);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            int flag = -1;
+            Log.i(CloudClientSetActivity.TAG, "writeXml");
+            Log.i(CloudClientSetActivity.TAG, "2152");
+            String ip = CloudClientSetActivity.access$0(CloudClientSetActivity.this).getText().toString();
+            AppEnvironment.MOBILESTUDYSERVERIP = ip;
+            String ip2 = ip.replaceAll(" ", "");
+            if (ip2.length() > 7) {
+                String subhttp2 = ip2.substring(0, 7);
+                if (subhttp2.equals("http://")) {
+                    ip2 = ip2.substring(7);
+                    CloudClientSetActivity.access$52(CloudClientSetActivity.this).setText(ip2);
+                    CloudClientSetActivity.access$0(CloudClientSetActivity.this).setText(ip2);
+                }
+            }
+            if (ip2.endsWith("/")) {
+                Message message2 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message2.what = PointerIconCompat.TYPE_HELP;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message2);
+                return;
+            }
+            if (ip2 == null || (ip2 != null && ip2.length() <= 0)) {
+                ip2 = "192.168.0.88";
+            }
+            String url = "http://" + ip2 + "/api/config";
+            WifiManager wm = (WifiManager) CloudClientSetActivity.this.getSystemService("wifi");
+            String m_szWLANMAC = wm.getConnectionInfo().getMacAddress();
+            if (m_szWLANMAC != null && m_szWLANMAC.equals("02:00:00:00:00:00")) {
+                m_szWLANMAC = CloudClientSetActivity.this.getMacAddr();
+            }
+            String result = null;
+            try {
+                result = CloudClientSetActivity.access$59(CloudClientSetActivity.this, String.valueOf(url) + "/mac/" + m_szWLANMAC, CloudClientSetActivity.access$58(CloudClientSetActivity.this));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            CloudClientSetActivity.access$54(CloudClientSetActivity.this, "");
+            if (result != null && !result.equals("")) {
+                flag = CloudClientSetActivity.access$60(CloudClientSetActivity.this, result);
+            }
+            if (flag == 1) {
+                Message message3 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message3.what = 20;
+                message3.obj = result;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message3);
+            } else if (flag == 0) {
+                Message message4 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message4.what = 31;
+                message4.obj = result;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message4);
+            } else if (flag == 2) {
+                Message message5 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message5.what = 32;
+                message5.obj = result;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message5);
+            } else if (flag == -2) {
+                Message message6 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message6.what = PointerIconCompat.TYPE_HAND;
+                message6.obj = result;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message6);
+            } else if (flag == -100) {
+                Message message7 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message7.what = 1005;
+                message7.obj = result;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message7);
+            } else {
+                Message message8 = CloudClientSetActivity.access$31(CloudClientSetActivity.this).obtainMessage();
+                message8.what = 21;
+                message8.obj = result;
+                CloudClientSetActivity.access$31(CloudClientSetActivity.this).sendMessage(message8);
+            }
+        }
+    }
+
+    private boolean checkConfig(String jsonStr, String timeStamp) {
+        try {
+            JSONObject json = new JSONObject(jsonStr);
+            if (json.has("checksum")) {
+                JSONObject data = json.getJSONObject("data");
+                data.toString();
+                String checksum = json.getString("checksum");
+                String seed = data.getString("privatekey");
+                String apihost = data.getString("apihost");
+                String aesString = AESUtils.encrypt(seed, String.valueOf(seed) + apihost + timeStamp);
+                String md5String = My_md5.Md5(aesString);
+                if (md5String == null || checksum == null) {
+                    return false;
+                }
+                if (!md5String.equals(checksum)) {
+                    return false;
+                }
+                return true;
+            }
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            return false;
+        }
+    }
+
+    static /* synthetic */ String access$59(CloudClientSetActivity cloudClientSetActivity, String str, String str2) {
+        return cloudClientSetActivity.Get_Config_Json(str, str2);
+    }
+
+    private String Get_Config_Json(String url, String username) {
+        if (url.equals("") || url == null || username.equals("") || username == null) {
+            Log.e(TAG, "Get_Config_Json 入参有问题。。。");
+            return null;
+        }
+        Log.e(TAG, "Get_Config_Json 入参有问题。。。" + url);
+        try {
+            HttpResponse httpResponse = Get_http_addheader(url, username, true);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                StringBuilder builder = new StringBuilder();
+                BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8"));
+                for (String s = bufferedReader2.readLine(); s != null; s = bufferedReader2.readLine()) {
+                    builder.append(s);
+                }
+                String resultString = builder.toString();
+                Log.e(TAG, "学校和用户个人信息获取完成。。。" + resultString);
+                return resultString;
+            }
+            Log.e(TAG, "学校和用户个人信息获取完成。。。" + httpResponse.getStatusLine().getStatusCode());
+            return null;
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e2) {
+            e2.printStackTrace();
+            return null;
+        }
+    }
+
+    static /* synthetic */ int access$60(CloudClientSetActivity cloudClientSetActivity, String str) {
+        return cloudClientSetActivity.jsonToConfig(str);
+    }
+
+    private int jsonToConfig(String json_str) {
+        String owncloud_port;
+        String username;
+        String mongo_pwd;
+        String tigase_ip;
+        String userid;
+        if (json_str == null || json_str.equals("")) {
+            return -1;
+        }
+        String guidancestate = "0";
+        String guidenotes = "0";
+        if (!checkConfig(json_str, this.timeStamp)) {
+            return -100;
+        }
+        try {
+            JSONObject info = new JSONObject(json_str);
+            info.getString("status");
+            String errorInfo = info.getString("errorInfo");
+            this.saveErrorInfo = errorInfo;
+            String errorNum = info.getString("errorNum");
+            if (errorNum.equals("-2")) {
+                return -2;
+            }
+            if (errorNum.equals("0")) {
+                JSONObject data = info.getJSONObject("data");
+                String privatekey = data.getString("privatekey");
+                String encrypt = data.getString("encrypt");
+                String apihost = data.getString("apihost");
+                try {
+                    guidancestate = data.getString("guidelearncomment");
+                } catch (Exception e) {
+                }
+                try {
+                    guidenotes = data.getString("guidenotes");
+                } catch (Exception e2) {
+                }
+                JSONObject user = data.getJSONObject(UserID.ELEMENT_NAME);
+                String pubkey = user.getString("pubkey");
+                String type_user = user.getString("type");
+                if (!type_user.equals("03") && !type_user.equals(LogHelp.TYPE_HWHELP)) {
+                    return 2;
+                }
+                try {
+                    userid = user.getString("id");
+                } catch (Exception e3) {
+                    e3.printStackTrace();
+                }
+                if (!My_md5.Md5(this.Pwd).equals(pubkey)) {
+                    return 0;
+                }
+                SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
+                SharedPreferences.Editor editor = sharePre.edit();
+                editor.putString("key", privatekey);
+                editor.putString("name", user.getString("usercode"));
+                editor.putString("apihost", apihost);
+                JSONObject ebag = null;
+                try {
+                    ebag = data.getJSONObject("ebag");
+                    if (ebag != null && !sharePre.getString("updatetime", "").equals(ebag.getString("updatetime"))) {
+                        Log.i("liu", "save time:" + sharePre.getString("updatetime", ""));
+                        Log.i("liu", "request time:" + ebag.getString("updatetime"));
+                        this.isUpdate = true;
+                        editor.putString("updatetime", ebag.getString("updatetime"));
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                editor.putString("userid", userid);
+                editor.commit();
+                String domain = "";
+                String port = "";
+                try {
+                    JSONObject tigase = data.getJSONObject("tigase");
+                    domain = "";
+                    try {
+                        domain = tigase.getString(ClientCookie.DOMAIN_ATTR);
+                    } catch (Exception e4) {
+                        e4.printStackTrace();
+                    }
+                    try {
+                        port = tigase.getString(ClientCookie.PORT_ATTR);
+                    } catch (Exception e5) {
+                        e5.printStackTrace();
+                    }
+                    try {
+                        tigase_ip = tigase.getString("ip");
+                    } catch (Exception e6) {
+                        e6.printStackTrace();
+                    }
+                } catch (Exception e7) {
+                    e7.printStackTrace();
+                }
+                String mongo_domain = "";
+                String mongo_port = "";
+                String mongo_user = "";
+                try {
+                    JSONObject mongo = data.getJSONObject("mongo");
+                    mongo_domain = "";
+                    mongo_port = "";
+                    mongo_user = "";
+                    try {
+                        mongo_domain = mongo.getString(ClientCookie.DOMAIN_ATTR);
+                    } catch (Exception e8) {
+                        e8.printStackTrace();
+                    }
+                    try {
+                        mongo_port = mongo.getString(ClientCookie.PORT_ATTR);
+                    } catch (Exception e9) {
+                        e9.printStackTrace();
+                    }
+                    try {
+                        mongo_user = mongo.getString(UserID.ELEMENT_NAME);
+                    } catch (Exception e10) {
+                        e10.printStackTrace();
+                    }
+                    try {
+                        mongo_pwd = mongo.getString("pwd");
+                    } catch (Exception e11) {
+                        e11.printStackTrace();
+                    }
+                } catch (Exception e12) {
+                    e12.printStackTrace();
+                }
+                String type = "";
+                String schoolid = "";
+                String schoolname = "";
+                String usercode = "";
+                try {
+                    JSONObject user_json = data.getJSONObject(UserID.ELEMENT_NAME);
+                    try {
+                        String Type = user_json.getString("type");
+                        try {
+                            if (Type.equals("02")) {
+                                type = "0";
+                            } else if (Type.equals("03")) {
+                                type = LogHelp.TYPE_MYWORK;
+                            } else if (Type.equals("05")) {
+                                type = LogHelp.TYPE_GUIDANCE;
+                            } else {
+                                type = "7";
+                            }
+                        } catch (Exception e13) {
+                            e13.printStackTrace();
+                            type = LogHelp.TYPE_MYWORK;
+                        }
+                    } catch (Exception e14) {
+                        e14.printStackTrace();
+                        type = "7";
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.setting_noneusererror), 0).show();
+                    }
+                    try {
+                        JSONArray school_json = user_json.getJSONArray("school");
+                        try {
+                            JSONObject school_item = school_json.getJSONObject(0);
+                            try {
+                                schoolid = school_item.getString("id");
+                                SharedPreferences sharePre2 = getSharedPreferences("privatekey", 0);
+                                SharedPreferences.Editor editor2 = sharePre2.edit();
+                                editor2.putString("schoolid", schoolid);
+                                editor2.commit();
+                            } catch (Exception e15) {
+                                e15.printStackTrace();
+                            }
+                            try {
+                                schoolname = school_item.getString("name");
+                            } catch (Exception e16) {
+                                e16.printStackTrace();
+                            }
+                        } catch (Exception e17) {
+                            e17.printStackTrace();
+                        }
+                    } catch (Exception e18) {
+                        e18.printStackTrace();
+                    }
+                    try {
+                        usercode = user_json.getString("usercode");
+                    } catch (Exception e19) {
+                        e19.printStackTrace();
+                    }
+                    try {
+                        username = user_json.getString("name");
+                        this.stu_name = username;
+                    } catch (Exception e20) {
+                        e20.printStackTrace();
+                    }
+                } catch (Exception e21) {
+                    e21.printStackTrace();
+                }
+                String owncloud_domain = "";
+                try {
+                    JSONObject cloud = data.getJSONObject("cloud");
+                    owncloud_domain = "";
+                    try {
+                        cloud.getString("scheme");
+                    } catch (Exception e22) {
+                        e22.printStackTrace();
+                    }
+                    try {
+                        owncloud_domain = cloud.getString(ClientCookie.DOMAIN_ATTR);
+                    } catch (Exception e23) {
+                        e23.printStackTrace();
+                    }
+                    try {
+                        owncloud_port = cloud.getString(ClientCookie.PORT_ATTR);
+                    } catch (Exception e24) {
+                        e24.printStackTrace();
+                    }
+                } catch (Exception e25) {
+                    e25.printStackTrace();
+                }
+                String wifi = null;
+                String setting = null;
+                String large = null;
+                String normal = null;
+                String small = null;
+                ArrayList<AppBean> apps = new ArrayList<>();
+                try {
+                    JSONObject desktopicon = ebag.getJSONObject("desktopicon");
+                    wifi = desktopicon.getString("wifi");
+                    setting = desktopicon.getString("setting");
+                    JSONObject background = desktopicon.getJSONObject("background");
+                    large = background.getString("large");
+                    normal = background.getString(SQLExec.DelimiterType.NORMAL);
+                    small = background.getString("small");
+                    JSONArray app = ebag.getJSONArray("app");
+                    for (int i = 0; i < app.length(); i++) {
+                        HashMap<String, String> config = new HashMap<>();
+                        String code = app.getJSONObject(i).getString("code");
+                        String name = app.getJSONObject(i).getString("name");
+                        String color = app.getJSONObject(i).getString("color");
+                        String icon = app.getJSONObject(i).getString("icon");
+                        String iconLocal = String.valueOf(AppEnvironment.icon) + icon.substring(icon.lastIndexOf("/") + 1);
+                        int enable = app.getJSONObject(i).getInt("enable");
+                        try {
+                            String comment = new StringBuilder(String.valueOf(app.getJSONObject(i).getJSONObject("config").getInt(ClientCookie.COMMENT_ATTR))).toString();
+                            String download = new StringBuilder(String.valueOf(app.getJSONObject(i).getJSONObject("config").getInt("download"))).toString();
+                            config.put(ClientCookie.COMMENT_ATTR, comment);
+                            config.put("download", download);
+                        } catch (Exception e26) {
+                            config.put(ClientCookie.COMMENT_ATTR, "-1");
+                            config.put("download", "-1");
+                            e26.printStackTrace();
+                        }
+                        apps.add(new AppBean(code, name, color, icon, enable, config, iconLocal));
+                    }
+                } catch (Exception e27) {
+                    e27.printStackTrace();
+                    Log.i("liu", "Exception :" + e27);
+                }
+                String owncloudip = (owncloud_port == null || owncloud_port.equals("") || !owncloud_port.equals("80")) ? String.valueOf(owncloud_domain) + ":" + owncloud_port : owncloud_domain;
+                writeXml_config(privatekey, encrypt, apihost, domain, port, tigase_ip, mongo_domain, mongo_port, mongo_user, mongo_pwd, type, schoolid, schoolname, owncloudip, usercode, userid, guidancestate, username, null, wifi, setting, apps, guidenotes);
+                ArrayList<String> urls = new ArrayList<>();
+                urls.add(wifi);
+                urls.add(setting);
+                urls.add(large);
+                urls.add(normal);
+                urls.add(small);
+                for (int i2 = 0; i2 < apps.size(); i2++) {
+                    urls.add(apps.get(i2).getIcon());
+                }
+                return 1;
+            }
+            return -1;
+        } catch (JSONException e28) {
+            e28.printStackTrace();
+            return -1;
+        }
+    }
+
+    private void downLoadImage(ArrayList<String> urls) {
+        for (int i = 0; i < urls.size(); i++) {
+            try {
+                URL url = new URL(urls.get(i));
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                int code = conn.getResponseCode();
+                if (code == 200) {
+                    InputStream in = conn.getInputStream();
+                    savePic(in, urls.get(i));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("liu", "downLoadImage:" + e);
+            }
+        }
+    }
+
+    private void savePic(InputStream in, String url) {
+        Throwable th;
+        FileOutputStream out;
+        String picPath = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/MobileStudyClient/.System/icon";
+        String name = url.substring(url.lastIndexOf("/") + 1);
+        File file = FileInOutHelper.setupOrOpenFile(picPath, name);
+        FileOutputStream out2 = null;
+        try {
+            try {
+                out = new FileOutputStream(file);
+            } catch (Exception e) {
+                e = e;
+            }
+        } catch (Throwable th2) {
+            th = th2;
+        }
+        try {
+            byte[] b = new byte[1024];
+            while (true) {
+                int length = in.read(b);
+                if (length != -1) {
+                    out.write(b, 0, length);
+                } else {
+                    try {
+                        in.close();
+                        out.close();
+                        return;
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                        Log.i("liu", "close stream:" + e2);
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e3) {
+            e = e3;
+            out2 = out;
+            e.printStackTrace();
+            Log.i("liu", "savePic:" + e);
+            try {
+                in.close();
+                out2.close();
+            } catch (Exception e4) {
+                e4.printStackTrace();
+                Log.i("liu", "close stream:" + e4);
+            }
+        } catch (Throwable th3) {
+            th = th3;
+            out2 = out;
+            try {
+                in.close();
+                out2.close();
+            } catch (Exception e5) {
+                e5.printStackTrace();
+                Log.i("liu", "close stream:" + e5);
+            }
+            throw th;
+        }
+    }
+
+    private void appendUserInfo(String fileName, String content) {
+        try {
+            RandomAccessFile randomFile = new RandomAccessFile(fileName, "rw");
+            long fileLength = randomFile.length();
+            randomFile.seek(fileLength);
+            randomFile.writeBytes(String.valueOf(content) + "\r\n");
+            randomFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e2) {
+        }
+    }
+
+    private void writeXml_config(String privatekey, String encrypt, String apihost, String domain, String port, String tigase_ip, String mongo_domain, String mongo_port, String mongo_user, String mongo_pwd, String type, String schoolid, String schoolname, String owncloudip, String usercode, String userid, String guidancestate, String truename, String guidelearndownload, String wifi, String setting, ArrayList<AppBean> apps, String guidenotes) {
+        Log.i(TAG, "writeXml");
+        if (privatekey != null && !privatekey.equals("")) {
+            String ip = this.ip_edit.getText().toString();
+            AppEnvironment.MOBILESTUDYSERVERIP = ip;
+            String ip2 = ip.replaceAll(" ", "");
+            if (ip2.length() > 7) {
+                String subhttp = ip2.substring(0, 7);
+                if (subhttp.equals("http://")) {
+                    ip2 = ip2.substring(7);
+                    this.ptfw_edit.setText(ip2);
+                    this.ip_edit.setText(ip2);
+                    showToast(getResources().getString(R.string.setting_serverurlerror));
+                    getResources().getString(R.string.setting_signing);
+                }
+            }
+            if (ip2 != null && ip2 != null) {
+                ip2.length();
+            }
+            String apihost2 = apihost.replaceAll(" ", "");
+            if (apihost2.length() > 7) {
+                String subhttp2 = apihost2.substring(0, 7);
+                if (subhttp2.equals("http://")) {
+                    apihost2 = apihost2.substring(7);
+                    Log.i("Test2", getResources().getString(R.string.setting_serverurlerror));
+                }
+            }
+            String username = "";
+            String password = "";
+            String pwd = "";
+            String stuid = "";
+            String gdstate = "";
+            String stuname = "";
+            String guidenote = "";
+            String appendData = String.valueOf(ip2) + ":" + usercode;
+            try {
+                String struserName = this.Name;
+                String strpassWord = this.Pwd;
+                username = BZip2Utils.StringEncodeToBase64(struserName);
+                pwd = BZip2Utils.StringEncodeToBase64(strpassWord);
+                if (encrypt.toString().trim().equals("md5")) {
+                    password = My_md5.Md5(strpassWord);
+                } else {
+                    password = BZip2Utils.StringEncodeToBase64(strpassWord);
+                }
+                privatekey = BZip2Utils.StringEncodeToBase64(privatekey);
+                apihost2 = BZip2Utils.StringEncodeToBase64(apihost2);
+                port = BZip2Utils.StringEncodeToBase64(port);
+                domain = BZip2Utils.StringEncodeToBase64(domain);
+                tigase_ip = BZip2Utils.StringEncodeToBase64(tigase_ip);
+                mongo_domain = BZip2Utils.StringEncodeToBase64(mongo_domain);
+                mongo_port = BZip2Utils.StringEncodeToBase64(mongo_port);
+                mongo_user = BZip2Utils.StringEncodeToBase64(mongo_user);
+                mongo_pwd = BZip2Utils.StringEncodeToBase64(mongo_pwd);
+                type = BZip2Utils.StringEncodeToBase64(type);
+                schoolid = BZip2Utils.StringEncodeToBase64(schoolid);
+                schoolname = BZip2Utils.StringEncodeToBase64(schoolname);
+                owncloudip = BZip2Utils.StringEncodeToBase64(owncloudip);
+                usercode = BZip2Utils.StringEncodeToBase64(usercode);
+                stuid = BZip2Utils.StringEncodeToBase64(userid);
+                gdstate = BZip2Utils.StringEncodeToBase64(guidancestate);
+                stuname = BZip2Utils.StringEncodeToBase64(truename);
+                guidelearndownload = BZip2Utils.StringEncodeToBase64(guidelearndownload);
+                wifi = BZip2Utils.StringEncodeToBase64(wifi);
+                setting = BZip2Utils.StringEncodeToBase64(setting);
+                guidenote = BZip2Utils.StringEncodeToBase64(guidenotes);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            File xmlFile = FileInOutHelper.setupOrOpenFile(this.urlfilepath);
+            try {
+                this.fileos = new FileOutputStream(xmlFile);
+            } catch (FileNotFoundException e) {
+                Log.e("FileNotFoundException", "can't create FileOutputStream");
+            }
+            XmlSerializer serializer = Xml.newSerializer();
+            try {
+                serializer.setOutput(this.fileos, "UTF-8");
+                serializer.startDocument(null, true);
+                serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+                try {
+                    serializer.startTag(null, "urlpath");
+                    try {
+                        serializer.startTag(null, "ip");
+                        serializer.text(ip2);
+                        serializer.endTag(null, "ip");
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "showDemo");
+                        serializer.text(this.setDemoShow);
+                        serializer.endTag(null, "showDemo");
+                    } catch (Exception e3) {
+                        e3.printStackTrace();
+                    }
+                    serializer.endTag(null, "urlpath");
+                } catch (Exception e4) {
+                    e4.printStackTrace();
+                }
+                try {
+                    serializer.startTag(null, "student");
+                    try {
+                        serializer.startTag(null, "stuid");
+                        serializer.text(stuid);
+                        serializer.endTag(null, "stuid");
+                        serializer.startTag(null, "usercode");
+                        serializer.text(usercode);
+                        serializer.endTag(null, "usercode");
+                        serializer.startTag(null, "username");
+                        serializer.text(username);
+                        serializer.endTag(null, "username");
+                        serializer.startTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
+                        serializer.text(password);
+                        serializer.endTag(null, com.edutech.idauthentication.AppEnvironment.PASSWORD);
+                        serializer.startTag(null, "pwd");
+                        serializer.text(pwd);
+                        serializer.endTag(null, "pwd");
+                        serializer.startTag(null, "stuname");
+                        serializer.text(stuname);
+                        serializer.endTag(null, "stuname");
+                    } catch (Exception e5) {
+                        e5.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "privatekey");
+                        serializer.text(privatekey);
+                        serializer.endTag(null, "privatekey");
+                        serializer.startTag(null, "encrypt");
+                        serializer.text(encrypt);
+                        serializer.endTag(null, "encrypt");
+                        serializer.startTag(null, "apihost");
+                        serializer.text(apihost2);
+                        serializer.endTag(null, "apihost");
+                        serializer.startTag(null, ClientCookie.DOMAIN_ATTR);
+                        serializer.text(domain);
+                        serializer.endTag(null, ClientCookie.DOMAIN_ATTR);
+                        serializer.startTag(null, ClientCookie.PORT_ATTR);
+                        serializer.text(port);
+                        serializer.endTag(null, ClientCookie.PORT_ATTR);
+                        serializer.startTag(null, "tigase_ip");
+                        serializer.text(tigase_ip);
+                        serializer.endTag(null, "tigase_ip");
+                    } catch (Exception e6) {
+                        e6.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "mongo_domain");
+                        serializer.text(mongo_domain);
+                        serializer.endTag(null, "mongo_domain");
+                        serializer.startTag(null, "mongo_port");
+                        serializer.text(mongo_port);
+                        serializer.endTag(null, "mongo_port");
+                        serializer.startTag(null, "mongo_user");
+                        serializer.text(mongo_user);
+                        serializer.endTag(null, "mongo_user");
+                        serializer.startTag(null, "mongo_pwd");
+                        serializer.text(mongo_pwd);
+                        serializer.endTag(null, "mongo_pwd");
+                    } catch (Exception e7) {
+                        e7.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "user_type");
+                        serializer.text(type);
+                        serializer.endTag(null, "user_type");
+                        serializer.startTag(null, "schoolid");
+                        serializer.text(schoolid);
+                        serializer.endTag(null, "schoolid");
+                        serializer.startTag(null, "schoolname");
+                        serializer.text(schoolname);
+                        serializer.endTag(null, "schoolname");
+                    } catch (Exception e8) {
+                        e8.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "owncloudip");
+                        serializer.text(owncloudip);
+                        serializer.endTag(null, "owncloudip");
+                    } catch (Exception e9) {
+                        e9.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "gdstate");
+                        serializer.text(gdstate);
+                        serializer.endTag(null, "gdstate");
+                    } catch (Exception e10) {
+                        e10.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "guidenotes");
+                        serializer.text(guidenote);
+                        serializer.endTag(null, "guidenotes");
+                    } catch (Exception e11) {
+                        e11.printStackTrace();
+                    }
+                    try {
+                        serializer.startTag(null, "guidelearndownload");
+                        serializer.text(new StringBuilder(String.valueOf(guidelearndownload)).toString());
+                        serializer.endTag(null, "guidelearndownload");
+                    } catch (Exception e12) {
+                    }
+                    try {
+                        serializer.startTag(null, "wifi");
+                        serializer.text(new StringBuilder(String.valueOf(wifi)).toString());
+                        serializer.endTag(null, "wifi");
+                    } catch (Exception e13) {
+                    }
+                    try {
+                        serializer.startTag(null, "setting");
+                        serializer.text(new StringBuilder(String.valueOf(setting)).toString());
+                        serializer.endTag(null, "setting");
+                    } catch (Exception e14) {
+                    }
+                    serializer.endTag(null, "student");
+                } catch (Exception e15) {
+                    e15.printStackTrace();
+                }
+                try {
+                    serializer.startTag(null, "apps");
+                    for (int i = 0; i < apps.size(); i++) {
+                        serializer.startTag(null, "app");
+                        serializer.startTag(null, "code");
+                        serializer.text(apps.get(i).getCode());
+                        serializer.endTag(null, "code");
+                        serializer.startTag(null, "name");
+                        serializer.text(apps.get(i).getName());
+                        serializer.endTag(null, "name");
+                        serializer.startTag(null, "color");
+                        serializer.text(apps.get(i).getColor());
+                        serializer.endTag(null, "color");
+                        serializer.startTag(null, "icon");
+                        serializer.text(apps.get(i).getIcon());
+                        serializer.endTag(null, "icon");
+                        serializer.startTag(null, "iconLocal");
+                        serializer.text(apps.get(i).getIconLocal());
+                        serializer.endTag(null, "iconLocal");
+                        serializer.startTag(null, "enable");
+                        serializer.text(new StringBuilder(String.valueOf(apps.get(i).getEnable())).toString());
+                        serializer.endTag(null, "enable");
+                        serializer.startTag(null, "config");
+                        serializer.startTag(null, "download");
+                        serializer.text(apps.get(i).getConfig().get("download"));
+                        serializer.endTag(null, "download");
+                        serializer.startTag(null, ClientCookie.COMMENT_ATTR);
+                        serializer.text(apps.get(i).getConfig().get(ClientCookie.COMMENT_ATTR));
+                        serializer.endTag(null, ClientCookie.COMMENT_ATTR);
+                        serializer.endTag(null, "config");
+                        serializer.endTag(null, "app");
+                    }
+                    serializer.endTag(null, "apps");
+                } catch (Exception e16) {
+                    e16.printStackTrace();
+                    Log.e(TAG, "write to  xml file" + e16.toString());
+                }
+                serializer.endDocument();
+                serializer.flush();
+                this.fileos.close();
+                appendUserInfo(this.settingHistory, appendData);
+            } catch (Exception e17) {
+                e17.printStackTrace();
+            }
+        }
+    }
+
+    private HttpResponse Get_http_addheader(String url, String user_Name, boolean isconfig) throws IOException, ClientProtocolException {
+        HttpGet request = new HttpGet(url);
+        request.addHeader("X-Edutech-Entity", user_Name);
+        long imestamp = System.currentTimeMillis();
+        if (isconfig) {
+            this.timeStamp = new StringBuilder(String.valueOf(imestamp)).toString();
+        }
+        String sign = My_md5.Md5(String.valueOf(imestamp) + user_Name);
+        request.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        try {
+            HttpResponse httpResponse = httpClient.execute(request);
+            return httpResponse;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class HostPwd extends Thread {
+        HostPwd() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public void run() {
+            try {
+                CloudClientSetActivity.access$79(CloudClientSetActivity.this, CloudClientSetActivity.access$78(CloudClientSetActivity.this));
+                CloudClientSetActivity.access$81(CloudClientSetActivity.this, CloudClientSetActivity.access$80(CloudClientSetActivity.this));
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    static /* synthetic */ String access$78(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.getManagerPwd();
+    }
+
+    private String getManagerPwd() {
+        SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
+        String privatekey = sharePre.getString("key", "");
+        String ip = sharePre.getString("apihost", "");
+        String username = sharePre.getString("name", "");
+        HashMap<String, String> hashmap = XmlLoadHelper.loadXml();
+        if (hashmap != null && (ip == null || ip.equals("") || username.equals(""))) {
+            ip = hashmap.get("ip");
+            username = hashmap.get("usercode");
+            privatekey = hashmap.get("privatekey");
+        }
+        Log.e("pwd", "start get pwd");
+        String url = "http://" + ip + "/api/padpwd";
+        HttpPost post = new HttpPost(url);
+        post.addHeader("X-Edutech-Entity", username);
+        long imestamp = System.currentTimeMillis();
+        String sign = My_md5.Md5(String.valueOf(imestamp) + username + privatekey);
+        post.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
+        DefaultHttpClient client = new DefaultHttpClient();
+        try {
+            HttpResponse response = client.execute(post);
+            String result = getJsonStringFromGZIP(response);
+            JSONObject jobj = new JSONObject(result);
+            String data = jobj.getString("data");
+            AESSet aesset = new AESSet();
+            byte[] byaes = aesset.decrypt(data);
+            String pwd = new String(byaes, 0, byaes.length);
+            return pwd;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ayjedutechyx@123456z";
+        }
+    }
+
+    static /* synthetic */ String access$80(CloudClientSetActivity cloudClientSetActivity) {
+        return cloudClientSetActivity.getUserPwd();
+    }
+
+    private String getUserPwd() {
+        String pwd = this.pwdOrigal;
+        String url = "http://" + this.ipOrigal + "/api/config";
+        String result = Get_Config_Json(url, this.nameOrigal);
+        try {
+            JSONObject jobj = new JSONObject(result);
+            JSONObject data = null;
+            JSONObject user = null;
+            if (jobj != null) {
+                data = jobj.getJSONObject("data");
+            }
+            if (data != null) {
+                user = data.getJSONObject(UserID.ELEMENT_NAME);
+            }
+            if (user != null) {
+                String pubkey = user.getString("pubkey");
+                try {
+                    return BZip2Utils.Base64DecodeToString(pubkey);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return pwd;
+                }
+            }
+            return pwd;
+        } catch (JSONException e2) {
+            e2.printStackTrace();
+            return pwd;
+        }
+    }
+
+    static /* synthetic */ void access$48(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.showConfirmPwdDialog();
+    }
+
+    private void showConfirmPwdDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.confirm_pwd);
+        View view = LayoutInflater.from(this).inflate(R.layout.confirmpwd, (ViewGroup) null);
+        EditText edtpwd = (EditText) view.findViewById(R.id.edt_pwd);
+        builder.setView(view);
+        builder.setNegativeButton(R.string.cancel, new AnonymousClass24()).setPositiveButton(R.string.appmanager_ok, new AnonymousClass25(edtpwd));
+        this.pwdConfirmDialog = null;
+        try {
+            this.pwdConfirmDialog = builder.create();
+            this.pwdConfirmDialog.show();
         } catch (Exception e) {
         }
     }
 
-    public void showToast(String str) {
-        if (this.mToast != null) {
-            this.mToast.cancel();
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$24 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass24 implements DialogInterface.OnClickListener {
+        AnonymousClass24() {
+            CloudClientSetActivity.this = r1;
         }
-        this.mToast = Toast.makeText(this, str, 1);
-        this.mToast.show();
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface arg0, int arg1) {
+            CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+            CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+            CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+            if (CloudClientSetActivity.access$87(CloudClientSetActivity.this) != null) {
+                CloudClientSetActivity.access$87(CloudClientSetActivity.this).dismiss();
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$25 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass25 implements DialogInterface.OnClickListener {
+        private final /* synthetic */ EditText val$edtpwd;
+
+        AnonymousClass25(EditText editText) {
+            CloudClientSetActivity.this = r1;
+            this.val$edtpwd = editText;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface arg0, int arg1) {
+            if (this.val$edtpwd != null) {
+                String edtStr = this.val$edtpwd.getText().toString() != null ? this.val$edtpwd.getText().toString() : "";
+                if (AppEnvironment.isXF || AppEnvironment.isNL || AppEnvironment.isNLEZ || AppEnvironment.isHT || AppEnvironment.isGQ) {
+                    if (edtStr.equals(CloudClientSetActivity.access$88(CloudClientSetActivity.this).trim())) {
+                        new Thread(CloudClientSetActivity.this.runnable_GetConfig_Infor).start();
+                    } else {
+                        CloudClientSetActivity.access$16(CloudClientSetActivity.this).setEnabled(true);
+                        CloudClientSetActivity.access$17(CloudClientSetActivity.this).setEnabled(true);
+                        CloudClientSetActivity.access$17(CloudClientSetActivity.this).setText(CloudClientSetActivity.this.getResources().getString(R.string.setting_save));
+                        Toast.makeText(CloudClientSetActivity.this, "密码验证不通过！", 0).show();
+                    }
+                } else if (edtStr.equals(CloudClientSetActivity.access$88(CloudClientSetActivity.this).trim()) || edtStr.equals(CloudClientSetActivity.access$89(CloudClientSetActivity.this).trim())) {
+                    CloudClientSetActivity.access$32(CloudClientSetActivity.this, true);
+                } else {
+                    CloudClientSetActivity.access$32(CloudClientSetActivity.this, false);
+                }
+            }
+            if (CloudClientSetActivity.access$87(CloudClientSetActivity.this) != null) {
+                CloudClientSetActivity.access$87(CloudClientSetActivity.this).dismiss();
+            }
+        }
+    }
+
+    @Override // com.edutech.cloudclientsetting.activity.IPListAdapter.IpInterface
+    public void okIp(String ip) {
+        if (this.listpop != null) {
+            this.listpop.dismiss();
+        }
+        if (this.ip_edit != null) {
+            this.ip_edit.setText(ip);
+        }
+    }
+
+    @Override // com.edutech.cloudclientsetting.activity.IPListAdapter.IpInterface
+    public void deleteIp(String ip) {
+        if (this.ips != null) {
+            if (this.listpop != null && this.ipAdpter != null) {
+                if (this.ips != null && this.ips.contains(ip)) {
+                    this.ips.remove(ip);
+                    this.ipAdpter.setIps(this.ips);
+                    this.ipAdpter.notifyDataSetChanged();
+                }
+                SharedPreferences loginSp = getSharedPreferences("loginhistory", 4);
+                String tempips = loginSp.getString("iphistoryString", "");
+                loginSp.edit().putString("iphistoryString", tempips.replace(String.valueOf(ip) + ",:,", "").replace(ip, "")).commit();
+            }
+            this.history_array = nameHistoryDeleteByIP(ip, this.history_array);
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    private class MyHostnameVerifier implements HostnameVerifier {
+        private MyHostnameVerifier() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        /* synthetic */ MyHostnameVerifier(CloudClientSetActivity cloudClientSetActivity, MyHostnameVerifier myHostnameVerifier) {
+            this();
+        }
+
+        @Override // javax.net.ssl.HostnameVerifier
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    private class MyTrustManager implements X509TrustManager {
+        private MyTrustManager() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override // javax.net.ssl.X509TrustManager
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }
+
+    static /* synthetic */ void access$43(CloudClientSetActivity cloudClientSetActivity) {
+        cloudClientSetActivity.updatePassword();
+    }
+
+    private void updatePassword() {
+        LayoutInflater pwdinflater = getLayoutInflater();
+        View pwdlayout = pwdinflater.inflate(R.layout.update_pwd_dialog_setting, (ViewGroup) findViewById(R.id.update_pwd_dialog));
+        this.oldpwd = (EditText) pwdlayout.findViewById(R.id.update_pwd_dialog_oldpwd);
+        this.newpwd = (EditText) pwdlayout.findViewById(R.id.update_pwd_dialog_newpwd);
+        this.confirmpwd = (EditText) pwdlayout.findViewById(R.id.update_pwd_dialog_confirmpwd);
+        AlertDialog.Builder pwdalertDialog = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.setting_cp)).setInverseBackgroundForced(true).setView(pwdlayout).setPositiveButton(getResources().getString(R.string.setting_submit), new AnonymousClass26()).setNegativeButton(getResources().getString(R.string.setting_cancel), new AnonymousClass27());
+        pwdalertDialog.show();
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$26 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass26 implements DialogInterface.OnClickListener {
+        AnonymousClass26() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (CloudClientSetActivity.this.oldpwd.getText().toString().length() >= 6) {
+                if (CloudClientSetActivity.this.newpwd.getText().toString().length() >= 6) {
+                    if (CloudClientSetActivity.this.newpwd.getText().toString().equals(CloudClientSetActivity.this.confirmpwd.getText().toString())) {
+                        CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_submiting));
+                        new Thread(CloudClientSetActivity.this.updatepwdRun).start();
+                        return;
+                    }
+                    CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpw1));
+                    return;
+                }
+                CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpw2));
+                return;
+            }
+            CloudClientSetActivity.this.showToast(CloudClientSetActivity.this.getResources().getString(R.string.setting_errorpw3));
+        }
+    }
+
+    /* renamed from: com.edutech.cloudclientsetting.activity.CloudClientSetActivity$27 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass27 implements DialogInterface.OnClickListener {
+        AnonymousClass27() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.DialogInterface.OnClickListener
+        public void onClick(DialogInterface dialog, int which) {
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    private JSONArray nameHistoryParser() {
+        SharedPreferences sp = getSharedPreferences("loginhistory", 4);
+        if (!sp.contains("namehistorystring")) {
+            return null;
+        }
+        String namesString = sp.getString("namehistorystring", "");
+        if (namesString == null || namesString.equals("")) {
+            return null;
+        }
+        try {
+            return new JSONArray(namesString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private ArrayList<HashMap<String, String>> nameHistoryQuery(String ipHistory, JSONArray arrays) {
+        ArrayList<HashMap<String, String>> names = new ArrayList<>();
+        if (arrays != null && ipHistory != null && arrays.length() > 0) {
+            for (int i = 0; i < arrays.length(); i++) {
+                try {
+                    JSONObject jObject = arrays.getJSONObject(i);
+                    JSONArray nameArrays = null;
+                    if (jObject.has("ip") && ipHistory.equals(jObject.getString("ip")) && jObject.has("students")) {
+                        nameArrays = jObject.getJSONArray("students");
+                    }
+                    if (nameArrays != null && nameArrays.length() > 0) {
+                        for (int j = 0; j < nameArrays.length(); j++) {
+                            JSONObject stuObject = nameArrays.getJSONObject(j);
+                            if (stuObject != null && stuObject.has("code") && stuObject.has("name")) {
+                                HashMap<String, String> stuInfo = new HashMap<>();
+                                String code = stuObject.getString("code");
+                                String name = stuObject.getString("name");
+                                stuInfo.put("code", code);
+                                stuInfo.put("name", name);
+                                names.add(stuInfo);
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return names;
+    }
+
+    static /* synthetic */ JSONArray access$40(CloudClientSetActivity cloudClientSetActivity, String str, String str2, String str3, JSONArray jSONArray) {
+        return cloudClientSetActivity.nameHistoryAdd(str, str2, str3, jSONArray);
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:21:0x0054  */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+    */
+    private JSONArray nameHistoryAdd(String addName, String ipHistory, String addCode, JSONArray preArray) {
+        JSONObject addObject;
+        JSONException e;
+        JSONException e2;
+        JSONArray afterAddArray = new JSONArray();
+        JSONObject addObject2 = null;
+        if (addCode == null || ipHistory == null) {
+            return preArray;
+        }
+        boolean has = false;
+        if (preArray != null && preArray.length() >= 0) {
+            for (int i = 0; i < preArray.length(); i++) {
+                try {
+                    JSONObject jObject = preArray.getJSONObject(i);
+                    JSONArray nameArrays = null;
+                    if (!jObject.has("ip")) {
+                        afterAddArray.put(jObject);
+                    } else {
+                        if (jObject.has("ip") && ipHistory.equals(jObject.getString("ip")) && jObject.has("students")) {
+                            nameArrays = jObject.getJSONArray("students");
+                        }
+                        if (nameArrays != null && nameArrays.length() > 0) {
+                            int j = 0;
+                            while (true) {
+                                if (j >= nameArrays.length()) {
+                                    break;
+                                }
+                                JSONObject stuObject = nameArrays.getJSONObject(j);
+                                if (stuObject == null || !stuObject.has("code") || !stuObject.getString("code").equals(addCode)) {
+                                    j++;
+                                } else {
+                                    has = true;
+                                    break;
+                                }
+                            }
+                            if (!has) {
+                                JSONObject temp = new JSONObject();
+                                temp.put("code", addCode);
+                                temp.put("name", addName);
+                                nameArrays.put(temp);
+                                JSONObject addObject3 = new JSONObject();
+                                try {
+                                    addObject3.put("ip", ipHistory);
+                                    addObject3.put("students", nameArrays);
+                                    addObject2 = addObject3;
+                                } catch (JSONException e3) {
+                                    e2 = e3;
+                                    addObject2 = addObject3;
+                                    e2.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException e4) {
+                    e2 = e4;
+                }
+            }
+        }
+        JSONObject addObject4 = addObject2;
+        if (addObject4 != null || has) {
+            addObject = addObject4;
+        } else {
+            JSONArray nameArrays2 = new JSONArray();
+            JSONObject temp2 = new JSONObject();
+            try {
+                temp2.put("code", addCode);
+                temp2.put("name", addName);
+                nameArrays2.put(temp2);
+                addObject = new JSONObject();
+            } catch (JSONException e5) {
+                e = e5;
+                addObject = addObject4;
+            }
+            try {
+                addObject.put("ip", ipHistory);
+                addObject.put("students", nameArrays2);
+            } catch (JSONException e6) {
+                e = e6;
+                e.printStackTrace();
+                if (addObject != null) {
+                }
+                return afterAddArray == null ? afterAddArray : afterAddArray;
+            }
+        }
+        if (addObject != null) {
+            afterAddArray.put(addObject);
+        }
+        if (afterAddArray == null && afterAddArray.length() > 0) {
+            SharedPreferences sp = getSharedPreferences("loginhistory", 4);
+            sp.edit().putString("namehistorystring", afterAddArray.toString()).commit();
+            return afterAddArray;
+        }
+    }
+
+    private JSONArray nameHistoryDelete(String ipHistory, String deleteCode, JSONArray preArray) {
+        JSONException e;
+        JSONArray afterAddArray = new JSONArray();
+        if (preArray == null || deleteCode == null || ipHistory == null || preArray.length() <= 0) {
+            return preArray;
+        }
+        if (preArray != null && preArray.length() >= 0) {
+            for (int i = 0; i < preArray.length(); i++) {
+                try {
+                    JSONObject jObject = preArray.getJSONObject(i);
+                    JSONArray nameArrays = null;
+                    if (!jObject.has("ip")) {
+                        afterAddArray.put(jObject);
+                    } else {
+                        if (jObject.has("ip") && ipHistory.equals(jObject.getString("ip")) && jObject.has("students")) {
+                            nameArrays = jObject.getJSONArray("students");
+                        }
+                        if (nameArrays != null && nameArrays.length() > 0) {
+                            JSONArray tempArray = new JSONArray();
+                            for (int j = 0; j < nameArrays.length(); j++) {
+                                JSONObject stuObject = nameArrays.getJSONObject(j);
+                                if (stuObject != null && stuObject.has("code") && !deleteCode.equals(stuObject.getString("code"))) {
+                                    tempArray.put(stuObject);
+                                }
+                            }
+                            JSONObject modifiedObject = new JSONObject();
+                            try {
+                                modifiedObject.put("ip", ipHistory);
+                                modifiedObject.put("students", tempArray);
+                                afterAddArray.put(modifiedObject);
+                            } catch (JSONException e2) {
+                                e = e2;
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } catch (JSONException e3) {
+                    e = e3;
+                }
+            }
+        }
+        if (afterAddArray != null) {
+            SharedPreferences sp = getSharedPreferences("loginhistory", 4);
+            sp.edit().putString("namehistorystring", afterAddArray.toString()).commit();
+            return afterAddArray;
+        }
+        return afterAddArray;
+    }
+
+    private JSONArray nameHistoryDeleteByIP(String ipHistory, JSONArray preArray) {
+        JSONArray afterAddArray = new JSONArray();
+        if (preArray == null || ipHistory == null || preArray.length() <= 0) {
+            return preArray;
+        }
+        if (preArray != null && preArray.length() >= 0) {
+            for (int i = 0; i < preArray.length(); i++) {
+                try {
+                    JSONObject jObject = preArray.getJSONObject(i);
+                    if (!jObject.has("ip")) {
+                        afterAddArray.put(jObject);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (afterAddArray != null) {
+            SharedPreferences sp = getSharedPreferences("loginhistory", 4);
+            sp.edit().putString("namehistorystring", afterAddArray.toString()).commit();
+            return afterAddArray;
+        }
+        return afterAddArray;
+    }
+
+    @Override // com.edutech.cloudclientsetting.activity.NameListAdapter.NameHistoryInterface
+    public void deleteName(String code) {
+        String ip = this.ip_edit != null ? this.ip_edit.getText().toString() : "";
+        if (!ip.equals("") && this.history_array != null) {
+            this.history_array = nameHistoryDelete(ip, code, this.history_array);
+            this.history_nameList = nameHistoryQuery(ip, this.history_array);
+            if (this.nameListAdapter != null && this.history_nameList != null) {
+                this.nameListAdapter.setIps(this.history_nameList);
+                this.nameListAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override // com.edutech.cloudclientsetting.activity.NameListAdapter.NameHistoryInterface
+    public void okName(String name) {
+        if (this.nameListpop != null) {
+            this.nameListpop.dismiss();
+        }
+        if (this.username_edit != null) {
+            this.username_edit.setText(name);
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class InstallReceiver extends BroadcastReceiver {
+        InstallReceiver() {
+            CloudClientSetActivity.this = r1;
+        }
+
+        @Override // android.content.BroadcastReceiver
+        public void onReceive(Context arg0, Intent arg1) {
+            if (arg1.getAction().equals("android.intent.action.PACKAGE_ADDED") && AppEnvironment.isNewUpdate && CloudClientSetActivity.access$14(CloudClientSetActivity.this) != null && CloudClientSetActivity.access$14(CloudClientSetActivity.this).size() > 0) {
+                boolean hasFinishedUpdate = true;
+                List<ApkUpdateBean> uninstalledList = new ArrayList<>();
+                String packageName = arg1.getDataString().replace("package:", "");
+                for (int i = 0; i < CloudClientSetActivity.access$14(CloudClientSetActivity.this).size(); i++) {
+                    ApkUpdateBean bean = (ApkUpdateBean) CloudClientSetActivity.access$14(CloudClientSetActivity.this).get(i);
+                    if (packageName.equals(bean.getPackagename())) {
+                        CloudClientSetActivity.access$73(CloudClientSetActivity.this, i, 1, CloudClientSetActivity.UPDATE_INSTALLSTATE);
+                    } else if (bean.getInstallState() != 1) {
+                        hasFinishedUpdate = false;
+                        uninstalledList.add(bean);
+                    }
+                }
+                if (hasFinishedUpdate && !"com.launcher.activity".equals(packageName)) {
+                    CloudClientSetActivity.access$5(CloudClientSetActivity.this);
+                    CloudClientSetActivity.access$6(CloudClientSetActivity.this);
+                } else if (uninstalledList.size() == 1 && "com.launcher.activity".equals(uninstalledList.get(0).getPackagename()) && !TextUtils.isEmpty(CloudClientSetActivity.access$72(CloudClientSetActivity.this))) {
+                    CloudClientSetActivity.access$73(CloudClientSetActivity.this, -1, uninstalledList.get(0).getApkLocalPath(), CloudClientSetActivity.UPDATE_INSTALLSINGLE);
+                }
+            }
+        }
     }
 }

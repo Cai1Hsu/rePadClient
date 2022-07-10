@@ -3,59 +3,63 @@ package com.google.zxing.client.result;
 import com.google.zxing.Result;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/SMSMMSResultParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class SMSMMSResultParser extends ResultParser {
-    private static void addNumberVia(Collection<String> collection, Collection<String> collection2, String str) {
-        int indexOf = str.indexOf(59);
-        if (indexOf < 0) {
-            collection.add(str);
-            collection2.add(null);
-            return;
-        }
-        collection.add(str.substring(0, indexOf));
-        String substring = str.substring(indexOf + 1);
-        collection2.add(substring.startsWith("via=") ? substring.substring(4) : null);
-    }
-
     @Override // com.google.zxing.client.result.ResultParser
     public SMSParsedResult parse(Result result) {
-        SMSParsedResult sMSParsedResult;
-        String text = result.getText();
-        if (text.startsWith("sms:") || text.startsWith("SMS:") || text.startsWith("mms:") || text.startsWith("MMS:")) {
-            Map<String, String> parseNameValuePairs = parseNameValuePairs(text);
-            String str = null;
-            boolean z = false;
-            String str2 = null;
-            if (parseNameValuePairs != null) {
-                str = null;
-                z = false;
-                str2 = null;
-                if (!parseNameValuePairs.isEmpty()) {
-                    str2 = parseNameValuePairs.get("subject");
-                    str = parseNameValuePairs.get("body");
-                    z = true;
-                }
-            }
-            int indexOf = text.indexOf(63, 4);
-            String substring = (indexOf < 0 || !z) ? text.substring(4) : text.substring(4, indexOf);
-            int i = -1;
-            ArrayList arrayList = new ArrayList(1);
-            ArrayList arrayList2 = new ArrayList(1);
-            while (true) {
-                int indexOf2 = substring.indexOf(44, i + 1);
-                if (indexOf2 <= i) {
-                    break;
-                }
-                addNumberVia(arrayList, arrayList2, substring.substring(i + 1, indexOf2));
-                i = indexOf2;
-            }
-            addNumberVia(arrayList, arrayList2, substring.substring(i + 1));
-            sMSParsedResult = new SMSParsedResult((String[]) arrayList.toArray(new String[arrayList.size()]), (String[]) arrayList2.toArray(new String[arrayList2.size()]), str2, str);
-        } else {
-            sMSParsedResult = null;
+        String smsURIWithoutQuery;
+        String rawText = result.getText();
+        if (!rawText.startsWith("sms:") && !rawText.startsWith("SMS:") && !rawText.startsWith("mms:") && !rawText.startsWith("MMS:")) {
+            return null;
         }
-        return sMSParsedResult;
+        Map<String, String> nameValuePairs = parseNameValuePairs(rawText);
+        String subject = null;
+        String body = null;
+        boolean querySyntax = false;
+        if (nameValuePairs != null && !nameValuePairs.isEmpty()) {
+            subject = nameValuePairs.get("subject");
+            body = nameValuePairs.get("body");
+            querySyntax = true;
+        }
+        int queryStart = rawText.indexOf(63, 4);
+        if (queryStart < 0 || !querySyntax) {
+            smsURIWithoutQuery = rawText.substring(4);
+        } else {
+            smsURIWithoutQuery = rawText.substring(4, queryStart);
+        }
+        int lastComma = -1;
+        List<String> numbers = new ArrayList<>(1);
+        List<String> vias = new ArrayList<>(1);
+        while (true) {
+            int comma = smsURIWithoutQuery.indexOf(44, lastComma + 1);
+            if (comma > lastComma) {
+                String numberPart = smsURIWithoutQuery.substring(lastComma + 1, comma);
+                addNumberVia(numbers, vias, numberPart);
+                lastComma = comma;
+            } else {
+                addNumberVia(numbers, vias, smsURIWithoutQuery.substring(lastComma + 1));
+                return new SMSParsedResult((String[]) numbers.toArray(new String[numbers.size()]), (String[]) vias.toArray(new String[vias.size()]), subject, body);
+            }
+        }
+    }
+
+    private static void addNumberVia(Collection<String> numbers, Collection<String> vias, String numberPart) {
+        String via;
+        int numberEnd = numberPart.indexOf(59);
+        if (numberEnd < 0) {
+            numbers.add(numberPart);
+            vias.add(null);
+            return;
+        }
+        numbers.add(numberPart.substring(0, numberEnd));
+        String maybeVia = numberPart.substring(numberEnd + 1);
+        if (maybeVia.startsWith("via=")) {
+            via = maybeVia.substring(4);
+        } else {
+            via = null;
+        }
+        vias.add(via);
     }
 }

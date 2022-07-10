@@ -2,8 +2,7 @@ package com.pgyersdk.feedback;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-
-/* loaded from: classes.jar:com/pgyersdk/feedback/PgyFeedbackShakeManager.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class PgyFeedbackShakeManager {
     private static String a = "PgyFeedbackShake";
     private static PgyFeedbackShakeManager b = null;
@@ -18,9 +17,25 @@ public class PgyFeedbackShakeManager {
         return b;
     }
 
-    public static void register(Context context, String str) {
+    public static /* synthetic */ l a(PgyFeedbackShakeManager pgyFeedbackShakeManager) {
+        return pgyFeedbackShakeManager.c;
+    }
+
+    public static /* synthetic */ void a(PgyFeedbackShakeManager pgyFeedbackShakeManager, MediaPlayer mediaPlayer) {
+        pgyFeedbackShakeManager.d = mediaPlayer;
+    }
+
+    public static /* synthetic */ MediaPlayer b(PgyFeedbackShakeManager pgyFeedbackShakeManager) {
+        return pgyFeedbackShakeManager.d;
+    }
+
+    public static /* synthetic */ Boolean c(PgyFeedbackShakeManager pgyFeedbackShakeManager) {
+        return pgyFeedbackShakeManager.e;
+    }
+
+    public static void register(Context context, String appId) {
         try {
-            com.pgyersdk.a.a.k = str;
+            com.pgyersdk.a.a.k = appId;
             PgyFeedbackShakeManager a2 = a();
             a2.c = new l(context);
             a2.c.a(new j(a2, context));
@@ -29,8 +44,8 @@ public class PgyFeedbackShakeManager {
         }
     }
 
-    public static PgyFeedbackShakeManager setGLSurface(boolean z) {
-        a().e = Boolean.valueOf(z);
+    public static PgyFeedbackShakeManager setGLSurface(boolean glSurface) {
+        a().e = Boolean.valueOf(glSurface);
         return b;
     }
 

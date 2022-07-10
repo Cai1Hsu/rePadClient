@@ -4,36 +4,8 @@ import android.annotation.TargetApi;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
-
-/* loaded from: classes.jar:com/handmark/pulltorefresh/library/internal/ViewCompat.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class ViewCompat {
-
-    @TargetApi(11)
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/internal/ViewCompat$SDK11.class */
-    static class SDK11 {
-        SDK11() {
-        }
-
-        public static void setLayerType(View view, int i) {
-            view.setLayerType(i, null);
-        }
-    }
-
-    @TargetApi(16)
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/internal/ViewCompat$SDK16.class */
-    static class SDK16 {
-        SDK16() {
-        }
-
-        public static void postOnAnimation(View view, Runnable runnable) {
-            view.postOnAnimation(runnable);
-        }
-
-        public static void setBackground(View view, Drawable drawable) {
-            view.setBackground(drawable);
-        }
-    }
-
     public static void postOnAnimation(View view, Runnable runnable) {
         if (Build.VERSION.SDK_INT >= 16) {
             SDK16.postOnAnimation(view, runnable);
@@ -42,17 +14,43 @@ public class ViewCompat {
         }
     }
 
-    public static void setBackground(View view, Drawable drawable) {
+    public static void setBackground(View view, Drawable background) {
         if (Build.VERSION.SDK_INT >= 16) {
-            SDK16.setBackground(view, drawable);
+            SDK16.setBackground(view, background);
         } else {
-            view.setBackgroundDrawable(drawable);
+            view.setBackgroundDrawable(background);
         }
     }
 
-    public static void setLayerType(View view, int i) {
+    public static void setLayerType(View view, int layerType) {
         if (Build.VERSION.SDK_INT >= 11) {
-            SDK11.setLayerType(view, i);
+            SDK11.setLayerType(view, layerType);
+        }
+    }
+
+    @TargetApi(11)
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    static class SDK11 {
+        SDK11() {
+        }
+
+        public static void setLayerType(View view, int layerType) {
+            view.setLayerType(layerType, null);
+        }
+    }
+
+    @TargetApi(16)
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    static class SDK16 {
+        SDK16() {
+        }
+
+        public static void postOnAnimation(View view, Runnable runnable) {
+            view.postOnAnimation(runnable);
+        }
+
+        public static void setBackground(View view, Drawable background) {
+            view.setBackground(background);
         }
     }
 }

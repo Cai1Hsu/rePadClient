@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-/* loaded from: classes.jar:com/edutech/json/Tree.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class Tree<T> {
     private static final int indent = 2;
     private T head;
@@ -13,121 +12,114 @@ public class Tree<T> {
     private Tree<T> parent = null;
     private HashMap<T, Tree<T>> locate = new HashMap<>();
 
-    public Tree(T t) {
-        this.head = t;
-        this.locate.put(t, this);
+    public Tree(T head) {
+        this.head = head;
+        this.locate.put(head, this);
     }
 
-    public static <T> Collection<T> getSuccessors(T t, Collection<Tree<T>> collection) {
-        ArrayList arrayList;
-        Iterator<Tree<T>> it = collection.iterator();
-        while (true) {
-            if (it.hasNext()) {
-                Tree<T> next = it.next();
-                if (((Tree) next).locate.containsKey(t)) {
-                    arrayList = next.getSuccessors(t);
-                    break;
-                }
-            } else {
-                arrayList = new ArrayList();
-                break;
-            }
-        }
-        return arrayList;
-    }
-
-    private String printTree(int i) {
-        Iterator<Tree<T>> it;
-        String str = "";
-        for (int i2 = 0; i2 < i; i2++) {
-            str = String.valueOf(str) + " ";
-        }
-        String str2 = String.valueOf(str) + this.head;
-        while (this.leafs.iterator().hasNext()) {
-            str2 = String.valueOf(str2) + "\n" + it.next().printTree(i + 2);
-        }
-        return str2;
-    }
-
-    public Tree<T> addLeaf(T t) {
-        Tree<T> tree = new Tree<>(t);
-        this.leafs.add(tree);
-        tree.parent = this;
-        tree.locate = this.locate;
-        this.locate.put(t, tree);
-        return tree;
-    }
-
-    public void addLeaf(T t, T t2) {
-        if (this.locate.containsKey(t)) {
-            this.locate.get(t).addLeaf(t2);
+    public void addLeaf(T root, T leaf) {
+        if (this.locate.containsKey(root)) {
+            this.locate.get(root).addLeaf(leaf);
         } else {
-            addLeaf(t).addLeaf(t2);
+            addLeaf(root).addLeaf(leaf);
         }
+    }
+
+    public Tree<T> addLeaf(T leaf) {
+        Tree<T> t = new Tree<>(leaf);
+        this.leafs.add(t);
+        t.parent = this;
+        t.locate = this.locate;
+        this.locate.put(leaf, t);
+        return t;
+    }
+
+    public Tree<T> setAsParent(T parentRoot) {
+        Tree<T> t = new Tree<>(parentRoot);
+        t.leafs.add(this);
+        this.parent = t;
+        t.locate = this.locate;
+        t.locate.put(this.head, this);
+        t.locate.put(parentRoot, t);
+        return t;
     }
 
     public T getHead() {
         return this.head;
     }
 
+    public Tree<T> getTree(T element) {
+        return this.locate.get(element);
+    }
+
+    public void updateTree(T parent, Tree<T> leafTree) {
+        this.locate.put(parent, leafTree);
+    }
+
+    public void setHead(T h) {
+        this.head = h;
+        this.locate.put(this.head, this);
+    }
+
+    public void removeHead(T h) {
+        this.locate.remove(h);
+    }
+
+    public ArrayList<Tree<T>> getTrees(T parent) {
+        ArrayList<Tree<T>> treeList = new ArrayList<>();
+        Tree<T> tree = getTree(parent);
+        if (tree != null) {
+            ArrayList<Tree<T>> treeList2 = tree.leafs;
+            return treeList2;
+        }
+        return treeList;
+    }
+
     public Tree<T> getParent() {
         return this.parent;
+    }
+
+    public Collection<T> getSuccessors(T root) {
+        Collection<T> successors = new ArrayList<>();
+        Tree<T> tree = getTree(root);
+        if (tree != null) {
+            Iterator<Tree<T>> it = tree.leafs.iterator();
+            while (it.hasNext()) {
+                Tree<T> leaf = it.next();
+                successors.add(leaf.head);
+            }
+        }
+        return successors;
     }
 
     public Collection<Tree<T>> getSubTrees() {
         return this.leafs;
     }
 
-    public Collection<T> getSuccessors(T t) {
-        ArrayList arrayList = new ArrayList();
-        Tree<T> tree = getTree(t);
-        if (tree != null) {
-            Iterator<Tree<T>> it = tree.leafs.iterator();
-            while (it.hasNext()) {
-                arrayList.add(it.next().head);
+    public static <T> Collection<T> getSuccessors(T of, Collection<Tree<T>> in) {
+        for (Tree<T> tree : in) {
+            if (((Tree) tree).locate.containsKey(of)) {
+                return tree.getSuccessors(of);
             }
         }
-        return arrayList;
-    }
-
-    public Tree<T> getTree(T t) {
-        return this.locate.get(t);
-    }
-
-    public ArrayList<Tree<T>> getTrees(T t) {
-        ArrayList<Tree<T>> arrayList = new ArrayList<>();
-        Tree<T> tree = getTree(t);
-        ArrayList<Tree<T>> arrayList2 = arrayList;
-        if (tree != null) {
-            arrayList2 = tree.leafs;
-        }
-        return arrayList2;
-    }
-
-    public void removeHead(T t) {
-        this.locate.remove(t);
-    }
-
-    public Tree<T> setAsParent(T t) {
-        Tree<T> tree = new Tree<>(t);
-        tree.leafs.add(this);
-        this.parent = tree;
-        tree.locate = this.locate;
-        tree.locate.put(this.head, this);
-        tree.locate.put(t, tree);
-        return tree;
-    }
-
-    public void setHead(T t) {
-        this.head = t;
-        this.locate.put(this.head, this);
+        return new ArrayList();
     }
 
     public String toString() {
         return printTree(0);
     }
 
-    public void updateTree(T t, Tree<T> tree) {
-        this.locate.put(t, tree);
+    private String printTree(int increment) {
+        String inc = "";
+        for (int i = 0; i < increment; i++) {
+            inc = String.valueOf(inc) + " ";
+        }
+        String s = String.valueOf(inc) + this.head;
+        Iterator<Tree<T>> it = this.leafs.iterator();
+        while (it.hasNext()) {
+            Tree<T> child = it.next();
+            s = String.valueOf(s) + "\n" + child.printTree(increment + 2);
+        }
+        return s;
     }
 }

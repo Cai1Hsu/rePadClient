@@ -11,79 +11,84 @@ import android.widget.TextView;
 import com.edutech.mobilestudyclient.util.AppDetails;
 import com.launcher.activity.R;
 import java.util.List;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/view/AppControlAdapter.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class AppControlAdapter extends BaseAdapter {
     private List<AppDetails> details;
     private Context mContext;
 
-    /* loaded from: classes.jar:com/edutech/mobilestudyclient/view/AppControlAdapter$ViewHolder.class */
-    class ViewHolder {
-        ImageView img_icon;
-        TextView tv_name;
-        TextView tv_version;
-
-        ViewHolder() {
-            AppControlAdapter.this = r4;
-        }
-    }
-
-    public AppControlAdapter(List<AppDetails> list, Context context) {
-        this.details = list;
-        this.mContext = context;
-    }
-
-    @Override // android.widget.Adapter
-    public int getCount() {
-        return this.details == null ? 0 : this.details.size();
+    public AppControlAdapter(List<AppDetails> details, Context mContext) {
+        this.details = details;
+        this.mContext = mContext;
     }
 
     public List<AppDetails> getDetails() {
         return this.details;
     }
 
-    @Override // android.widget.Adapter
-    public Object getItem(int i) {
-        return this.details == null ? null : this.details.get(i);
+    public void setDetails(List<AppDetails> details) {
+        this.details = details;
     }
 
     @Override // android.widget.Adapter
-    public long getItemId(int i) {
-        return i;
+    public int getCount() {
+        if (this.details == null) {
+            return 0;
+        }
+        return this.details.size();
     }
 
     @Override // android.widget.Adapter
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder viewHolder;
-        if (view == null) {
-            view = LayoutInflater.from(this.mContext).inflate(R.layout.appcontroladapter, (ViewGroup) null);
-            viewHolder = new ViewHolder();
-            viewHolder.img_icon = (ImageView) view.findViewById(R.id.img_icon);
-            viewHolder.tv_name = (TextView) view.findViewById(R.id.tv_name);
-            viewHolder.tv_version = (TextView) view.findViewById(R.id.tv_version);
-            view.setTag(viewHolder);
+    public Object getItem(int arg0) {
+        if (this.details == null) {
+            return null;
+        }
+        return this.details.get(arg0);
+    }
+
+    @Override // android.widget.Adapter
+    public long getItemId(int arg0) {
+        return arg0;
+    }
+
+    @Override // android.widget.Adapter
+    public View getView(int position, View convertView, ViewGroup arg2) {
+        ViewHolder holder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(this.mContext).inflate(R.layout.appcontroladapter, (ViewGroup) null);
+            holder = new ViewHolder();
+            holder.img_icon = (ImageView) convertView.findViewById(R.id.img_icon);
+            holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
+            holder.tv_version = (TextView) convertView.findViewById(R.id.tv_version);
+            convertView.setTag(holder);
         } else {
-            viewHolder = (ViewHolder) view.getTag();
+            holder = (ViewHolder) convertView.getTag();
         }
-        if (this.details.size() > i) {
-            AppDetails appDetails = this.details.get(i);
-            Drawable appIcon = appDetails.getAppIcon();
-            String appName = appDetails.getAppName();
-            String appVersion = appDetails.getAppVersion();
-            if (appIcon != null) {
-                viewHolder.img_icon.setBackgroundDrawable(appIcon);
+        if (this.details.size() > position) {
+            AppDetails appinfo = this.details.get(position);
+            Drawable icon = appinfo.getAppIcon();
+            String name = appinfo.getAppName();
+            String version = appinfo.getAppVersion();
+            if (icon != null) {
+                holder.img_icon.setBackgroundDrawable(icon);
             }
-            if (appName != null) {
-                viewHolder.tv_name.setText(appName);
+            if (name != null) {
+                holder.tv_name.setText(name);
             }
-            if (appVersion != null) {
-                viewHolder.tv_version.setText("V: " + appVersion);
+            if (version != null) {
+                holder.tv_version.setText("V: " + version);
             }
         }
-        return view;
+        return convertView;
     }
 
-    public void setDetails(List<AppDetails> list) {
-        this.details = list;
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class ViewHolder {
+        ImageView img_icon;
+        TextView tv_name;
+        TextView tv_version;
+
+        ViewHolder() {
+            AppControlAdapter.this = r1;
+        }
     }
 }

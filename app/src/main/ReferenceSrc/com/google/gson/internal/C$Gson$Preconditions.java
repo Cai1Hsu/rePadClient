@@ -1,18 +1,17 @@
 package com.google.gson.internal;
-
 /* renamed from: com.google.gson.internal.$Gson$Preconditions */
-/* loaded from: classes.jar:com/google/gson/internal/$Gson$Preconditions.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class C$Gson$Preconditions {
-    public static void checkArgument(boolean z) {
-        if (!z) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public static <T> T checkNotNull(T t) {
-        if (t == null) {
+    public static <T> T checkNotNull(T obj) {
+        if (obj == null) {
             throw new NullPointerException();
         }
-        return t;
+        return obj;
+    }
+
+    public static void checkArgument(boolean condition) {
+        if (!condition) {
+            throw new IllegalArgumentException();
+        }
     }
 }

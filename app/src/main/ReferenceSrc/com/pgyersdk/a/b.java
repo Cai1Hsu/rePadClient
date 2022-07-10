@@ -4,8 +4,7 @@ import com.pgyersdk.crash.h;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.net.bsd.RCommandClient;
-
-/* loaded from: classes.jar:com/pgyersdk/a/b.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class b {
     private static final Map a;
 
@@ -32,10 +31,6 @@ public final class b {
         if (hVar != null) {
             str = hVar.getStringForResource(i);
         }
-        String str2 = str;
-        if (str == null) {
-            str2 = (String) a.get(Integer.valueOf(i));
-        }
-        return str2;
+        return str == null ? (String) a.get(Integer.valueOf(i)) : str;
     }
 }

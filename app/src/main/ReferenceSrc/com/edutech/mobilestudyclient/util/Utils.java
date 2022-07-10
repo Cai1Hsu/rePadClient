@@ -2,6 +2,8 @@ package com.edutech.mobilestudyclient.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -27,82 +30,9 @@ import java.util.zip.ZipInputStream;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/util/Utils.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class Utils {
     public static Utils utils;
-
-    public static void clearUpdateAPks(Context context, String str) {
-        context.getSharedPreferences("updateapks", 0).edit().putString("apks_" + str, "").commit();
-    }
-
-    public static String getAppName(String str, Context context) {
-        String str2;
-        try {
-            PackageManager packageManager = context.getPackageManager();
-            str2 = packageManager.getApplicationLabel(packageManager.getApplicationInfo(str, 128)).toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            str2 = "";
-        }
-        return str2;
-    }
-
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:47:0x014c -> B:16:0x0087). Please submit an issue!!! */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:49:0x0154 -> B:41:0x0113). Please submit an issue!!! */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:50:0x015a -> B:16:0x0087). Please submit an issue!!! */
-    public static List<String> getFailedEbagUpdated(Context context, String str) {
-        ArrayList arrayList;
-        ArrayList arrayList2 = new ArrayList();
-        if (context == null) {
-            arrayList = arrayList2;
-        } else {
-            SharedPreferences sharedPreferences = context.getSharedPreferences("updateapks", 0);
-            String string = sharedPreferences.getString("apks_" + str, "");
-            arrayList = arrayList2;
-            if (!TextUtils.isEmpty(string)) {
-                try {
-                    JSONArray jSONArray = new JSONArray(string);
-                    boolean z = false;
-                    for (int i = 0; i < jSONArray.length(); i++) {
-                        JSONObject jSONObject = jSONArray.getJSONObject(i);
-                        String string2 = jSONObject.getString("packagename");
-                        String string3 = jSONObject.getString("versioncode");
-                        String string4 = jSONObject.getString("versionname");
-                        String string5 = jSONObject.getString("appname");
-                        if (needUpdate(string2, context, string3)) {
-                            String appName = getAppName(string2, context);
-                            String str2 = appName;
-                            if (TextUtils.isEmpty(appName)) {
-                                str2 = appName;
-                                if (!TextUtils.isEmpty(string5)) {
-                                    int length = string5.length() > 16 ? 16 : string5.length();
-                                    if (string5.contains("_")) {
-                                        length = string5.indexOf("_");
-                                    }
-                                    try {
-                                        str2 = string5.substring(0, length);
-                                    } catch (Exception e) {
-                                        str2 = appName;
-                                    }
-                                }
-                            }
-                            arrayList2.add(String.valueOf(str2) + ": v" + string4);
-                            z = true;
-                        }
-                    }
-                    if (!z) {
-                        sharedPreferences.edit().putString("apks_" + str, "").commit();
-                    }
-                } catch (JSONException e2) {
-                    e2.printStackTrace();
-                } catch (Exception e3) {
-                }
-                arrayList = new ArrayList();
-            }
-        }
-        return arrayList;
-    }
 
     public static Utils init() {
         if (utils == null) {
@@ -111,129 +41,72 @@ public class Utils {
         return utils;
     }
 
-    public static boolean needUpdate(String str, Context context, String str2) {
-        int i;
-        Log.e("AppUtils", String.valueOf(str) + "," + str2);
-        boolean z = false;
+    public void copyBinFile(String fileFromPath, String fileToPath) {
+        FileNotFoundException e;
+        InputStream in;
+        createFileIfNotExist(fileFromPath);
+        createNewFile(fileToPath);
+        InputStream in2 = null;
+        OutputStream out = null;
         try {
-            i = Integer.parseInt(str2);
-        } catch (NumberFormatException e) {
+            in = new FileInputStream(fileFromPath);
+        } catch (FileNotFoundException e2) {
+            e = e2;
+        }
+        try {
+            OutputStream out2 = new FileOutputStream(fileToPath);
+            out = out2;
+            in2 = in;
+        } catch (FileNotFoundException e3) {
+            e = e3;
+            in2 = in;
             e.printStackTrace();
-            i = 1;
-        } catch (Exception e2) {
-            e2.printStackTrace();
-            i = 1;
+            copyBinFile(in2, out);
         }
-        try {
-            int i2 = context.getPackageManager().getPackageInfo(str, 0).versionCode;
-            if (i > i2) {
-                z = true;
-            }
-            Log.e("AppUtils", String.valueOf(str) + "," + i + "," + i2);
-        } catch (Exception e3) {
-            z = true;
-        }
-        return z;
+        copyBinFile(in2, out);
     }
 
-    public static void saveUpdateApks(List<ApkUpdateBean> list, Context context, String str) {
-        if (list == null || list.size() <= 0 || context == null || TextUtils.isEmpty(str)) {
-            clearUpdateAPks(context, str);
-        } else {
-            context.getSharedPreferences("updateapks", 0).edit().putString("apks_" + str, list.toString()).commit();
-        }
-    }
-
-    public void Unzip(InputStream inputStream, String str) {
-        Exception e;
-        Exception e2;
-        try {
-            ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(inputStream));
-            while (true) {
-                try {
-                    ZipEntry nextEntry = zipInputStream.getNextEntry();
-                    if (nextEntry == null) {
-                        zipInputStream.close();
-                        return;
-                    }
-                    try {
-                        byte[] bArr = new byte[102400];
-                        File file = new File(String.valueOf(str) + nextEntry.getName());
-                        File file2 = new File(file.getParent());
-                        if (!file2.exists()) {
-                            file2.mkdirs();
-                        }
-                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file), 102400);
-                        while (true) {
-                            try {
-                                int read = zipInputStream.read(bArr, 0, 102400);
-                                if (read == -1) {
-                                    break;
-                                }
-                                bufferedOutputStream.write(bArr, 0, read);
-                            } catch (Exception e3) {
-                                e2 = e3;
-                                e2.printStackTrace();
-                            }
-                        }
-                        bufferedOutputStream.flush();
-                        bufferedOutputStream.close();
-                    } catch (Exception e4) {
-                        e2 = e4;
-                    }
-                } catch (Exception e5) {
-                    e = e5;
-                    e.printStackTrace();
-                    return;
-                }
-            }
-        } catch (Exception e6) {
-            e = e6;
-        }
-    }
-
-    /* JADX DEBUG: Another duplicated slice has different insns count: {[]}, finally: {[INVOKE, MOVE_EXCEPTION, INVOKE, IF, INVOKE, MOVE_EXCEPTION, INVOKE, IF, INVOKE, INVOKE, MOVE_EXCEPTION, IF] complete} */
-    public void copyBinFile(InputStream inputStream, OutputStream outputStream) {
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+    public void copyBinFile(InputStream in, OutputStream out) {
+        InputStream inBuffer = new BufferedInputStream(in);
+        OutputStream outBuffer = new BufferedOutputStream(out);
         while (true) {
             try {
                 try {
-                    int read = bufferedInputStream.read();
-                    if (read == -1) {
+                    int byteData = inBuffer.read();
+                    if (byteData == -1) {
                         break;
                     }
-                    outputStream.write(read);
+                    out.write(byteData);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    if (bufferedInputStream != null) {
+                    if (inBuffer != null) {
                         try {
-                            bufferedInputStream.close();
+                            inBuffer.close();
                         } catch (IOException e2) {
                             e2.printStackTrace();
                             return;
                         }
                     }
-                    if (bufferedOutputStream == null) {
+                    if (outBuffer != null) {
+                        outBuffer.close();
                         return;
                     }
-                    bufferedOutputStream.close();
                     return;
                 }
             } finally {
-                if (bufferedInputStream != null) {
+                if (inBuffer != null) {
                     try {
-                        bufferedInputStream.close();
+                        inBuffer.close();
                     } catch (IOException e3) {
                         e3.printStackTrace();
                     }
                 }
-                if (bufferedOutputStream != null) {
-                    bufferedOutputStream.close();
+                if (outBuffer != null) {
+                    outBuffer.close();
                 }
             }
         }
-        if (bufferedInputStream != null) {
+        if (inBuffer != null) {
             try {
             } catch (IOException e32) {
                 return;
@@ -241,232 +114,100 @@ public class Utils {
         }
     }
 
-    public void copyBinFile(String str, String str2) {
-        FileNotFoundException e;
-        FileInputStream fileInputStream;
-        FileOutputStream fileOutputStream;
-        FileInputStream fileInputStream2;
-        createFileIfNotExist(str);
-        createNewFile(str2);
+    public void copyFile(InputStream in, String targetFilePath) {
+        createNewFile(targetFilePath);
+        OutputStream out = null;
         try {
-            fileInputStream2 = new FileInputStream(str);
-        } catch (FileNotFoundException e2) {
-            e = e2;
-            fileInputStream = null;
-        }
-        try {
-            fileOutputStream = new FileOutputStream(str2);
-            fileInputStream = fileInputStream2;
-        } catch (FileNotFoundException e3) {
-            e = e3;
-            fileInputStream = fileInputStream2;
-            e.printStackTrace();
-            fileOutputStream = null;
-            copyBinFile(fileInputStream, fileOutputStream);
-        }
-        copyBinFile(fileInputStream, fileOutputStream);
-    }
-
-    public void copyDictFile(InputStream inputStream, String str) {
-        try {
-            createNewFile(str);
-            int i = 0;
-            FileOutputStream fileOutputStream = new FileOutputStream(str);
-            byte[] bArr = new byte[1444];
-            while (true) {
-                int read = inputStream.read(bArr);
-                if (read == -1) {
-                    inputStream.close();
-                    return;
-                } else {
-                    i += read;
-                    fileOutputStream.write(bArr, 0, read);
-                }
-            }
-        } catch (Exception e) {
+            OutputStream out2 = new FileOutputStream(targetFilePath);
+            out = out2;
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        copyFile(in, out);
     }
 
-    public void copyDictUTFFile(InputStream inputStream, String str) throws UnsupportedEncodingException, FileNotFoundException {
-        try {
-            createNewFile(str);
-            int i = 0;
-            FileOutputStream fileOutputStream = new FileOutputStream(str);
-            byte[] bArr = new byte[512];
-            while (true) {
-                int read = inputStream.read(bArr);
-                if (read == -1) {
-                    inputStream.close();
-                    return;
-                } else {
-                    i += read;
-                    fileOutputStream.write(bArr, 0, read);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /* JADX DEBUG: Failed to insert an additional move for type inference into block B:51:0x00f8 */
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r0v7, types: [java.io.BufferedReader] */
-    public void copyDictUTFFile2(InputStream inputStream, String str) {
-        Throwable th;
-        BufferedReader bufferedReader;
-        String readLine;
-        createNewFile(str);
-        StringBuffer stringBuffer = new StringBuffer();
-        BufferedReader bufferedReader2 = null;
-        try {
-            try {
-                BufferedReader bufferedReader3 = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-                while (true) {
-                    try {
-                        try {
-                            if (bufferedReader3.readLine() == null) {
-                                break;
-                            }
-                            stringBuffer.append(String.valueOf(readLine) + "\n");
-                        } catch (Throwable th2) {
-                            th = th2;
-                            bufferedReader2 = bufferedReader3;
-                            try {
-                                bufferedReader2.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            throw th;
-                        }
-                    } catch (IOException e2) {
-                        e = e2;
-                        bufferedReader = bufferedReader3;
-                        e.printStackTrace();
-                        try {
-                            bufferedReader.close();
-                            return;
-                        } catch (IOException e3) {
-                            e3.printStackTrace();
-                            return;
-                        }
-                    }
-                }
-                bufferedReader2 = new File(str);
-                OutputStreamWriter outputStreamWriter = null;
-                try {
-                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(bufferedReader2), "UTF-8");
-                } catch (FileNotFoundException e4) {
-                    e4.printStackTrace();
-                } catch (UnsupportedEncodingException e5) {
-                    e5.printStackTrace();
-                }
-                try {
-                    outputStreamWriter.write(stringBuffer.toString());
-                } catch (IOException e6) {
-                    e6.printStackTrace();
-                }
-                try {
-                    outputStreamWriter.close();
-                } catch (IOException e7) {
-                    e7.printStackTrace();
-                }
-                try {
-                    bufferedReader3.close();
-                } catch (IOException e8) {
-                    e8.printStackTrace();
-                }
-            } catch (Throwable th3) {
-                th = th3;
-            }
-        } catch (IOException e9) {
-            e = e9;
-            bufferedReader = null;
-        }
-    }
-
-    /* JADX WARN: Removed duplicated region for block: B:14:0x005a A[Catch: IOException -> 0x007b, all -> 0x0095, LOOP:0: B:35:0x0037->B:14:0x005a, LOOP_END, TRY_ENTER, TRY_LEAVE, TryCatch #6 {IOException -> 0x007b, blocks: (B:7:0x0037, B:14:0x005a), top: B:35:0x0037, outer: #2 }] */
-    /* JADX WARN: Removed duplicated region for block: B:31:0x0042 A[EXC_TOP_SPLITTER, SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:13:0x0031 A[Catch: IOException -> 0x0049, all -> 0x0059, LOOP:0: B:28:0x001f->B:13:0x0031, LOOP_END, TRY_ENTER, TRY_LEAVE, TryCatch #0 {IOException -> 0x0049, blocks: (B:7:0x001f, B:13:0x0031), top: B:28:0x001f, outer: #5 }] */
+    /* JADX WARN: Removed duplicated region for block: B:30:0x0025 A[EXC_TOP_SPLITTER, SYNTHETIC] */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
     */
-    public void copyFile(InputStream inputStream, OutputStream outputStream) {
-        BufferedReader bufferedReader;
-        BufferedWriter bufferedWriter;
-        String readLine;
+    public void copyFile(InputStream in, OutputStream out) {
         UnsupportedEncodingException e;
-        BufferedReader bufferedReader2;
+        String data;
+        BufferedReader br;
+        BufferedReader br2 = null;
+        BufferedWriter bw = null;
         try {
-            BufferedReader bufferedReader3 = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-            try {
-                bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                bufferedReader = bufferedReader3;
-            } catch (UnsupportedEncodingException e2) {
-                e = e2;
-                bufferedReader2 = bufferedReader3;
-                e.printStackTrace();
-                bufferedReader = bufferedReader2;
-                bufferedWriter = null;
-                while (true) {
+            br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        } catch (UnsupportedEncodingException e2) {
+            e = e2;
+        }
+        try {
+            BufferedWriter bw2 = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+            bw = bw2;
+            br2 = br;
+        } catch (UnsupportedEncodingException e3) {
+            e = e3;
+            br2 = br;
+            e.printStackTrace();
+            while (true) {
+                try {
                     try {
-                        try {
-                            if (bufferedReader.readLine() != null) {
-                            }
-                            bufferedWriter.write(String.valueOf(readLine) + "\n");
-                        } finally {
-                            try {
-                                bufferedReader.close();
-                                bufferedWriter.close();
-                            } catch (IOException e3) {
-                                e3.printStackTrace();
-                            }
+                        data = br2.readLine();
+                        if (data == null) {
                         }
+                        bw.write(String.valueOf(data) + "\n");
                     } catch (IOException e4) {
                         e4.printStackTrace();
                         try {
-                            bufferedReader.close();
-                            bufferedWriter.close();
+                            br2.close();
+                            bw.close();
                             return;
                         } catch (IOException e5) {
                             e5.printStackTrace();
                             return;
                         }
                     }
+                } finally {
+                    try {
+                        br2.close();
+                        bw.close();
+                    } catch (IOException e6) {
+                        e6.printStackTrace();
+                    }
                 }
             }
-        } catch (UnsupportedEncodingException e6) {
-            e = e6;
-            bufferedReader2 = null;
         }
         while (true) {
-            if (bufferedReader.readLine() != null) {
+            data = br2.readLine();
+            if (data == null) {
+                bw.write(String.valueOf(data) + "\n");
+            } else {
                 try {
                     return;
-                } catch (IOException e32) {
+                } catch (IOException e62) {
                     return;
                 }
             }
-            bufferedWriter.write(String.valueOf(readLine) + "\n");
         }
     }
 
-    public void copyFile(InputStream inputStream, String str) {
-        FileOutputStream fileOutputStream;
-        createNewFile(str);
+    public void createNewFile(String targetFilePath) {
+        createFileIfNotExist(targetFilePath);
+        File targetFile = new File(targetFilePath);
+        targetFile.delete();
         try {
-            fileOutputStream = new FileOutputStream(str);
-        } catch (FileNotFoundException e) {
+            targetFile.createNewFile();
+        } catch (IOException e) {
             e.printStackTrace();
-            fileOutputStream = null;
         }
-        copyFile(inputStream, fileOutputStream);
     }
 
-    public File createFileIfNotExist(String str) {
-        File file = new File(str);
+    public File createFileIfNotExist(String path) {
+        File file = new File(path);
         if (!file.exists()) {
             try {
-                new File(str.substring(0, str.lastIndexOf(File.separator))).mkdirs();
+                new File(path.substring(0, path.lastIndexOf(File.separator))).mkdirs();
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -475,40 +216,296 @@ public class Utils {
         return file;
     }
 
-    public void createNewFile(String str) {
-        createFileIfNotExist(str);
-        File file = new File(str);
-        file.delete();
+    public boolean isExist(String path) {
+        File file = new File(path);
+        return file.exists();
+    }
+
+    public void copyDictFile(InputStream inStream, String newPath) {
         try {
-            file.createNewFile();
-        } catch (IOException e) {
+            createNewFile(newPath);
+            int bytesum = 0;
+            FileOutputStream fs = new FileOutputStream(newPath);
+            byte[] buffer = new byte[1444];
+            while (true) {
+                int byteread = inStream.read(buffer);
+                if (byteread != -1) {
+                    bytesum += byteread;
+                    fs.write(buffer, 0, byteread);
+                } else {
+                    inStream.close();
+                    return;
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public boolean isExist(String str) {
-        return new File(str).exists();
-    }
-
-    public void merge(String[] strArr, String str, Context context) throws Exception {
-        createNewFile(str);
+    public void copyDictUTFFile(InputStream inStream, String filePath) throws UnsupportedEncodingException, FileNotFoundException {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(str));
-            for (String str2 : strArr) {
-                InputStream open = context.getAssets().open(str2);
-                byte[] bArr = new byte[102400];
-                while (true) {
-                    int read = open.read(bArr);
-                    if (read == -1) {
-                        break;
-                    }
-                    fileOutputStream.write(bArr, 0, read);
+            createNewFile(filePath);
+            int bytesum = 0;
+            FileOutputStream fs = new FileOutputStream(filePath);
+            byte[] buffer = new byte[512];
+            while (true) {
+                int byteread = inStream.read(buffer);
+                if (byteread != -1) {
+                    bytesum += byteread;
+                    fs.write(buffer, 0, byteread);
+                } else {
+                    inStream.close();
+                    return;
                 }
-                open.close();
             }
-            fileOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void merge(String[] fileNames, String TargetFileName, Context mContext) throws Exception {
+        createNewFile(TargetFileName);
+        try {
+            File fout = new File(TargetFileName);
+            FileOutputStream out = new FileOutputStream(fout);
+            for (String str : fileNames) {
+                InputStream in = mContext.getAssets().open(str);
+                byte[] b = new byte[102400];
+                while (true) {
+                    int c = in.read(b);
+                    if (c == -1) {
+                        break;
+                    }
+                    out.write(b, 0, c);
+                }
+                in.close();
+            }
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void copyDictUTFFile2(InputStream inStream, String filePath) {
+        Throwable th;
+        createNewFile(filePath);
+        BufferedReader br = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+            try {
+                BufferedReader br2 = new BufferedReader(new InputStreamReader(inStream, "UTF-8"));
+                while (true) {
+                    try {
+                        try {
+                            String line = br2.readLine();
+                            if (line == null) {
+                                break;
+                            }
+                            sb.append(String.valueOf(line) + "\n");
+                        } catch (IOException e) {
+                            e = e;
+                            br = br2;
+                            e.printStackTrace();
+                            try {
+                                br.close();
+                                return;
+                            } catch (IOException e2) {
+                                e2.printStackTrace();
+                                return;
+                            }
+                        }
+                    } catch (Throwable th2) {
+                        th = th2;
+                        br = br2;
+                        try {
+                            br.close();
+                        } catch (IOException e3) {
+                            e3.printStackTrace();
+                        }
+                        throw th;
+                    }
+                }
+                File file2 = new File(filePath);
+                Writer writer = null;
+                try {
+                    writer = new OutputStreamWriter(new FileOutputStream(file2), "UTF-8");
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (UnsupportedEncodingException e12) {
+                    e12.printStackTrace();
+                }
+                String s3 = sb.toString();
+                try {
+                    writer.write(s3);
+                } catch (IOException e4) {
+                    e4.printStackTrace();
+                }
+                try {
+                    writer.close();
+                } catch (IOException e5) {
+                    e5.printStackTrace();
+                }
+                try {
+                    br2.close();
+                } catch (IOException e6) {
+                    e6.printStackTrace();
+                }
+            } catch (Throwable th3) {
+                th = th3;
+            }
+        } catch (IOException e7) {
+            e = e7;
+        }
+    }
+
+    public void Unzip(InputStream inStream, String targetDir) {
+        Exception cwj;
+        BufferedOutputStream dest;
+        try {
+            ZipInputStream zis = new ZipInputStream(new BufferedInputStream(inStream));
+            BufferedOutputStream dest2 = null;
+            while (true) {
+                try {
+                    ZipEntry entry = zis.getNextEntry();
+                    if (entry != null) {
+                        try {
+                            byte[] data = new byte[102400];
+                            String strEntry = entry.getName();
+                            File entryFile = new File(String.valueOf(targetDir) + strEntry);
+                            File entryDir = new File(entryFile.getParent());
+                            if (!entryDir.exists()) {
+                                entryDir.mkdirs();
+                            }
+                            FileOutputStream fos = new FileOutputStream(entryFile);
+                            dest = new BufferedOutputStream(fos, 102400);
+                            while (true) {
+                                try {
+                                    int count = zis.read(data, 0, 102400);
+                                    if (count == -1) {
+                                        break;
+                                    }
+                                    dest.write(data, 0, count);
+                                } catch (Exception e) {
+                                    ex = e;
+                                    ex.printStackTrace();
+                                    dest2 = dest;
+                                }
+                            }
+                            dest.flush();
+                            dest.close();
+                            dest2 = dest;
+                        } catch (Exception e2) {
+                            ex = e2;
+                            dest = dest2;
+                        }
+                    } else {
+                        zis.close();
+                        return;
+                    }
+                } catch (Exception e3) {
+                    cwj = e3;
+                    cwj.printStackTrace();
+                    return;
+                }
+            }
+        } catch (Exception e4) {
+            cwj = e4;
+        }
+    }
+
+    public static void saveUpdateApks(List<ApkUpdateBean> apks, Context context, String ip) {
+        if (apks == null || apks.size() <= 0 || context == null || TextUtils.isEmpty(ip)) {
+            clearUpdateAPks(context, ip);
+            return;
+        }
+        SharedPreferences sp = context.getSharedPreferences("updateapks", 0);
+        sp.edit().putString("apks_" + ip, apks.toString()).commit();
+    }
+
+    public static void clearUpdateAPks(Context context, String ip) {
+        SharedPreferences sp = context.getSharedPreferences("updateapks", 0);
+        sp.edit().putString("apks_" + ip, "").commit();
+    }
+
+    public static List<String> getFailedEbagUpdated(Context context, String ip) {
+        List<String> apkFailedList = new ArrayList<>();
+        if (context != null) {
+            SharedPreferences sp = context.getSharedPreferences("updateapks", 0);
+            String apkJsonStr = sp.getString("apks_" + ip, "");
+            if (!TextUtils.isEmpty(apkJsonStr)) {
+                try {
+                    JSONArray jsonArray = new JSONArray(apkJsonStr);
+                    boolean isFailed = false;
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String pkgName = jsonObject.getString("packagename");
+                        String vcode = jsonObject.getString("versioncode");
+                        String vname = jsonObject.getString("versionname");
+                        String name = jsonObject.getString("appname");
+                        boolean isNeed = needUpdate(pkgName, context, vcode);
+                        if (isNeed) {
+                            isFailed = true;
+                            String appName = getAppName(pkgName, context);
+                            if (TextUtils.isEmpty(appName) && !TextUtils.isEmpty(name)) {
+                                int length = name.length() > 16 ? 16 : name.length();
+                                if (name.contains("_")) {
+                                    length = name.indexOf("_");
+                                }
+                                try {
+                                    appName = name.substring(0, length);
+                                } catch (Exception e) {
+                                }
+                            }
+                            apkFailedList.add(String.valueOf(appName) + ": v" + vname);
+                        }
+                    }
+                    if (!isFailed) {
+                        sp.edit().putString("apks_" + ip, "").commit();
+                    }
+                } catch (JSONException e2) {
+                    e2.printStackTrace();
+                } catch (Exception e3) {
+                }
+                return new ArrayList<>();
+            }
+            return apkFailedList;
+        }
+        return apkFailedList;
+    }
+
+    public static boolean needUpdate(String packagename, Context context, String code) {
+        Log.e("AppUtils", String.valueOf(packagename) + "," + code);
+        boolean need = false;
+        int vcode = 1;
+        try {
+            vcode = Integer.parseInt(code);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(packagename, 0);
+            int versionCode = info.versionCode;
+            if (vcode > versionCode) {
+                need = true;
+            }
+            Log.e("AppUtils", String.valueOf(packagename) + "," + vcode + "," + versionCode);
+            return need;
+        } catch (Exception e3) {
+            return true;
+        }
+    }
+
+    public static String getAppName(String packagename, Context context) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo appInfo = pm.getApplicationInfo(packagename, 128);
+            String appName = pm.getApplicationLabel(appInfo).toString();
+            return appName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
     }
 }

@@ -2,14 +2,13 @@ package com.pgyersdk.feedback;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-
-/* loaded from: classes.jar:com/pgyersdk/feedback/h.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class h extends AsyncTask {
     final /* synthetic */ c a;
     private final /* synthetic */ Bitmap b;
     private final /* synthetic */ String c;
 
-    h(c cVar, Bitmap bitmap, String str) {
+    public h(c cVar, Bitmap bitmap, String str) {
         this.a = cVar;
         this.b = bitmap;
         this.c = str;
@@ -22,27 +21,16 @@ final class h extends AsyncTask {
 
     @Override // android.os.AsyncTask
     protected final /* synthetic */ void onPostExecute(Object obj) {
-        b bVar;
-        b bVar2;
-        b bVar3;
-        String str;
-        b unused;
         Boolean bool = (Boolean) obj;
         super.onPostExecute(bool);
-        if (!bool.booleanValue()) {
-            bVar = c.i;
-            if (bVar == null) {
+        if (bool.booleanValue()) {
+            if (c.b() == null) {
                 return;
             }
-            unused = c.i;
-            return;
+            c.b().a(c.b(this.a));
+        } else if (c.b() == null) {
+        } else {
+            c.b();
         }
-        bVar2 = c.i;
-        if (bVar2 == null) {
-            return;
-        }
-        bVar3 = c.i;
-        str = this.a.h;
-        bVar3.a(str);
     }
 }

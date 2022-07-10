@@ -1,58 +1,34 @@
 package com.google.zxing.client.result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/GeoParsedResult.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class GeoParsedResult extends ParsedResult {
     private final double altitude;
     private final double latitude;
     private final double longitude;
     private final String query;
 
-    GeoParsedResult(double d, double d2, double d3, String str) {
+    public GeoParsedResult(double latitude, double longitude, double altitude, String query) {
         super(ParsedResultType.GEO);
-        this.latitude = d;
-        this.longitude = d2;
-        this.altitude = d3;
-        this.query = str;
-    }
-
-    public double getAltitude() {
-        return this.altitude;
-    }
-
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
-        StringBuilder sb = new StringBuilder(20);
-        sb.append(this.latitude);
-        sb.append(", ");
-        sb.append(this.longitude);
-        if (this.altitude > 0.0d) {
-            sb.append(", ");
-            sb.append(this.altitude);
-            sb.append('m');
-        }
-        if (this.query != null) {
-            sb.append(" (");
-            sb.append(this.query);
-            sb.append(')');
-        }
-        return sb.toString();
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = altitude;
+        this.query = query;
     }
 
     public String getGeoURI() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("geo:");
-        sb.append(this.latitude);
-        sb.append(',');
-        sb.append(this.longitude);
+        StringBuilder result = new StringBuilder();
+        result.append("geo:");
+        result.append(this.latitude);
+        result.append(',');
+        result.append(this.longitude);
         if (this.altitude > 0.0d) {
-            sb.append(',');
-            sb.append(this.altitude);
+            result.append(',');
+            result.append(this.altitude);
         }
         if (this.query != null) {
-            sb.append('?');
-            sb.append(this.query);
+            result.append('?');
+            result.append(this.query);
         }
-        return sb.toString();
+        return result.toString();
     }
 
     public double getLatitude() {
@@ -63,7 +39,30 @@ public final class GeoParsedResult extends ParsedResult {
         return this.longitude;
     }
 
+    public double getAltitude() {
+        return this.altitude;
+    }
+
     public String getQuery() {
         return this.query;
+    }
+
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
+        StringBuilder result = new StringBuilder(20);
+        result.append(this.latitude);
+        result.append(", ");
+        result.append(this.longitude);
+        if (this.altitude > 0.0d) {
+            result.append(", ");
+            result.append(this.altitude);
+            result.append('m');
+        }
+        if (this.query != null) {
+            result.append(" (");
+            result.append(this.query);
+            result.append(')');
+        }
+        return result.toString();
     }
 }

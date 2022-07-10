@@ -6,32 +6,16 @@ import java.io.OutputStream;
 import org.apache.http.Header;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.params.HttpParams;
-
-/* loaded from: classes.jar:com/android/internal/http/multipart/MultipartEntity.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class MultipartEntity extends AbstractHttpEntity {
     public static final String MULTIPART_BOUNDARY = "http.method.multipart.boundary";
     protected Part[] parts = null;
 
-    public MultipartEntity(Part[] partArr) {
+    public MultipartEntity(Part[] parts, HttpParams params) {
         throw new RuntimeException("Stub!");
     }
 
-    public MultipartEntity(Part[] partArr, HttpParams httpParams) {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // org.apache.http.HttpEntity
-    public InputStream getContent() throws IOException, IllegalStateException {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // org.apache.http.HttpEntity
-    public long getContentLength() {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // org.apache.http.entity.AbstractHttpEntity, org.apache.http.HttpEntity
-    public Header getContentType() {
+    public MultipartEntity(Part[] parts) {
         throw new RuntimeException("Stub!");
     }
 
@@ -45,12 +29,27 @@ public class MultipartEntity extends AbstractHttpEntity {
     }
 
     @Override // org.apache.http.HttpEntity
-    public boolean isStreaming() {
+    public void writeTo(OutputStream out) throws IOException {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // org.apache.http.entity.AbstractHttpEntity, org.apache.http.HttpEntity
+    public Header getContentType() {
         throw new RuntimeException("Stub!");
     }
 
     @Override // org.apache.http.HttpEntity
-    public void writeTo(OutputStream outputStream) throws IOException {
+    public long getContentLength() {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // org.apache.http.HttpEntity
+    public InputStream getContent() throws IOException, IllegalStateException {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // org.apache.http.HttpEntity
+    public boolean isStreaming() {
         throw new RuntimeException("Stub!");
     }
 }

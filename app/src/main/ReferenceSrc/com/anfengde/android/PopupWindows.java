@@ -9,8 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
-
-/* loaded from: classes.jar:com/anfengde/android/PopupWindows.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class PopupWindows {
     protected Drawable mBackground = null;
     protected Context mContext;
@@ -21,30 +20,33 @@ public class PopupWindows {
     public PopupWindows(Context context) {
         this.mContext = context;
         this.mWindow = new PopupWindow(context);
-        this.mWindow.setTouchInterceptor(new View.OnTouchListener() { // from class: com.anfengde.android.PopupWindows.1
-            @Override // android.view.View.OnTouchListener
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == 4) {
-                    PopupWindows.this.mWindow.dismiss();
-                    return false;
-                }
-                return false;
-            }
-        });
+        this.mWindow.setTouchInterceptor(new AnonymousClass1());
         this.mWindowManager = (WindowManager) context.getSystemService("window");
     }
 
-    public void dismiss() {
-        this.mWindow.dismiss();
+    /* renamed from: com.anfengde.android.PopupWindows$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 implements View.OnTouchListener {
+        AnonymousClass1() {
+            PopupWindows.this = r1;
+        }
+
+        @Override // android.view.View.OnTouchListener
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == 4) {
+                PopupWindows.this.mWindow.dismiss();
+            }
+            return false;
+        }
     }
 
-    protected void onDismiss() {
+    public void onDismiss() {
     }
 
     protected void onShow() {
     }
 
-    protected void preShow() {
+    public void preShow() {
         if (this.mRootView == null) {
             throw new IllegalStateException("setContentView was not called with a view to display.");
         }
@@ -61,20 +63,25 @@ public class PopupWindows {
         this.mWindow.setContentView(this.mRootView);
     }
 
-    public void setBackgroundDrawable(Drawable drawable) {
-        this.mBackground = drawable;
+    public void setBackgroundDrawable(Drawable background) {
+        this.mBackground = background;
     }
 
-    public void setContentView(int i) {
-        setContentView(((LayoutInflater) this.mContext.getSystemService("layout_inflater")).inflate(i, (ViewGroup) null));
+    public void setContentView(View root) {
+        this.mRootView = root;
+        this.mWindow.setContentView(root);
     }
 
-    public void setContentView(View view) {
-        this.mRootView = view;
-        this.mWindow.setContentView(view);
+    public void setContentView(int layoutResID) {
+        LayoutInflater inflator = (LayoutInflater) this.mContext.getSystemService("layout_inflater");
+        setContentView(inflator.inflate(layoutResID, (ViewGroup) null));
     }
 
-    public void setOnDismissListener(PopupWindow.OnDismissListener onDismissListener) {
-        this.mWindow.setOnDismissListener(onDismissListener);
+    public void setOnDismissListener(PopupWindow.OnDismissListener listener) {
+        this.mWindow.setOnDismissListener(listener);
+    }
+
+    public void dismiss() {
+        this.mWindow.dismiss();
     }
 }

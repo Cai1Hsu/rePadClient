@@ -11,8 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.edutech.mobilestudyclient.activity.CloudClientActivity;
 import com.launcher.activity.R;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/view/CustomAlertDialog.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class CustomAlertDialog {
     AlertDialog ad;
     LinearLayout buttonLayout;
@@ -31,53 +30,64 @@ public class CustomAlertDialog {
         this.buttonLayout = (LinearLayout) window.findViewById(R.id.buttonLayout);
     }
 
-    public void dismiss() {
-        this.ad.dismiss();
+    public void setTitle(int resId) {
+        this.titleView.setText(resId);
     }
 
-    public void setMessage(int i) {
-        this.messageView.setText(i);
+    public void setTitle(String title) {
+        this.titleView.setText(title);
     }
 
-    public void setMessage(String str) {
-        this.messageView.setText(str);
+    public void setMessage(int resId) {
+        this.messageView.setText(resId);
     }
 
-    public void setNegativeButton(String str, View.OnClickListener onClickListener) {
+    public void setMessage(String message) {
+        this.messageView.setText(message);
+    }
+
+    public void setPositiveButton(String text, View.OnClickListener listener) {
+        LinearLayout.LayoutParams params;
         Button button = new Button(this.context);
-        button.setLayoutParams(CloudClientActivity.mWidth == 1280 ? new LinearLayout.LayoutParams((int) TransportMediator.KEYCODE_MEDIA_RECORD, 50) : new LinearLayout.LayoutParams(100, 40));
-        button.setBackgroundResource(R.drawable.button_negative);
-        button.setText(str);
-        button.setTextColor(ViewCompat.MEASURED_STATE_MASK);
+        if (CloudClientActivity.mWidth == 1280) {
+            params = new LinearLayout.LayoutParams((int) TransportMediator.KEYCODE_MEDIA_RECORD, 50);
+        } else {
+            params = new LinearLayout.LayoutParams(100, 40);
+        }
+        button.setLayoutParams(params);
+        button.setBackgroundResource(R.drawable.button_positive);
+        button.setText(text);
+        button.setTextColor(-1);
         button.setTextSize(20.0f);
-        button.setOnClickListener(onClickListener);
+        button.setOnClickListener(listener);
+        if (this.buttonLayout.getChildCount() > 0) {
+            params.setMargins(20, 0, 0, 0);
+            button.setLayoutParams(params);
+            this.buttonLayout.addView(button, 1);
+            return;
+        }
+        button.setLayoutParams(params);
         this.buttonLayout.addView(button);
     }
 
-    public void setPositiveButton(String str, View.OnClickListener onClickListener) {
+    public void setNegativeButton(String text, View.OnClickListener listener) {
+        LinearLayout.LayoutParams params;
         Button button = new Button(this.context);
-        LinearLayout.LayoutParams layoutParams = CloudClientActivity.mWidth == 1280 ? new LinearLayout.LayoutParams((int) TransportMediator.KEYCODE_MEDIA_RECORD, 50) : new LinearLayout.LayoutParams(100, 40);
-        button.setLayoutParams(layoutParams);
-        button.setBackgroundResource(R.drawable.button_positive);
-        button.setText(str);
-        button.setTextColor(-1);
-        button.setTextSize(20.0f);
-        button.setOnClickListener(onClickListener);
-        if (this.buttonLayout.getChildCount() <= 0) {
-            button.setLayoutParams(layoutParams);
-            this.buttonLayout.addView(button);
-            return;
+        if (CloudClientActivity.mWidth == 1280) {
+            params = new LinearLayout.LayoutParams((int) TransportMediator.KEYCODE_MEDIA_RECORD, 50);
+        } else {
+            params = new LinearLayout.LayoutParams(100, 40);
         }
-        layoutParams.setMargins(20, 0, 0, 0);
-        button.setLayoutParams(layoutParams);
-        this.buttonLayout.addView(button, 1);
+        button.setLayoutParams(params);
+        button.setBackgroundResource(R.drawable.button_negative);
+        button.setText(text);
+        button.setTextColor(ViewCompat.MEASURED_STATE_MASK);
+        button.setTextSize(20.0f);
+        button.setOnClickListener(listener);
+        this.buttonLayout.addView(button);
     }
 
-    public void setTitle(int i) {
-        this.titleView.setText(i);
-    }
-
-    public void setTitle(String str) {
-        this.titleView.setText(str);
+    public void dismiss() {
+        this.ad.dismiss();
     }
 }

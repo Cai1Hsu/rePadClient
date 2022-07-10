@@ -12,8 +12,7 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpProtocolParams;
-
-/* loaded from: classes.jar:com/pgyersdk/c/b.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class b {
     private HttpClient a;
 
@@ -31,7 +30,7 @@ public final class b {
         this.a = new DefaultHttpClient(new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry), basicHttpParams);
     }
 
-    /* synthetic */ b(byte b) {
+    public /* synthetic */ b(byte b) {
         this();
     }
 

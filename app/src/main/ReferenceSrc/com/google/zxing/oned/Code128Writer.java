@@ -5,10 +5,10 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
-import org.apache.commons.compress.archivers.tar.TarConstants;
-
-/* loaded from: classes.jar:com/google/zxing/oned/Code128Writer.class */
+import org.apache.commons.net.telnet.TelnetCommand;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class Code128Writer extends UPCEANWriter {
     private static final int CODE_CODE_B = 100;
     private static final int CODE_CODE_C = 99;
@@ -24,141 +24,122 @@ public final class Code128Writer extends UPCEANWriter {
     private static final char ESCAPE_FNC_3 = 243;
     private static final char ESCAPE_FNC_4 = 244;
 
-    private static boolean isDigits(CharSequence charSequence, int i, int i2) {
-        int i3;
-        boolean z = false;
-        int i4 = i + i2;
-        int length = charSequence.length();
-        while (i < i4 && i < length) {
-            char charAt = charSequence.charAt(i);
-            if (charAt >= '0') {
-                i3 = i4;
-                if (charAt <= '9') {
-                    continue;
-                    i++;
-                    i4 = i3;
-                }
-            }
-            if (charAt != 241) {
-                break;
-            }
-            i3 = i4 + 1;
-            i++;
-            i4 = i3;
-        }
-        if (i4 <= length) {
-            z = true;
-        }
-        return z;
-    }
-
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter, com.google.zxing.Writer
-    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
-        if (barcodeFormat != BarcodeFormat.CODE_128) {
-            throw new IllegalArgumentException("Can only encode CODE_128, but got " + barcodeFormat);
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
+        if (format != BarcodeFormat.CODE_128) {
+            throw new IllegalArgumentException("Can only encode CODE_128, but got " + format);
         }
-        return super.encode(str, barcodeFormat, i, i2, map);
+        return super.encode(contents, format, width, height, hints);
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public byte[] encode(String str) {
-        int i;
-        int i2;
-        int i3;
-        int length = str.length();
+    public byte[] encode(String contents) {
+        int newCodeSet;
+        int patternIndex;
+        int length = contents.length();
         if (length < 1 || length > 80) {
             throw new IllegalArgumentException("Contents length should be between 1 and 80 characters, but got " + length);
         }
-        for (int i4 = 0; i4 < length; i4++) {
-            char charAt = str.charAt(i4);
-            if (charAt < ' ' || charAt > '~') {
-                switch (charAt) {
-                    case 241:
+        for (int i = 0; i < length; i++) {
+            char c = contents.charAt(i);
+            if (c < ' ' || c > '~') {
+                switch (c) {
+                    case TelnetCommand.NOP /* 241 */:
                     case 242:
-                    case 243:
-                    case 244:
+                    case TelnetCommand.BREAK /* 243 */:
+                    case TelnetCommand.IP /* 244 */:
                         break;
                     default:
-                        throw new IllegalArgumentException("Bad character in input: " + charAt);
+                        throw new IllegalArgumentException("Bad character in input: " + c);
                 }
             }
         }
-        ArrayList<int[]> arrayList = new ArrayList();
-        int i5 = 0;
-        int i6 = 1;
-        int i7 = 0;
-        int i8 = 0;
-        while (i8 < length) {
-            int i9 = isDigits(str, i8, i7 == CODE_CODE_C ? 2 : 4) ? CODE_CODE_C : 100;
-            if (i9 != i7) {
-                i = i9;
-                i2 = i7 == 0 ? i9 == 100 ? CODE_START_B : CODE_START_C : i9;
-                i3 = i8;
-            } else if (i7 != 100) {
-                switch (str.charAt(i8)) {
-                    case 241:
-                        i2 = 102;
-                        i3 = i8 + 1;
-                        i = i7;
-                        break;
-                    case 242:
-                        i2 = CODE_FNC_2;
-                        i3 = i8 + 1;
-                        i = i7;
-                        break;
-                    case 243:
-                        i2 = 96;
-                        i3 = i8 + 1;
-                        i = i7;
-                        break;
-                    case 244:
-                        i2 = 100;
-                        i3 = i8 + 1;
-                        i = i7;
-                        break;
-                    default:
-                        i2 = Integer.parseInt(str.substring(i8, i8 + 2));
-                        i3 = i8 + 2;
-                        i = i7;
-                        break;
+        Collection<int[]> patterns = new ArrayList<>();
+        int checkSum = 0;
+        int checkWeight = 1;
+        int codeSet = 0;
+        int position = 0;
+        while (position < length) {
+            int requiredDigitCount = codeSet == CODE_CODE_C ? 2 : 4;
+            if (isDigits(contents, position, requiredDigitCount)) {
+                newCodeSet = CODE_CODE_C;
+            } else {
+                newCodeSet = 100;
+            }
+            if (newCodeSet == codeSet) {
+                if (codeSet == 100) {
+                    patternIndex = contents.charAt(position) - ' ';
+                    position++;
+                } else {
+                    switch (contents.charAt(position)) {
+                        case TelnetCommand.NOP /* 241 */:
+                            patternIndex = 102;
+                            position++;
+                            break;
+                        case 242:
+                            patternIndex = CODE_FNC_2;
+                            position++;
+                            break;
+                        case TelnetCommand.BREAK /* 243 */:
+                            patternIndex = 96;
+                            position++;
+                            break;
+                        case TelnetCommand.IP /* 244 */:
+                            patternIndex = 100;
+                            position++;
+                            break;
+                        default:
+                            patternIndex = Integer.parseInt(contents.substring(position, position + 2));
+                            position += 2;
+                            break;
+                    }
                 }
             } else {
-                i2 = str.charAt(i8) - ' ';
-                i3 = i8 + 1;
-                i = i7;
-            }
-            arrayList.add(Code128Reader.CODE_PATTERNS[i2]);
-            int i10 = i5 + (i2 * i6);
-            i5 = i10;
-            i7 = i;
-            i8 = i3;
-            if (i3 != 0) {
-                i6++;
-                i5 = i10;
-                i7 = i;
-                i8 = i3;
-            }
-        }
-        arrayList.add(Code128Reader.CODE_PATTERNS[i5 % TarConstants.LF_PAX_GLOBAL_EXTENDED_HEADER]);
-        arrayList.add(Code128Reader.CODE_PATTERNS[CODE_STOP]);
-        int i11 = 0;
-        for (int[] iArr : arrayList) {
-            int length2 = iArr.length;
-            int i12 = 0;
-            int i13 = i11;
-            while (true) {
-                i11 = i13;
-                if (i12 < length2) {
-                    i13 += iArr[i12];
-                    i12++;
+                if (codeSet == 0) {
+                    if (newCodeSet == 100) {
+                        patternIndex = CODE_START_B;
+                    } else {
+                        patternIndex = CODE_START_C;
+                    }
+                } else {
+                    patternIndex = newCodeSet;
                 }
+                codeSet = newCodeSet;
+            }
+            patterns.add(Code128Reader.CODE_PATTERNS[patternIndex]);
+            checkSum += patternIndex * checkWeight;
+            if (position != 0) {
+                checkWeight++;
             }
         }
-        byte[] bArr = new byte[i11];
-        int i14 = 0;
-        for (int[] iArr2 : arrayList) {
-            i14 += appendPattern(bArr, i14, iArr2, 1);
+        patterns.add(Code128Reader.CODE_PATTERNS[checkSum % 103]);
+        patterns.add(Code128Reader.CODE_PATTERNS[CODE_STOP]);
+        int codeWidth = 0;
+        for (int[] pattern : patterns) {
+            for (int width : pattern) {
+                codeWidth += width;
+            }
         }
-        return bArr;
+        byte[] result = new byte[codeWidth];
+        int pos = 0;
+        for (int[] pattern2 : patterns) {
+            pos += appendPattern(result, pos, pattern2, 1);
+        }
+        return result;
+    }
+
+    private static boolean isDigits(CharSequence value, int start, int length) {
+        int end = start + length;
+        int last = value.length();
+        for (int i = start; i < end && i < last; i++) {
+            char c = value.charAt(i);
+            if (c < '0' || c > '9') {
+                if (c != 241) {
+                    return false;
+                }
+                end++;
+            }
+        }
+        return end <= last;
     }
 }

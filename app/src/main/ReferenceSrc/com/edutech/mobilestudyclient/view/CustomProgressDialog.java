@@ -2,25 +2,21 @@ package com.edutech.mobilestudyclient.view;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.edutech.mobilestudyclient.ApkUpdateBean;
 import com.launcher.activity.R;
 import java.util.List;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/view/CustomProgressDialog.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class CustomProgressDialog extends Dialog {
     private ApkUpdateAdapter apkUpdateAdapter;
     private List<ApkUpdateBean> apkUpdateList;
     private Context context;
     private ListView ctmdialog_list;
 
-    public CustomProgressDialog(Context context) {
-        super(context);
-    }
-
-    public CustomProgressDialog(Context context, int i) {
-        super(context, i);
+    public CustomProgressDialog(Context context, int theme) {
+        super(context, theme);
     }
 
     public CustomProgressDialog(Context context, List<ApkUpdateBean> list) {
@@ -35,11 +31,8 @@ public class CustomProgressDialog extends Dialog {
         getWindow().getAttributes().gravity = 17;
     }
 
-    public void resetData() {
-        this.apkUpdateAdapter = null;
-        this.apkUpdateList.clear();
-        this.apkUpdateList = null;
-        this.ctmdialog_list = null;
+    public CustomProgressDialog(Context context) {
+        super(context);
     }
 
     public void setData(List<ApkUpdateBean> list) {
@@ -48,10 +41,18 @@ public class CustomProgressDialog extends Dialog {
         this.apkUpdateAdapter.notifyDataSetChanged();
     }
 
-    public void updateProgress(int i) {
-        int firstVisiblePosition = this.ctmdialog_list.getFirstVisiblePosition();
-        if (i - firstVisiblePosition >= 0) {
-            this.apkUpdateAdapter.updateView(this.ctmdialog_list.getChildAt(i - firstVisiblePosition), i);
+    public void updateProgress(int itemIndex) {
+        int visiblePosition = this.ctmdialog_list.getFirstVisiblePosition();
+        if (itemIndex - visiblePosition >= 0) {
+            View view = this.ctmdialog_list.getChildAt(itemIndex - visiblePosition);
+            this.apkUpdateAdapter.updateView(view, itemIndex);
         }
+    }
+
+    public void resetData() {
+        this.apkUpdateAdapter = null;
+        this.apkUpdateList.clear();
+        this.apkUpdateList = null;
+        this.ctmdialog_list = null;
     }
 }

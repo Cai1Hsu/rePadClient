@@ -17,546 +17,838 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.json.JSONTokener;
-
-/* loaded from: classes.jar:com/edutech/daoxueben/until/JsonHelper.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class JsonHelper {
-    private static String CreateDir() {
-        String str = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + "JSONFile" + File.separatorChar;
-        File file = new File(str);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        return str;
-    }
-
-    public static boolean CreateFile(String str, String str2) {
-        boolean z = false;
-        synchronized (JsonHelper.class) {
+    public static ArrayList<BookInfo> peerbookparserJson(ArrayList<BookInfo> book, String json) {
+        int book_total = 0;
+        int isnew_count = 0;
+        book.clear();
+        if (!"".equals(json)) {
             try {
-                try {
-                    FileOutputStream fileOutputStream = new FileOutputStream(new File(str2));
-                    try {
-                        fileOutputStream.write(str.getBytes("UTF-8"));
-                        fileOutputStream.close();
-                        z = true;
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                JSONTokener jsonTokener = new JSONTokener(json);
+                JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+                String book_id = getPropertyName(jsonObject, "id");
+                String book_name = getPropertyName(jsonObject, "name");
+                long book_downloadsize = getLongPropertyName(jsonObject, KeyEnvironment.KEYDOWNLOADSIZE).longValue();
+                long book_size = getLongPropertyName(jsonObject, "size").longValue();
+                String book_updatetime = getPropertyName(jsonObject, "updatetime");
+                JSONArray array = jsonObject.getJSONArray("data");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject object = array.getJSONObject(i);
+                    JSONTokener jsonTokener1 = new JSONTokener(object.toString());
+                    JSONObject jsonObject1 = (JSONObject) jsonTokener1.nextValue();
+                    String chapterid = getPropertyName(jsonObject1, "id");
+                    String chaptername = getPropertyName(jsonObject1, "name");
+                    String childjson = getPropertyName(jsonObject1, "children");
+                    if ("".equals(childjson)) {
+                        BookInfo bookinfo = new BookInfo();
+                        bookinfo.setBook_id(book_id);
+                        bookinfo.setBook_name(book_name);
+                        bookinfo.setBookdownloadsize(book_downloadsize);
+                        bookinfo.setBooksize(book_size);
+                        bookinfo.setBook_updatetime(book_updatetime);
+                        bookinfo.setChapter_id(chapterid);
+                        bookinfo.setchapter_name(chaptername);
+                        bookinfo.setParent(false);
+                        book.add(bookinfo);
+                    } else {
+                        JSONArray array2 = new JSONArray(childjson);
+                        if (array2.length() == 0) {
+                            BookInfo bookinfo2 = new BookInfo();
+                            bookinfo2.setBook_id(book_id);
+                            bookinfo2.setBook_name(book_name);
+                            bookinfo2.setBookdownloadsize(book_downloadsize);
+                            bookinfo2.setBooksize(book_size);
+                            bookinfo2.setBook_updatetime(book_updatetime);
+                            bookinfo2.setChapter_id(chapterid);
+                            bookinfo2.setchapter_name(chaptername);
+                            bookinfo2.setParent(false);
+                            book.add(bookinfo2);
+                        } else {
+                            for (int j = 0; j < array2.length(); j++) {
+                                JSONObject object2 = array2.getJSONObject(j);
+                                JSONTokener jsonTokener2 = new JSONTokener(object2.toString());
+                                JSONObject jsonObject2 = (JSONObject) jsonTokener2.nextValue();
+                                String section_id = getPropertyName(jsonObject2, "id");
+                                String section_dxid = getPropertyName(jsonObject2, "dxid");
+                                String section_name = getPropertyName(jsonObject2, "name");
+                                String section_webpath = getPropertyName(jsonObject2, KeyEnvironment.KEYWEBPATH);
+                                String section_path = getPropertyName(jsonObject2, "path");
+                                String exams = getPropertyName(jsonObject2, "exams");
+                                String exams_progress = getPropertyName(jsonObject2, "examsprogress");
+                                ArrayList<ExamsInfo> examslist = parseExamsInfo(book_id, section_dxid, new ArrayList<>(), exams);
+                                long sectionexamsize = 0;
+                                Iterator<ExamsInfo> it = examslist.iterator();
+                                while (it.hasNext()) {
+                                    ExamsInfo tempexam = it.next();
+                                    sectionexamsize += tempexam.getexams_totalsize();
+                                }
+                                String section_tag = getPropertyName(jsonObject2, "tag");
+                                String section_updatetime = getPropertyName(jsonObject2, "updatetime");
+                                String section_progress = getPropertyName(jsonObject2, "progress");
+                                String downloadsize = getPropertyName(jsonObject2, KeyEnvironment.KEYDOWNLOADSIZE);
+                                String size = getPropertyName(jsonObject2, "size");
+                                boolean isdown = getBooleanPropertyName(jsonObject2, "isdown");
+                                boolean isnew = getBooleanPropertyName(jsonObject2, AppEnvironment.ISNEW);
+                                BookInfo bookinfo3 = new BookInfo();
+                                bookinfo3.setBook_id(book_id);
+                                bookinfo3.setBook_name(book_name);
+                                bookinfo3.setBookdownloadsize(book_downloadsize);
+                                bookinfo3.setBooksize(book_size);
+                                bookinfo3.setBook_updatetime(book_updatetime);
+                                bookinfo3.setChapter_id(chapterid);
+                                bookinfo3.setchapter_name(chaptername);
+                                bookinfo3.setSection_id(section_id);
+                                bookinfo3.setSection_dxid(section_dxid);
+                                bookinfo3.setsection_name(section_name);
+                                bookinfo3.setExams(examslist);
+                                bookinfo3.setSection_webpath(getJsonArray(section_webpath));
+                                bookinfo3.setSection_path(getJsonArray(section_path));
+                                int webpathsize = bookinfo3.getSection_webpath().size();
+                                bookinfo3.setDownloadsize(getLongJsonArray(webpathsize, downloadsize));
+                                bookinfo3.setSize(getLongJsonArray(webpathsize, size));
+                                bookinfo3.setsection_tag(section_tag);
+                                bookinfo3.setsection_updatetime(section_updatetime);
+                                bookinfo3.setIsdown(isdown);
+                                bookinfo3.setIsnew(isnew);
+                                if ("".equals(exams_progress)) {
+                                    if (sectionexamsize == 0) {
+                                        bookinfo3.setexams_progress("100");
+                                    } else {
+                                        bookinfo3.setexams_progress("0");
+                                    }
+                                } else if (sectionexamsize == 0) {
+                                    bookinfo3.setexams_progress("100");
+                                } else {
+                                    bookinfo3.setexams_progress(exams_progress);
+                                }
+                                if (!"".equals(section_progress)) {
+                                    bookinfo3.setSection_progress(getJsonArray(section_progress));
+                                } else if (bookinfo3.getSection_webpath().size() > 0) {
+                                    ArrayList<String> progresslist = new ArrayList<>();
+                                    for (int k = 0; k < webpathsize; k++) {
+                                        progresslist.add("0");
+                                    }
+                                    bookinfo3.setSection_progress(progresslist);
+                                }
+                                bookinfo3.setParent(true);
+                                book_total = bookinfo3.getSection_webpath().size() + book_total + bookinfo3.getExams().size();
+                                if (bookinfo3.isIsnew()) {
+                                    isnew_count++;
+                                }
+                                book.add(bookinfo3);
+                            }
+                        }
                     }
-                } catch (FileNotFoundException e2) {
-                    e2.printStackTrace();
                 }
-            } finally {
-            }
-        }
-        return z;
-    }
-
-    public static String bookUpdatePostCreateJson(ArrayList<BookUpdateInfo> arrayList) {
-        String jSONStringer;
-        if (arrayList.size() == 0) {
-            jSONStringer = "";
-        } else {
-            JSONStringer jSONStringer2 = new JSONStringer();
-            try {
-                jSONStringer2.object();
-                jSONStringer2.key("data");
-                jSONStringer2.array();
-                for (int i = 0; i < arrayList.size(); i++) {
-                    BookUpdateInfo bookUpdateInfo = arrayList.get(i);
-                    jSONStringer2.object();
-                    String idVar = bookUpdateInfo.getid();
-                    String str = bookUpdateInfo.gettype();
-                    String str2 = bookUpdateInfo.getsource();
-                    String str3 = bookUpdateInfo.getupdatetime();
-                    int i2 = bookUpdateInfo.gettotal();
-                    jSONStringer2.key("id").value(idVar);
-                    jSONStringer2.key("type").value(str);
-                    jSONStringer2.key("source").value(str2);
-                    jSONStringer2.key("updatetime").value(str3);
-                    jSONStringer2.key("total").value(i2);
-                    jSONStringer2.endObject();
+                "".equals(book_id);
+                if (!"".equals(book_id) && book.size() > 0) {
+                    ArrayList<OldBooks> books = new ArrayList<>();
+                    OldBooks newbook = new OldBooks();
+                    newbook.setbook_id(book_id);
+                    newbook.setbook_name(book_name);
+                    newbook.setBookdownloadsize(book_downloadsize);
+                    newbook.setBooksize(0L);
+                    newbook.setBook_total(book_total);
+                    newbook.setProgress("100");
+                    newbook.setbook_path("../offlinedownload/" + book_id + "/");
+                    newbook.setBook_updatetime(book_updatetime);
+                    newbook.setBook_isnew(0);
+                    ArrayList<OldBooks> books2 = booksparserJson(books);
+                    boolean isnewbook = true;
+                    Iterator<OldBooks> it2 = books2.iterator();
+                    while (it2.hasNext()) {
+                        OldBooks entry = it2.next();
+                        if (newbook.getbook_id().equals(entry.getbook_id())) {
+                            isnewbook = false;
+                            entry.setbook_id(newbook.getbook_id());
+                            entry.setbook_name(newbook.getbook_name());
+                            entry.setbook_path(newbook.getbook_path());
+                            entry.setBook_updatetime(newbook.getBook_updatetime());
+                            entry.setBook_total(newbook.getBook_total());
+                            if (isnew_count == 0) {
+                                entry.setBook_isnew(newbook.getBook_isnew());
+                            } else {
+                                entry.setBook_isnew(1);
+                            }
+                        }
+                    }
+                    if (isnewbook) {
+                        books2.add(newbook);
+                        String Newjson = bookscreateJson(books2);
+                        if (CreateFile(Newjson, com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File) && !"".equals(book_id)) {
+                            String NewBookPath = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + book_id;
+                            File offlinedownloaddir = new File(NewBookPath);
+                            if (!offlinedownloaddir.exists()) {
+                                offlinedownloaddir.mkdirs();
+                            }
+                        }
+                    } else {
+                        String Newjson2 = bookscreateJson(books2);
+                        if (CreateFile(Newjson2, com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File)) {
+                            "".equals(book_id);
+                        }
+                    }
                 }
-                jSONStringer2.endArray();
-                jSONStringer2.endObject();
             } catch (Exception e) {
                 e.printStackTrace();
+                book.clear();
             }
-            jSONStringer = jSONStringer2.toString();
         }
-        return jSONStringer;
+        return book;
     }
 
-    public static String bookscreateJson(ArrayList<OldBooks> arrayList) {
-        JSONStringer jSONStringer = new JSONStringer();
-        try {
-            jSONStringer.object();
-            jSONStringer.key("data");
-            jSONStringer.array();
-            for (int i = 0; i < arrayList.size(); i++) {
-                OldBooks oldBooks = arrayList.get(i);
-                jSONStringer.object();
-                String str = oldBooks.getbook_id();
-                String str2 = oldBooks.getbook_name();
-                long bookdownloadsize = oldBooks.getBookdownloadsize();
-                long booksize = oldBooks.getBooksize();
-                String str3 = oldBooks.getbook_path();
-                String progress = oldBooks.getProgress();
-                String book_updatetime = oldBooks.getBook_updatetime();
-                int book_isnew = oldBooks.getBook_isnew();
-                int book_total = oldBooks.getBook_total();
-                jSONStringer.key("id").value(str);
-                jSONStringer.key("name").value(str2);
-                jSONStringer.key("path").value(str3);
-                jSONStringer.key(KeyEnvironment.KEYDOWNLOADSIZE).value(bookdownloadsize);
-                jSONStringer.key("size").value(booksize);
-                jSONStringer.key("progress").value(progress);
-                jSONStringer.key("updatetime").value(book_updatetime);
-                jSONStringer.key(AppEnvironment.ISNEW).value(book_isnew);
-                jSONStringer.key("total").value(book_total);
-                jSONStringer.endObject();
-            }
-            jSONStringer.endArray();
-            jSONStringer.endObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jSONStringer.toString();
-    }
-
-    public static ArrayList<OldBooks> booksparserJson(ArrayList<OldBooks> arrayList) {
-        arrayList.clear();
-        File file = new File(com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File);
-        if (!file.exists()) {
+    public static ArrayList<OldBooks> booksparserJson(ArrayList<OldBooks> books) {
+        books.clear();
+        File bookjson = new File(com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File);
+        if (!bookjson.exists()) {
             try {
-                file.createNewFile();
+                bookjson.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            String fileString = getFileString(com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File);
-            if (!"".equals(fileString)) {
+            String json = getFileString(com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File);
+            if (!"".equals(json)) {
                 try {
-                    JSONArray jSONArray = ((JSONObject) new JSONTokener(fileString).nextValue()).getJSONArray("data");
-                    for (int i = 0; i < jSONArray.length(); i++) {
-                        JSONObject jSONObject = jSONArray.getJSONObject(i);
-                        OldBooks oldBooks = new OldBooks();
-                        String propertyName = getPropertyName(jSONObject, "id");
-                        String propertyName2 = getPropertyName(jSONObject, "name");
-                        long longValue = getLongPropertyName(jSONObject, KeyEnvironment.KEYDOWNLOADSIZE).longValue();
-                        long longValue2 = getLongPropertyName(jSONObject, "size").longValue();
-                        String propertyName3 = getPropertyName(jSONObject, "path");
-                        String propertyName4 = getPropertyName(jSONObject, "progress");
-                        String propertyName5 = getPropertyName(jSONObject, "updatetime");
-                        int intPropertyName = getIntPropertyName(jSONObject, AppEnvironment.ISNEW);
-                        int intPropertyName2 = getIntPropertyName(jSONObject, "total");
-                        oldBooks.setbook_id(propertyName);
-                        oldBooks.setbook_name(propertyName2);
-                        oldBooks.setBookdownloadsize(longValue);
-                        oldBooks.setBooksize(longValue2);
-                        oldBooks.setbook_path(propertyName3);
-                        oldBooks.setProgress(propertyName4);
-                        oldBooks.setBook_updatetime(propertyName5);
-                        oldBooks.setBook_isnew(intPropertyName);
-                        oldBooks.setBook_total(intPropertyName2);
-                        arrayList.add(oldBooks);
+                    JSONTokener jsonTokener = new JSONTokener(json);
+                    JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+                    JSONArray array = jsonObject.getJSONArray("data");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject object = array.getJSONObject(i);
+                        OldBooks book = new OldBooks();
+                        String book_id = getPropertyName(object, "id");
+                        String book_name = getPropertyName(object, "name");
+                        long book_downloadsize = getLongPropertyName(object, KeyEnvironment.KEYDOWNLOADSIZE).longValue();
+                        long book_size = getLongPropertyName(object, "size").longValue();
+                        String book_path = getPropertyName(object, "path");
+                        String book_progress = getPropertyName(object, "progress");
+                        String book_updatetime = getPropertyName(object, "updatetime");
+                        int book_isnew = getIntPropertyName(object, AppEnvironment.ISNEW);
+                        int book_total = getIntPropertyName(object, "total");
+                        book.setbook_id(book_id);
+                        book.setbook_name(book_name);
+                        book.setBookdownloadsize(book_downloadsize);
+                        book.setBooksize(book_size);
+                        book.setbook_path(book_path);
+                        book.setProgress(book_progress);
+                        book.setBook_updatetime(book_updatetime);
+                        book.setBook_isnew(book_isnew);
+                        book.setBook_total(book_total);
+                        books.add(book);
                     }
                 } catch (Exception e2) {
                     e2.printStackTrace();
                 }
             }
         }
-        return arrayList;
+        return books;
     }
 
-    public static void createExamsInfo(int i, String str, String str2, ArrayList<ExamsInfo> arrayList, String str3) {
-        if (arrayList.size() <= 0 || "".equals(str) || "".equals(str2)) {
-            return;
+    public static String peerbookcreateJson(ArrayList<BookInfo> book) {
+        if (book.size() == 0) {
+            return "";
         }
-        JSONStringer jSONStringer = new JSONStringer();
+        String Book_id = book.get(0).getBook_id();
+        String Book_name = book.get(0).getBook_name();
+        long Book_downloadsize = book.get(0).getBookdownloadsize();
+        long Book_size = book.get(0).getBooksize();
+        String Book_updatetime = book.get(0).getBook_updatetime();
+        JSONStringer jsonStringer = new JSONStringer();
         try {
-            jSONStringer.object();
-            jSONStringer.key("studentid").value(str3);
-            jSONStringer.key("exams");
-            jSONStringer.array();
-            Iterator<ExamsInfo> it = arrayList.iterator();
-            while (it.hasNext()) {
-                ExamsInfo next = it.next();
-                jSONStringer.object();
-                jSONStringer.key("id").value(next.getexams_id());
-                jSONStringer.key("questionid").value(next.getquestion_id());
-                jSONStringer.key("body").value(next.getexams_body());
-                jSONStringer.key("type").value(next.getexams_type());
-                jSONStringer.key("answer").value(next.getexams_answer());
-                jSONStringer.key(Form.TYPE_RESULT).value(next.getexams_result());
-                jSONStringer.key("studentresult").value(next.getexams_studentresult());
-                setJsonArray(jSONStringer, next.getexams_webpath(), KeyEnvironment.KEYWEBPATH);
-                setJsonArray(jSONStringer, next.getexams_path(), "path");
-                setLongJsonArray(jSONStringer, next.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
-                setLongJsonArray(jSONStringer, next.getSize(), "sizes");
-                setJsonArray(jSONStringer, next.getexams_progress(), "progress");
-                jSONStringer.key("size").value(next.getexams_totalsize());
-                jSONStringer.key("updatetime").value(next.getExams_updatetime());
-                jSONStringer.endObject();
-            }
-            jSONStringer.endArray();
-            jSONStringer.endObject();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (Exception e2) {
-            e2.printStackTrace();
-        }
-        String jSONStringer2 = jSONStringer.toString();
-        String str4 = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + str + "/" + str2 + "/" + str3 + "/";
-        String str5 = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + str + "/" + str2 + "/" + str3 + "/" + str2 + ".json";
-        File file = new File(str5);
-        if (i == 0) {
-            if (FileInOutHelper.fileIsExists(str4)) {
-                return;
-            }
-            FileInOutHelper.createNewFile(file);
-            CreateFile(jSONStringer2, str5);
-        } else if (i != 1) {
-        } else {
-            if (file.exists()) {
-                file.delete();
-            }
-            FileInOutHelper.createNewFile(file);
-            CreateFile(jSONStringer2, str5);
-        }
-    }
-
-    public static boolean getBooleanPropertyName(JSONObject jSONObject, String str) {
-        boolean z;
-        if (!jSONObject.isNull(str)) {
-            try {
-                z = jSONObject.getBoolean(str);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                z = false;
-            }
-        } else {
-            z = false;
-        }
-        return z;
-    }
-
-    public static String getFileString(String str) {
-        String str2;
-        synchronized (JsonHelper.class) {
-            try {
-                if (!new File(str).exists()) {
-                    str2 = "";
+            jsonStringer.object();
+            jsonStringer.key("id").value(Book_id);
+            jsonStringer.key("name").value(Book_name);
+            jsonStringer.key(KeyEnvironment.KEYDOWNLOADSIZE).value(Book_downloadsize);
+            jsonStringer.key("size").value(Book_size);
+            jsonStringer.key("updatetime").value(Book_updatetime);
+            jsonStringer.key("data");
+            jsonStringer.array();
+            int i = 0;
+            while (i < book.size()) {
+                BookInfo bookinfo = book.get(i);
+                jsonStringer.object();
+                String first_chapter_id = bookinfo.getChapter_id();
+                String first_chapter_name = bookinfo.getchapter_name();
+                jsonStringer.key("id").value(first_chapter_id);
+                jsonStringer.key("name").value(first_chapter_name);
+                if (!bookinfo.isParent()) {
+                    i++;
+                    jsonStringer.key("children");
+                    jsonStringer.array();
+                    jsonStringer.endArray();
                 } else {
-                    String str3 = "";
-                    try {
-                        FileInputStream fileInputStream = new FileInputStream(str);
-                        byte[] bArr = new byte[fileInputStream.available()];
-                        fileInputStream.read(bArr);
-                        String string = EncodingUtils.getString(bArr, "UTF-8");
-                        str3 = string;
-                        fileInputStream.close();
-                        str3 = string;
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    jsonStringer.key("children");
+                    jsonStringer.array();
+                    jsonStringer.object();
+                    jsonStringer.key("id").value(bookinfo.getSection_id());
+                    jsonStringer.key("dxid").value(bookinfo.getSection_dxid());
+                    jsonStringer.key("name").value(bookinfo.getsection_name());
+                    jsonStringer.key("examsprogress").value(bookinfo.getexams_progress());
+                    jsonStringer.key("exams");
+                    jsonStringer.array();
+                    if (bookinfo.getExams().size() == 0) {
+                        jsonStringer.endArray();
+                    } else {
+                        Iterator<ExamsInfo> it = bookinfo.getExams().iterator();
+                        while (it.hasNext()) {
+                            ExamsInfo tempexam = it.next();
+                            jsonStringer.object();
+                            jsonStringer.key("id").value(tempexam.getexams_id());
+                            jsonStringer.key("questionid").value(tempexam.getquestion_id());
+                            jsonStringer.key("body").value(tempexam.getexams_body());
+                            jsonStringer.key("type").value(tempexam.getexams_type());
+                            jsonStringer.key("answer").value(tempexam.getexams_answer());
+                            jsonStringer.key(Form.TYPE_RESULT).value(tempexam.getexams_result());
+                            jsonStringer.key("studentresult").value(tempexam.getexams_studentresult());
+                            setJsonArray(jsonStringer, tempexam.getexams_webpath(), KeyEnvironment.KEYWEBPATH);
+                            setJsonArray(jsonStringer, tempexam.getexams_path(), "path");
+                            setLongJsonArray(jsonStringer, tempexam.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
+                            setLongJsonArray(jsonStringer, tempexam.getSize(), "sizes");
+                            setJsonArray(jsonStringer, tempexam.getexams_progress(), "progress");
+                            jsonStringer.key("size").value(tempexam.getexams_totalsize());
+                            jsonStringer.key("updatetime").value(tempexam.getExams_updatetime());
+                            jsonStringer.endObject();
+                        }
+                        jsonStringer.endArray();
                     }
-                    str2 = str3 == null ? "" : str3;
+                    setJsonArray(jsonStringer, bookinfo.getSection_webpath(), KeyEnvironment.KEYWEBPATH);
+                    setJsonArray(jsonStringer, bookinfo.getSection_path(), "path");
+                    jsonStringer.key("tag").value(bookinfo.getsection_tag());
+                    jsonStringer.key("updatetime").value(bookinfo.getsection_updatetime());
+                    setJsonArray(jsonStringer, bookinfo.getSection_progress(), "progress");
+                    setLongJsonArray(jsonStringer, bookinfo.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
+                    setLongJsonArray(jsonStringer, bookinfo.getSize(), "size");
+                    jsonStringer.key("isdown").value(book.get(i).isIsdown());
+                    jsonStringer.key(AppEnvironment.ISNEW).value(book.get(i).isIsnew());
+                    jsonStringer.endObject();
+                    i++;
+                    while (i < book.size() && first_chapter_name.equals(book.get(i).getchapter_name())) {
+                        jsonStringer.object();
+                        jsonStringer.key("id").value(book.get(i).getSection_id());
+                        jsonStringer.key("dxid").value(book.get(i).getSection_dxid());
+                        jsonStringer.key("name").value(book.get(i).getsection_name());
+                        jsonStringer.key("examsprogress").value(book.get(i).getexams_progress());
+                        jsonStringer.key("exams");
+                        jsonStringer.array();
+                        if (book.get(i).getExams().size() == 0) {
+                            jsonStringer.endArray();
+                        } else {
+                            Iterator<ExamsInfo> it2 = book.get(i).getExams().iterator();
+                            while (it2.hasNext()) {
+                                ExamsInfo tempexam2 = it2.next();
+                                jsonStringer.object();
+                                jsonStringer.key("id").value(tempexam2.getexams_id());
+                                jsonStringer.key("questionid").value(tempexam2.getquestion_id());
+                                jsonStringer.key("body").value(tempexam2.getexams_body());
+                                jsonStringer.key("type").value(tempexam2.getexams_type());
+                                jsonStringer.key("answer").value(tempexam2.getexams_answer());
+                                jsonStringer.key(Form.TYPE_RESULT).value(tempexam2.getexams_result());
+                                jsonStringer.key("studentresult").value(tempexam2.getexams_studentresult());
+                                setJsonArray(jsonStringer, tempexam2.getexams_webpath(), KeyEnvironment.KEYWEBPATH);
+                                setJsonArray(jsonStringer, tempexam2.getexams_path(), "path");
+                                setLongJsonArray(jsonStringer, tempexam2.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
+                                setLongJsonArray(jsonStringer, tempexam2.getSize(), "sizes");
+                                setJsonArray(jsonStringer, tempexam2.getexams_progress(), "progress");
+                                jsonStringer.key("size").value(tempexam2.getexams_totalsize());
+                                jsonStringer.key("updatetime").value(tempexam2.getExams_updatetime());
+                                jsonStringer.endObject();
+                            }
+                            jsonStringer.endArray();
+                        }
+                        setJsonArray(jsonStringer, book.get(i).getSection_webpath(), KeyEnvironment.KEYWEBPATH);
+                        setJsonArray(jsonStringer, book.get(i).getSection_path(), "path");
+                        jsonStringer.key("tag").value(book.get(i).getsection_tag());
+                        jsonStringer.key("updatetime").value(book.get(i).getsection_updatetime());
+                        setJsonArray(jsonStringer, book.get(i).getSection_progress(), "progress");
+                        setLongJsonArray(jsonStringer, book.get(i).getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
+                        setLongJsonArray(jsonStringer, book.get(i).getSize(), "size");
+                        jsonStringer.key("isdown").value(book.get(i).isIsdown());
+                        jsonStringer.key(AppEnvironment.ISNEW).value(book.get(i).isIsnew());
+                        jsonStringer.endObject();
+                        i++;
+                    }
+                    jsonStringer.endArray();
                 }
-            } finally {
+                jsonStringer.endObject();
             }
+            jsonStringer.endArray();
+            jsonStringer.endObject();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return str2;
+        return jsonStringer.toString();
     }
 
-    public static int getIntPropertyName(JSONObject jSONObject, String str) {
-        int i;
-        if (!jSONObject.isNull(str)) {
-            try {
-                i = jSONObject.getInt(str);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                i = 0;
-            }
-        } else {
-            i = 0;
-        }
-        return i;
-    }
-
-    public static ArrayList<String> getJsonArray(String str) {
-        ArrayList<String> arrayList = new ArrayList<>();
+    public static String bookscreateJson(ArrayList<OldBooks> books) {
+        JSONStringer jsonStringer = new JSONStringer();
         try {
-            JSONArray jSONArray = new JSONArray(str);
-            for (int i = 0; i < jSONArray.length(); i++) {
-                arrayList.add(jSONArray.getString(i));
+            jsonStringer.object();
+            jsonStringer.key("data");
+            jsonStringer.array();
+            for (int i = 0; i < books.size(); i++) {
+                OldBooks book = books.get(i);
+                jsonStringer.object();
+                String bookid = book.getbook_id();
+                String bookname = book.getbook_name();
+                long bookdownloadsize = book.getBookdownloadsize();
+                long booksize = book.getBooksize();
+                String bookpath = book.getbook_path();
+                String bookprogress = book.getProgress();
+                String book_updatetime = book.getBook_updatetime();
+                int book_isnew = book.getBook_isnew();
+                int book_total = book.getBook_total();
+                jsonStringer.key("id").value(bookid);
+                jsonStringer.key("name").value(bookname);
+                jsonStringer.key("path").value(bookpath);
+                jsonStringer.key(KeyEnvironment.KEYDOWNLOADSIZE).value(bookdownloadsize);
+                jsonStringer.key("size").value(booksize);
+                jsonStringer.key("progress").value(bookprogress);
+                jsonStringer.key("updatetime").value(book_updatetime);
+                jsonStringer.key(AppEnvironment.ISNEW).value(book_isnew);
+                jsonStringer.key("total").value(book_total);
+                jsonStringer.endObject();
             }
-        } catch (JSONException e) {
+            jsonStringer.endArray();
+            jsonStringer.endObject();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return arrayList;
+        return jsonStringer.toString();
     }
 
-    public static ArrayList<Long> getLongJsonArray(int i, String str) {
-        ArrayList<Long> arrayList = new ArrayList<>();
-        if (!"".equals(str)) {
-            try {
-                JSONArray jSONArray = new JSONArray(str);
-                for (int i2 = 0; i2 < jSONArray.length(); i2++) {
-                    arrayList.add(Long.valueOf(jSONArray.getLong(i2)));
+    public static ArrayList<BookInfo> getNeedDownloadList(ArrayList<BookInfo> peerbook, String downloadjson, String studentid) {
+        ArrayList<ArrayList<String>> downloadjsonlist = new ArrayList<>();
+        ArrayList<String> temp = new ArrayList<>();
+        parsedownloadjson(downloadjson, downloadjsonlist, temp);
+        int downloadjsonlistsize = downloadjsonlist.size();
+        for (int i = 0; i < downloadjsonlistsize; i++) {
+            int dipbook = downloadjsonlist.get(i).size();
+            String bookid = "";
+            String chapterid = "";
+            String sectionid = "";
+            for (int j = 0; j < dipbook; j++) {
+                if (j == 0) {
+                    String bookid2 = downloadjsonlist.get(i).get(j);
+                    bookid = bookid2;
+                } else if (j == 1) {
+                    String chapterid2 = downloadjsonlist.get(i).get(j);
+                    chapterid = chapterid2;
+                } else if (j == 2) {
+                    String sectionid2 = downloadjsonlist.get(i).get(j);
+                    sectionid = sectionid2;
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-        } else if (i > 0) {
-            for (int i3 = 0; i3 < i; i3++) {
-                arrayList.add(0L);
-            }
-        }
-        return arrayList;
-    }
-
-    private static Long getLongPropertyName(JSONObject jSONObject, String str) {
-        long j;
-        if (!jSONObject.isNull(str)) {
-            try {
-                j = jSONObject.getLong(str);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                j = 0;
-            }
-        } else {
-            j = 0;
-        }
-        return Long.valueOf(j);
-    }
-
-    public static ArrayList<BookInfo> getNeedDownloadList(ArrayList<BookInfo> arrayList, String str, String str2) {
-        String str3;
-        String str4;
-        ArrayList arrayList2 = new ArrayList();
-        parsedownloadjson(str, arrayList2, new ArrayList());
-        int size = arrayList2.size();
-        for (int i = 0; i < size; i++) {
-            int size2 = ((ArrayList) arrayList2.get(i)).size();
-            String str5 = "";
-            String str6 = "";
-            String str7 = "";
-            int i2 = 0;
-            while (i2 < size2) {
-                if (i2 == 0) {
-                    str3 = (String) ((ArrayList) arrayList2.get(i)).get(i2);
-                    str4 = str6;
-                } else if (i2 == 1) {
-                    str4 = (String) ((ArrayList) arrayList2.get(i)).get(i2);
-                    str3 = str5;
-                } else {
-                    str3 = str5;
-                    str4 = str6;
-                    if (i2 == 2) {
-                        str7 = (String) ((ArrayList) arrayList2.get(i)).get(i2);
-                        str3 = str5;
-                        str4 = str6;
-                    }
-                }
-                i2++;
-                str5 = str3;
-                str6 = str4;
-            }
-            if ("".equals(str5) || "-2".equals(str5)) {
+            if ("".equals(bookid) || "-2".equals(bookid)) {
                 break;
             }
-            if ("".equals(str6)) {
-                Iterator<BookInfo> it = arrayList.iterator();
+            if ("".equals(chapterid)) {
+                Iterator<BookInfo> it = peerbook.iterator();
                 while (it.hasNext()) {
-                    BookInfo next = it.next();
-                    if (str5.equals(next.getBook_id())) {
-                        next.setIsdown(true);
-                        createExamsInfo(1, next.getBook_id(), next.getSection_dxid(), next.getExams(), str2);
+                    BookInfo book = it.next();
+                    if (bookid.equals(book.getBook_id())) {
+                        book.setIsdown(true);
+                        createExamsInfo(1, book.getBook_id(), book.getSection_dxid(), book.getExams(), studentid);
                     }
                 }
-            } else if ("".equals(str7)) {
-                Iterator<BookInfo> it2 = arrayList.iterator();
+            } else if ("".equals(sectionid)) {
+                Iterator<BookInfo> it2 = peerbook.iterator();
                 while (it2.hasNext()) {
-                    BookInfo next2 = it2.next();
-                    if (str5.equals(next2.getBook_id()) && str6.equals(next2.getChapter_id())) {
-                        next2.setIsdown(true);
-                        createExamsInfo(1, next2.getBook_id(), next2.getSection_dxid(), next2.getExams(), str2);
+                    BookInfo book2 = it2.next();
+                    if (bookid.equals(book2.getBook_id()) && chapterid.equals(book2.getChapter_id())) {
+                        book2.setIsdown(true);
+                        createExamsInfo(1, book2.getBook_id(), book2.getSection_dxid(), book2.getExams(), studentid);
                     }
                 }
             } else {
-                Iterator<BookInfo> it3 = arrayList.iterator();
+                Iterator<BookInfo> it3 = peerbook.iterator();
                 while (it3.hasNext()) {
-                    BookInfo next3 = it3.next();
-                    if (str5.equals(next3.getBook_id()) && str6.equals(next3.getChapter_id()) && str7.equals(next3.getSection_id())) {
-                        next3.setIsdown(true);
-                        createExamsInfo(1, next3.getBook_id(), next3.getSection_dxid(), next3.getExams(), str2);
+                    BookInfo book3 = it3.next();
+                    if (bookid.equals(book3.getBook_id()) && chapterid.equals(book3.getChapter_id()) && sectionid.equals(book3.getSection_id())) {
+                        book3.setIsdown(true);
+                        createExamsInfo(1, book3.getBook_id(), book3.getSection_dxid(), book3.getExams(), studentid);
                     }
                 }
             }
         }
-        return arrayList;
+        return peerbook;
     }
 
-    public static OldBooks getNewBooInfo(String str, String str2, String str3) {
-        OldBooks oldBooks = new OldBooks();
-        oldBooks.setbook_id(str);
-        oldBooks.setbook_id(str2);
-        oldBooks.setbook_id(str3);
-        return oldBooks;
+    public static void parsedownloadjson(String downloadjson, ArrayList<ArrayList<String>> downloadjsonlist, ArrayList<String> temp) {
+        try {
+            JSONObject jsonObject = new JSONObject(downloadjson);
+            String id = getPropertyName(jsonObject, "id");
+            String items = getPropertyName(jsonObject, "items");
+            if (!"".equals(items)) {
+                JSONArray array = jsonObject.getJSONArray("items");
+                if (array.length() == 0) {
+                    temp.add(id);
+                    ArrayList<String> temp1 = new ArrayList<>();
+                    Iterator<String> it = temp.iterator();
+                    while (it.hasNext()) {
+                        String s = it.next();
+                        temp1.add(s);
+                    }
+                    downloadjsonlist.add(temp1);
+                    if (temp.size() - 1 >= 0) {
+                        temp.remove(temp.size() - 1);
+                    }
+                } else {
+                    temp.add(id);
+                }
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject object = array.getJSONObject(i);
+                    parsedownloadjson(object.toString(), downloadjsonlist, temp);
+                    if (i + 1 == array.length()) {
+                        temp.remove(temp.size() - 1);
+                    }
+                }
+                return;
+            }
+            temp.add(id);
+            ArrayList<String> temp12 = new ArrayList<>();
+            Iterator<String> it2 = temp.iterator();
+            while (it2.hasNext()) {
+                String s2 = it2.next();
+                temp12.add(s2);
+            }
+            downloadjsonlist.add(temp12);
+            if (temp.size() - 1 >= 0) {
+                temp.remove(temp.size() - 1);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
     }
 
-    public static String getPropertyName(JSONObject jSONObject, String str) {
-        String str2;
-        if (!jSONObject.isNull(str)) {
+    public static void createExamsInfo(int jsupdate, String bookid, String dxid, ArrayList<ExamsInfo> exams, String studentid) {
+        if (exams.size() > 0 && !"".equals(bookid) && !"".equals(dxid)) {
+            JSONStringer jsonStringer = new JSONStringer();
             try {
-                str2 = jSONObject.getString(str);
+                jsonStringer.object();
+                jsonStringer.key("studentid").value(studentid);
+                jsonStringer.key("exams");
+                jsonStringer.array();
+                Iterator<ExamsInfo> it = exams.iterator();
+                while (it.hasNext()) {
+                    ExamsInfo tempexam = it.next();
+                    jsonStringer.object();
+                    jsonStringer.key("id").value(tempexam.getexams_id());
+                    jsonStringer.key("questionid").value(tempexam.getquestion_id());
+                    jsonStringer.key("body").value(tempexam.getexams_body());
+                    jsonStringer.key("type").value(tempexam.getexams_type());
+                    jsonStringer.key("answer").value(tempexam.getexams_answer());
+                    jsonStringer.key(Form.TYPE_RESULT).value(tempexam.getexams_result());
+                    jsonStringer.key("studentresult").value(tempexam.getexams_studentresult());
+                    setJsonArray(jsonStringer, tempexam.getexams_webpath(), KeyEnvironment.KEYWEBPATH);
+                    setJsonArray(jsonStringer, tempexam.getexams_path(), "path");
+                    setLongJsonArray(jsonStringer, tempexam.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
+                    setLongJsonArray(jsonStringer, tempexam.getSize(), "sizes");
+                    setJsonArray(jsonStringer, tempexam.getexams_progress(), "progress");
+                    jsonStringer.key("size").value(tempexam.getexams_totalsize());
+                    jsonStringer.key("updatetime").value(tempexam.getExams_updatetime());
+                    jsonStringer.endObject();
+                }
+                jsonStringer.endArray();
+                jsonStringer.endObject();
             } catch (JSONException e) {
                 e.printStackTrace();
-                str2 = "";
+            } catch (Exception e2) {
+                e2.printStackTrace();
             }
-        } else {
-            str2 = "";
+            String json = jsonStringer.toString();
+            String pathdir = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + bookid + "/" + dxid + "/" + studentid + "/";
+            String path = String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + bookid + "/" + dxid + "/" + studentid + "/" + dxid + ".json";
+            File outFile = new File(path);
+            if (jsupdate == 0) {
+                if (!FileInOutHelper.fileIsExists(pathdir)) {
+                    FileInOutHelper.createNewFile(outFile);
+                    CreateFile(json, path);
+                }
+            } else if (jsupdate == 1) {
+                if (outFile.exists()) {
+                    outFile.delete();
+                }
+                FileInOutHelper.createNewFile(outFile);
+                CreateFile(json, path);
+            }
         }
-        return str2;
     }
 
-    public static boolean isJsonArray(String str) {
-        boolean z = false;
-        if (str != null) {
-            if ("".equals(str)) {
-                z = false;
-            } else {
-                z = false;
-                if (str.indexOf("{") != -1) {
-                    z = true;
+    public static ArrayList<ExamsInfo> parseExamsInfo(String bookid, String dxid, ArrayList<ExamsInfo> exams, String json) {
+        try {
+            JSONArray examsarray = new JSONArray(json);
+            for (int i = 0; i < examsarray.length(); i++) {
+                JSONObject examsobject = examsarray.getJSONObject(i);
+                String exams_id = getPropertyName(examsobject, "id");
+                String question_id = getPropertyName(examsobject, "questionid");
+                String exams_body = getPropertyName(examsobject, "body");
+                String exams_type = getPropertyName(examsobject, "type");
+                int exams_answer = getIntPropertyName(examsobject, "answer");
+                String exams_result = getPropertyName(examsobject, Form.TYPE_RESULT);
+                String exams_studentresult = getPropertyName(examsobject, "studentresult");
+                String exams_webpath = getPropertyName(examsobject, KeyEnvironment.KEYWEBPATH);
+                String exams_path = getPropertyName(examsobject, "path");
+                String downloadsize = getPropertyName(examsobject, KeyEnvironment.KEYDOWNLOADSIZE);
+                long totalsize = getLongPropertyName(examsobject, "size").longValue();
+                String size = getPropertyName(examsobject, "sizes");
+                String exams_progress = getPropertyName(examsobject, "progress");
+                String exams_updatetime = getPropertyName(examsobject, "updatetime");
+                ExamsInfo examsinfo = new ExamsInfo();
+                examsinfo.setexams_id(exams_id);
+                examsinfo.setquestion_id(question_id);
+                examsinfo.setexams_body(exams_body);
+                examsinfo.setexams_type(exams_type);
+                examsinfo.setexams_answer(exams_answer);
+                examsinfo.setexams_result(exams_result);
+                examsinfo.setexams_totalsize(totalsize);
+                examsinfo.setexams_studentresult(exams_studentresult);
+                examsinfo.setexams_webpath(getJsonArray(exams_webpath));
+                examsinfo.setexams_path(getJsonArray(exams_path));
+                examsinfo.setExams_updatetime(exams_updatetime);
+                int webpathsize = examsinfo.getexams_webpath().size();
+                examsinfo.setDownloadsize(getLongJsonArray(webpathsize, downloadsize));
+                examsinfo.setSize(getLongJsonArray(webpathsize, size));
+                if (!"".equals(exams_progress)) {
+                    examsinfo.setexams_progress(getJsonArray(exams_progress));
+                } else if (examsinfo.getexams_webpath().size() > 0) {
+                    ArrayList<String> progresslist = new ArrayList<>();
+                    for (int k = 0; k < webpathsize; k++) {
+                        progresslist.add("0");
+                    }
+                    examsinfo.setexams_progress(progresslist);
                 }
+                exams.add(examsinfo);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+        return exams;
+    }
+
+    public static int parseHttpPostReturnJson(String json) {
+        if ("".equals(json)) {
+            return 0;
+        }
+        try {
+            JSONTokener jsonTokener = new JSONTokener(json);
+            JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+            boolean status = getBooleanPropertyName(jsonObject, "status");
+            int errorNum = getIntPropertyName(jsonObject, "errorNum");
+            String errorInfo = getPropertyName(jsonObject, "errorInfo");
+            if (!status || errorNum != 0) {
+                return 0;
+            }
+            return "".equals(errorInfo) ? 1 : 0;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            return 0;
+        }
+    }
+
+    public static String bookUpdatePostCreateJson(ArrayList<BookUpdateInfo> updateinfo) {
+        if (updateinfo.size() == 0) {
+            return "";
+        }
+        JSONStringer jsonStringer = new JSONStringer();
+        try {
+            jsonStringer.object();
+            jsonStringer.key("data");
+            jsonStringer.array();
+            for (int i = 0; i < updateinfo.size(); i++) {
+                BookUpdateInfo bookupdateinfo = updateinfo.get(i);
+                jsonStringer.object();
+                String id = bookupdateinfo.getid();
+                String type = bookupdateinfo.gettype();
+                String source = bookupdateinfo.getsource();
+                String updatetime = bookupdateinfo.getupdatetime();
+                int total = bookupdateinfo.gettotal();
+                jsonStringer.key("id").value(id);
+                jsonStringer.key("type").value(type);
+                jsonStringer.key("source").value(source);
+                jsonStringer.key("updatetime").value(updatetime);
+                jsonStringer.key("total").value(total);
+                jsonStringer.endObject();
+            }
+            jsonStringer.endArray();
+            jsonStringer.endObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonStringer.toString();
+    }
+
+    public static OldBooks getNewBooInfo(String id, String name, String path) {
+        OldBooks book = new OldBooks();
+        book.setbook_id(id);
+        book.setbook_id(name);
+        book.setbook_id(path);
+        return book;
+    }
+
+    private static String CreateDir() {
+        String SQLMessagePath = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + "JSONFile" + File.separatorChar;
+        File sqlmessagepath = new File(SQLMessagePath);
+        if (!sqlmessagepath.exists()) {
+            sqlmessagepath.mkdirs();
+        }
+        return SQLMessagePath;
+    }
+
+    public static synchronized String getFileString(String path) {
+        String str;
+        synchronized (JsonHelper.class) {
+            String res = "";
+            File file = new File(path);
+            if (!file.exists()) {
+                str = res;
+            } else {
+                try {
+                    FileInputStream fin = new FileInputStream(path);
+                    int length = fin.available();
+                    byte[] buffer = new byte[length];
+                    fin.read(buffer);
+                    res = EncodingUtils.getString(buffer, "UTF-8");
+                    fin.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                str = res == null ? "" : res;
+            }
+        }
+        return str;
+    }
+
+    public static synchronized boolean CreateFile(String Json, String path) {
+        boolean z = false;
+        synchronized (JsonHelper.class) {
+            File newFile = new File(path);
+            try {
+                FileOutputStream fos = new FileOutputStream(newFile);
+                try {
+                    fos.write(Json.getBytes("UTF-8"));
+                    fos.close();
+                    z = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (FileNotFoundException e2) {
+                e2.printStackTrace();
             }
         }
         return z;
     }
 
-    public static ArrayList<ExamsInfo> parseExamsInfo(String str, String str2, ArrayList<ExamsInfo> arrayList, String str3) {
+    public static String getPropertyName(JSONObject jsonObject, String propertyName) {
+        if (!jsonObject.isNull(propertyName)) {
+            try {
+                String Name = jsonObject.getString(propertyName);
+                return Name;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+        return "";
+    }
+
+    public static boolean getBooleanPropertyName(JSONObject jsonObject, String propertyName) {
+        if (!jsonObject.isNull(propertyName)) {
+            try {
+                boolean Name = jsonObject.getBoolean(propertyName);
+                return Name;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private static Long getLongPropertyName(JSONObject jsonObject, String propertyName) {
+        long Name;
+        if (!jsonObject.isNull(propertyName)) {
+            try {
+                Name = jsonObject.getLong(propertyName);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Name = 0;
+            }
+        } else {
+            Name = 0;
+        }
+        return Long.valueOf(Name);
+    }
+
+    public static int getIntPropertyName(JSONObject jsonObject, String propertyName) {
+        if (!jsonObject.isNull(propertyName)) {
+            try {
+                int Name = jsonObject.getInt(propertyName);
+                return Name;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    public static boolean isJsonArray(String objectString) {
+        if (objectString == null || "".equals(objectString)) {
+            return false;
+        }
+        int start = objectString.indexOf("{");
+        return start != -1;
+    }
+
+    public static ArrayList<String> getJsonArray(String objectString) {
+        ArrayList<String> temparray = new ArrayList<>();
         try {
-            JSONArray jSONArray = new JSONArray(str3);
-            for (int i = 0; i < jSONArray.length(); i++) {
-                JSONObject jSONObject = jSONArray.getJSONObject(i);
-                String propertyName = getPropertyName(jSONObject, "id");
-                String propertyName2 = getPropertyName(jSONObject, "questionid");
-                String propertyName3 = getPropertyName(jSONObject, "body");
-                String propertyName4 = getPropertyName(jSONObject, "type");
-                int intPropertyName = getIntPropertyName(jSONObject, "answer");
-                String propertyName5 = getPropertyName(jSONObject, Form.TYPE_RESULT);
-                String propertyName6 = getPropertyName(jSONObject, "studentresult");
-                String propertyName7 = getPropertyName(jSONObject, KeyEnvironment.KEYWEBPATH);
-                String propertyName8 = getPropertyName(jSONObject, "path");
-                String propertyName9 = getPropertyName(jSONObject, KeyEnvironment.KEYDOWNLOADSIZE);
-                long longValue = getLongPropertyName(jSONObject, "size").longValue();
-                String propertyName10 = getPropertyName(jSONObject, "sizes");
-                String propertyName11 = getPropertyName(jSONObject, "progress");
-                String propertyName12 = getPropertyName(jSONObject, "updatetime");
-                ExamsInfo examsInfo = new ExamsInfo();
-                examsInfo.setexams_id(propertyName);
-                examsInfo.setquestion_id(propertyName2);
-                examsInfo.setexams_body(propertyName3);
-                examsInfo.setexams_type(propertyName4);
-                examsInfo.setexams_answer(intPropertyName);
-                examsInfo.setexams_result(propertyName5);
-                examsInfo.setexams_totalsize(longValue);
-                examsInfo.setexams_studentresult(propertyName6);
-                examsInfo.setexams_webpath(getJsonArray(propertyName7));
-                examsInfo.setexams_path(getJsonArray(propertyName8));
-                examsInfo.setExams_updatetime(propertyName12);
-                int size = examsInfo.getexams_webpath().size();
-                examsInfo.setDownloadsize(getLongJsonArray(size, propertyName9));
-                examsInfo.setSize(getLongJsonArray(size, propertyName10));
-                if (!"".equals(propertyName11)) {
-                    examsInfo.setexams_progress(getJsonArray(propertyName11));
-                } else if (examsInfo.getexams_webpath().size() > 0) {
-                    ArrayList<String> arrayList2 = new ArrayList<>();
-                    for (int i2 = 0; i2 < size; i2++) {
-                        arrayList2.add("0");
-                    }
-                    examsInfo.setexams_progress(arrayList2);
-                }
-                arrayList.add(examsInfo);
+            JSONArray jsonarray = new JSONArray(objectString);
+            for (int k = 0; k < jsonarray.length(); k++) {
+                temparray.add(jsonarray.getString(k));
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (Exception e2) {
-            e2.printStackTrace();
         }
-        return arrayList;
+        return temparray;
     }
 
-    public static int parseHttpPostReturnJson(String str) {
-        int i;
-        if ("".equals(str)) {
-            i = 0;
-        } else {
+    public static ArrayList<Long> getLongJsonArray(int webpathsize, String objectString) {
+        ArrayList<Long> temparray = new ArrayList<>();
+        if (!"".equals(objectString)) {
             try {
-                JSONObject jSONObject = (JSONObject) new JSONTokener(str).nextValue();
-                boolean booleanPropertyName = getBooleanPropertyName(jSONObject, "status");
-                int intPropertyName = getIntPropertyName(jSONObject, "errorNum");
-                String propertyName = getPropertyName(jSONObject, "errorInfo");
-                i = 0;
-                if (booleanPropertyName) {
-                    i = 0;
-                    if (intPropertyName == 0) {
-                        i = 0;
-                        if ("".equals(propertyName)) {
-                            i = 1;
-                        }
-                    }
+                JSONArray jsonarray = new JSONArray(objectString);
+                for (int k = 0; k < jsonarray.length(); k++) {
+                    temparray.add(Long.valueOf(jsonarray.getLong(k)));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                i = 0;
-            } catch (Exception e2) {
-                e2.printStackTrace();
-                i = 0;
+            }
+        } else if (webpathsize > 0) {
+            for (int k2 = 0; k2 < webpathsize; k2++) {
+                temparray.add(0L);
             }
         }
-        return i;
+        return temparray;
     }
 
-    public static void parsedownloadjson(String str, ArrayList<ArrayList<String>> arrayList, ArrayList<String> arrayList2) {
+    public static void setJsonArray(JSONStringer jsonStringer, ArrayList<String> arraylist, String propertyName) {
+        int arraylistsize = arraylist.size();
         try {
-            JSONObject jSONObject = new JSONObject(str);
-            String propertyName = getPropertyName(jSONObject, "id");
-            if ("".equals(getPropertyName(jSONObject, "items"))) {
-                arrayList2.add(propertyName);
-                ArrayList<String> arrayList3 = new ArrayList<>();
-                Iterator<String> it = arrayList2.iterator();
-                while (it.hasNext()) {
-                    arrayList3.add(it.next());
-                }
-                arrayList.add(arrayList3);
-                if (arrayList2.size() - 1 < 0) {
-                    return;
-                }
-                arrayList2.remove(arrayList2.size() - 1);
-                return;
+            jsonStringer.key(propertyName);
+            jsonStringer.array();
+            for (int k = 0; k < arraylistsize; k++) {
+                jsonStringer.value(arraylist.get(k));
             }
-            JSONArray jSONArray = jSONObject.getJSONArray("items");
-            if (jSONArray.length() == 0) {
-                arrayList2.add(propertyName);
-                ArrayList<String> arrayList4 = new ArrayList<>();
-                Iterator<String> it2 = arrayList2.iterator();
-                while (it2.hasNext()) {
-                    arrayList4.add(it2.next());
-                }
-                arrayList.add(arrayList4);
-                if (arrayList2.size() - 1 >= 0) {
-                    arrayList2.remove(arrayList2.size() - 1);
-                }
-            } else {
-                arrayList2.add(propertyName);
-            }
-            for (int i = 0; i < jSONArray.length(); i++) {
-                parsedownloadjson(jSONArray.getJSONObject(i).toString(), arrayList, arrayList2);
-                if (i + 1 == jSONArray.length()) {
-                    arrayList2.remove(arrayList2.size() - 1);
-                }
-            }
+            jsonStringer.endArray();
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (Exception e2) {
@@ -564,360 +856,15 @@ public class JsonHelper {
         }
     }
 
-    public static String peerbookcreateJson(ArrayList<BookInfo> arrayList) {
-        String jSONStringer;
-        if (arrayList.size() == 0) {
-            jSONStringer = "";
-        } else {
-            String book_id = arrayList.get(0).getBook_id();
-            String book_name = arrayList.get(0).getBook_name();
-            long bookdownloadsize = arrayList.get(0).getBookdownloadsize();
-            long booksize = arrayList.get(0).getBooksize();
-            String book_updatetime = arrayList.get(0).getBook_updatetime();
-            JSONStringer jSONStringer2 = new JSONStringer();
-            try {
-                jSONStringer2.object();
-                jSONStringer2.key("id").value(book_id);
-                jSONStringer2.key("name").value(book_name);
-                jSONStringer2.key(KeyEnvironment.KEYDOWNLOADSIZE).value(bookdownloadsize);
-                jSONStringer2.key("size").value(booksize);
-                jSONStringer2.key("updatetime").value(book_updatetime);
-                jSONStringer2.key("data");
-                jSONStringer2.array();
-                int i = 0;
-                while (i < arrayList.size()) {
-                    BookInfo bookInfo = arrayList.get(i);
-                    jSONStringer2.object();
-                    String chapter_id = bookInfo.getChapter_id();
-                    String str = bookInfo.getchapter_name();
-                    jSONStringer2.key("id").value(chapter_id);
-                    jSONStringer2.key("name").value(str);
-                    if (!bookInfo.isParent()) {
-                        i++;
-                        jSONStringer2.key("children");
-                        jSONStringer2.array();
-                        jSONStringer2.endArray();
-                    } else {
-                        jSONStringer2.key("children");
-                        jSONStringer2.array();
-                        jSONStringer2.object();
-                        jSONStringer2.key("id").value(bookInfo.getSection_id());
-                        jSONStringer2.key("dxid").value(bookInfo.getSection_dxid());
-                        jSONStringer2.key("name").value(bookInfo.getsection_name());
-                        jSONStringer2.key("examsprogress").value(bookInfo.getexams_progress());
-                        jSONStringer2.key("exams");
-                        jSONStringer2.array();
-                        if (bookInfo.getExams().size() == 0) {
-                            jSONStringer2.endArray();
-                        } else {
-                            Iterator<ExamsInfo> it = bookInfo.getExams().iterator();
-                            while (it.hasNext()) {
-                                ExamsInfo next = it.next();
-                                jSONStringer2.object();
-                                jSONStringer2.key("id").value(next.getexams_id());
-                                jSONStringer2.key("questionid").value(next.getquestion_id());
-                                jSONStringer2.key("body").value(next.getexams_body());
-                                jSONStringer2.key("type").value(next.getexams_type());
-                                jSONStringer2.key("answer").value(next.getexams_answer());
-                                jSONStringer2.key(Form.TYPE_RESULT).value(next.getexams_result());
-                                jSONStringer2.key("studentresult").value(next.getexams_studentresult());
-                                setJsonArray(jSONStringer2, next.getexams_webpath(), KeyEnvironment.KEYWEBPATH);
-                                setJsonArray(jSONStringer2, next.getexams_path(), "path");
-                                setLongJsonArray(jSONStringer2, next.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
-                                setLongJsonArray(jSONStringer2, next.getSize(), "sizes");
-                                setJsonArray(jSONStringer2, next.getexams_progress(), "progress");
-                                jSONStringer2.key("size").value(next.getexams_totalsize());
-                                jSONStringer2.key("updatetime").value(next.getExams_updatetime());
-                                jSONStringer2.endObject();
-                            }
-                            jSONStringer2.endArray();
-                        }
-                        setJsonArray(jSONStringer2, bookInfo.getSection_webpath(), KeyEnvironment.KEYWEBPATH);
-                        setJsonArray(jSONStringer2, bookInfo.getSection_path(), "path");
-                        jSONStringer2.key("tag").value(bookInfo.getsection_tag());
-                        jSONStringer2.key("updatetime").value(bookInfo.getsection_updatetime());
-                        setJsonArray(jSONStringer2, bookInfo.getSection_progress(), "progress");
-                        setLongJsonArray(jSONStringer2, bookInfo.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
-                        setLongJsonArray(jSONStringer2, bookInfo.getSize(), "size");
-                        jSONStringer2.key("isdown").value(arrayList.get(i).isIsdown());
-                        jSONStringer2.key(AppEnvironment.ISNEW).value(arrayList.get(i).isIsnew());
-                        jSONStringer2.endObject();
-                        while (true) {
-                            i++;
-                            if (i >= arrayList.size() || !str.equals(arrayList.get(i).getchapter_name())) {
-                                break;
-                            }
-                            jSONStringer2.object();
-                            jSONStringer2.key("id").value(arrayList.get(i).getSection_id());
-                            jSONStringer2.key("dxid").value(arrayList.get(i).getSection_dxid());
-                            jSONStringer2.key("name").value(arrayList.get(i).getsection_name());
-                            jSONStringer2.key("examsprogress").value(arrayList.get(i).getexams_progress());
-                            jSONStringer2.key("exams");
-                            jSONStringer2.array();
-                            if (arrayList.get(i).getExams().size() == 0) {
-                                jSONStringer2.endArray();
-                            } else {
-                                Iterator<ExamsInfo> it2 = arrayList.get(i).getExams().iterator();
-                                while (it2.hasNext()) {
-                                    ExamsInfo next2 = it2.next();
-                                    jSONStringer2.object();
-                                    jSONStringer2.key("id").value(next2.getexams_id());
-                                    jSONStringer2.key("questionid").value(next2.getquestion_id());
-                                    jSONStringer2.key("body").value(next2.getexams_body());
-                                    jSONStringer2.key("type").value(next2.getexams_type());
-                                    jSONStringer2.key("answer").value(next2.getexams_answer());
-                                    jSONStringer2.key(Form.TYPE_RESULT).value(next2.getexams_result());
-                                    jSONStringer2.key("studentresult").value(next2.getexams_studentresult());
-                                    setJsonArray(jSONStringer2, next2.getexams_webpath(), KeyEnvironment.KEYWEBPATH);
-                                    setJsonArray(jSONStringer2, next2.getexams_path(), "path");
-                                    setLongJsonArray(jSONStringer2, next2.getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
-                                    setLongJsonArray(jSONStringer2, next2.getSize(), "sizes");
-                                    setJsonArray(jSONStringer2, next2.getexams_progress(), "progress");
-                                    jSONStringer2.key("size").value(next2.getexams_totalsize());
-                                    jSONStringer2.key("updatetime").value(next2.getExams_updatetime());
-                                    jSONStringer2.endObject();
-                                }
-                                jSONStringer2.endArray();
-                            }
-                            setJsonArray(jSONStringer2, arrayList.get(i).getSection_webpath(), KeyEnvironment.KEYWEBPATH);
-                            setJsonArray(jSONStringer2, arrayList.get(i).getSection_path(), "path");
-                            jSONStringer2.key("tag").value(arrayList.get(i).getsection_tag());
-                            jSONStringer2.key("updatetime").value(arrayList.get(i).getsection_updatetime());
-                            setJsonArray(jSONStringer2, arrayList.get(i).getSection_progress(), "progress");
-                            setLongJsonArray(jSONStringer2, arrayList.get(i).getDownloadsize(), KeyEnvironment.KEYDOWNLOADSIZE);
-                            setLongJsonArray(jSONStringer2, arrayList.get(i).getSize(), "size");
-                            jSONStringer2.key("isdown").value(arrayList.get(i).isIsdown());
-                            jSONStringer2.key(AppEnvironment.ISNEW).value(arrayList.get(i).isIsnew());
-                            jSONStringer2.endObject();
-                        }
-                        jSONStringer2.endArray();
-                    }
-                    jSONStringer2.endObject();
-                }
-                jSONStringer2.endArray();
-                jSONStringer2.endObject();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            jSONStringer = jSONStringer2.toString();
-        }
-        return jSONStringer;
-    }
-
-    public static ArrayList<BookInfo> peerbookparserJson(ArrayList<BookInfo> arrayList, String str) {
-        int i;
-        int i2;
-        int i3 = 0;
-        int i4 = 0;
-        arrayList.clear();
-        if (!"".equals(str)) {
-            try {
-                JSONObject jSONObject = (JSONObject) new JSONTokener(str).nextValue();
-                String propertyName = getPropertyName(jSONObject, "id");
-                String propertyName2 = getPropertyName(jSONObject, "name");
-                long longValue = getLongPropertyName(jSONObject, KeyEnvironment.KEYDOWNLOADSIZE).longValue();
-                long longValue2 = getLongPropertyName(jSONObject, "size").longValue();
-                String propertyName3 = getPropertyName(jSONObject, "updatetime");
-                JSONArray jSONArray = jSONObject.getJSONArray("data");
-                int i5 = 0;
-                while (true) {
-                    if (i5 >= jSONArray.length()) {
-                        break;
-                    }
-                    JSONObject jSONObject2 = (JSONObject) new JSONTokener(jSONArray.getJSONObject(i5).toString()).nextValue();
-                    String propertyName4 = getPropertyName(jSONObject2, "id");
-                    String propertyName5 = getPropertyName(jSONObject2, "name");
-                    String propertyName6 = getPropertyName(jSONObject2, "children");
-                    if ("".equals(propertyName6)) {
-                        BookInfo bookInfo = new BookInfo();
-                        bookInfo.setBook_id(propertyName);
-                        bookInfo.setBook_name(propertyName2);
-                        bookInfo.setBookdownloadsize(longValue);
-                        bookInfo.setBooksize(longValue2);
-                        bookInfo.setBook_updatetime(propertyName3);
-                        bookInfo.setChapter_id(propertyName4);
-                        bookInfo.setchapter_name(propertyName5);
-                        bookInfo.setParent(false);
-                        arrayList.add(bookInfo);
-                        i2 = i4;
-                        i = i3;
-                    } else {
-                        JSONArray jSONArray2 = new JSONArray(propertyName6);
-                        if (jSONArray2.length() == 0) {
-                            BookInfo bookInfo2 = new BookInfo();
-                            bookInfo2.setBook_id(propertyName);
-                            bookInfo2.setBook_name(propertyName2);
-                            bookInfo2.setBookdownloadsize(longValue);
-                            bookInfo2.setBooksize(longValue2);
-                            bookInfo2.setBook_updatetime(propertyName3);
-                            bookInfo2.setChapter_id(propertyName4);
-                            bookInfo2.setchapter_name(propertyName5);
-                            bookInfo2.setParent(false);
-                            arrayList.add(bookInfo2);
-                            i = i3;
-                            i2 = i4;
-                        } else {
-                            int i6 = 0;
-                            while (true) {
-                                i = i3;
-                                i2 = i4;
-                                if (i6 < jSONArray2.length()) {
-                                    JSONObject jSONObject3 = (JSONObject) new JSONTokener(jSONArray2.getJSONObject(i6).toString()).nextValue();
-                                    String propertyName7 = getPropertyName(jSONObject3, "id");
-                                    String propertyName8 = getPropertyName(jSONObject3, "dxid");
-                                    String propertyName9 = getPropertyName(jSONObject3, "name");
-                                    String propertyName10 = getPropertyName(jSONObject3, KeyEnvironment.KEYWEBPATH);
-                                    String propertyName11 = getPropertyName(jSONObject3, "path");
-                                    String propertyName12 = getPropertyName(jSONObject3, "exams");
-                                    String propertyName13 = getPropertyName(jSONObject3, "examsprogress");
-                                    ArrayList<ExamsInfo> parseExamsInfo = parseExamsInfo(propertyName, propertyName8, new ArrayList(), propertyName12);
-                                    long j = 0;
-                                    Iterator<ExamsInfo> it = parseExamsInfo.iterator();
-                                    while (it.hasNext()) {
-                                        j += it.next().getexams_totalsize();
-                                    }
-                                    String propertyName14 = getPropertyName(jSONObject3, "tag");
-                                    String propertyName15 = getPropertyName(jSONObject3, "updatetime");
-                                    String propertyName16 = getPropertyName(jSONObject3, "progress");
-                                    String propertyName17 = getPropertyName(jSONObject3, KeyEnvironment.KEYDOWNLOADSIZE);
-                                    String propertyName18 = getPropertyName(jSONObject3, "size");
-                                    boolean booleanPropertyName = getBooleanPropertyName(jSONObject3, "isdown");
-                                    boolean booleanPropertyName2 = getBooleanPropertyName(jSONObject3, AppEnvironment.ISNEW);
-                                    BookInfo bookInfo3 = new BookInfo();
-                                    bookInfo3.setBook_id(propertyName);
-                                    bookInfo3.setBook_name(propertyName2);
-                                    bookInfo3.setBookdownloadsize(longValue);
-                                    bookInfo3.setBooksize(longValue2);
-                                    bookInfo3.setBook_updatetime(propertyName3);
-                                    bookInfo3.setChapter_id(propertyName4);
-                                    bookInfo3.setchapter_name(propertyName5);
-                                    bookInfo3.setSection_id(propertyName7);
-                                    bookInfo3.setSection_dxid(propertyName8);
-                                    bookInfo3.setsection_name(propertyName9);
-                                    bookInfo3.setExams(parseExamsInfo);
-                                    bookInfo3.setSection_webpath(getJsonArray(propertyName10));
-                                    bookInfo3.setSection_path(getJsonArray(propertyName11));
-                                    int size = bookInfo3.getSection_webpath().size();
-                                    bookInfo3.setDownloadsize(getLongJsonArray(size, propertyName17));
-                                    bookInfo3.setSize(getLongJsonArray(size, propertyName18));
-                                    bookInfo3.setsection_tag(propertyName14);
-                                    bookInfo3.setsection_updatetime(propertyName15);
-                                    bookInfo3.setIsdown(booleanPropertyName);
-                                    bookInfo3.setIsnew(booleanPropertyName2);
-                                    if ("".equals(propertyName13)) {
-                                        if (j == 0) {
-                                            bookInfo3.setexams_progress("100");
-                                        } else {
-                                            bookInfo3.setexams_progress("0");
-                                        }
-                                    } else if (j == 0) {
-                                        bookInfo3.setexams_progress("100");
-                                    } else {
-                                        bookInfo3.setexams_progress(propertyName13);
-                                    }
-                                    if (!"".equals(propertyName16)) {
-                                        bookInfo3.setSection_progress(getJsonArray(propertyName16));
-                                    } else if (bookInfo3.getSection_webpath().size() > 0) {
-                                        ArrayList<String> arrayList2 = new ArrayList<>();
-                                        for (int i7 = 0; i7 < size; i7++) {
-                                            arrayList2.add("0");
-                                        }
-                                        bookInfo3.setSection_progress(arrayList2);
-                                    }
-                                    bookInfo3.setParent(true);
-                                    i3 = bookInfo3.getSection_webpath().size() + i3 + bookInfo3.getExams().size();
-                                    int i8 = i4;
-                                    if (bookInfo3.isIsnew()) {
-                                        i8 = i4 + 1;
-                                    }
-                                    arrayList.add(bookInfo3);
-                                    i6++;
-                                    i4 = i8;
-                                }
-                            }
-                        }
-                    }
-                    i5++;
-                    i3 = i;
-                    i4 = i2;
-                }
-                "".equals(propertyName);
-                if (!"".equals(propertyName) && arrayList.size() > 0) {
-                    ArrayList arrayList3 = new ArrayList();
-                    OldBooks oldBooks = new OldBooks();
-                    oldBooks.setbook_id(propertyName);
-                    oldBooks.setbook_name(propertyName2);
-                    oldBooks.setBookdownloadsize(longValue);
-                    oldBooks.setBooksize(0L);
-                    oldBooks.setBook_total(i3);
-                    oldBooks.setProgress("100");
-                    oldBooks.setbook_path("../offlinedownload/" + propertyName + "/");
-                    oldBooks.setBook_updatetime(propertyName3);
-                    oldBooks.setBook_isnew(0);
-                    ArrayList<OldBooks> booksparserJson = booksparserJson(arrayList3);
-                    boolean z = true;
-                    Iterator<OldBooks> it2 = booksparserJson.iterator();
-                    while (it2.hasNext()) {
-                        OldBooks next = it2.next();
-                        if (oldBooks.getbook_id().equals(next.getbook_id())) {
-                            z = false;
-                            next.setbook_id(oldBooks.getbook_id());
-                            next.setbook_name(oldBooks.getbook_name());
-                            next.setbook_path(oldBooks.getbook_path());
-                            next.setBook_updatetime(oldBooks.getBook_updatetime());
-                            next.setBook_total(oldBooks.getBook_total());
-                            if (i4 == 0) {
-                                next.setBook_isnew(oldBooks.getBook_isnew());
-                            } else {
-                                next.setBook_isnew(1);
-                            }
-                        }
-                    }
-                    if (z) {
-                        booksparserJson.add(oldBooks);
-                        if (CreateFile(bookscreateJson(booksparserJson), com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File) && !"".equals(propertyName)) {
-                            File file = new File(String.valueOf(com.edutech.daoxueben.sysconfig.AppEnvironment.OFFLINE_DOWNLOAD) + propertyName);
-                            if (!file.exists()) {
-                                file.mkdirs();
-                            }
-                        }
-                    } else if (CreateFile(bookscreateJson(booksparserJson), com.edutech.daoxueben.sysconfig.AppEnvironment.JSON_BOOKS_File)) {
-                        "".equals(propertyName);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                arrayList.clear();
-            }
-        }
-        return arrayList;
-    }
-
-    public static void setJsonArray(JSONStringer jSONStringer, ArrayList<String> arrayList, String str) {
-        int size = arrayList.size();
+    public static void setLongJsonArray(JSONStringer jsonStringer, ArrayList<Long> arraylist, String propertyName) {
+        int arraylistsize = arraylist.size();
         try {
-            jSONStringer.key(str);
-            jSONStringer.array();
-            for (int i = 0; i < size; i++) {
-                jSONStringer.value(arrayList.get(i));
+            jsonStringer.key(propertyName);
+            jsonStringer.array();
+            for (int k = 0; k < arraylistsize; k++) {
+                jsonStringer.value(arraylist.get(k));
             }
-            jSONStringer.endArray();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (Exception e2) {
-            e2.printStackTrace();
-        }
-    }
-
-    public static void setLongJsonArray(JSONStringer jSONStringer, ArrayList<Long> arrayList, String str) {
-        int size = arrayList.size();
-        try {
-            jSONStringer.key(str);
-            jSONStringer.array();
-            for (int i = 0; i < size; i++) {
-                jSONStringer.value(arrayList.get(i));
-            }
-            jSONStringer.endArray();
+            jsonStringer.endArray();
         } catch (JSONException e) {
             e.printStackTrace();
         }

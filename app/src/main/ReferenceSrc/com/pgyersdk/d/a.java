@@ -21,8 +21,7 @@ import android.widget.TextView;
 import com.pgyersdk.c.f;
 import com.pgyersdk.c.i;
 import org.apache.commons.net.telnet.TelnetCommand;
-
-/* loaded from: classes.jar:com/pgyersdk/d/a.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class a extends AlertDialog.Builder implements com.pgyersdk.feedback.b {
     private Context b;
     private Activity c;
@@ -75,6 +74,18 @@ public final class a extends AlertDialog.Builder implements com.pgyersdk.feedbac
         textView.setPadding(30, 20, 0, 20);
         textView.setBackgroundColor(Color.parseColor("#56bc94"));
         return textView;
+    }
+
+    public static /* synthetic */ ImageView a(a aVar) {
+        return aVar.f;
+    }
+
+    public static /* synthetic */ Handler b(a aVar) {
+        return aVar.n;
+    }
+
+    public static /* synthetic */ Activity c(a aVar) {
+        return aVar.c;
     }
 
     private static LinearLayout.LayoutParams c() {
@@ -211,9 +222,9 @@ public final class a extends AlertDialog.Builder implements com.pgyersdk.feedbac
     }
 
     @Override // android.app.AlertDialog.Builder
-    public final AlertDialog.Builder setTitle(CharSequence charSequence) {
-        setCustomTitle(a(this.b, charSequence));
-        return super.setTitle(charSequence);
+    public final AlertDialog.Builder setTitle(CharSequence title) {
+        setCustomTitle(a(this.b, title));
+        return super.setTitle(title);
     }
 
     @Override // android.app.AlertDialog.Builder

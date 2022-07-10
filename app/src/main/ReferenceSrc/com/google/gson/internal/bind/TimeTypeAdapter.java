@@ -14,38 +14,44 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-/* loaded from: classes.jar:com/google/gson/internal/bind/TimeTypeAdapter.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class TimeTypeAdapter extends TypeAdapter<Time> {
-    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.TimeTypeAdapter.1
-        @Override // com.google.gson.TypeAdapterFactory
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Time.class ? new TimeTypeAdapter() : null;
-        }
-    };
+    public static final TypeAdapterFactory FACTORY = new AnonymousClass1();
     private final DateFormat format = new SimpleDateFormat("hh:mm:ss a");
 
+    /* renamed from: com.google.gson.internal.bind.TimeTypeAdapter$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    static class AnonymousClass1 implements TypeAdapterFactory {
+        AnonymousClass1() {
+        }
+
+        @Override // com.google.gson.TypeAdapterFactory
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+            if (typeToken.getRawType() == Time.class) {
+                return new TimeTypeAdapter();
+            }
+            return null;
+        }
+    }
+
     @Override // com.google.gson.TypeAdapter
-    public Time read(JsonReader jsonReader) throws IOException {
+    public synchronized Time read(JsonReader in) throws IOException {
         Time time;
-        synchronized (this) {
-            if (jsonReader.peek() == JsonToken.NULL) {
-                jsonReader.nextNull();
-                time = null;
-            } else {
-                try {
-                    time = new Time(this.format.parse(jsonReader.nextString()).getTime());
-                } catch (ParseException e) {
-                    throw new JsonSyntaxException(e);
-                }
+        if (in.peek() == JsonToken.NULL) {
+            in.nextNull();
+            time = null;
+        } else {
+            try {
+                Date date = this.format.parse(in.nextString());
+                time = new Time(date.getTime());
+            } catch (ParseException e) {
+                throw new JsonSyntaxException(e);
             }
         }
         return time;
     }
 
-    public void write(JsonWriter jsonWriter, Time time) throws IOException {
-        synchronized (this) {
-            jsonWriter.value(time == null ? null : this.format.format((Date) time));
-        }
+    public synchronized void write(JsonWriter out, Time value) throws IOException {
+        out.value(value == null ? null : this.format.format((Date) value));
     }
 }

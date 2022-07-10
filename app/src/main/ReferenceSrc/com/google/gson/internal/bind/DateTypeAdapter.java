@@ -16,64 +16,67 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-/* loaded from: classes.jar:com/google/gson/internal/bind/DateTypeAdapter.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class DateTypeAdapter extends TypeAdapter<Date> {
-    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.DateTypeAdapter.1
-        @Override // com.google.gson.TypeAdapterFactory
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Date.class ? new DateTypeAdapter() : null;
-        }
-    };
+    public static final TypeAdapterFactory FACTORY = new AnonymousClass1();
     private final DateFormat enUsFormat = DateFormat.getDateTimeInstance(2, 2, Locale.US);
     private final DateFormat localFormat = DateFormat.getDateTimeInstance(2, 2);
     private final DateFormat iso8601Format = buildIso8601Format();
 
-    private static DateFormat buildIso8601Format() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(JSONCallback._secDateFormat, Locale.US);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return simpleDateFormat;
+    /* renamed from: com.google.gson.internal.bind.DateTypeAdapter$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    static class AnonymousClass1 implements TypeAdapterFactory {
+        AnonymousClass1() {
+        }
+
+        @Override // com.google.gson.TypeAdapterFactory
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+            if (typeToken.getRawType() == Date.class) {
+                return new DateTypeAdapter();
+            }
+            return null;
+        }
     }
 
-    private Date deserializeToDate(String str) {
+    private static DateFormat buildIso8601Format() {
+        DateFormat iso8601Format = new SimpleDateFormat(JSONCallback._secDateFormat, Locale.US);
+        iso8601Format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return iso8601Format;
+    }
+
+    @Override // com.google.gson.TypeAdapter
+    public Date read(JsonReader in) throws IOException {
+        if (in.peek() == JsonToken.NULL) {
+            in.nextNull();
+            return null;
+        }
+        return deserializeToDate(in.nextString());
+    }
+
+    private synchronized Date deserializeToDate(String json) {
         Date parse;
-        synchronized (this) {
+        try {
+            parse = this.localFormat.parse(json);
+        } catch (ParseException e) {
             try {
-                parse = this.localFormat.parse(str);
-            } catch (ParseException e) {
+                parse = this.enUsFormat.parse(json);
+            } catch (ParseException e2) {
                 try {
-                    parse = this.enUsFormat.parse(str);
-                } catch (ParseException e2) {
-                    try {
-                        parse = this.iso8601Format.parse(str);
-                    } catch (ParseException e3) {
-                        throw new JsonSyntaxException(str, e3);
-                    }
+                    parse = this.iso8601Format.parse(json);
+                } catch (ParseException e3) {
+                    throw new JsonSyntaxException(json, e3);
                 }
             }
         }
         return parse;
     }
 
-    @Override // com.google.gson.TypeAdapter
-    public Date read(JsonReader jsonReader) throws IOException {
-        Date deserializeToDate;
-        if (jsonReader.peek() == JsonToken.NULL) {
-            jsonReader.nextNull();
-            deserializeToDate = null;
+    public synchronized void write(JsonWriter out, Date value) throws IOException {
+        if (value == null) {
+            out.nullValue();
         } else {
-            deserializeToDate = deserializeToDate(jsonReader.nextString());
-        }
-        return deserializeToDate;
-    }
-
-    public void write(JsonWriter jsonWriter, Date date) throws IOException {
-        synchronized (this) {
-            if (date == null) {
-                jsonWriter.nullValue();
-            } else {
-                jsonWriter.value(this.enUsFormat.format(date));
-            }
+            String dateFormatAsString = this.enUsFormat.format(value);
+            out.value(dateFormatAsString);
         }
     }
 }

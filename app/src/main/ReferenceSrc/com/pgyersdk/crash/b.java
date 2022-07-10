@@ -1,11 +1,10 @@
 package com.pgyersdk.crash;
-
-/* loaded from: classes.jar:com/pgyersdk/crash/b.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class b extends Thread {
     final /* synthetic */ a a;
     private final /* synthetic */ Throwable b;
 
-    b(a aVar, Throwable th) {
+    public b(a aVar, Throwable th) {
         this.a = aVar;
         this.b = th;
     }

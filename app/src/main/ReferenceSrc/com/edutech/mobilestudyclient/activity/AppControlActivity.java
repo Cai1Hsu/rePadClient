@@ -31,8 +31,7 @@ import com.launcher.activity.R;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/AppControlActivity.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class AppControlActivity extends Activity {
     private static String TAG = " ";
     private AppControlAdapter adapter;
@@ -46,117 +45,56 @@ public class AppControlActivity extends Activity {
     private List<String> selfApps;
     private String installPkg = "";
     private long installTime = 0;
-    View.OnClickListener cleanListener = new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.AppControlActivity.1
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            Toast.makeText(AppControlActivity.this, (int) R.string.appcleanok, 0).show();
-        }
-    };
-    Handler handler = new Handler() { // from class: com.edutech.mobilestudyclient.activity.AppControlActivity.2
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            switch (message.what) {
-                case 1:
-                    AppControlActivity.this.searchApps((String) message.obj);
-                    if (AppControlActivity.this.adapter == null || AppControlActivity.this.appSearchList == null) {
-                        return;
-                    }
-                    AppControlActivity.this.adapter.setDetails(AppControlActivity.this.appSearchList);
-                    AppControlActivity.this.adapter.notifyDataSetChanged();
-                    return;
-                case 2:
-                    if (AppControlActivity.this.adapter != null && AppControlActivity.this.appInfoList != null) {
-                        AppControlActivity.this.adapter.setDetails(AppControlActivity.this.appInfoList);
-                        AppControlActivity.this.adapter.notifyDataSetChanged();
-                    }
-                    AppControlActivity.this.btn_search.setEnabled(true);
-                    return;
-                default:
-                    return;
-            }
-        }
-    };
-    View.OnClickListener backListener = new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.AppControlActivity.3
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            AppControlActivity.this.finish();
-        }
-    };
-    View.OnClickListener searchListener = new View.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.AppControlActivity.4
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            AppControlActivity.this.edt_search.setText("");
-            if (AppControlActivity.this.edt_search.getVisibility() != 8) {
-                AppControlActivity.this.edt_search.setVisibility(8);
-                AppControlActivity.this.btn_search.setText(AppControlActivity.this.getResources().getString(R.string.appsearch));
-                Message obtainMessage = AppControlActivity.this.handler.obtainMessage();
-                obtainMessage.what = 2;
-                obtainMessage.sendToTarget();
-                return;
-            }
-            AppControlActivity.this.edt_search.setVisibility(0);
-            AppControlActivity.this.btn_search.setText(AppControlActivity.this.getResources().getString(R.string.apphide));
-            Message obtainMessage2 = AppControlActivity.this.handler.obtainMessage();
-            obtainMessage2.what = 1;
-            obtainMessage2.obj = "";
-            obtainMessage2.sendToTarget();
-        }
-    };
-    AdapterView.OnItemClickListener appClickListener = new AdapterView.OnItemClickListener() { // from class: com.edutech.mobilestudyclient.activity.AppControlActivity.5
-        @Override // android.widget.AdapterView.OnItemClickListener
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
-            if (AppControlActivity.this.edt_search.getVisibility() == 8) {
-                if (AppControlActivity.this.appInfoList.size() <= i) {
-                    return;
-                }
-                String appPackageName = ((AppDetails) AppControlActivity.this.appInfoList.get(i)).getAppPackageName();
-                AppEnvironment.CleaningPackage = appPackageName;
-                AppControlActivity.this.startActivity(new Intent("android.settings.APPLICATION_DETAILS_SETTINGS", Uri.parse("package:" + appPackageName)));
-            } else if (AppControlActivity.this.appSearchList.size() <= i) {
-            } else {
-                String appPackageName2 = ((AppDetails) AppControlActivity.this.appSearchList.get(i)).getAppPackageName();
-                AppEnvironment.CleaningPackage = appPackageName2;
-                AppControlActivity.this.startActivity(new Intent("android.settings.APPLICATION_DETAILS_SETTINGS", Uri.parse("package:" + appPackageName2)));
-            }
-        }
-    };
+    View.OnClickListener cleanListener = new AnonymousClass1();
+    Handler handler = new AnonymousClass2();
+    View.OnClickListener backListener = new AnonymousClass3();
+    View.OnClickListener searchListener = new AnonymousClass4();
+    AdapterView.OnItemClickListener appClickListener = new AnonymousClass5();
 
-    /* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/AppControlActivity$ShowAppsThread.class */
-    class ShowAppsThread extends Thread {
-        ShowAppsThread() {
-            AppControlActivity.this = r4;
-        }
-
-        @Override // java.lang.Thread, java.lang.Runnable
-        public void run() {
-            AppControlActivity.this.initApps();
-            Message obtainMessage = AppControlActivity.this.handler.obtainMessage();
-            obtainMessage.what = 2;
-            obtainMessage.sendToTarget();
-        }
+    static /* synthetic */ List access$3(AppControlActivity appControlActivity) {
+        return appControlActivity.appInfoList;
     }
 
-    private static void cleanCacheFile(String str) {
-        File[] listFiles;
-        Log.e("sdcard", str);
-        File file = new File(str);
-        if (!file.isDirectory() || (listFiles = file.listFiles()) == null) {
-            return;
-        }
-        for (File file2 : listFiles) {
-            file2.delete();
-        }
+    static /* synthetic */ List access$2(AppControlActivity appControlActivity) {
+        return appControlActivity.appSearchList;
     }
 
-    public static void cleanExternalCache(Context context) {
-        if (Environment.getExternalStorageState().equals("mounted")) {
-            Log.e(TAG, context.getExternalCacheDir().getAbsolutePath());
-            deleteFilesByDirectory(context.getExternalCacheDir());
-        }
+    static /* synthetic */ AppControlAdapter access$1(AppControlActivity appControlActivity) {
+        return appControlActivity.adapter;
     }
 
-    public static void cleanFiles(Context context) {
-        deleteFilesByDirectory(context.getFilesDir());
+    static /* synthetic */ Button access$4(AppControlActivity appControlActivity) {
+        return appControlActivity.btn_search;
+    }
+
+    static /* synthetic */ EditText access$5(AppControlActivity appControlActivity) {
+        return appControlActivity.edt_search;
+    }
+
+    @Override // android.app.Activity
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.appcontrol);
+        initWidget();
+        AppEnvironment.CleaningPackage = "";
+        SharedPreferences sp = getSharedPreferences("language", 0);
+        String type = sp.getString("language", "chinese");
+        if (!type.equals("en")) {
+            LanguageUtils.SetLanguage(this, "chinese");
+        } else {
+            LanguageUtils.SetLanguage(this, "en");
+        }
+        new ShowAppsThread().start();
+    }
+
+    @Override // android.app.Activity, android.view.ContextThemeWrapper, android.content.ContextWrapper
+    protected void attachBaseContext(Context newBase) {
+        try {
+            SharedPreferences sp = newBase.getSharedPreferences("language", 0);
+            String type = sp.getString("language", "chinese");
+            super.attachBaseContext(LanguageUtils.attachBaseContext(newBase, type));
+        } catch (Exception e) {
+        }
     }
 
     public static void cleanInternalCache(Context context) {
@@ -168,48 +106,117 @@ public class AppControlActivity extends Activity {
         deleteFilesByDirectory(new File("/data/data/" + context.getPackageName() + "/shared_prefs"));
     }
 
-    private static void deleteFilesByDirectory(File file) {
-        Log.e("cleaning", file.getAbsolutePath());
-        if (file == null || !file.exists() || !file.isDirectory() || file.listFiles() == null) {
-            return;
-        }
-        for (File file2 : file.listFiles()) {
-            file2.delete();
+    public static void cleanFiles(Context context) {
+        deleteFilesByDirectory(context.getFilesDir());
+    }
+
+    public static void cleanExternalCache(Context context) {
+        if (Environment.getExternalStorageState().equals("mounted")) {
+            Log.e(TAG, context.getExternalCacheDir().getAbsolutePath());
+            deleteFilesByDirectory(context.getExternalCacheDir());
         }
     }
 
+    public void cleanApplicationData(Context context) {
+        cleanInternalCache(context);
+        cleanExternalCache(context);
+        cleanSharedPreference(context);
+        SharedPreferences sp = getSharedPreferences("lockscreen", 0);
+        sp.edit().putLong("installtime", this.installTime).commit();
+        sp.edit().putString("installpkg", this.installPkg).commit();
+    }
+
+    private static void deleteFilesByDirectory(File directory) {
+        File[] listFiles;
+        Log.e("cleaning", directory.getAbsolutePath());
+        if (directory != null && directory.exists() && directory.isDirectory()) {
+            File[] items = directory.listFiles();
+            if (items != null) {
+                for (File item : directory.listFiles()) {
+                    item.delete();
+                }
+            }
+        }
+    }
+
+    private static void cleanCacheFile(String path) {
+        File[] files;
+        Log.e("sdcard", path);
+        File file = new File(path);
+        if (file.isDirectory() && (files = file.listFiles()) != null) {
+            for (File tep : files) {
+                tep.delete();
+            }
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class ShowAppsThread extends Thread {
+        ShowAppsThread() {
+            AppControlActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public void run() {
+            AppControlActivity.access$6(AppControlActivity.this);
+            Message msg = AppControlActivity.this.handler.obtainMessage();
+            msg.what = 2;
+            msg.sendToTarget();
+        }
+    }
+
+    @Override // android.app.Activity
+    protected void onPause() {
+        super.onPause();
+        AppEnvironment.CleaningPackage = "";
+    }
+
+    @Override // android.app.Activity
+    protected void onDestroy() {
+        super.onDestroy();
+        AppEnvironment.CleaningPackage = "";
+    }
+
+    @Override // android.app.Activity, android.view.KeyEvent.Callback
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
+    }
+
+    static /* synthetic */ void access$6(AppControlActivity appControlActivity) {
+        appControlActivity.initApps();
+    }
+
     @SuppressLint({"NewApi"})
-    public void initApps() {
+    private void initApps() {
         new ArrayList();
         this.appInfoList = new ArrayList();
         this.selfApps = new ArrayList();
         this.selfApps.add("com.launcher.activity");
         this.selfApps.add("com.edutech.firewall");
         this.selfApps.add("com.edutech.assistantdemo");
-        List<PackageInfo> installedPackages = getPackageManager().getInstalledPackages(0);
-        if (installedPackages == null || installedPackages.size() <= 0) {
-            return;
-        }
-        for (int i = 0; i < installedPackages.size(); i++) {
-            PackageInfo packageInfo = installedPackages.get(i);
-            AppDetails appDetails = new AppDetails();
-            String str = packageInfo.packageName;
-            if (!this.selfApps.contains(str) && !str.contains("com.edutech.myfiles") && !str.contains("com.edutech.protect") && (str.contains("com.edutech") || str.contains("cn.wps.moffice_eng"))) {
-                String charSequence = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
-                String str2 = packageInfo.versionName;
-                String sb = new StringBuilder(String.valueOf(packageInfo.versionCode)).toString();
-                Drawable drawable = getResources().getDrawable(2130837884);
-                try {
-                    drawable = packageInfo.applicationInfo.loadIcon(getPackageManager());
-                } catch (Exception e) {
-                }
-                if (charSequence != null && str != null && str2 != null && sb != null && drawable != null && !this.selfApps.contains(str)) {
-                    appDetails.setAppIcon(drawable);
-                    appDetails.setAppName(charSequence);
-                    appDetails.setAppPackageName(str);
-                    appDetails.setAppVersion(str2);
-                    appDetails.setAppVersionCode(sb);
-                    this.appInfoList.add(appDetails);
+        List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
+        if (packages != null && packages.size() > 0) {
+            for (int i = 0; i < packages.size(); i++) {
+                PackageInfo info = packages.get(i);
+                AppDetails detail = new AppDetails();
+                String pkName = info.packageName;
+                if (!this.selfApps.contains(pkName) && !pkName.contains("com.edutech.myfiles") && !pkName.contains("com.edutech.protect") && (pkName.contains("com.edutech") || pkName.contains("cn.wps.moffice_eng"))) {
+                    String name = info.applicationInfo.loadLabel(getPackageManager()).toString();
+                    String version = info.versionName;
+                    String vcode = new StringBuilder(String.valueOf(info.versionCode)).toString();
+                    Drawable icon = getResources().getDrawable(2130837884);
+                    try {
+                        icon = info.applicationInfo.loadIcon(getPackageManager());
+                    } catch (Exception e) {
+                    }
+                    if (name != null && pkName != null && version != null && vcode != null && icon != null && !this.selfApps.contains(pkName)) {
+                        detail.setAppIcon(icon);
+                        detail.setAppName(name);
+                        detail.setAppPackageName(pkName);
+                        detail.setAppVersion(version);
+                        detail.setAppVersionCode(vcode);
+                        this.appInfoList.add(detail);
+                    }
                 }
             }
         }
@@ -229,84 +236,160 @@ public class AppControlActivity extends Activity {
         this.btn_search.setOnClickListener(this.searchListener);
         this.btn_search.setEnabled(false);
         this.btn_clean.setOnClickListener(this.cleanListener);
-        this.edt_search.addTextChangedListener(new TextWatcher() { // from class: com.edutech.mobilestudyclient.activity.AppControlActivity.6
-            @Override // android.text.TextWatcher
-            public void afterTextChanged(Editable editable) {
-                String editable2 = editable.toString();
-                Message obtainMessage = AppControlActivity.this.handler.obtainMessage();
-                obtainMessage.obj = editable2;
-                obtainMessage.what = 1;
-                obtainMessage.sendToTarget();
-            }
-
-            @Override // android.text.TextWatcher
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-            }
-
-            @Override // android.text.TextWatcher
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-            }
-        });
+        this.edt_search.addTextChangedListener(new AnonymousClass6());
     }
 
-    public void searchApps(String str) {
+    /* renamed from: com.edutech.mobilestudyclient.activity.AppControlActivity$6 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass6 implements TextWatcher {
+        AnonymousClass6() {
+            AppControlActivity.this = r1;
+        }
+
+        @Override // android.text.TextWatcher
+        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override // android.text.TextWatcher
+        public void afterTextChanged(Editable arg0) {
+            String key = arg0.toString();
+            Message msg = AppControlActivity.this.handler.obtainMessage();
+            msg.obj = key;
+            msg.what = 1;
+            msg.sendToTarget();
+        }
+    }
+
+    /* renamed from: com.edutech.mobilestudyclient.activity.AppControlActivity$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 implements View.OnClickListener {
+        AnonymousClass1() {
+            AppControlActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View arg0) {
+            Toast.makeText(AppControlActivity.this, (int) R.string.appcleanok, 0).show();
+        }
+    }
+
+    /* renamed from: com.edutech.mobilestudyclient.activity.AppControlActivity$2 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass2 extends Handler {
+        AnonymousClass2() {
+            AppControlActivity.this = r1;
+        }
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            int what = msg.what;
+            switch (what) {
+                case 1:
+                    String keywords = (String) msg.obj;
+                    AppControlActivity.access$0(AppControlActivity.this, keywords);
+                    if (AppControlActivity.access$1(AppControlActivity.this) != null && AppControlActivity.access$2(AppControlActivity.this) != null) {
+                        AppControlActivity.access$1(AppControlActivity.this).setDetails(AppControlActivity.access$2(AppControlActivity.this));
+                        AppControlActivity.access$1(AppControlActivity.this).notifyDataSetChanged();
+                        return;
+                    }
+                    return;
+                case 2:
+                    if (AppControlActivity.access$1(AppControlActivity.this) != null && AppControlActivity.access$3(AppControlActivity.this) != null) {
+                        AppControlActivity.access$1(AppControlActivity.this).setDetails(AppControlActivity.access$3(AppControlActivity.this));
+                        AppControlActivity.access$1(AppControlActivity.this).notifyDataSetChanged();
+                    }
+                    AppControlActivity.access$4(AppControlActivity.this).setEnabled(true);
+                    return;
+                default:
+                    return;
+            }
+        }
+    }
+
+    static /* synthetic */ void access$0(AppControlActivity appControlActivity, String str) {
+        appControlActivity.searchApps(str);
+    }
+
+    private void searchApps(String keywords) {
         this.appSearchList = new ArrayList();
-        if (str == null || str.equals("")) {
-            return;
-        }
-        for (int i = 0; i < this.appInfoList.size(); i++) {
-            AppDetails appDetails = this.appInfoList.get(i);
-            if (appDetails.getAppName().contains(str)) {
-                this.appSearchList.add(appDetails);
+        if (keywords != null && !keywords.equals("")) {
+            for (int i = 0; i < this.appInfoList.size(); i++) {
+                AppDetails detail = this.appInfoList.get(i);
+                if (detail.getAppName().contains(keywords)) {
+                    this.appSearchList.add(detail);
+                }
             }
         }
     }
 
-    @Override // android.app.Activity, android.view.ContextThemeWrapper, android.content.ContextWrapper
-    protected void attachBaseContext(Context context) {
-        try {
-            super.attachBaseContext(LanguageUtils.attachBaseContext(context, context.getSharedPreferences("language", 0).getString("language", "chinese")));
-        } catch (Exception e) {
+    /* renamed from: com.edutech.mobilestudyclient.activity.AppControlActivity$3 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass3 implements View.OnClickListener {
+        AnonymousClass3() {
+            AppControlActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View arg0) {
+            AppControlActivity.this.finish();
         }
     }
 
-    public void cleanApplicationData(Context context) {
-        cleanInternalCache(context);
-        cleanExternalCache(context);
-        cleanSharedPreference(context);
-        SharedPreferences sharedPreferences = getSharedPreferences("lockscreen", 0);
-        sharedPreferences.edit().putLong("installtime", this.installTime).commit();
-        sharedPreferences.edit().putString("installpkg", this.installPkg).commit();
-    }
-
-    @Override // android.app.Activity
-    protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
-        setContentView(R.layout.appcontrol);
-        initWidget();
-        AppEnvironment.CleaningPackage = "";
-        if (!getSharedPreferences("language", 0).getString("language", "chinese").equals("en")) {
-            LanguageUtils.SetLanguage(this, "chinese");
-        } else {
-            LanguageUtils.SetLanguage(this, "en");
+    /* renamed from: com.edutech.mobilestudyclient.activity.AppControlActivity$4 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass4 implements View.OnClickListener {
+        AnonymousClass4() {
+            AppControlActivity.this = r1;
         }
-        new ShowAppsThread().start();
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View arg0) {
+            AppControlActivity.access$5(AppControlActivity.this).setText("");
+            if (AppControlActivity.access$5(AppControlActivity.this).getVisibility() == 8) {
+                AppControlActivity.access$5(AppControlActivity.this).setVisibility(0);
+                AppControlActivity.access$4(AppControlActivity.this).setText(AppControlActivity.this.getResources().getString(R.string.apphide));
+                Message msg = AppControlActivity.this.handler.obtainMessage();
+                msg.what = 1;
+                msg.obj = "";
+                msg.sendToTarget();
+                return;
+            }
+            AppControlActivity.access$5(AppControlActivity.this).setVisibility(8);
+            AppControlActivity.access$4(AppControlActivity.this).setText(AppControlActivity.this.getResources().getString(R.string.appsearch));
+            Message msg2 = AppControlActivity.this.handler.obtainMessage();
+            msg2.what = 2;
+            msg2.sendToTarget();
+        }
     }
 
-    @Override // android.app.Activity
-    protected void onDestroy() {
-        super.onDestroy();
-        AppEnvironment.CleaningPackage = "";
-    }
+    /* renamed from: com.edutech.mobilestudyclient.activity.AppControlActivity$5 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass5 implements AdapterView.OnItemClickListener {
+        AnonymousClass5() {
+            AppControlActivity.this = r1;
+        }
 
-    @Override // android.app.Activity, android.view.KeyEvent.Callback
-    public boolean onKeyDown(int i, KeyEvent keyEvent) {
-        return super.onKeyDown(i, keyEvent);
-    }
-
-    @Override // android.app.Activity
-    protected void onPause() {
-        super.onPause();
-        AppEnvironment.CleaningPackage = "";
+        @Override // android.widget.AdapterView.OnItemClickListener
+        public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+            if (AppControlActivity.access$5(AppControlActivity.this).getVisibility() == 8) {
+                if (AppControlActivity.access$3(AppControlActivity.this).size() > arg2) {
+                    AppDetails detail = (AppDetails) AppControlActivity.access$3(AppControlActivity.this).get(arg2);
+                    String packageName = detail.getAppPackageName();
+                    AppEnvironment.CleaningPackage = packageName;
+                    Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS", Uri.parse("package:" + packageName));
+                    AppControlActivity.this.startActivity(intent);
+                }
+            } else if (AppControlActivity.access$2(AppControlActivity.this).size() > arg2) {
+                AppDetails detail2 = (AppDetails) AppControlActivity.access$2(AppControlActivity.this).get(arg2);
+                String packageName2 = detail2.getAppPackageName();
+                AppEnvironment.CleaningPackage = packageName2;
+                Intent intent2 = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS", Uri.parse("package:" + packageName2));
+                AppControlActivity.this.startActivity(intent2);
+            }
+        }
     }
 }

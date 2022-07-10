@@ -3,8 +3,7 @@ package com.edutech.daoxueben.sysconfig;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import java.io.File;
-
-/* loaded from: classes.jar:com/edutech/daoxueben/sysconfig/AppEnvironment.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class AppEnvironment {
     public static final String BOOK_ID = "book_id";
     public static final String BOOK_ID_NAME = "bookid=";
@@ -73,20 +72,20 @@ public class AppEnvironment {
     public static String SUCCESS_EXAM_ID = "";
     public static String SUCCESS_SUBJECT_ID = "";
 
-    public static String GET_JSON_LOG_File(String str) {
-        return String.valueOf(FOLDER_MAIN) + str + "Log.json";
+    public static String GET_SETTING_URL(String ip) {
+        return "http://" + ip;
     }
 
-    public static String GET_SETTING_URL(String str) {
-        return "http://" + str;
+    public static String GET_JSON_LOG_File(String userId) {
+        return String.valueOf(FOLDER_MAIN) + userId + "Log.json";
     }
 
-    public static String LOGJSON_HTTPPOST_URL(String str) {
-        return "http://" + str + "/api/padlog";
+    public static String LOGJSON_HTTPPOST_URL(String ip) {
+        return "http://" + ip + "/api/padlog";
     }
 
-    public static String UPDATEJSON_HTTPPOST_URL(String str, String str2) {
-        return "http://" + str + "/default/index/check-update/studentid/" + str2;
+    public static String UPDATEJSON_HTTPPOST_URL(String ip, String stuid) {
+        return "http://" + ip + "/default/index/check-update/studentid/" + stuid;
     }
 
     public static MediaPlayer getMedia() {

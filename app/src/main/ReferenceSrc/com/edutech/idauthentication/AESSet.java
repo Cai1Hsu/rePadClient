@@ -6,8 +6,8 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-/* loaded from: classes.jar:com/edutech/idauthentication/AESSet.class */
+import org.bson.BSON;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class AESSet {
     static char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private Cipher cipher;
@@ -26,77 +26,73 @@ public class AESSet {
         }
     }
 
-    public static String bytesToHex(byte[] bArr) {
-        char[] cArr = new char[bArr.length * 2];
-        for (int i = 0; i < bArr.length; i++) {
-            cArr[i * 2] = HEX_CHARS[(bArr[i] & 240) >>> 4];
-            cArr[(i * 2) + 1] = HEX_CHARS[bArr[i] & 15];
+    public byte[] encrypt(String text) throws Exception {
+        if (text == null || text.length() == 0) {
+            throw new Exception("Empty string");
         }
-        return new String(cArr);
+        try {
+            this.cipher.init(1, this.keyspec, this.ivspec);
+            byte[] encrypted = this.cipher.doFinal(padString(text).getBytes());
+            return encrypted;
+        } catch (Exception e) {
+            throw new Exception("[encrypt] " + e.getMessage());
+        }
     }
 
-    public static byte[] hexToBytes(String str) {
-        byte[] bArr = null;
-        if (str != null && str.length() >= 2) {
-            int length = str.length() / 2;
-            byte[] bArr2 = new byte[length];
-            int i = 0;
-            while (true) {
-                bArr = bArr2;
-                if (i >= length) {
-                    break;
-                }
-                bArr2[i] = (byte) Integer.parseInt(str.substring(i * 2, (i * 2) + 2), 16);
-                i++;
-            }
-        }
-        return bArr;
-    }
-
-    private static String padString(String str) {
-        int length = str.length();
-        for (int i = 0; i < 16 - (length % 16); i++) {
-            str = String.valueOf(str) + (char) 0;
-        }
-        return str;
-    }
-
-    public byte[] decrypt(String str) throws Exception {
-        if (str == null || str.length() == 0) {
+    public byte[] decrypt(String code) throws Exception {
+        if (code == null || code.length() == 0) {
             throw new Exception("Empty string");
         }
         try {
             this.cipher.init(2, this.keyspec, this.ivspec);
-            byte[] doFinal = this.cipher.doFinal(hexToBytes(str));
-            byte[] bArr = doFinal;
-            if (doFinal.length > 0) {
-                int i = 0;
-                for (int length = doFinal.length - 1; length >= 0; length--) {
-                    if (doFinal[length] == 0) {
-                        i++;
+            byte[] decrypted = this.cipher.doFinal(hexToBytes(code));
+            if (decrypted.length > 0) {
+                int trim = 0;
+                for (int i = decrypted.length - 1; i >= 0; i--) {
+                    if (decrypted[i] == 0) {
+                        trim++;
                     }
                 }
-                bArr = doFinal;
-                if (i > 0) {
-                    bArr = new byte[doFinal.length - i];
-                    System.arraycopy(doFinal, 0, bArr, 0, doFinal.length - i);
+                if (trim > 0) {
+                    byte[] newArray = new byte[decrypted.length - trim];
+                    System.arraycopy(decrypted, 0, newArray, 0, decrypted.length - trim);
+                    return newArray;
                 }
+                return decrypted;
             }
-            return bArr;
+            return decrypted;
         } catch (Exception e) {
             throw new Exception("[decrypt] " + e.getMessage());
         }
     }
 
-    public byte[] encrypt(String str) throws Exception {
-        if (str == null || str.length() == 0) {
-            throw new Exception("Empty string");
+    public static String bytesToHex(byte[] buf) {
+        char[] chars = new char[buf.length * 2];
+        for (int i = 0; i < buf.length; i++) {
+            chars[i * 2] = HEX_CHARS[(buf[i] & 240) >>> 4];
+            chars[(i * 2) + 1] = HEX_CHARS[buf[i] & BSON.CODE_W_SCOPE];
         }
-        try {
-            this.cipher.init(1, this.keyspec, this.ivspec);
-            return this.cipher.doFinal(padString(str).getBytes());
-        } catch (Exception e) {
-            throw new Exception("[encrypt] " + e.getMessage());
+        return new String(chars);
+    }
+
+    public static byte[] hexToBytes(String str) {
+        byte[] buffer = null;
+        if (str != null && str.length() >= 2) {
+            int len = str.length() / 2;
+            buffer = new byte[len];
+            for (int i = 0; i < len; i++) {
+                buffer[i] = (byte) Integer.parseInt(str.substring(i * 2, (i * 2) + 2), 16);
+            }
         }
+        return buffer;
+    }
+
+    private static String padString(String source) {
+        int x = source.length() % 16;
+        int padLength = 16 - x;
+        for (int i = 0; i < padLength; i++) {
+            source = String.valueOf(source) + (char) 0;
+        }
+        return source;
     }
 }

@@ -1,9 +1,8 @@
 package com.launcher.activity;
-
-/* loaded from: classes.jar:com/launcher/activity/R.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class R {
 
-    /* loaded from: classes.jar:com/launcher/activity/R$anim.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class anim {
         public static final int fade = 0x7f040000;
         public static final int hold = 0x7f040001;
@@ -42,7 +41,7 @@ public final class R {
         public static final int zoom_exit = 0x7f040022;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$array.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class array {
         public static final int actionbar_sortby = 0x7f0e0000;
         public static final int arrcontent_chat = 0x7f0e0009;
@@ -56,7 +55,7 @@ public final class R {
         public static final int arrcontent_system_notice = 0x7f0e0001;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$attr.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class attr {
         public static final int onBadgeClick = 0x7f010017;
         public static final int optionOneColor = 0x7f010014;
@@ -84,7 +83,7 @@ public final class R {
         public static final int ptrSubHeaderTextAppearance = 0x7f01000b;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$bool.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class bool {
         public static final int feedback_enabled = 0x7f0b0007;
         public static final int help_enabled = 0x7f0b0004;
@@ -96,7 +95,7 @@ public final class R {
         public static final int show_welcome_link = 0x7f0b0002;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$color.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class color {
         public static final int Annular_text_color = 0x7f0c0043;
         public static final int ForgotPassword = 0x7f0c0031;
@@ -245,7 +244,7 @@ public final class R {
         public static final int yellow_light = 0x7f0c0063;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$dimen.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class dimen {
         public static final int Buttom = 0x7f07007d;
         public static final int Net_Error = 0x7f070050;
@@ -377,7 +376,7 @@ public final class R {
         public static final int zero = 0x7f070007;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$drawable.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class drawable {
         public static final int action_item_btn = 0x7f020000;
         public static final int action_item_selected = 0x7f020001;
@@ -1244,7 +1243,7 @@ public final class R {
         public static final int zysf = 0x7f02034c;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$id.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class id {
         public static final int BottomlinearLayout = 0x7f0a00ad;
         public static final int GridView01 = 0x7f0a01da;
@@ -1796,7 +1795,7 @@ public final class R {
         public static final int zoomlayout = 0x7f0a00b7;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$integer.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class integer {
         public static final int gridview_num = 0x7f0d0001;
         public static final int gv_img_length = 0x7f0d0004;
@@ -1807,7 +1806,7 @@ public final class R {
         public static final int tv_state = 0x7f0d0003;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$layout.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class layout {
         public static final int activity_capture = 0x7f030000;
         public static final int activity_cloud_client_homework = 0x7f030001;
@@ -1946,12 +1945,12 @@ public final class R {
         public static final int webbrowser_zyfd = 0x7f030086;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$menu.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class menu {
         public static final int cloud_client_homework = 0x7f0f0000;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$raw.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class raw {
         public static final int afd = 0x7f060000;
         public static final int androidselection = 0x7f060001;
@@ -1976,7 +1975,7 @@ public final class R {
         public static final int toc = 0x7f060014;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$string.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class string {
         public static final int Beiwang_intent = 0x7f08033b;
         public static final int Chinese = 0x7f080389;
@@ -3060,7 +3059,7 @@ public final class R {
         public static final int zyfd_name = 0x7f08002f;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$style.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class style {
         public static final int AlertDialogCustom = 0x7f09001f;
         public static final int Animations = 0x7f090018;
@@ -3140,7 +3139,7 @@ public final class R {
         public static final int tv_name_grades = 0x7f09002b;
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$styleable.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class styleable {
         public static final int ActionEditText_onBadgeClick = 0x00000004;
         public static final int ActionEditText_optionOneColor = 0x00000001;
@@ -3170,7 +3169,7 @@ public final class R {
         public static final int[] PullToRefresh = {2130771968, 2130771969, 2130771970, 2130771971, 2130771972, 2130771973, 2130771974, 2130771975, 2130771976, 2130771977, 2130771978, 2130771979, 2130771980, 2130771981, 2130771982, 2130771983, 2130771984, 2130771985, 2130771986};
     }
 
-    /* loaded from: classes.jar:com/launcher/activity/R$xml.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class xml {
         public static final int authenticator = 0x7f050000;
         public static final int device = 0x7f050001;

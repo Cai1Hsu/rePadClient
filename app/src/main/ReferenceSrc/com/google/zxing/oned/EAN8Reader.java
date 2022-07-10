@@ -3,34 +3,36 @@ package com.google.zxing.oned;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
-
-/* loaded from: classes.jar:com/google/zxing/oned/EAN8Reader.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class EAN8Reader extends UPCEANReader {
     private final int[] decodeMiddleCounters = new int[4];
 
     @Override // com.google.zxing.oned.UPCEANReader
-    protected int decodeMiddle(BitArray bitArray, int[] iArr, StringBuilder sb) throws NotFoundException {
-        int[] iArr2 = this.decodeMiddleCounters;
-        iArr2[0] = 0;
-        iArr2[1] = 0;
-        iArr2[2] = 0;
-        iArr2[3] = 0;
-        int size = bitArray.getSize();
-        int i = iArr[1];
-        for (int i2 = 0; i2 < 4 && i < size; i2++) {
-            sb.append((char) (decodeDigit(bitArray, iArr2, i, L_PATTERNS) + 48));
-            for (int i3 : iArr2) {
-                i += i3;
+    public int decodeMiddle(BitArray row, int[] startRange, StringBuilder result) throws NotFoundException {
+        int[] counters = this.decodeMiddleCounters;
+        counters[0] = 0;
+        counters[1] = 0;
+        counters[2] = 0;
+        counters[3] = 0;
+        int end = row.getSize();
+        int rowOffset = startRange[1];
+        for (int x = 0; x < 4 && rowOffset < end; x++) {
+            int bestMatch = decodeDigit(row, counters, rowOffset, L_PATTERNS);
+            result.append((char) (bestMatch + 48));
+            for (int counter : counters) {
+                rowOffset += counter;
             }
         }
-        int i4 = findGuardPattern(bitArray, i, true, MIDDLE_PATTERN)[1];
-        for (int i5 = 0; i5 < 4 && i4 < size; i5++) {
-            sb.append((char) (decodeDigit(bitArray, iArr2, i4, L_PATTERNS) + 48));
-            for (int i6 : iArr2) {
-                i4 += i6;
+        int[] middleRange = findGuardPattern(row, rowOffset, true, MIDDLE_PATTERN);
+        int rowOffset2 = middleRange[1];
+        for (int x2 = 0; x2 < 4 && rowOffset2 < end; x2++) {
+            int bestMatch2 = decodeDigit(row, counters, rowOffset2, L_PATTERNS);
+            result.append((char) (bestMatch2 + 48));
+            for (int counter2 : counters) {
+                rowOffset2 += counter2;
             }
         }
-        return i4;
+        return rowOffset2;
     }
 
     @Override // com.google.zxing.oned.UPCEANReader

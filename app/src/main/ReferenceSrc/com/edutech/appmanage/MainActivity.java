@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -55,15 +56,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -77,8 +81,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-/* loaded from: classes.jar:com/edutech/appmanage/MainActivity.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class MainActivity extends Activity {
     private static final String TAG = "AppmanageMainActivity";
     public static DownloadManager downloadManager;
@@ -121,253 +124,101 @@ public class MainActivity extends Activity {
     private Timer mTimer = null;
     private TimerTask mTimerTask = null;
     private boolean toast_unlink = false;
-    Runnable net_thread = new Runnable() { // from class: com.edutech.appmanage.MainActivity.1
-        @Override // java.lang.Runnable
-        public void run() {
-            synchronized (this) {
-                MainActivity.this.progress_handler.sendEmptyMessage(3);
-                MainActivity.this.progress_handler.sendEmptyMessage(1);
-                MainActivity.this.login_res = MainActivity.this.userLogin(MainActivity.this.ip, MainActivity.this.usercode, MainActivity.this.pwd);
-                Log.i(MainActivity.TAG, "LOGIN_RES   :" + MainActivity.this.login_res);
-                if (MainActivity.this.login_res != 0) {
-                    if (-1 == MainActivity.this.login_res) {
-                        MainActivity.this.wrong_handler.sendEmptyMessage(2);
-                    } else if (2 == MainActivity.this.login_res) {
-                        MainActivity.this.wrong_handler.sendEmptyMessage(2);
-                    } else if (MainActivity.this.login_res != 0) {
-                        MainActivity.this.wrong_handler.sendEmptyMessage(2);
-                    }
-                    MainActivity.this.unlink_parse(SharedPreferencesHelper.load_info());
-                } else {
-                    Log.i(MainActivity.TAG, "usercode==" + MainActivity.this.usercode);
-                    String inVar = HttpHelper.getin("http://" + MainActivity.this.ip + "/api/pad-login/code/" + MainActivity.this.usercode + "/pwd/" + MainActivity.this.pwd, MainActivity.this.usercode, MainActivity.this.privatekey);
-                    Log.i(MainActivity.TAG, "333---RES_ID  :" + inVar);
-                    if (inVar == null) {
-                        Log.i(MainActivity.TAG, "345");
-                        MainActivity.this.handler_toast.sendEmptyMessage(4);
-                    } else if (MainActivity.this.parse_studentid(inVar) == null) {
-                        Log.i(MainActivity.TAG, "338");
-                        MainActivity.this.handler_toast.sendEmptyMessage(4);
-                    } else {
-                        String inVar2 = HttpHelper.getin("http://" + MainActivity.this.ip + "/api/app/projectcode/myapp/os/android", MainActivity.this.usercode, MainActivity.this.privatekey);
-                        Log.i(MainActivity.TAG, "346-infor--->" + inVar2);
-                        if (inVar2 != null) {
-                            MainActivity.this.unlink_handler.sendEmptyMessage(3);
-                            SharedPreferencesHelper.save_info(inVar2);
-                            MainActivity.this.parse_json();
-                        } else {
-                            MainActivity.this.handler_toast.sendEmptyMessage(4);
-                        }
-                    }
-                }
-            }
-        }
-    };
-    Handler unlink_handler = new Handler() { // from class: com.edutech.appmanage.MainActivity.2
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            super.handleMessage(message);
-            switch (message.what) {
-                case 1:
-                    if (MainActivity.market_applist.size() != 0) {
-                        MainActivity.this.wrong_net.setVisibility(8);
-                        MainActivity.this.layout_appwarning.setVisibility(8);
-                        MainActivity.this.gv.setVisibility(0);
-                        return;
-                    }
-                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_errornetwork));
-                    MainActivity.this.wrong_net.setVisibility(0);
-                    MainActivity.this.img_appwarning.setBackgroundResource(R.drawable.nointernet);
-                    MainActivity.this.layout_appwarning.setVisibility(0);
-                    MainActivity.this.gv.setVisibility(8);
-                    return;
-                case 2:
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_errornetwork), 0).show();
-                    return;
-                case 3:
-                    MainActivity.this.wrong_net.setVisibility(8);
-                    MainActivity.this.layout_appwarning.setVisibility(8);
-                    MainActivity.this.gv.setVisibility(0);
-                    return;
-                default:
-                    return;
-            }
-        }
-    };
-    Handler handler_toast = new Handler() { // from class: com.edutech.appmanage.MainActivity.3
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            super.handleMessage(message);
-            switch (message.what) {
-                case 1:
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_nonefile), 0).show();
-                    return;
-                case 2:
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_installok), 0).show();
-                    return;
-                case 3:
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_nonememory), 0).show();
-                    return;
-                case 4:
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_errornet), 0).show();
-                    MainActivity.this.progress_handler.sendEmptyMessage(2);
-                    return;
-                default:
-                    return;
-            }
-        }
-    };
-    Handler wrong_handler = new Handler() { // from class: com.edutech.appmanage.MainActivity.4
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            super.handleMessage(message);
-            switch (message.what) {
-                case 1:
-                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_errorsetting));
-                    MainActivity.this.img_appwarning.setBackgroundResource(R.drawable.errorsetting);
-                    MainActivity.this.data_load = true;
-                    MainActivity.this.pic_load = true;
-                    break;
-                case 2:
-                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_errornetwork));
-                    MainActivity.this.img_appwarning.setBackgroundResource(R.drawable.nointernet);
-                    MainActivity.this.data_load = true;
-                    MainActivity.this.pic_load = true;
-                    break;
-                case 3:
-                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_noneapp));
-                    MainActivity.this.img_appwarning.setBackgroundResource(R.drawable.nodetails);
-                    MainActivity.this.data_load = true;
-                    MainActivity.this.pic_load = true;
-                    MainActivity.this.wrong_net.setVisibility(0);
-                    MainActivity.this.layout_appwarning.setVisibility(0);
-                    MainActivity.this.gv.setVisibility(8);
-                    break;
-            }
-            MainActivity.this.progress_handler.sendEmptyMessage(2);
-        }
-    };
-    Handler progress_handler = new Handler() { // from class: com.edutech.appmanage.MainActivity.5
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            super.handleMessage(message);
-            switch (message.what) {
-                case 1:
-                    if (!MainActivity.this.isFinishing()) {
-                        try {
-                            MainActivity.this.changed_progress.show();
-                        } catch (Exception e) {
-                        }
-                    }
-                    MainActivity.this.startTimer();
-                    return;
-                case 2:
-                    MainActivity.this.stopTimer();
-                    if (MainActivity.this.isFinishing()) {
-                        return;
-                    }
-                    try {
-                        MainActivity.this.changed_progress.dismiss();
-                        return;
-                    } catch (Exception e2) {
-                        return;
-                    }
-                case 3:
-                    if (MainActivity.this.isFinishing()) {
-                        return;
-                    }
-                    try {
-                        MainActivity.this.changed_progress.setTitle(MainActivity.this.getResources().getString(R.string.appmanager_jiazaiing));
-                        return;
-                    } catch (Exception e3) {
-                        return;
-                    }
-                case 4:
-                    if (MainActivity.this.isFinishing()) {
-                        return;
-                    }
-                    try {
-                        MainActivity.this.changed_progress.setTitle(MainActivity.this.getResources().getString(R.string.appmanager_uninstalling));
-                        return;
-                    } catch (Exception e4) {
-                        return;
-                    }
-                default:
-                    return;
-            }
-        }
-    };
-    Runnable runnableUi = new Runnable() { // from class: com.edutech.appmanage.MainActivity.6
-        @Override // java.lang.Runnable
-        public void run() {
-            MainActivity.this.adapter.notifyDataSetChanged();
-        }
-    };
-    private Handler mHandlerApk = new Handler() { // from class: com.edutech.appmanage.MainActivity.7
-        /* JADX WARN: Type inference failed for: r0v16, types: [com.edutech.appmanage.MainActivity$7$1] */
-        /* JADX WARN: Type inference failed for: r0v9, types: [com.edutech.appmanage.MainActivity$7$2] */
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            if (message.what == MainActivity.apk_install) {
-                final String str = (String) message.obj;
-                Log.i(MainActivity.TAG, "path-->" + str);
-                new Thread() { // from class: com.edutech.appmanage.MainActivity.7.1
-                    @Override // java.lang.Thread, java.lang.Runnable
-                    public void run() {
-                        Log.i(MainActivity.TAG, "path-->" + str);
-                        if (!ApkController.install(str, MainActivity.this.getApplicationContext())) {
-                            MainActivity.this.toast(MainActivity.this.getResources().getString(R.string.appmanager_installfailed));
-                        }
-                    }
-                }.start();
-            } else if (message.what == MainActivity.apk_uninstall) {
-                final String str2 = (String) message.obj;
-                Log.i(MainActivity.TAG, "path-->" + str2);
-                new Thread() { // from class: com.edutech.appmanage.MainActivity.7.2
-                    @Override // java.lang.Thread, java.lang.Runnable
-                    public void run() {
-                        if (!ApkController.uninstall(str2, MainActivity.this.getApplicationContext())) {
-                            MainActivity.this.toast(MainActivity.this.getResources().getString(R.string.appmanager_uninstallfailed));
-                        }
-                    }
-                }.start();
-            }
-            super.handleMessage(message);
-        }
-    };
-    Runnable runnable_GetConfig_Infor = new Runnable() { // from class: com.edutech.appmanage.MainActivity.8
-        @Override // java.lang.Runnable
-        public void run() {
-            String str = "http://" + MainActivity.this.ip + "/api/config/";
-            Log.e(MainActivity.TAG, "URL:" + str);
-            String Get_Config_Json = MainActivity.this.Get_Config_Json(str, MainActivity.this.username);
-            if (Get_Config_Json != null) {
-                MainActivity.this.jsonToConfig(Get_Config_Json);
-            }
-            Message obtainMessage = MainActivity.this.getMarkertHandler.obtainMessage();
-            obtainMessage.what = 1;
-            obtainMessage.sendToTarget();
-        }
-    };
-    Handler getMarkertHandler = new Handler() { // from class: com.edutech.appmanage.MainActivity.9
-        @Override // android.os.Handler
-        public void handleMessage(Message message) {
-            switch (message.what) {
-                case 1:
-                    if (((ConnectivityManager) MainActivity.this.getSystemService("connectivity")).getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) {
-                        new Thread(MainActivity.this.net_thread).start();
-                        return;
-                    } else {
-                        MainActivity.this.unlink_parse(SharedPreferencesHelper.load_info());
-                        return;
-                    }
-                default:
-                    return;
-            }
-        }
-    };
+    Runnable net_thread = new AnonymousClass1();
+    Handler unlink_handler = new AnonymousClass2();
+    Handler handler_toast = new AnonymousClass3();
+    Handler wrong_handler = new AnonymousClass4();
+    Handler progress_handler = new AnonymousClass5();
+    Runnable runnableUi = new AnonymousClass6();
+    private Handler mHandlerApk = new AnonymousClass7();
+    Runnable runnable_GetConfig_Infor = new AnonymousClass8();
+    Handler getMarkertHandler = new AnonymousClass9();
 
-    /* loaded from: classes.jar:com/edutech/appmanage/MainActivity$AppInfo.class */
+    static /* synthetic */ MyAdapter access$12(MainActivity mainActivity) {
+        return mainActivity.adapter;
+    }
+
+    static /* synthetic */ GridView access$7(MainActivity mainActivity) {
+        return mainActivity.gv;
+    }
+
+    static /* synthetic */ int access$18(MainActivity mainActivity) {
+        return mainActivity.height;
+    }
+
+    static /* synthetic */ int access$20(MainActivity mainActivity) {
+        return mainActivity.pic_width;
+    }
+
+    static /* synthetic */ int access$19(MainActivity mainActivity) {
+        return mainActivity.pic_height;
+    }
+
+    static /* synthetic */ String access$0(MainActivity mainActivity) {
+        return mainActivity.ip;
+    }
+
+    static /* synthetic */ String access$1(MainActivity mainActivity) {
+        return mainActivity.usercode;
+    }
+
+    static /* synthetic */ String access$2(MainActivity mainActivity) {
+        return mainActivity.pwd;
+    }
+
+    static /* synthetic */ String access$4(MainActivity mainActivity) {
+        return mainActivity.privatekey;
+    }
+
+    static /* synthetic */ String access$15(MainActivity mainActivity) {
+        return mainActivity.username;
+    }
+
+    static /* synthetic */ boolean access$22(MainActivity mainActivity) {
+        return mainActivity.data_load;
+    }
+
+    static /* synthetic */ void access$8(MainActivity mainActivity, boolean z) {
+        mainActivity.data_load = z;
+    }
+
+    static /* synthetic */ boolean access$23(MainActivity mainActivity) {
+        return mainActivity.pic_load;
+    }
+
+    static /* synthetic */ void access$9(MainActivity mainActivity, boolean z) {
+        mainActivity.pic_load = z;
+    }
+
+    static /* synthetic */ int access$26() {
+        return count;
+    }
+
+    static /* synthetic */ void access$27(int i) {
+        count = i;
+    }
+
+    static /* synthetic */ void access$24(MainActivity mainActivity, boolean z) {
+        mainActivity.toast_unlink = z;
+    }
+
+    static /* synthetic */ int access$13() {
+        return apk_install;
+    }
+
+    static /* synthetic */ int access$14() {
+        return apk_uninstall;
+    }
+
+    static /* synthetic */ RelativeLayout access$6(MainActivity mainActivity) {
+        return mainActivity.layout_appwarning;
+    }
+
+    static /* synthetic */ ImageView access$5(MainActivity mainActivity) {
+        return mainActivity.img_appwarning;
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     class AppInfo {
         public int apptype = 0;
         public int versionCode = 0;
@@ -386,1007 +237,28 @@ public class MainActivity extends Activity {
         public boolean islocal = false;
 
         AppInfo() {
-            MainActivity.this = r4;
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/appmanage/MainActivity$CompleteReceiver.class */
-    class CompleteReceiver extends BroadcastReceiver {
-        long completeDownloadId = 0;
-        Handler handler = new Handler() { // from class: com.edutech.appmanage.MainActivity.CompleteReceiver.1
-            @Override // android.os.Handler
-            public void handleMessage(Message message) {
-                super.handleMessage(message);
-                switch (message.what) {
-                    case 1:
-                        Toast.makeText(CompleteReceiver.this.mycontext, MainActivity.this.getResources().getString(R.string.appmanager_downerror), 0).show();
-                        return;
-                    case 2:
-                        Toast.makeText(CompleteReceiver.this.mycontext, MainActivity.this.getResources().getString(R.string.appmanager_installerror1), 0).show();
-                        return;
-                    case 3:
-                        Toast.makeText(CompleteReceiver.this.mycontext, MainActivity.this.getResources().getString(R.string.appmanager_installerror2), 0).show();
-                        return;
-                    default:
-                        return;
-                }
-            }
-        };
-        Context mycontext;
-
-        CompleteReceiver() {
-            MainActivity.this = r6;
-        }
-
-        /* JADX WARN: Type inference failed for: r0v64, types: [com.edutech.appmanage.MainActivity$CompleteReceiver$2] */
-        @Override // android.content.BroadcastReceiver
-        public void onReceive(final Context context, Intent intent) {
-            synchronized (this) {
-                Log.i(MainActivity.TAG, "2586---RECEIVICE" + intent.getAction());
-                if (intent.getAction().equals("android.intent.action.DOWNLOAD_COMPLETE") && this.completeDownloadId != intent.getLongExtra("extra_download_id", -1L)) {
-                    this.completeDownloadId = intent.getLongExtra("extra_download_id", -1L);
-                    if (MainActivity.downloadManagerPro != null) {
-                        Log.i(MainActivity.TAG, "2603---RECEIVICE" + MainActivity.downloadManagerPro.getStatusById(this.completeDownloadId));
-                        if (MainActivity.downloadManagerPro.getStatusById(this.completeDownloadId) == 8) {
-                            new Thread() { // from class: com.edutech.appmanage.MainActivity.CompleteReceiver.2
-                                @Override // java.lang.Thread, java.lang.Runnable
-                                public void run() {
-                                    synchronized (this) {
-                                        super.run();
-                                        long j = CompleteReceiver.this.completeDownloadId;
-                                        Log.i(MainActivity.TAG, "2618---aaa  :" + HttpHelper.install_num.size());
-                                        int i = 0;
-                                        while (true) {
-                                            if (i >= HttpHelper.install_num.size()) {
-                                                break;
-                                            } else if (j == ((Long) HttpHelper.install_num.get(i).get("downid")).longValue()) {
-                                                MainActivity.downloadManager.remove(j);
-                                                if (!((Boolean) HttpHelper.install_num.get(i).get("setuped")).booleanValue()) {
-                                                    HttpHelper.install_num.get(i).put("setuped", true);
-                                                    int intValue = ((Integer) HttpHelper.install_num.get(i).get("position")).intValue();
-                                                    int intValue2 = ((Integer) HttpHelper.install_num.get(i).get("type")).intValue();
-                                                    String str = (String) HttpHelper.install_num.get(i).get("apkname");
-                                                    Log.i(MainActivity.TAG, "2638---name--->" + str);
-                                                    Log.i(MainActivity.TAG, "2639---type--->" + intValue2);
-                                                    if (1 == intValue2) {
-                                                        File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str);
-                                                        if (!file.exists() || 0 == file.length()) {
-                                                            CompleteReceiver.this.mycontext = context;
-                                                            CompleteReceiver.this.handler.sendEmptyMessage(1);
-                                                        } else {
-                                                            Log.i(MainActivity.TAG, "2671");
-                                                            Message obtainMessage = MainActivity.this.mHandlerApk.obtainMessage();
-                                                            obtainMessage.what = MainActivity.apk_install;
-                                                            obtainMessage.obj = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + str;
-                                                            MainActivity.this.mHandlerApk.sendMessage(obtainMessage);
-                                                        }
-                                                        int i2 = 0;
-                                                        while (true) {
-                                                            if (i2 >= HttpHelper.install_num.size()) {
-                                                                break;
-                                                            } else if (str.equals(HttpHelper.install_num.get(i2).get("apkname").toString())) {
-                                                                HttpHelper.install_num.remove(i2);
-                                                                break;
-                                                            } else {
-                                                                i2++;
-                                                            }
-                                                        }
-                                                        if (!MainActivity.delete_apkfile.contains(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str)) {
-                                                            MainActivity.delete_apkfile.add(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str);
-                                                        }
-                                                    } else if (intValue2 == 0) {
-                                                        String str2 = MainActivity.market_applist.get(intValue).apkname;
-                                                        File file2 = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str2);
-                                                        if (!file2.exists() || 0 == file2.length()) {
-                                                            CompleteReceiver.this.mycontext = context;
-                                                            CompleteReceiver.this.handler.sendEmptyMessage(1);
-                                                        } else {
-                                                            Log.i(MainActivity.TAG, "2782");
-                                                            Message obtainMessage2 = MainActivity.this.mHandlerApk.obtainMessage();
-                                                            obtainMessage2.what = 0;
-                                                            obtainMessage2.obj = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str2;
-                                                            MainActivity.this.mHandlerApk.sendMessage(obtainMessage2);
-                                                        }
-                                                        int i3 = 0;
-                                                        while (true) {
-                                                            if (i3 >= HttpHelper.install_num.size()) {
-                                                                break;
-                                                            } else if (str2.equals(HttpHelper.install_num.get(i3).get("apkname").toString())) {
-                                                                HttpHelper.install_num.remove(i3);
-                                                                break;
-                                                            } else {
-                                                                i3++;
-                                                            }
-                                                        }
-                                                        if (!MainActivity.delete_apkfile.contains(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str2)) {
-                                                            MainActivity.delete_apkfile.add(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str2);
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                i++;
-                                            }
-                                        }
-                                        MainActivity.this.complete();
-                                    }
-                                }
-                            }.start();
-                        } else if (MainActivity.downloadManagerPro.getStatusById(this.completeDownloadId) != 4) {
-                            long j = this.completeDownloadId;
-                            for (int i = 0; i < HttpHelper.install_num.size(); i++) {
-                                if (j == ((Long) HttpHelper.install_num.get(i).get("downid")).longValue()) {
-                                    if (((Boolean) HttpHelper.install_num.get(i).get("setuped")).booleanValue()) {
-                                        break;
-                                    }
-                                    this.mycontext = context;
-                                    this.handler.sendEmptyMessage(1);
-                                    String str = (String) HttpHelper.install_num.get(i).get("apkname");
-                                    int i2 = 0;
-                                    while (true) {
-                                        if (i2 >= HttpHelper.install_num.size()) {
-                                            break;
-                                        } else if (str.equals(HttpHelper.install_num.get(i2).get("apkname").toString())) {
-                                            HttpHelper.install_num.remove(i2);
-                                            break;
-                                        } else {
-                                            i2++;
-                                        }
-                                    }
-                                    int i3 = 0;
-                                    while (true) {
-                                        if (i3 < MainActivity.market_applist.size()) {
-                                            if (MainActivity.market_applist.get(i3).packagename.equals(str)) {
-                                                MainActivity.market_applist.get(i3).doing = false;
-                                                break;
-                                            }
-                                            i3++;
-                                        }
-                                    }
-                                }
-                            }
-                            MainActivity.this.complete();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/appmanage/MainActivity$GetBroadcast.class */
-    class GetBroadcast extends BroadcastReceiver {
-        GetBroadcast() {
-            MainActivity.this = r4;
-        }
-
-        @Override // android.content.BroadcastReceiver
-        public void onReceive(Context context, Intent intent) {
-            synchronized (this) {
-                String str = intent.getDataString().split(":")[1];
-                Log.i(MainActivity.TAG, intent.getAction());
-                if ("android.intent.action.PACKAGE_ADDED".equals(intent.getAction())) {
-                    if (MainActivity.market_applist != null) {
-                        int i = 0;
-                        while (true) {
-                            if (i >= MainActivity.market_applist.size()) {
-                                break;
-                            } else if (MainActivity.market_applist.get(i).packagename.equals(str)) {
-                                MainActivity.market_applist.get(i).doing = false;
-                                MainActivity.market_applist.get(i).islocal = true;
-                                break;
-                            } else {
-                                i++;
-                            }
-                        }
-                    }
-                    if (HttpHelper.install_num != null) {
-                        int i2 = 0;
-                        while (true) {
-                            if (i2 >= HttpHelper.install_num.size()) {
-                                break;
-                            } else if (str.equals(HttpHelper.install_num.get(i2).get("packagename").toString())) {
-                                MainActivity.this.deleteFile(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + HttpHelper.install_num.get(i2).get("apkname").toString());
-                                HttpHelper.install_num.remove(i2);
-                                break;
-                            } else {
-                                i2++;
-                            }
-                        }
-                    }
-                    MainActivity.this.complete();
-                } else if ("android.intent.action.PACKAGE_REMOVED".equals(intent.getAction())) {
-                    if (MainActivity.market_applist != null) {
-                        int i3 = 0;
-                        while (true) {
-                            if (i3 >= MainActivity.market_applist.size()) {
-                                break;
-                            } else if (MainActivity.market_applist.get(i3).packagename.equals(str)) {
-                                MainActivity.market_applist.get(i3).doing = false;
-                                MainActivity.market_applist.get(i3).islocal = false;
-                                break;
-                            } else {
-                                i3++;
-                            }
-                        }
-                    }
-                    if (HttpHelper.install_num != null) {
-                        int i4 = 0;
-                        while (true) {
-                            if (i4 >= HttpHelper.install_num.size()) {
-                                break;
-                            } else if (str.equals(HttpHelper.install_num.get(i4).get("packagename").toString())) {
-                                HttpHelper.install_num.remove(i4);
-                                break;
-                            } else {
-                                i4++;
-                            }
-                        }
-                    }
-                    MainActivity.this.complete();
-                } else if ("android.intent.action.PACKAGE_REPLACED".equals(intent.getAction())) {
-                    if (MainActivity.market_applist != null) {
-                        int i5 = 0;
-                        while (true) {
-                            if (i5 >= MainActivity.market_applist.size()) {
-                                break;
-                            } else if (MainActivity.market_applist.get(i5).packagename.equals(str)) {
-                                MainActivity.market_applist.get(i5).doing = false;
-                                MainActivity.market_applist.get(i5).update = false;
-                                break;
-                            } else {
-                                i5++;
-                            }
-                        }
-                    }
-                    if (HttpHelper.install_num != null) {
-                        int i6 = 0;
-                        while (true) {
-                            if (i6 >= HttpHelper.install_num.size()) {
-                                break;
-                            } else if (str.equals(HttpHelper.install_num.get(i6).get("packagename").toString())) {
-                                MainActivity.this.deleteFile(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + HttpHelper.install_num.get(i6).get("apkname").toString());
-                                HttpHelper.install_num.remove(i6);
-                                break;
-                            } else {
-                                i6++;
-                            }
-                        }
-                    }
-                    MainActivity.this.complete();
-                }
-            }
-        }
-    }
-
-    /* loaded from: classes.jar:com/edutech/appmanage/MainActivity$MyAdapter.class */
-    class MyAdapter extends BaseAdapter {
-        AppInfo appinfo;
-        Context context;
-        private LayoutInflater mInflater;
-
-        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$5 */
-        /* loaded from: classes.jar:com/edutech/appmanage/MainActivity$MyAdapter$5.class */
-        class AnonymousClass5 implements View.OnClickListener {
-            private final /* synthetic */ int val$position;
-
-            AnonymousClass5(int i) {
-                MyAdapter.this = r4;
-                this.val$position = i;
-            }
-
-            @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
-                final String str = MainActivity.market_applist.get(this.val$position).packagename;
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle(MainActivity.this.getResources().getString(R.string.uninstall)).setMessage(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_quituninstall)) + MainActivity.market_applist.get(this.val$position).appname + MainActivity.this.getResources().getString(R.string.appmanager_ma));
-                builder.setNegativeButton(MainActivity.this.getResources().getString(R.string.appmanager_ok), new DialogInterface.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.5.1
-                    /* JADX WARN: Type inference failed for: r0v0, types: [com.edutech.appmanage.MainActivity$MyAdapter$5$1$1] */
-                    @Override // android.content.DialogInterface.OnClickListener
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        final String str2 = str;
-                        new Thread() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.5.1.1
-                            @Override // java.lang.Thread, java.lang.Runnable
-                            public void run() {
-                                super.run();
-                                Message obtainMessage = MainActivity.this.mHandlerApk.obtainMessage();
-                                obtainMessage.what = MainActivity.apk_uninstall;
-                                obtainMessage.obj = str2;
-                                MainActivity.this.mHandlerApk.sendMessage(obtainMessage);
-                            }
-                        }.start();
-                    }
-                });
-                builder.setPositiveButton(MainActivity.this.getResources().getString(R.string.appmanager_cancel), new DialogInterface.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.5.2
-                    @Override // android.content.DialogInterface.OnClickListener
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.create().show();
-            }
-        }
-
-        /* loaded from: classes.jar:com/edutech/appmanage/MainActivity$MyAdapter$ViewHolder.class */
-        public final class ViewHolder {
-            public Button btn_start;
-            public Button btn_uninstall;
-            public TextView code;
-            public ImageView image;
-            public LinearLayout layout;
-            public TextView name;
-
-            public ViewHolder() {
-                MyAdapter.this = r4;
-            }
-        }
-
-        MyAdapter(Context context) {
-            MainActivity.this = r4;
-            this.context = context;
-            this.mInflater = LayoutInflater.from(context);
-        }
-
-        @Override // android.widget.Adapter
-        public int getCount() {
-            return MainActivity.market_applist.size();
-        }
-
-        @Override // android.widget.Adapter
-        public Object getItem(int i) {
-            return Integer.valueOf(i);
-        }
-
-        @Override // android.widget.Adapter
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override // android.widget.Adapter
-        public View getView(final int i, View view, ViewGroup viewGroup) {
-            ViewHolder viewHolder;
-            if (view == null) {
-                view = this.mInflater.inflate(R.layout.pic_item, (ViewGroup) null);
-                view.setLayoutParams(new AbsListView.LayoutParams(-1, MainActivity.this.height));
-                viewHolder = new ViewHolder();
-                viewHolder.layout = (LinearLayout) view.findViewById(R.id.linearlayout_pre);
-                viewHolder.name = (TextView) view.findViewById(R.id.textView_pre);
-                viewHolder.code = (TextView) view.findViewById(R.id.textView_versioncode);
-                viewHolder.image = (ImageView) view.findViewById(R.id.imageView_pre);
-                viewHolder.btn_start = (Button) view.findViewById(R.id.btn_start);
-                viewHolder.btn_uninstall = (Button) view.findViewById(R.id.btn_uninstall);
-                ViewGroup.LayoutParams layoutParams = viewHolder.image.getLayoutParams();
-                layoutParams.height = MainActivity.this.pic_height;
-                layoutParams.width = MainActivity.this.pic_width;
-                viewHolder.image.setLayoutParams(layoutParams);
-                view.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) view.getTag();
-            }
-            if (MainActivity.market_applist != null && i < MainActivity.market_applist.size()) {
-                this.appinfo = new AppInfo();
-                this.appinfo = MainActivity.market_applist.get(i);
-                Log.i(MainActivity.TAG, this.appinfo.appname);
-                if (this.appinfo.islocal) {
-                    viewHolder.btn_start.setFocusable(false);
-                    viewHolder.btn_uninstall.setFocusable(false);
-                    viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.open_app));
-                    viewHolder.btn_start.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_open));
-                    viewHolder.btn_uninstall.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_open));
-                    viewHolder.btn_uninstall.setTextColor(MainActivity.this.getResources().getColor(R.color.whilte));
-                    if (i < MainActivity.market_applist.size() && this.appinfo.doing) {
-                        viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updatingapp));
-                    }
-                    if (i < MainActivity.market_applist.size()) {
-                        String str = this.appinfo.apkname;
-                        int i2 = 0;
-                        while (true) {
-                            if (i2 >= HttpHelper.install_num.size()) {
-                                break;
-                            } else if (HttpHelper.install_num.get(i2).get("apkname").equals(str)) {
-                                viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updatingapp));
-                                break;
-                            } else {
-                                i2++;
-                            }
-                        }
-                    }
-                    viewHolder.btn_uninstall.setVisibility(0);
-                    if (i < MainActivity.market_applist.size()) {
-                        viewHolder.name.setText(this.appinfo.appname);
-                        if (this.appinfo.update) {
-                            viewHolder.code.setText(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_version)) + this.appinfo.local_versionName + "\r\n" + MainActivity.this.getResources().getString(R.string.appmanager_newversion) + this.appinfo.versionName);
-                            viewHolder.btn_start.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_update));
-                            viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updateapp));
-                            final ViewHolder viewHolder2 = viewHolder;
-                            viewHolder.btn_start.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.1
-                                @Override // android.view.View.OnClickListener
-                                public void onClick(View view2) {
-                                    Log.i("TAGS", String.valueOf(i) + "====" + i + "更新");
-                                    if (MainActivity.this.getResources().getString(R.string.appmanager_updatingapp).equals(viewHolder2.btn_start.getText())) {
-                                        Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_updating), 0).show();
-                                        return;
-                                    }
-                                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_startupdate), 0).show();
-                                    viewHolder2.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updatingapp));
-                                    File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + MyAdapter.this.appinfo.apkname);
-                                    if (file.exists()) {
-                                        file.delete();
-                                    }
-                                    HttpHelper.download(i, 0);
-                                }
-                            });
-                            final ViewHolder viewHolder3 = viewHolder;
-                            view.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.2
-                                @Override // android.view.View.OnClickListener
-                                public void onClick(View view2) {
-                                    Log.i(MainActivity.TAG, "准备打开。。。");
-                                    if (MainActivity.this.getResources().getString(R.string.appmanager_updatingapp).equals(viewHolder3.btn_start.getText())) {
-                                        Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_updating), 0).show();
-                                        return;
-                                    }
-                                    new Intent();
-                                    MainActivity.this.startActivity(MainActivity.this.getPackageManager().getLaunchIntentForPackage(MainActivity.market_applist.get(i).packagename));
-                                }
-                            });
-                        } else {
-                            viewHolder.code.setText(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_version)) + this.appinfo.versionName);
-                            final ViewHolder viewHolder4 = viewHolder;
-                            view.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.3
-                                @Override // android.view.View.OnClickListener
-                                public void onClick(View view2) {
-                                    Log.i(MainActivity.TAG, "准备打开。。。");
-                                    if (MainActivity.this.getResources().getString(R.string.appmanager_updatingapp).equals(viewHolder4.btn_start.getText())) {
-                                        Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_updating), 0).show();
-                                        return;
-                                    }
-                                    new Intent();
-                                    MainActivity.this.startActivity(MainActivity.this.getPackageManager().getLaunchIntentForPackage(MainActivity.market_applist.get(i).packagename));
-                                }
-                            });
-                        }
-                    }
-                    if (MainActivity.market_applist != null && i < MainActivity.market_applist.size()) {
-                        if (this.appinfo.appicon != null) {
-                            viewHolder.image.setImageDrawable(this.appinfo.appicon);
-                        } else {
-                            viewHolder.image.setImageResource(R.drawable.default_icon);
-                        }
-                    }
-                    final ViewHolder viewHolder5 = viewHolder;
-                    view.findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.4
-                        @Override // android.view.View.OnClickListener
-                        public void onClick(View view2) {
-                            if (MainActivity.this.getResources().getString(R.string.appmanager_updatingapp).equals(viewHolder5.btn_start.getText())) {
-                                Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_updating), 0).show();
-                            } else if (!MainActivity.this.getResources().getString(R.string.appmanager_updateapp).equals(viewHolder5.btn_start.getText())) {
-                                new Intent();
-                                MainActivity.this.startActivity(MainActivity.this.getPackageManager().getLaunchIntentForPackage(MainActivity.market_applist.get(i).packagename));
-                            } else {
-                                Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_startupdate), 0).show();
-                                viewHolder5.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updatingapp));
-                                File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + MyAdapter.this.appinfo.apkname);
-                                if (file.exists()) {
-                                    file.delete();
-                                }
-                                HttpHelper.download(i, 0);
-                            }
-                        }
-                    });
-                    view.findViewById(R.id.btn_uninstall).setOnClickListener(new AnonymousClass5(i));
-                } else if (MainActivity.market_applist.size() != 0) {
-                    synchronized (MainActivity.market_applist) {
-                        viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_install));
-                        if (i < MainActivity.market_applist.size() && this.appinfo.doing) {
-                            viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_installing));
-                        }
-                        viewHolder.btn_start.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_open));
-                        viewHolder.btn_uninstall.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_uninstall));
-                        viewHolder.btn_uninstall.setTextColor(MainActivity.this.getResources().getColor(R.color.btn_uninstall));
-                        if (i < MainActivity.market_applist.size()) {
-                            String str2 = this.appinfo.apkname;
-                            int i3 = 0;
-                            while (true) {
-                                if (i3 < HttpHelper.install_num.size()) {
-                                    boolean z = this.appinfo.islocal;
-                                    if (HttpHelper.install_num.get(i3).get("apkname").equals(str2) && !z) {
-                                        viewHolder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_installing));
-                                        break;
-                                    }
-                                    i3++;
-                                } else {
-                                    break;
-                                }
-                            }
-                        }
-                        viewHolder.name.setText(this.appinfo.appname);
-                        viewHolder.code.setText(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_version)) + this.appinfo.versionName);
-                        if (i < MainActivity.market_applist.size()) {
-                            if (this.appinfo.appicon != null) {
-                                viewHolder.image.setImageDrawable(this.appinfo.appicon);
-                            } else {
-                                viewHolder.image.setImageResource(R.drawable.default_icon);
-                            }
-                        }
-                        view.setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.6
-                            @Override // android.view.View.OnClickListener
-                            public void onClick(View view2) {
-                            }
-                        });
-                        final ViewHolder viewHolder6 = viewHolder;
-                        view.findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.MyAdapter.7
-                            @Override // android.view.View.OnClickListener
-                            public void onClick(View view2) {
-                                if (!MainActivity.this.getResources().getString(R.string.appmanager_installing).equals(viewHolder6.btn_start.getText())) {
-                                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_startdown), 0).show();
-                                    if (MainActivity.market_applist.size() <= i) {
-                                        return;
-                                    }
-                                    String str3 = MainActivity.market_applist.get(i).apkname;
-                                    viewHolder6.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_installing));
-                                    File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + str3);
-                                    if (file.exists()) {
-                                        file.delete();
-                                    }
-                                    HttpHelper.download(i, 1);
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-            return view;
-        }
-    }
-
-    public String Get_Config_Json(String str, String str2) {
-        String str3;
-        if (str == null || str.equals("") || str2 == null || str2.equals("")) {
-            Log.e(TAG, "Get_Config_Json 入参有问题。。。");
-            str3 = null;
-        } else {
-            try {
-                HttpResponse Get_http_addheader = Get_http_addheader(str, str2);
-                Log.e(TAG, "解析返回的内容...");
-                if (Get_http_addheader == null) {
-                    str3 = null;
-                } else if (Get_http_addheader.getStatusLine().getStatusCode() == 200) {
-                    StringBuilder sb = new StringBuilder();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Get_http_addheader.getEntity().getContent(), "UTF-8"));
-                    for (String readLine = bufferedReader.readLine(); readLine != null; readLine = bufferedReader.readLine()) {
-                        sb.append(readLine);
-                    }
-                    str3 = sb.toString();
-                    System.out.println(str3);
-                    Log.e(TAG, "学校和用户个人信息获取完成。。。");
-                } else {
-                    Log.e(TAG, "与服务端连接失败。。。");
-                    Log.e(TAG, "连接状态码Status=" + Get_http_addheader.getStatusLine().getStatusCode());
-                    Log.e(TAG, "ddddd=" + Get_http_addheader.getEntity());
-                    str3 = null;
-                }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-                str3 = null;
-                return str3;
-            } catch (IOException e2) {
-                e2.printStackTrace();
-                str3 = null;
-                return str3;
-            }
-        }
-        return str3;
-    }
-
-    private HttpResponse Get_http_addheader(String str, String str2) throws IOException, ClientProtocolException {
-        HttpGet httpGet = new HttpGet(str);
-        httpGet.addHeader("X-Edutech-Entity", str2);
-        long currentTimeMillis = System.currentTimeMillis();
-        String Md5 = My_md5.Md5(String.valueOf(currentTimeMillis) + str2);
-        Log.e(TAG, "timestamp=" + currentTimeMillis + "   sign=" + Md5);
-        httpGet.addHeader("X-Edutech-Sign", String.valueOf(currentTimeMillis) + "+" + Md5);
-        return new DefaultHttpClient().execute(httpGet);
-    }
-
-    public static String LOGINURL(String str, String str2, String str3) {
-        return "http://" + str + "/default/index/pad-login/code/" + str2 + "/pwd/" + str3;
-    }
-
-    private void findview() {
-        findViewById(R.id.btn_refresh).setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.10
-            @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
-                if (!MainActivity.this.data_load) {
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_unloading), 0).show();
-                } else if (!MainActivity.this.pic_load) {
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_iconunloading), 0).show();
-                } else {
-                    MainActivity.this.data_load = false;
-                    MainActivity.this.pic_load = false;
-                    MainActivity.this.toast_unlink = false;
-                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.action_refresh), 0).show();
-                    MainActivity.this.getMarketInfor();
-                }
-            }
-        });
-        findViewById(R.id.tv_exit).setOnClickListener(new View.OnClickListener() { // from class: com.edutech.appmanage.MainActivity.11
-            @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
-                MainActivity.this.finish();
-            }
-        });
-    }
-
-    public void getMarketInfor() {
-        if (((ConnectivityManager) getSystemService("connectivity")).getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) {
-            new Thread(this.net_thread).start();
-        } else {
-            unlink_parse(SharedPreferencesHelper.load_info());
-        }
-    }
-
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:39:0x0252 -> B:14:0x00ec). Please submit an issue!!! */
-    public boolean jsonToConfig(String str) {
-        boolean z;
-        if (str == null || str.equals("")) {
-            z = false;
-        } else {
-            try {
-                JSONObject jSONObject = new JSONObject(str);
-                Log.i(TAG, "info :" + jSONObject);
-                String string = jSONObject.getString("status");
-                String string2 = jSONObject.getString("errorNum");
-                String string3 = jSONObject.getString("errorInfo");
-                if (string2.equals("0")) {
-                    JSONObject jSONObject2 = jSONObject.getJSONObject("data");
-                    Log.i(TAG, "status :" + string);
-                    Log.i(TAG, "errorNum :" + string2);
-                    Log.i(TAG, "errorInfo :" + string3);
-                    Log.i(TAG, "data :" + jSONObject2);
-                    String string4 = jSONObject2.getString("privatekey");
-                    try {
-                        this.usercode = jSONObject2.getJSONObject(UserID.ELEMENT_NAME).getString("usercode");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    Log.i(TAG, "privatekey :" + string4);
-                    Log.i(TAG, "encrypt :" + ((String) null));
-                    Log.i(TAG, "apihost :" + ((String) null));
-                    try {
-                        JSONObject jSONObject3 = jSONObject2.getJSONObject("tigase");
-                        String str2 = null;
-                        String str3 = null;
-                        try {
-                            str2 = jSONObject3.getString(ClientCookie.DOMAIN_ATTR);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
-                        try {
-                            str3 = jSONObject3.getString(ClientCookie.PORT_ATTR);
-                        } catch (Exception e3) {
-                            e3.printStackTrace();
-                        }
-                        Log.i(TAG, "domain :" + str2);
-                        Log.i(TAG, "port :" + str3);
-                    } catch (Exception e4) {
-                        e4.printStackTrace();
-                    }
-                    try {
-                        JSONObject jSONObject4 = jSONObject2.getJSONObject("mongo");
-                        String str4 = null;
-                        String str5 = null;
-                        String str6 = null;
-                        String str7 = null;
-                        try {
-                            str4 = jSONObject4.getString(ClientCookie.DOMAIN_ATTR);
-                        } catch (Exception e5) {
-                            e5.printStackTrace();
-                        }
-                        try {
-                            str5 = jSONObject4.getString(ClientCookie.PORT_ATTR);
-                        } catch (Exception e6) {
-                            e6.printStackTrace();
-                        }
-                        try {
-                            str6 = jSONObject4.getString(UserID.ELEMENT_NAME);
-                        } catch (Exception e7) {
-                            e7.printStackTrace();
-                        }
-                        try {
-                            str7 = jSONObject4.getString("pwd");
-                        } catch (Exception e8) {
-                            e8.printStackTrace();
-                        }
-                        Log.i(TAG, "mongo_domain :" + str4);
-                        Log.i(TAG, "mongo_port :" + str5);
-                        Log.i(TAG, "mongo_user :" + str6);
-                        Log.i(TAG, "mongo_pwd :" + str7);
-                    } catch (Exception e9) {
-                        e9.printStackTrace();
-                    }
-                    z = true;
-                } else {
-                    Log.i(TAG, "配置信息 json数据  返回错误数据。。。");
-                    z = false;
-                }
-            } catch (JSONException e10) {
-                e10.printStackTrace();
-                z = false;
-            }
-        }
-        return z;
-    }
-
-    public void startTimer() {
-        if (this.mTimer == null) {
-            this.mTimer = new Timer();
-        }
-        if (this.mTimerTask == null) {
-            this.mTimerTask = new TimerTask() { // from class: com.edutech.appmanage.MainActivity.17
-                @Override // java.util.TimerTask, java.lang.Runnable
-                public void run() {
-                    MainActivity.count++;
-                    Log.e(MainActivity.TAG, new StringBuilder(String.valueOf(MainActivity.count)).toString());
-                    if (30 == MainActivity.count) {
-                        MainActivity.this.progress_handler.sendEmptyMessage(2);
-                        MainActivity.this.wrong_handler.sendEmptyMessage(2);
-                    }
-                }
-            };
-        }
-        if (this.mTimer == null || this.mTimerTask == null) {
-            return;
-        }
-        this.mTimer.schedule(this.mTimerTask, 0L, 1000L);
-    }
-
-    public void stopTimer() {
-        if (this.mTimer != null) {
-            this.mTimer.cancel();
-            this.mTimer = null;
-        }
-        if (this.mTimerTask != null) {
-            this.mTimerTask.cancel();
-            this.mTimerTask = null;
-        }
-        count = 0;
-    }
-
-    public int userLogin(String str, String str2, String str3) {
-        int i;
-        HttpPost httpPost = new HttpPost(LOGINURL(str, str2, str3));
-        int i2 = -1;
-        int i3 = -1;
-        int i4 = -1;
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(new ArrayList(), "UTF-8"));
-            HttpResponse execute = new DefaultHttpClient().execute(httpPost);
-            i = -1;
-            if (execute.getStatusLine().getStatusCode() == 200) {
-                i = JsonHelper.parseHttpPostReturnJson(EntityUtils.toString(execute.getEntity()));
-                i2 = i;
-                i3 = i;
-                i4 = i;
-                Log.i(TAG, "RES:" + i);
-            }
-        } catch (ClientProtocolException e) {
-            Log.i(TAG, LogHelp.TYPE_GUIDANCE);
-            e.printStackTrace();
-            i = i2;
-        } catch (IOException e2) {
-            Log.i(TAG, LogHelp.TYPE_MYWORK);
-            e2.printStackTrace();
-            i = i3;
-        } catch (Exception e3) {
-            Log.i(TAG, LogHelp.TYPE_HWHELP);
-            e3.printStackTrace();
-            i = i4;
-        }
-        return i;
-    }
-
-    /* JADX WARN: Type inference failed for: r0v18, types: [com.edutech.appmanage.MainActivity$15] */
-    public void compare() {
-        PackageInfo packageInfo;
-        PackageInfo packageInfo2;
-        ArrayList arrayList = new ArrayList();
-        if (this.silent_uninstall == null) {
-            this.silent_uninstall = new ArrayList<>();
-        }
-        for (int i = 0; i < market_applist.size(); i++) {
-            if (2 == market_applist_local.get(i).apptype) {
-                try {
-                    packageInfo2 = getPackageManager().getPackageInfo(market_applist_local.get(i).packagename, 0);
-                } catch (PackageManager.NameNotFoundException e) {
-                    packageInfo2 = null;
-                    e.printStackTrace();
-                }
-                if (packageInfo2 != null) {
-                    if (!this.silent_uninstall.contains(market_applist_local.get(i).packagename)) {
-                        this.silent_uninstall.add(market_applist_local.get(i).packagename);
-                    }
-                } else if (this.silent_uninstall.contains(market_applist_local.get(i).packagename)) {
-                    this.silent_uninstall.remove(market_applist_local.get(i).packagename);
-                }
-                arrayList.add(market_applist_local.get(i).packagename);
-            }
-        }
-        for (int i2 = 0; i2 < this.silent_uninstall.size(); i2++) {
-        }
-        for (int i3 = 0; i3 < arrayList.size(); i3++) {
-            int i4 = 0;
-            while (true) {
-                if (i4 < market_applist.size()) {
-                    if (((String) arrayList.get(i3)).equals(market_applist.get(i4).packagename)) {
-                        market_applist.remove(i4);
-                        break;
-                    }
-                    i4++;
-                }
-            }
-        }
-        if (HttpHelper.install_num.size() != 0) {
-            for (int i5 = 0; i5 < this.silent_uninstall.size(); i5++) {
-                for (int i6 = 0; i6 < HttpHelper.install_num.size(); i6++) {
-                    if (this.silent_uninstall.get(i5).equals((String) HttpHelper.install_num.get(i6).get("packagename"))) {
-                        downloadManager.remove(((Long) HttpHelper.install_num.get(i6).get("downid")).longValue());
-                        HttpHelper.install_num.remove(i6);
-                    }
-                }
-            }
-        }
-        for (int i7 = 0; i7 < market_applist.size(); i7++) {
-            try {
-                packageInfo = getPackageManager().getPackageInfo(market_applist.get(i7).packagename, 0);
-            } catch (PackageManager.NameNotFoundException e2) {
-                packageInfo = null;
-                e2.printStackTrace();
-            }
-            if (packageInfo != null) {
-                market_applist.get(i7).islocal = true;
-                if (packageInfo.versionCode != market_applist.get(i7).versionCode) {
-                    if (packageInfo.versionName.length() > 10) {
-                        market_applist.get(i7).local_versionName = String.valueOf(packageInfo.versionName.substring(0, 10)) + "...";
-                    } else {
-                        market_applist.get(i7).local_versionName = packageInfo.versionName;
-                    }
-                    market_applist.get(i7).update = true;
-                }
-            } else {
-                market_applist.get(i7).islocal = false;
-            }
-        }
-        Collections.sort(market_applist, new Comparator<AppInfo>() { // from class: com.edutech.appmanage.MainActivity.14
-            public int compare(AppInfo appInfo, AppInfo appInfo2) {
-                char c = 0;
-                char c2 = 0;
-                if (appInfo.islocal) {
-                    c = 1;
-                }
-                if (appInfo2.islocal) {
-                    c2 = 1;
-                }
-                return c > c2 ? -1 : c == c2 ? 0 : 1;
-            }
-        });
-        if (this.silent_uninstall.size() != 0) {
-            Intent intent = new Intent(this, SilentUninstall_Service.class);
-            intent.putStringArrayListExtra("uninstall_list", this.silent_uninstall);
-            startService(intent);
-        }
-        this.data_load = true;
-        new Thread() { // from class: com.edutech.appmanage.MainActivity.15
-            @Override // java.lang.Thread, java.lang.Runnable
-            public void run() {
-                super.run();
-                for (int i8 = 0; i8 < MainActivity.market_applist.size(); i8++) {
-                    int i9 = 0;
-                    while (true) {
-                        if (i9 < MainActivity.market_applist_local.size()) {
-                            if (MainActivity.market_applist.get(i8).packagename.equals(MainActivity.market_applist_local.get(i9).packagename)) {
-                                try {
-                                    MainActivity.market_applist.get(i8).appicon = MainActivity.this.getImageDrawable(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon" + File.separatorChar + MainActivity.market_applist.get(i8).packagename + ".png");
-                                    break;
-                                } catch (IOException e3) {
-                                    e3.printStackTrace();
-                                }
-                            } else {
-                                i9++;
-                            }
-                        }
-                    }
-                }
-                MainActivity.this.pic_load = true;
-            }
-        }.start();
-    }
-
-    /* JADX WARN: Type inference failed for: r0v0, types: [com.edutech.appmanage.MainActivity$18] */
-    public void complete() {
-        new Thread() { // from class: com.edutech.appmanage.MainActivity.18
-            @Override // java.lang.Thread, java.lang.Runnable
-            public void run() {
-                synchronized (this) {
-                    MainActivity.this.parse_json();
-                }
-            }
-        }.start();
-    }
-
-    @Override // android.content.ContextWrapper, android.content.Context
-    public boolean deleteFile(String str) {
-        File file = new File(str);
-        boolean z = false;
-        if (file.isFile()) {
-            z = false;
-            if (file.exists()) {
-                z = file.delete();
-            }
-        }
-        return z;
-    }
-
-    public BitmapDrawable getImageDrawable(String str) throws IOException {
-        BitmapDrawable bitmapDrawable;
-        File file = new File(str);
-        if (!file.exists()) {
-            bitmapDrawable = null;
-        } else {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] bArr = new byte[1024];
-            FileInputStream fileInputStream = new FileInputStream(file);
-            int read = fileInputStream.read(bArr);
-            while (true) {
-                int i = read;
-                if (i == -1) {
-                    break;
-                }
-                byteArrayOutputStream.write(bArr, 0, i);
-                read = fileInputStream.read(bArr);
-            }
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            bitmapDrawable = new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length));
-        }
-        return bitmapDrawable;
-    }
-
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_refresh /* 2131362262 */:
-                if (!this.data_load) {
-                    Toast.makeText(getApplication(), getResources().getString(R.string.appmanager_unloading), 0).show();
-                    return;
-                } else if (!this.pic_load) {
-                    Toast.makeText(getApplication(), getResources().getString(R.string.appmanager_iconunloading), 0).show();
-                    return;
-                } else {
-                    this.data_load = false;
-                    this.pic_load = false;
-                    this.toast_unlink = false;
-                    Toast.makeText(getApplication(), getResources().getString(R.string.action_refresh), 0).show();
-                    getMarketInfor();
-                    return;
-                }
-            default:
-                return;
+            MainActivity.this = r3;
         }
     }
 
     @Override // android.app.Activity
-    public void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         getWindow().setFlags(1024, 1024);
         setContentView(R.layout.pic_show);
         findview();
         this.wrong_net = (TextView) findViewById(R.id.tv_wrong_net);
         this.layout_appwarning = (RelativeLayout) findViewById(R.id.layout_appwarn);
         this.img_appwarning = (ImageView) findViewById(R.id.img_appwarn);
-        WindowManager windowManager = (WindowManager) getApplication().getSystemService("window");
+        WindowManager manager = (WindowManager) getApplication().getSystemService("window");
         downloadManager = (DownloadManager) getSystemService("download");
         downloadManagerPro = new DownloadManagerPro(downloadManager);
         SharedPreferencesHelper.preferences = getSharedPreferences("configure", 0);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        int i = displayMetrics.widthPixels;
-        this.height = ((i - 60) * displayMetrics.heightPixels) / (i * 4);
+        DisplayMetrics dm = new DisplayMetrics();
+        manager.getDefaultDisplay().getMetrics(dm);
+        int width2 = dm.widthPixels;
+        int height2 = dm.heightPixels;
+        this.height = ((width2 - 60) * height2) / (width2 * 4);
         this.pic_height = (this.height * 5) / 10;
         this.pic_width = this.pic_height;
         this.gv = (GridView) findViewById(R.id.GridView01);
@@ -1412,16 +284,566 @@ public class MainActivity extends Activity {
         }
         this.completeReceiver = new CompleteReceiver();
         this.getbroadcast = new GetBroadcast();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.intent.action.PACKAGE_ADDED");
-        intentFilter.addAction("android.intent.action.PACKAGE_REMOVED");
-        intentFilter.addAction("android.intent.action.PACKAGE_REPLACED");
-        intentFilter.addDataScheme("package");
-        registerReceiver(this.getbroadcast, intentFilter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.intent.action.PACKAGE_ADDED");
+        filter.addAction("android.intent.action.PACKAGE_REMOVED");
+        filter.addAction("android.intent.action.PACKAGE_REPLACED");
+        filter.addDataScheme("package");
+        registerReceiver(this.getbroadcast, filter);
         this.completereceiver = new CompleteReceiver();
-        IntentFilter intentFilter2 = new IntentFilter();
-        intentFilter2.addAction("android.intent.action.DOWNLOAD_COMPLETE");
-        registerReceiver(this.completereceiver, intentFilter2);
+        IntentFilter filters = new IntentFilter();
+        filters.addAction("android.intent.action.DOWNLOAD_COMPLETE");
+        registerReceiver(this.completereceiver, filters);
+    }
+
+    private void findview() {
+        findViewById(R.id.btn_refresh).setOnClickListener(new AnonymousClass10());
+        findViewById(R.id.tv_exit).setOnClickListener(new AnonymousClass11());
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$10 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass10 implements View.OnClickListener {
+        AnonymousClass10() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            if (!MainActivity.access$22(MainActivity.this)) {
+                Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_unloading), 0).show();
+            } else if (!MainActivity.access$23(MainActivity.this)) {
+                Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_iconunloading), 0).show();
+            } else {
+                MainActivity.access$8(MainActivity.this, false);
+                MainActivity.access$9(MainActivity.this, false);
+                MainActivity.access$24(MainActivity.this, false);
+                Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.action_refresh), 0).show();
+                MainActivity.access$25(MainActivity.this);
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$11 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass11 implements View.OnClickListener {
+        AnonymousClass11() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            MainActivity.this.finish();
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 implements Runnable {
+        AnonymousClass1() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Runnable
+        public synchronized void run() {
+            MainActivity.this.progress_handler.sendEmptyMessage(3);
+            MainActivity.this.progress_handler.sendEmptyMessage(1);
+            MainActivity.this.login_res = MainActivity.access$3(MainActivity.this, MainActivity.access$0(MainActivity.this), MainActivity.access$1(MainActivity.this), MainActivity.access$2(MainActivity.this));
+            Log.i(MainActivity.TAG, "LOGIN_RES   :" + MainActivity.this.login_res);
+            if (MainActivity.this.login_res != 0) {
+                if (-1 == MainActivity.this.login_res) {
+                    MainActivity.this.wrong_handler.sendEmptyMessage(2);
+                } else if (2 == MainActivity.this.login_res) {
+                    MainActivity.this.wrong_handler.sendEmptyMessage(2);
+                } else if (MainActivity.this.login_res != 0) {
+                    MainActivity.this.wrong_handler.sendEmptyMessage(2);
+                }
+                MainActivity.this.unlink_parse(SharedPreferencesHelper.load_info());
+            } else {
+                Log.i(MainActivity.TAG, "usercode==" + MainActivity.access$1(MainActivity.this));
+                String res_id = HttpHelper.getin("http://" + MainActivity.access$0(MainActivity.this) + "/api/pad-login/code/" + MainActivity.access$1(MainActivity.this) + "/pwd/" + MainActivity.access$2(MainActivity.this), MainActivity.access$1(MainActivity.this), MainActivity.access$4(MainActivity.this));
+                Log.i(MainActivity.TAG, "333---RES_ID  :" + res_id);
+                if (res_id != null) {
+                    String stu_id = MainActivity.this.parse_studentid(res_id);
+                    if (stu_id == null) {
+                        Log.i(MainActivity.TAG, "338");
+                        MainActivity.this.handler_toast.sendEmptyMessage(4);
+                    } else {
+                        String infor = HttpHelper.getin("http://" + MainActivity.access$0(MainActivity.this) + "/api/app/projectcode/myapp/os/android", MainActivity.access$1(MainActivity.this), MainActivity.access$4(MainActivity.this));
+                        Log.i(MainActivity.TAG, "346-infor--->" + infor);
+                        if (infor != null) {
+                            MainActivity.this.unlink_handler.sendEmptyMessage(3);
+                            SharedPreferencesHelper.save_info(infor);
+                            MainActivity.this.parse_json();
+                        } else {
+                            MainActivity.this.handler_toast.sendEmptyMessage(4);
+                        }
+                    }
+                } else {
+                    Log.i(MainActivity.TAG, "345");
+                    MainActivity.this.handler_toast.sendEmptyMessage(4);
+                }
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$2 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass2 extends Handler {
+        AnonymousClass2() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    if (MainActivity.market_applist.size() == 0) {
+                        MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_errornetwork));
+                        MainActivity.this.wrong_net.setVisibility(0);
+                        MainActivity.access$5(MainActivity.this).setBackgroundResource(R.drawable.nointernet);
+                        MainActivity.access$6(MainActivity.this).setVisibility(0);
+                        MainActivity.access$7(MainActivity.this).setVisibility(8);
+                        return;
+                    }
+                    MainActivity.this.wrong_net.setVisibility(8);
+                    MainActivity.access$6(MainActivity.this).setVisibility(8);
+                    MainActivity.access$7(MainActivity.this).setVisibility(0);
+                    return;
+                case 2:
+                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_errornetwork), 0).show();
+                    return;
+                case 3:
+                    MainActivity.this.wrong_net.setVisibility(8);
+                    MainActivity.access$6(MainActivity.this).setVisibility(8);
+                    MainActivity.access$7(MainActivity.this).setVisibility(0);
+                    return;
+                default:
+                    return;
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$3 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass3 extends Handler {
+        AnonymousClass3() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_nonefile), 0).show();
+                    return;
+                case 2:
+                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_installok), 0).show();
+                    return;
+                case 3:
+                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_nonememory), 0).show();
+                    return;
+                case 4:
+                    Toast.makeText(MainActivity.this.getApplication(), MainActivity.this.getResources().getString(R.string.appmanager_errornet), 0).show();
+                    MainActivity.this.progress_handler.sendEmptyMessage(2);
+                    return;
+                default:
+                    return;
+            }
+        }
+    }
+
+    public String parse_studentid(String res) {
+        JSONObject all_infor;
+        String err;
+        String type = null;
+        JSONTokener jsonparse = new JSONTokener(res);
+        try {
+            all_infor = (JSONObject) jsonparse.nextValue();
+            err = all_infor.getString("errorNum");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (!"0".equals(err)) {
+            return null;
+        }
+        JSONObject jo = all_infor.getJSONObject("data");
+        type = jo.getString("studentid");
+        return type;
+    }
+
+    public void shared_getinfo(String dir) {
+        StringBuffer sb = new StringBuffer();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(dir));
+            for (String data = br.readLine(); data != null; data = br.readLine()) {
+                sb.append(data);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        }
+        String res = sb.toString();
+        SharedPreferencesHelper.save_info(res);
+    }
+
+    public synchronized void parse_json() {
+        try {
+            ConnectivityManager manager = (ConnectivityManager) getSystemService("connectivity");
+            NetworkInfo.State wifi = manager.getNetworkInfo(1).getState();
+            if (wifi == NetworkInfo.State.CONNECTED) {
+                if (this.login_res != 0) {
+                    if (-1 == this.login_res) {
+                        this.wrong_handler.sendEmptyMessage(2);
+                    } else if (2 == this.login_res) {
+                        this.wrong_handler.sendEmptyMessage(2);
+                    } else if (this.login_res != 0) {
+                        this.wrong_handler.sendEmptyMessage(2);
+                    }
+                    unlink_parse(SharedPreferencesHelper.load_info());
+                } else {
+                    parse(SharedPreferencesHelper.load_info());
+                }
+            } else {
+                unlink_parse(SharedPreferencesHelper.load_info());
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    public void unlink_parse(String string) {
+        PackageInfo packageInfo;
+        JSONTokener jsonparse = new JSONTokener(string);
+        try {
+            JSONObject all_infor = (JSONObject) jsonparse.nextValue();
+            JSONObject jo = all_infor.getJSONObject("data");
+            JSONArray data = jo.getJSONArray("app");
+            market_applist = new LinkedList<>();
+            market_applist_local = new LinkedList<>();
+            for (int i = 0; i < data.length(); i++) {
+                AppInfo tmpInfo = new AppInfo();
+                JSONObject tmp = (JSONObject) data.get(i);
+                String type = tmp.getString("apptype");
+                tmpInfo.apptype = Integer.parseInt(type);
+                tmpInfo.apkname = tmp.getString("apkname");
+                tmpInfo.appname = tmp.getString("appname");
+                tmpInfo.packagename = tmp.getString("packagename");
+                if (!"".equals(tmpInfo.packagename)) {
+                    try {
+                        packageInfo = getPackageManager().getPackageInfo(tmpInfo.packagename, 0);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        packageInfo = null;
+                        e.printStackTrace();
+                    }
+                    if (packageInfo != null) {
+                        tmpInfo.islocal = true;
+                        tmpInfo.appsize = tmp.getString("appsize");
+                        String code = tmp.getString("versioncode");
+                        tmpInfo.versionCode = Integer.parseInt(code);
+                        if (tmp.getString("versionname").length() > 10) {
+                            tmpInfo.versionName = String.valueOf(tmp.getString("versionname").substring(0, 10)) + "...";
+                        } else {
+                            tmpInfo.versionName = tmp.getString("versionname");
+                        }
+                        tmpInfo.webpath = tmp.getString(KeyEnvironment.KEYWEBPATH);
+                        tmpInfo.iconurl = tmp.getString("iconurl");
+                        market_applist.add(tmpInfo);
+                        market_applist_local.add(tmpInfo);
+                    }
+                }
+            }
+        } catch (JSONException e2) {
+            e2.printStackTrace();
+        }
+        Collections.sort(market_applist, new AnonymousClass12());
+        this.data_load = true;
+        this.pic_load = true;
+        if (!this.toast_unlink) {
+            if (market_applist.size() != 0) {
+                this.unlink_handler.sendEmptyMessage(2);
+            }
+            this.toast_unlink = true;
+        }
+        this.unlink_handler.sendEmptyMessage(1);
+        this.progress_handler.sendEmptyMessage(2);
+        this.handler.post(this.runnableUi);
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$12 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass12 implements Comparator<AppInfo> {
+        AnonymousClass12() {
+            MainActivity.this = r1;
+        }
+
+        public int compare(AppInfo lhs, AppInfo rhs) {
+            int a = 0;
+            int b = 0;
+            if (lhs.islocal) {
+                a = 1;
+            }
+            if (rhs.islocal) {
+                b = 1;
+            }
+            if (a > b) {
+                return -1;
+            }
+            if (a == b) {
+                return 0;
+            }
+            return 1;
+        }
+    }
+
+    public void parse(String string) {
+        JSONTokener jsonparse = new JSONTokener(string);
+        try {
+            JSONObject all_infor = (JSONObject) jsonparse.nextValue();
+            JSONObject jo = all_infor.getJSONObject("data");
+            JSONArray data = jo.getJSONArray("app");
+            market_applist = new LinkedList<>();
+            market_applist_local = new LinkedList<>();
+            for (int i = 0; i < data.length(); i++) {
+                AppInfo tmpInfo = new AppInfo();
+                JSONObject tmp = (JSONObject) data.get(i);
+                String type = tmp.getString("apptype");
+                tmpInfo.apptype = Integer.parseInt(type);
+                tmpInfo.apkname = tmp.getString("apkname");
+                tmpInfo.appname = tmp.getString("appname");
+                tmpInfo.packagename = tmp.getString("packagename");
+                if (!"".equals(tmpInfo.packagename)) {
+                    tmpInfo.appsize = tmp.getString("appsize");
+                    String code = tmp.getString("versioncode");
+                    tmpInfo.versionCode = Integer.parseInt(code);
+                    if (tmp.getString("versionname").length() > 10) {
+                        tmpInfo.versionName = String.valueOf(tmp.getString("versionname").substring(0, 10)) + "...";
+                    } else {
+                        tmpInfo.versionName = tmp.getString("versionname");
+                    }
+                    tmpInfo.webpath = tmp.getString(KeyEnvironment.KEYWEBPATH);
+                    tmpInfo.iconurl = tmp.getString("iconurl");
+                    market_applist.add(tmpInfo);
+                    market_applist_local.add(tmpInfo);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (market_applist.size() == 0) {
+            this.wrong_handler.sendEmptyMessage(3);
+            this.progress_handler.sendEmptyMessage(2);
+            this.handler.post(this.runnableUi);
+            return;
+        }
+        this.wrong_net.setVisibility(8);
+        this.layout_appwarning.setVisibility(8);
+        this.gv.setVisibility(0);
+        new AnonymousClass13().start();
+        compare();
+        this.progress_handler.sendEmptyMessage(2);
+        this.handler.post(this.runnableUi);
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$13 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass13 extends Thread {
+        AnonymousClass13() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public void run() {
+            super.run();
+            File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon");
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            for (int k = 0; k < MainActivity.market_applist_local.size(); k++) {
+                HttpHelper.httpDownload(MainActivity.market_applist_local.get(k).iconurl, String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon" + File.separatorChar + MainActivity.market_applist_local.get(k).packagename + ".png", MainActivity.this);
+            }
+            while (!MainActivity.access$22(MainActivity.this)) {
+                try {
+                    sleep(500L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            for (int i = 0; i < MainActivity.market_applist.size(); i++) {
+                int j = 0;
+                while (true) {
+                    if (j < MainActivity.market_applist_local.size()) {
+                        if (!MainActivity.market_applist.get(i).packagename.equals(MainActivity.market_applist_local.get(j).packagename)) {
+                            j++;
+                        } else {
+                            try {
+                                MainActivity.market_applist.get(i).appicon = MainActivity.this.getImageDrawable(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon" + File.separatorChar + MainActivity.market_applist.get(i).packagename + ".png");
+                                break;
+                            } catch (IOException e2) {
+                                e2.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+            MainActivity.this.handler.post(MainActivity.this.runnableUi);
+        }
+    }
+
+    public void compare() {
+        PackageInfo packageInfo;
+        PackageInfo packageInfo2;
+        ArrayList<String> uninstall_list = new ArrayList<>();
+        if (this.silent_uninstall == null) {
+            this.silent_uninstall = new ArrayList<>();
+        }
+        for (int j = 0; j < market_applist.size(); j++) {
+            if (2 == market_applist_local.get(j).apptype) {
+                try {
+                    packageInfo2 = getPackageManager().getPackageInfo(market_applist_local.get(j).packagename, 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    packageInfo2 = null;
+                    e.printStackTrace();
+                }
+                if (packageInfo2 != null) {
+                    if (!this.silent_uninstall.contains(market_applist_local.get(j).packagename)) {
+                        this.silent_uninstall.add(market_applist_local.get(j).packagename);
+                    }
+                } else if (this.silent_uninstall.contains(market_applist_local.get(j).packagename)) {
+                    this.silent_uninstall.remove(market_applist_local.get(j).packagename);
+                }
+                uninstall_list.add(market_applist_local.get(j).packagename);
+            }
+        }
+        for (int i = 0; i < this.silent_uninstall.size(); i++) {
+        }
+        for (int i2 = 0; i2 < uninstall_list.size(); i2++) {
+            int j2 = 0;
+            while (true) {
+                if (j2 < market_applist.size()) {
+                    if (!uninstall_list.get(i2).equals(market_applist.get(j2).packagename)) {
+                        j2++;
+                    } else {
+                        market_applist.remove(j2);
+                        break;
+                    }
+                }
+            }
+        }
+        if (HttpHelper.install_num.size() != 0) {
+            for (int i3 = 0; i3 < this.silent_uninstall.size(); i3++) {
+                for (int j3 = 0; j3 < HttpHelper.install_num.size(); j3++) {
+                    if (this.silent_uninstall.get(i3).equals((String) HttpHelper.install_num.get(j3).get("packagename"))) {
+                        downloadManager.remove(((Long) HttpHelper.install_num.get(j3).get("downid")).longValue());
+                        HttpHelper.install_num.remove(j3);
+                    }
+                }
+            }
+        }
+        for (int i4 = 0; i4 < market_applist.size(); i4++) {
+            try {
+                packageInfo = getPackageManager().getPackageInfo(market_applist.get(i4).packagename, 0);
+            } catch (PackageManager.NameNotFoundException e2) {
+                packageInfo = null;
+                e2.printStackTrace();
+            }
+            if (packageInfo != null) {
+                market_applist.get(i4).islocal = true;
+                if (packageInfo.versionCode != market_applist.get(i4).versionCode) {
+                    if (packageInfo.versionName.length() > 10) {
+                        market_applist.get(i4).local_versionName = String.valueOf(packageInfo.versionName.substring(0, 10)) + "...";
+                    } else {
+                        market_applist.get(i4).local_versionName = packageInfo.versionName;
+                    }
+                    market_applist.get(i4).update = true;
+                }
+            } else {
+                market_applist.get(i4).islocal = false;
+            }
+        }
+        Collections.sort(market_applist, new AnonymousClass14());
+        if (this.silent_uninstall.size() != 0) {
+            Intent uninstall_intent = new Intent(this, SilentUninstall_Service.class);
+            uninstall_intent.putStringArrayListExtra("uninstall_list", this.silent_uninstall);
+            startService(uninstall_intent);
+        }
+        this.data_load = true;
+        new AnonymousClass15().start();
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$14 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass14 implements Comparator<AppInfo> {
+        AnonymousClass14() {
+            MainActivity.this = r1;
+        }
+
+        public int compare(AppInfo lhs, AppInfo rhs) {
+            int a = 0;
+            int b = 0;
+            if (lhs.islocal) {
+                a = 1;
+            }
+            if (rhs.islocal) {
+                b = 1;
+            }
+            if (a > b) {
+                return -1;
+            }
+            if (a == b) {
+                return 0;
+            }
+            return 1;
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$15 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass15 extends Thread {
+        AnonymousClass15() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public void run() {
+            super.run();
+            for (int i = 0; i < MainActivity.market_applist.size(); i++) {
+                int j = 0;
+                while (true) {
+                    if (j < MainActivity.market_applist_local.size()) {
+                        if (!MainActivity.market_applist.get(i).packagename.equals(MainActivity.market_applist_local.get(j).packagename)) {
+                            j++;
+                        } else {
+                            try {
+                                MainActivity.market_applist.get(i).appicon = MainActivity.this.getImageDrawable(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon" + File.separatorChar + MainActivity.market_applist.get(i).packagename + ".png");
+                                break;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+            MainActivity.access$9(MainActivity.this, true);
+        }
+    }
+
+    public BitmapDrawable getImageDrawable(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            return null;
+        }
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] bt = new byte[1024];
+        InputStream in = new FileInputStream(file);
+        for (int readLength = in.read(bt); readLength != -1; readLength = in.read(bt)) {
+            outStream.write(bt, 0, readLength);
+        }
+        byte[] data = outStream.toByteArray();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        return new BitmapDrawable(bitmap);
     }
 
     @Override // android.app.Activity
@@ -1437,22 +859,16 @@ public class MainActivity extends Activity {
         }
         intent.putExtra("deleteicon", String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + FOLDER_MAIN + File.separatorChar + "icon");
         if (HttpHelper.install_num != null) {
-            ArrayList arrayList = new ArrayList();
+            ArrayList<String> apk_list = new ArrayList<>();
             for (int i = 0; i < HttpHelper.install_num.size(); i++) {
-                arrayList.add((String) HttpHelper.install_num.get(i).get("apkname"));
+                apk_list.add((String) HttpHelper.install_num.get(i).get("apkname"));
             }
-            intent.putExtra("install", arrayList);
+            intent.putExtra("install", apk_list);
         }
         intent.putExtra("deleteapks", String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + FOLDER_MAIN);
         startService(intent);
     }
 
-    @Override // android.app.Activity
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        return true;
-    }
-
-    /* JADX WARN: Type inference failed for: r0v21, types: [com.edutech.appmanage.MainActivity$16] */
     @Override // android.app.Activity
     protected void onResume() {
         super.onResume();
@@ -1471,253 +887,1261 @@ public class MainActivity extends Activity {
             this.password = this.hashmap.get(AppEnvironment.PASSWORD);
             this.pwd = this.hashmap.get("pwd");
             this.privatekey = this.hashmap.get("privatekey");
-            if (this.ip == null || this.ip.equals("") || this.username == null || this.username.equals("")) {
+            if (this.ip != null && !this.ip.equals("") && this.username != null && !this.username.equals("")) {
+                new Thread(this.runnable_GetConfig_Infor).start();
                 return;
             }
-            new Thread(this.runnable_GetConfig_Infor).start();
-        } else if (((ConnectivityManager) getSystemService("connectivity")).getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED) {
-            parse_json();
-        } else if (this.login_res == 0) {
+            return;
+        }
+        ConnectivityManager manager = (ConnectivityManager) getSystemService("connectivity");
+        NetworkInfo.State wifi = manager.getNetworkInfo(1).getState();
+        if (wifi == NetworkInfo.State.CONNECTED) {
+            if (this.login_res != 0) {
+                if (-1 == this.login_res) {
+                    this.wrong_handler.sendEmptyMessage(2);
+                } else if (2 == this.login_res) {
+                    this.wrong_handler.sendEmptyMessage(2);
+                } else if (this.login_res != 0) {
+                    this.wrong_handler.sendEmptyMessage(2);
+                }
+                unlink_parse(SharedPreferencesHelper.load_info());
+                return;
+            }
             this.gv.setVisibility(0);
             this.wrong_net.setVisibility(8);
             this.layout_appwarning.setVisibility(8);
-            new Thread() { // from class: com.edutech.appmanage.MainActivity.16
-                @Override // java.lang.Thread, java.lang.Runnable
-                public void run() {
-                    synchronized (this) {
-                        MainActivity.this.parse_json();
-                    }
-                }
-            }.start();
+            new AnonymousClass16().start();
+            return;
+        }
+        parse_json();
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$16 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass16 extends Thread {
+        AnonymousClass16() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public synchronized void run() {
+            MainActivity.this.parse_json();
+        }
+    }
+
+    static /* synthetic */ void access$25(MainActivity mainActivity) {
+        mainActivity.getMarketInfor();
+    }
+
+    private void getMarketInfor() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService("connectivity");
+        NetworkInfo.State wifi = manager.getNetworkInfo(1).getState();
+        if (wifi == NetworkInfo.State.CONNECTED) {
+            new Thread(this.net_thread).start();
         } else {
-            if (-1 == this.login_res) {
-                this.wrong_handler.sendEmptyMessage(2);
-            } else if (2 == this.login_res) {
-                this.wrong_handler.sendEmptyMessage(2);
-            } else if (this.login_res != 0) {
-                this.wrong_handler.sendEmptyMessage(2);
-            }
             unlink_parse(SharedPreferencesHelper.load_info());
         }
     }
 
-    /* JADX WARN: Type inference failed for: r0v10, types: [com.edutech.appmanage.MainActivity$13] */
-    public void parse(String str) {
-        try {
-            JSONArray jSONArray = ((JSONObject) new JSONTokener(str).nextValue()).getJSONObject("data").getJSONArray("app");
-            market_applist = new LinkedList<>();
-            market_applist_local = new LinkedList<>();
-            int i = 0;
-            while (true) {
-                if (i >= jSONArray.length()) {
+    /* renamed from: com.edutech.appmanage.MainActivity$4 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass4 extends Handler {
+        AnonymousClass4() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_errorsetting));
+                    MainActivity.access$5(MainActivity.this).setBackgroundResource(R.drawable.errorsetting);
+                    MainActivity.access$8(MainActivity.this, true);
+                    MainActivity.access$9(MainActivity.this, true);
                     break;
-                }
-                AppInfo appInfo = new AppInfo();
-                JSONObject jSONObject = (JSONObject) jSONArray.get(i);
-                appInfo.apptype = Integer.parseInt(jSONObject.getString("apptype"));
-                appInfo.apkname = jSONObject.getString("apkname");
-                appInfo.appname = jSONObject.getString("appname");
-                appInfo.packagename = jSONObject.getString("packagename");
-                if (!"".equals(appInfo.packagename)) {
-                    appInfo.appsize = jSONObject.getString("appsize");
-                    appInfo.versionCode = Integer.parseInt(jSONObject.getString("versioncode"));
-                    if (jSONObject.getString("versionname").length() > 10) {
-                        appInfo.versionName = String.valueOf(jSONObject.getString("versionname").substring(0, 10)) + "...";
-                    } else {
-                        appInfo.versionName = jSONObject.getString("versionname");
-                    }
-                    appInfo.webpath = jSONObject.getString(KeyEnvironment.KEYWEBPATH);
-                    appInfo.iconurl = jSONObject.getString("iconurl");
-                    market_applist.add(appInfo);
-                    market_applist_local.add(appInfo);
-                }
-                i++;
+                case 2:
+                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_errornetwork));
+                    MainActivity.access$5(MainActivity.this).setBackgroundResource(R.drawable.nointernet);
+                    MainActivity.access$8(MainActivity.this, true);
+                    MainActivity.access$9(MainActivity.this, true);
+                    break;
+                case 3:
+                    MainActivity.this.wrong_net.setText(MainActivity.this.getResources().getString(R.string.appmanager_noneapp));
+                    MainActivity.access$5(MainActivity.this).setBackgroundResource(R.drawable.nodetails);
+                    MainActivity.access$8(MainActivity.this, true);
+                    MainActivity.access$9(MainActivity.this, true);
+                    MainActivity.this.wrong_net.setVisibility(0);
+                    MainActivity.access$6(MainActivity.this).setVisibility(0);
+                    MainActivity.access$7(MainActivity.this).setVisibility(8);
+                    break;
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            MainActivity.this.progress_handler.sendEmptyMessage(2);
         }
-        if (market_applist.size() == 0) {
-            this.wrong_handler.sendEmptyMessage(3);
-            this.progress_handler.sendEmptyMessage(2);
-            this.handler.post(this.runnableUi);
-            return;
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class MyAdapter extends BaseAdapter {
+        AppInfo appinfo;
+        Context context;
+        private LayoutInflater mInflater;
+
+        static /* synthetic */ MainActivity access$0(MyAdapter myAdapter) {
+            return MainActivity.this;
         }
-        this.wrong_net.setVisibility(8);
-        this.layout_appwarning.setVisibility(8);
-        this.gv.setVisibility(0);
-        new Thread() { // from class: com.edutech.appmanage.MainActivity.13
-            @Override // java.lang.Thread, java.lang.Runnable
-            public void run() {
-                super.run();
-                File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon");
-                if (!file.exists()) {
-                    file.mkdirs();
-                }
-                for (int i2 = 0; i2 < MainActivity.market_applist_local.size(); i2++) {
-                    HttpHelper.httpDownload(MainActivity.market_applist_local.get(i2).iconurl, String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon" + File.separatorChar + MainActivity.market_applist_local.get(i2).packagename + ".png", MainActivity.this);
-                }
-                while (!MainActivity.this.data_load) {
-                    try {
-                        sleep(500L);
-                    } catch (InterruptedException e2) {
-                        e2.printStackTrace();
+
+        MyAdapter(Context context) {
+            MainActivity.this = r2;
+            this.context = context;
+            this.mInflater = LayoutInflater.from(context);
+        }
+
+        @Override // android.widget.Adapter
+        public int getCount() {
+            return MainActivity.market_applist.size();
+        }
+
+        @Override // android.widget.Adapter
+        public Object getItem(int item) {
+            return Integer.valueOf(item);
+        }
+
+        @Override // android.widget.Adapter
+        public long getItemId(int id) {
+            return id;
+        }
+
+        @Override // android.widget.Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+            if (convertView == null) {
+                convertView = this.mInflater.inflate(R.layout.pic_item, (ViewGroup) null);
+                AbsListView.LayoutParams params = new AbsListView.LayoutParams(-1, MainActivity.access$18(MainActivity.this));
+                convertView.setLayoutParams(params);
+                holder = new ViewHolder();
+                holder.layout = (LinearLayout) convertView.findViewById(R.id.linearlayout_pre);
+                holder.name = (TextView) convertView.findViewById(R.id.textView_pre);
+                holder.code = (TextView) convertView.findViewById(R.id.textView_versioncode);
+                holder.image = (ImageView) convertView.findViewById(R.id.imageView_pre);
+                holder.btn_start = (Button) convertView.findViewById(R.id.btn_start);
+                holder.btn_uninstall = (Button) convertView.findViewById(R.id.btn_uninstall);
+                ViewGroup.LayoutParams para = holder.image.getLayoutParams();
+                para.height = MainActivity.access$19(MainActivity.this);
+                para.width = MainActivity.access$20(MainActivity.this);
+                holder.image.setLayoutParams(para);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            if (MainActivity.market_applist != null && position < MainActivity.market_applist.size()) {
+                this.appinfo = new AppInfo();
+                this.appinfo = MainActivity.market_applist.get(position);
+                Log.i(MainActivity.TAG, this.appinfo.appname);
+                if (this.appinfo.islocal) {
+                    holder.btn_start.setFocusable(false);
+                    holder.btn_uninstall.setFocusable(false);
+                    holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.open_app));
+                    holder.btn_start.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_open));
+                    holder.btn_uninstall.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_open));
+                    holder.btn_uninstall.setTextColor(MainActivity.this.getResources().getColor(R.color.whilte));
+                    if (position < MainActivity.market_applist.size() && this.appinfo.doing) {
+                        holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updatingapp));
+                    }
+                    if (position < MainActivity.market_applist.size()) {
+                        String apkname = this.appinfo.apkname;
+                        int i = 0;
+                        while (true) {
+                            if (i >= HttpHelper.install_num.size()) {
+                                break;
+                            } else if (!HttpHelper.install_num.get(i).get("apkname").equals(apkname)) {
+                                i++;
+                            } else {
+                                holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updatingapp));
+                                break;
+                            }
+                        }
+                    }
+                    holder.btn_uninstall.setVisibility(0);
+                    if (position < MainActivity.market_applist.size()) {
+                        holder.name.setText(this.appinfo.appname);
+                        if (this.appinfo.update) {
+                            holder.code.setText(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_version)) + this.appinfo.local_versionName + "\r\n" + MainActivity.this.getResources().getString(R.string.appmanager_newversion) + this.appinfo.versionName);
+                            holder.btn_start.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_update));
+                            holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_updateapp));
+                            holder.btn_start.setOnClickListener(new AnonymousClass1(position, holder));
+                            convertView.setOnClickListener(new AnonymousClass2(holder, position));
+                        } else {
+                            holder.code.setText(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_version)) + this.appinfo.versionName);
+                            convertView.setOnClickListener(new AnonymousClass3(holder, position));
+                        }
+                    }
+                    if (MainActivity.market_applist != null && position < MainActivity.market_applist.size()) {
+                        if (this.appinfo.appicon != null) {
+                            holder.image.setImageDrawable(this.appinfo.appicon);
+                        } else {
+                            holder.image.setImageResource(R.drawable.default_icon);
+                        }
+                    }
+                    convertView.findViewById(R.id.btn_start).setOnClickListener(new AnonymousClass4(holder, position));
+                    convertView.findViewById(R.id.btn_uninstall).setOnClickListener(new AnonymousClass5(position));
+                } else if (MainActivity.market_applist.size() != 0) {
+                    synchronized (MainActivity.market_applist) {
+                        holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_install));
+                        if (position < MainActivity.market_applist.size() && this.appinfo.doing) {
+                            holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_installing));
+                        }
+                        holder.btn_start.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_open));
+                        holder.btn_uninstall.setBackgroundDrawable(MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.btn_uninstall));
+                        holder.btn_uninstall.setTextColor(MainActivity.this.getResources().getColor(R.color.btn_uninstall));
+                        if (position < MainActivity.market_applist.size()) {
+                            String apkname2 = this.appinfo.apkname;
+                            int i2 = 0;
+                            while (true) {
+                                if (i2 < HttpHelper.install_num.size()) {
+                                    boolean islocal = this.appinfo.islocal;
+                                    if (!HttpHelper.install_num.get(i2).get("apkname").equals(apkname2) || islocal) {
+                                        i2++;
+                                    } else {
+                                        holder.btn_start.setText(MainActivity.this.getResources().getString(R.string.appmanager_installing));
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                        holder.name.setText(this.appinfo.appname);
+                        holder.code.setText(String.valueOf(MainActivity.this.getResources().getString(R.string.appmanager_version)) + this.appinfo.versionName);
+                        if (position < MainActivity.market_applist.size()) {
+                            if (this.appinfo.appicon != null) {
+                                holder.image.setImageDrawable(this.appinfo.appicon);
+                            } else {
+                                holder.image.setImageResource(R.drawable.default_icon);
+                            }
+                        }
+                        convertView.setOnClickListener(new AnonymousClass6());
+                        convertView.findViewById(R.id.btn_start).setOnClickListener(new AnonymousClass7(holder, position));
                     }
                 }
-                for (int i3 = 0; i3 < MainActivity.market_applist.size(); i3++) {
-                    int i4 = 0;
+            }
+            return convertView;
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$1 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass1 implements View.OnClickListener {
+            private final /* synthetic */ ViewHolder val$holder;
+            private final /* synthetic */ int val$position;
+
+            AnonymousClass1(int i, ViewHolder viewHolder) {
+                MyAdapter.this = r1;
+                this.val$position = i;
+                this.val$holder = viewHolder;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+                Log.i("TAGS", String.valueOf(this.val$position) + "====" + this.val$position + "更新");
+                if (MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updatingapp).equals(this.val$holder.btn_start.getText())) {
+                    Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updating), 0).show();
+                    return;
+                }
+                Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_startupdate), 0).show();
+                this.val$holder.btn_start.setText(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updatingapp));
+                File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + MyAdapter.this.appinfo.apkname);
+                if (file.exists()) {
+                    file.delete();
+                }
+                HttpHelper.download(this.val$position, 0);
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$2 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass2 implements View.OnClickListener {
+            private final /* synthetic */ ViewHolder val$holder;
+            private final /* synthetic */ int val$position;
+
+            AnonymousClass2(ViewHolder viewHolder, int i) {
+                MyAdapter.this = r1;
+                this.val$holder = viewHolder;
+                this.val$position = i;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+                Log.i(MainActivity.TAG, "准备打开。。。");
+                if (MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updatingapp).equals(this.val$holder.btn_start.getText())) {
+                    Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updating), 0).show();
+                    return;
+                }
+                new Intent();
+                Intent intent = MyAdapter.access$0(MyAdapter.this).getPackageManager().getLaunchIntentForPackage(MainActivity.market_applist.get(this.val$position).packagename);
+                MyAdapter.access$0(MyAdapter.this).startActivity(intent);
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$3 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass3 implements View.OnClickListener {
+            private final /* synthetic */ ViewHolder val$holder;
+            private final /* synthetic */ int val$position;
+
+            AnonymousClass3(ViewHolder viewHolder, int i) {
+                MyAdapter.this = r1;
+                this.val$holder = viewHolder;
+                this.val$position = i;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+                Log.i(MainActivity.TAG, "准备打开。。。");
+                if (MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updatingapp).equals(this.val$holder.btn_start.getText())) {
+                    Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updating), 0).show();
+                    return;
+                }
+                new Intent();
+                Intent intent = MyAdapter.access$0(MyAdapter.this).getPackageManager().getLaunchIntentForPackage(MainActivity.market_applist.get(this.val$position).packagename);
+                MyAdapter.access$0(MyAdapter.this).startActivity(intent);
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$4 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass4 implements View.OnClickListener {
+            private final /* synthetic */ ViewHolder val$holder;
+            private final /* synthetic */ int val$position;
+
+            AnonymousClass4(ViewHolder viewHolder, int i) {
+                MyAdapter.this = r1;
+                this.val$holder = viewHolder;
+                this.val$position = i;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+                if (MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updatingapp).equals(this.val$holder.btn_start.getText())) {
+                    Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updating), 0).show();
+                } else if (MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updateapp).equals(this.val$holder.btn_start.getText())) {
+                    Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_startupdate), 0).show();
+                    this.val$holder.btn_start.setText(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_updatingapp));
+                    File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + MyAdapter.this.appinfo.apkname);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    HttpHelper.download(this.val$position, 0);
+                } else {
+                    new Intent();
+                    Intent intent = MyAdapter.access$0(MyAdapter.this).getPackageManager().getLaunchIntentForPackage(MainActivity.market_applist.get(this.val$position).packagename);
+                    MyAdapter.access$0(MyAdapter.this).startActivity(intent);
+                }
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$5 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass5 implements View.OnClickListener {
+            private final /* synthetic */ int val$position;
+
+            AnonymousClass5(int i) {
+                MyAdapter.this = r1;
+                this.val$position = i;
+            }
+
+            static /* synthetic */ MyAdapter access$0(AnonymousClass5 anonymousClass5) {
+                return MyAdapter.this;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+                String packagename = MainActivity.market_applist.get(this.val$position).packagename;
+                AlertDialog.Builder builder = new AlertDialog.Builder(MyAdapter.access$0(MyAdapter.this));
+                builder.setTitle(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.uninstall)).setMessage(String.valueOf(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_quituninstall)) + MainActivity.market_applist.get(this.val$position).appname + MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_ma));
+                builder.setNegativeButton(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_ok), new AnonymousClass1(packagename));
+                builder.setPositiveButton(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_cancel), new AnonymousClass2());
+                builder.create().show();
+            }
+
+            /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$5$1 */
+            /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+            class AnonymousClass1 implements DialogInterface.OnClickListener {
+                private final /* synthetic */ String val$packagename;
+
+                AnonymousClass1(String str) {
+                    AnonymousClass5.this = r1;
+                    this.val$packagename = str;
+                }
+
+                static /* synthetic */ AnonymousClass5 access$0(AnonymousClass1 anonymousClass1) {
+                    return AnonymousClass5.this;
+                }
+
+                @Override // android.content.DialogInterface.OnClickListener
+                public void onClick(DialogInterface dialog, int which) {
+                    new C00011(this.val$packagename).start();
+                }
+
+                /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$5$1$1 */
+                /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+                class C00011 extends Thread {
+                    private final /* synthetic */ String val$packagename;
+
+                    C00011(String str) {
+                        AnonymousClass1.this = r1;
+                        this.val$packagename = str;
+                    }
+
+                    @Override // java.lang.Thread, java.lang.Runnable
+                    public void run() {
+                        super.run();
+                        Message message = MainActivity.access$21(MyAdapter.access$0(AnonymousClass5.access$0(AnonymousClass1.access$0(AnonymousClass1.this)))).obtainMessage();
+                        message.what = MainActivity.access$14();
+                        message.obj = this.val$packagename;
+                        MainActivity.access$21(MyAdapter.access$0(AnonymousClass5.access$0(AnonymousClass1.access$0(AnonymousClass1.this)))).sendMessage(message);
+                    }
+                }
+            }
+
+            /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$5$2 */
+            /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+            class AnonymousClass2 implements DialogInterface.OnClickListener {
+                AnonymousClass2() {
+                    AnonymousClass5.this = r1;
+                }
+
+                @Override // android.content.DialogInterface.OnClickListener
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$6 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass6 implements View.OnClickListener {
+            AnonymousClass6() {
+                MyAdapter.this = r1;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$MyAdapter$7 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass7 implements View.OnClickListener {
+            private final /* synthetic */ ViewHolder val$holder;
+            private final /* synthetic */ int val$position;
+
+            AnonymousClass7(ViewHolder viewHolder, int i) {
+                MyAdapter.this = r1;
+                this.val$holder = viewHolder;
+                this.val$position = i;
+            }
+
+            @Override // android.view.View.OnClickListener
+            public void onClick(View v) {
+                if (!MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_installing).equals(this.val$holder.btn_start.getText())) {
+                    Toast.makeText(MyAdapter.access$0(MyAdapter.this).getApplication(), MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_startdown), 0).show();
+                    if (MainActivity.market_applist.size() > this.val$position) {
+                        String apkname = MainActivity.market_applist.get(this.val$position).apkname;
+                        this.val$holder.btn_start.setText(MyAdapter.access$0(MyAdapter.this).getResources().getString(R.string.appmanager_installing));
+                        File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + apkname);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        HttpHelper.download(this.val$position, 1);
+                    }
+                }
+            }
+        }
+
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        public final class ViewHolder {
+            public Button btn_start;
+            public Button btn_uninstall;
+            public TextView code;
+            public ImageView image;
+            public LinearLayout layout;
+            public TextView name;
+
+            public ViewHolder() {
+                MyAdapter.this = r1;
+            }
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$5 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass5 extends Handler {
+        AnonymousClass5() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    if (!MainActivity.this.isFinishing()) {
+                        try {
+                            MainActivity.this.changed_progress.show();
+                        } catch (Exception e) {
+                        }
+                    }
+                    MainActivity.access$10(MainActivity.this);
+                    return;
+                case 2:
+                    MainActivity.access$11(MainActivity.this);
+                    if (!MainActivity.this.isFinishing()) {
+                        try {
+                            MainActivity.this.changed_progress.dismiss();
+                            return;
+                        } catch (Exception e2) {
+                            return;
+                        }
+                    }
+                    return;
+                case 3:
+                    if (!MainActivity.this.isFinishing()) {
+                        try {
+                            MainActivity.this.changed_progress.setTitle(MainActivity.this.getResources().getString(R.string.appmanager_jiazaiing));
+                            return;
+                        } catch (Exception e3) {
+                            return;
+                        }
+                    }
+                    return;
+                case 4:
+                    if (!MainActivity.this.isFinishing()) {
+                        try {
+                            MainActivity.this.changed_progress.setTitle(MainActivity.this.getResources().getString(R.string.appmanager_uninstalling));
+                            return;
+                        } catch (Exception e4) {
+                            return;
+                        }
+                    }
+                    return;
+                default:
+                    return;
+            }
+        }
+    }
+
+    static /* synthetic */ void access$10(MainActivity mainActivity) {
+        mainActivity.startTimer();
+    }
+
+    private void startTimer() {
+        if (this.mTimer == null) {
+            this.mTimer = new Timer();
+        }
+        if (this.mTimerTask == null) {
+            this.mTimerTask = new AnonymousClass17();
+        }
+        if (this.mTimer != null && this.mTimerTask != null) {
+            this.mTimer.schedule(this.mTimerTask, 0L, 1000L);
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$17 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass17 extends TimerTask {
+        AnonymousClass17() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.util.TimerTask, java.lang.Runnable
+        public void run() {
+            MainActivity.access$27(MainActivity.access$26() + 1);
+            Log.e(MainActivity.TAG, new StringBuilder(String.valueOf(MainActivity.access$26())).toString());
+            if (30 == MainActivity.access$26()) {
+                MainActivity.this.progress_handler.sendEmptyMessage(2);
+                MainActivity.this.wrong_handler.sendEmptyMessage(2);
+            }
+        }
+    }
+
+    static /* synthetic */ void access$11(MainActivity mainActivity) {
+        mainActivity.stopTimer();
+    }
+
+    private void stopTimer() {
+        if (this.mTimer != null) {
+            this.mTimer.cancel();
+            this.mTimer = null;
+        }
+        if (this.mTimerTask != null) {
+            this.mTimerTask.cancel();
+            this.mTimerTask = null;
+        }
+        count = 0;
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$6 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass6 implements Runnable {
+        AnonymousClass6() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            MainActivity.access$12(MainActivity.this).notifyDataSetChanged();
+        }
+    }
+
+    @Override // android.app.Activity
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return true;
+    }
+
+    static /* synthetic */ int access$3(MainActivity mainActivity, String str, String str2, String str3) {
+        return mainActivity.userLogin(str, str2, str3);
+    }
+
+    private int userLogin(String mServerIp, String musercode, String mPassWord) {
+        int result = -1;
+        String url = LOGINURL(mServerIp, musercode, mPassWord);
+        HttpPost httpRequest = new HttpPost(url);
+        try {
+            List<NameValuePair> params = new ArrayList<>();
+            httpRequest.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                String strResult = EntityUtils.toString(httpResponse.getEntity());
+                result = JsonHelper.parseHttpPostReturnJson(strResult);
+                Log.i(TAG, "RES:" + result);
+                return result;
+            }
+        } catch (ClientProtocolException e) {
+            Log.i(TAG, LogHelp.TYPE_GUIDANCE);
+            e.printStackTrace();
+        } catch (IOException e2) {
+            Log.i(TAG, LogHelp.TYPE_MYWORK);
+            e2.printStackTrace();
+        } catch (Exception e3) {
+            Log.i(TAG, LogHelp.TYPE_HWHELP);
+            e3.printStackTrace();
+        }
+        return result;
+    }
+
+    public static String LOGINURL(String ip, String usercode, String pwd) {
+        return "http://" + ip + "/default/index/pad-login/code/" + usercode + "/pwd/" + pwd;
+    }
+
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_refresh /* 2131362262 */:
+                if (!this.data_load) {
+                    Toast.makeText(getApplication(), getResources().getString(R.string.appmanager_unloading), 0).show();
+                    return;
+                } else if (!this.pic_load) {
+                    Toast.makeText(getApplication(), getResources().getString(R.string.appmanager_iconunloading), 0).show();
+                    return;
+                } else {
+                    this.data_load = false;
+                    this.pic_load = false;
+                    this.toast_unlink = false;
+                    Toast.makeText(getApplication(), getResources().getString(R.string.action_refresh), 0).show();
+                    getMarketInfor();
+                    return;
+                }
+            default:
+                return;
+        }
+    }
+
+    public void complete() {
+        new AnonymousClass18().start();
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$18 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass18 extends Thread {
+        AnonymousClass18() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Thread, java.lang.Runnable
+        public synchronized void run() {
+            MainActivity.this.parse_json();
+        }
+    }
+
+    @Override // android.content.ContextWrapper, android.content.Context
+    public boolean deleteFile(String sPath) {
+        File file = new File(sPath);
+        if (!file.isFile() || !file.exists()) {
+            return false;
+        }
+        boolean flag = file.delete();
+        return flag;
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class GetBroadcast extends BroadcastReceiver {
+        GetBroadcast() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.content.BroadcastReceiver
+        public synchronized void onReceive(Context context, Intent intent) {
+            String package_name = intent.getDataString().split(":")[1];
+            Log.i(MainActivity.TAG, intent.getAction());
+            if ("android.intent.action.PACKAGE_ADDED".equals(intent.getAction())) {
+                if (MainActivity.market_applist != null) {
+                    int j = 0;
                     while (true) {
-                        if (i4 < MainActivity.market_applist_local.size()) {
-                            if (MainActivity.market_applist.get(i3).packagename.equals(MainActivity.market_applist_local.get(i4).packagename)) {
-                                try {
-                                    MainActivity.market_applist.get(i3).appicon = MainActivity.this.getImageDrawable(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + File.separatorChar + "icon" + File.separatorChar + MainActivity.market_applist.get(i3).packagename + ".png");
+                        if (j >= MainActivity.market_applist.size()) {
+                            break;
+                        } else if (!MainActivity.market_applist.get(j).packagename.equals(package_name)) {
+                            j++;
+                        } else {
+                            MainActivity.market_applist.get(j).doing = false;
+                            MainActivity.market_applist.get(j).islocal = true;
+                            break;
+                        }
+                    }
+                }
+                if (HttpHelper.install_num != null) {
+                    int j2 = 0;
+                    while (true) {
+                        if (j2 >= HttpHelper.install_num.size()) {
+                            break;
+                        } else if (!package_name.equals(HttpHelper.install_num.get(j2).get("packagename").toString())) {
+                            j2++;
+                        } else {
+                            MainActivity.this.deleteFile(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + HttpHelper.install_num.get(j2).get("apkname").toString());
+                            HttpHelper.install_num.remove(j2);
+                            break;
+                        }
+                    }
+                }
+                MainActivity.this.complete();
+            } else if ("android.intent.action.PACKAGE_REMOVED".equals(intent.getAction())) {
+                if (MainActivity.market_applist != null) {
+                    int j3 = 0;
+                    while (true) {
+                        if (j3 >= MainActivity.market_applist.size()) {
+                            break;
+                        } else if (!MainActivity.market_applist.get(j3).packagename.equals(package_name)) {
+                            j3++;
+                        } else {
+                            MainActivity.market_applist.get(j3).doing = false;
+                            MainActivity.market_applist.get(j3).islocal = false;
+                            break;
+                        }
+                    }
+                }
+                if (HttpHelper.install_num != null) {
+                    int j4 = 0;
+                    while (true) {
+                        if (j4 >= HttpHelper.install_num.size()) {
+                            break;
+                        } else if (!package_name.equals(HttpHelper.install_num.get(j4).get("packagename").toString())) {
+                            j4++;
+                        } else {
+                            HttpHelper.install_num.remove(j4);
+                            break;
+                        }
+                    }
+                }
+                MainActivity.this.complete();
+            } else if ("android.intent.action.PACKAGE_REPLACED".equals(intent.getAction())) {
+                if (MainActivity.market_applist != null) {
+                    int j5 = 0;
+                    while (true) {
+                        if (j5 >= MainActivity.market_applist.size()) {
+                            break;
+                        } else if (!MainActivity.market_applist.get(j5).packagename.equals(package_name)) {
+                            j5++;
+                        } else {
+                            MainActivity.market_applist.get(j5).doing = false;
+                            MainActivity.market_applist.get(j5).update = false;
+                            break;
+                        }
+                    }
+                }
+                if (HttpHelper.install_num != null) {
+                    int j6 = 0;
+                    while (true) {
+                        if (j6 >= HttpHelper.install_num.size()) {
+                            break;
+                        } else if (!package_name.equals(HttpHelper.install_num.get(j6).get("packagename").toString())) {
+                            j6++;
+                        } else {
+                            MainActivity.this.deleteFile(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + HttpHelper.install_num.get(j6).get("apkname").toString());
+                            HttpHelper.install_num.remove(j6);
+                            break;
+                        }
+                    }
+                }
+                MainActivity.this.complete();
+            }
+        }
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class CompleteReceiver extends BroadcastReceiver {
+        long completeDownloadId = 0;
+        Handler handler = new AnonymousClass1();
+        Context mycontext;
+
+        CompleteReceiver() {
+            MainActivity.this = r3;
+        }
+
+        static /* synthetic */ MainActivity access$0(CompleteReceiver completeReceiver) {
+            return MainActivity.this;
+        }
+
+        @Override // android.content.BroadcastReceiver
+        public synchronized void onReceive(Context context, Intent intent) {
+            Log.i(MainActivity.TAG, "2586---RECEIVICE" + intent.getAction());
+            if (intent.getAction().equals("android.intent.action.DOWNLOAD_COMPLETE") && this.completeDownloadId != intent.getLongExtra("extra_download_id", -1L)) {
+                this.completeDownloadId = intent.getLongExtra("extra_download_id", -1L);
+                if (MainActivity.downloadManagerPro != null) {
+                    Log.i(MainActivity.TAG, "2603---RECEIVICE" + MainActivity.downloadManagerPro.getStatusById(this.completeDownloadId));
+                    if (MainActivity.downloadManagerPro.getStatusById(this.completeDownloadId) == 8) {
+                        new AnonymousClass2(context).start();
+                    } else if (MainActivity.downloadManagerPro.getStatusById(this.completeDownloadId) != 4) {
+                        long id = this.completeDownloadId;
+                        for (int i = 0; i < HttpHelper.install_num.size(); i++) {
+                            if (id == ((Long) HttpHelper.install_num.get(i).get("downid")).longValue()) {
+                                if (((Boolean) HttpHelper.install_num.get(i).get("setuped")).booleanValue()) {
                                     break;
-                                } catch (IOException e3) {
-                                    e3.printStackTrace();
                                 }
-                            } else {
-                                i4++;
+                                this.mycontext = context;
+                                this.handler.sendEmptyMessage(1);
+                                String name = (String) HttpHelper.install_num.get(i).get("apkname");
+                                int j = 0;
+                                while (true) {
+                                    if (j < HttpHelper.install_num.size()) {
+                                        if (!name.equals(HttpHelper.install_num.get(j).get("apkname").toString())) {
+                                            j++;
+                                        } else {
+                                            HttpHelper.install_num.remove(j);
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                int j2 = 0;
+                                while (true) {
+                                    if (j2 < MainActivity.market_applist.size()) {
+                                        if (!MainActivity.market_applist.get(j2).packagename.equals(name)) {
+                                            j2++;
+                                        } else {
+                                            MainActivity.market_applist.get(j2).doing = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        MainActivity.this.complete();
+                    }
+                }
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$CompleteReceiver$2 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass2 extends Thread {
+            private final /* synthetic */ Context val$context;
+
+            AnonymousClass2(Context context) {
+                CompleteReceiver.this = r1;
+                this.val$context = context;
+            }
+
+            @Override // java.lang.Thread, java.lang.Runnable
+            public synchronized void run() {
+                super.run();
+                long id = CompleteReceiver.this.completeDownloadId;
+                Log.i(MainActivity.TAG, "2618---aaa  :" + HttpHelper.install_num.size());
+                int i = 0;
+                while (true) {
+                    if (i >= HttpHelper.install_num.size()) {
+                        break;
+                    } else if (id != ((Long) HttpHelper.install_num.get(i).get("downid")).longValue()) {
+                        i++;
+                    } else {
+                        MainActivity.downloadManager.remove(id);
+                        if (!((Boolean) HttpHelper.install_num.get(i).get("setuped")).booleanValue()) {
+                            HttpHelper.install_num.get(i).put("setuped", true);
+                            int num = ((Integer) HttpHelper.install_num.get(i).get("position")).intValue();
+                            int type = ((Integer) HttpHelper.install_num.get(i).get("type")).intValue();
+                            String name = (String) HttpHelper.install_num.get(i).get("apkname");
+                            Log.i(MainActivity.TAG, "2638---name--->" + name);
+                            Log.i(MainActivity.TAG, "2639---type--->" + type);
+                            if (1 == type) {
+                                File file = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name);
+                                if (!file.exists() || 0 == file.length()) {
+                                    CompleteReceiver.this.mycontext = this.val$context;
+                                    CompleteReceiver.this.handler.sendEmptyMessage(1);
+                                } else {
+                                    Log.i(MainActivity.TAG, "2671");
+                                    Message message = MainActivity.access$21(CompleteReceiver.access$0(CompleteReceiver.this)).obtainMessage();
+                                    message.what = MainActivity.access$13();
+                                    message.obj = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + name;
+                                    MainActivity.access$21(CompleteReceiver.access$0(CompleteReceiver.this)).sendMessage(message);
+                                }
+                                int j = 0;
+                                while (true) {
+                                    if (j >= HttpHelper.install_num.size()) {
+                                        break;
+                                    } else if (!name.equals(HttpHelper.install_num.get(j).get("apkname").toString())) {
+                                        j++;
+                                    } else {
+                                        HttpHelper.install_num.remove(j);
+                                        break;
+                                    }
+                                }
+                                if (!MainActivity.delete_apkfile.contains(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name)) {
+                                    MainActivity.delete_apkfile.add(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name);
+                                }
+                            } else if (type == 0) {
+                                String name2 = MainActivity.market_applist.get(num).apkname;
+                                File file2 = new File(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name2);
+                                if (!file2.exists() || 0 == file2.length()) {
+                                    CompleteReceiver.this.mycontext = this.val$context;
+                                    CompleteReceiver.this.handler.sendEmptyMessage(1);
+                                } else {
+                                    Log.i(MainActivity.TAG, "2782");
+                                    Message message2 = MainActivity.access$21(CompleteReceiver.access$0(CompleteReceiver.this)).obtainMessage();
+                                    message2.what = 0;
+                                    message2.obj = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name2;
+                                    MainActivity.access$21(CompleteReceiver.access$0(CompleteReceiver.this)).sendMessage(message2);
+                                }
+                                int j2 = 0;
+                                while (true) {
+                                    if (j2 >= HttpHelper.install_num.size()) {
+                                        break;
+                                    } else if (!name2.equals(HttpHelper.install_num.get(j2).get("apkname").toString())) {
+                                        j2++;
+                                    } else {
+                                        HttpHelper.install_num.remove(j2);
+                                        break;
+                                    }
+                                }
+                                if (!MainActivity.delete_apkfile.contains(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name2)) {
+                                    MainActivity.delete_apkfile.add(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + MainActivity.FOLDER_MAIN + "/" + name2);
+                                }
                             }
                         }
                     }
                 }
-                MainActivity.this.handler.post(MainActivity.this.runnableUi);
+                CompleteReceiver.access$0(CompleteReceiver.this).complete();
             }
-        }.start();
-        compare();
-        this.progress_handler.sendEmptyMessage(2);
-        this.handler.post(this.runnableUi);
-    }
+        }
 
-    public void parse_json() {
-        synchronized (this) {
-            try {
-                if (((ConnectivityManager) getSystemService("connectivity")).getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED) {
-                    unlink_parse(SharedPreferencesHelper.load_info());
-                } else if (this.login_res != 0) {
-                    if (-1 == this.login_res) {
-                        this.wrong_handler.sendEmptyMessage(2);
-                    } else if (2 == this.login_res) {
-                        this.wrong_handler.sendEmptyMessage(2);
-                    } else if (this.login_res != 0) {
-                        this.wrong_handler.sendEmptyMessage(2);
-                    }
-                    unlink_parse(SharedPreferencesHelper.load_info());
-                } else {
-                    parse(SharedPreferencesHelper.load_info());
+        /* renamed from: com.edutech.appmanage.MainActivity$CompleteReceiver$1 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass1 extends Handler {
+            AnonymousClass1() {
+                CompleteReceiver.this = r1;
+            }
+
+            @Override // android.os.Handler
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case 1:
+                        Toast.makeText(CompleteReceiver.this.mycontext, CompleteReceiver.access$0(CompleteReceiver.this).getResources().getString(R.string.appmanager_downerror), 0).show();
+                        return;
+                    case 2:
+                        Toast.makeText(CompleteReceiver.this.mycontext, CompleteReceiver.access$0(CompleteReceiver.this).getResources().getString(R.string.appmanager_installerror1), 0).show();
+                        return;
+                    case 3:
+                        Toast.makeText(CompleteReceiver.this.mycontext, CompleteReceiver.access$0(CompleteReceiver.this).getResources().getString(R.string.appmanager_installerror2), 0).show();
+                        return;
+                    default:
+                        return;
                 }
-            } catch (Exception e) {
             }
         }
     }
 
-    public String parse_studentid(String str) {
-        String str2;
-        JSONObject jSONObject;
-        try {
-            jSONObject = (JSONObject) new JSONTokener(str).nextValue();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            str2 = null;
+    /* renamed from: com.edutech.appmanage.MainActivity$7 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass7 extends Handler {
+        AnonymousClass7() {
+            MainActivity.this = r1;
         }
-        if (!"0".equals(jSONObject.getString("errorNum"))) {
-            str2 = null;
-            return str2;
+
+        static /* synthetic */ MainActivity access$0(AnonymousClass7 anonymousClass7) {
+            return MainActivity.this;
         }
-        str2 = jSONObject.getJSONObject("data").getString("studentid");
-        return str2;
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            if (msg.what == MainActivity.access$13()) {
+                String path = (String) msg.obj;
+                Log.i(MainActivity.TAG, "path-->" + path);
+                new AnonymousClass1(path).start();
+            } else if (msg.what == MainActivity.access$14()) {
+                String path2 = (String) msg.obj;
+                Log.i(MainActivity.TAG, "path-->" + path2);
+                new AnonymousClass2(path2).start();
+            }
+            super.handleMessage(msg);
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$7$1 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass1 extends Thread {
+            private final /* synthetic */ String val$path;
+
+            AnonymousClass1(String str) {
+                AnonymousClass7.this = r1;
+                this.val$path = str;
+            }
+
+            @Override // java.lang.Thread, java.lang.Runnable
+            public void run() {
+                Log.i(MainActivity.TAG, "path-->" + this.val$path);
+                if (!ApkController.install(this.val$path, AnonymousClass7.access$0(AnonymousClass7.this).getApplicationContext())) {
+                    AnonymousClass7.access$0(AnonymousClass7.this).toast(AnonymousClass7.access$0(AnonymousClass7.this).getResources().getString(R.string.appmanager_installfailed));
+                }
+            }
+        }
+
+        /* renamed from: com.edutech.appmanage.MainActivity$7$2 */
+        /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+        class AnonymousClass2 extends Thread {
+            private final /* synthetic */ String val$path;
+
+            AnonymousClass2(String str) {
+                AnonymousClass7.this = r1;
+                this.val$path = str;
+            }
+
+            @Override // java.lang.Thread, java.lang.Runnable
+            public void run() {
+                if (!ApkController.uninstall(this.val$path, AnonymousClass7.access$0(AnonymousClass7.this).getApplicationContext())) {
+                    AnonymousClass7.access$0(AnonymousClass7.this).toast(AnonymousClass7.access$0(AnonymousClass7.this).getResources().getString(R.string.appmanager_uninstallfailed));
+                }
+            }
+        }
     }
 
-    public void shared_getinfo(String str) {
-        StringBuffer stringBuffer = new StringBuffer();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(str));
-            for (String readLine = bufferedReader.readLine(); readLine != null; readLine = bufferedReader.readLine()) {
-                stringBuffer.append(readLine);
+    static /* synthetic */ Handler access$21(MainActivity mainActivity) {
+        return mainActivity.mHandlerApk;
+    }
+
+    public void toast(String text) {
+        runOnUiThread(new AnonymousClass19(text));
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$19 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass19 implements Runnable {
+        private final /* synthetic */ String val$text;
+
+        AnonymousClass19(String str) {
+            MainActivity.this = r1;
+            this.val$text = str;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            Toast.makeText(MainActivity.this.getApplicationContext(), this.val$text, 0).show();
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$8 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass8 implements Runnable {
+        AnonymousClass8() {
+            MainActivity.this = r1;
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            String url = "http://" + MainActivity.access$0(MainActivity.this) + "/api/config/";
+            Log.e(MainActivity.TAG, "URL:" + url);
+            String result = MainActivity.access$16(MainActivity.this, url, MainActivity.access$15(MainActivity.this));
+            if (result != null) {
+                MainActivity.access$17(MainActivity.this, result);
             }
-        } catch (FileNotFoundException e) {
+            Message msg = MainActivity.this.getMarkertHandler.obtainMessage();
+            msg.what = 1;
+            msg.sendToTarget();
+        }
+    }
+
+    /* renamed from: com.edutech.appmanage.MainActivity$9 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass9 extends Handler {
+        AnonymousClass9() {
+            MainActivity.this = r1;
+        }
+
+        @Override // android.os.Handler
+        public void handleMessage(Message msg) {
+            int what = msg.what;
+            switch (what) {
+                case 1:
+                    ConnectivityManager manager = (ConnectivityManager) MainActivity.this.getSystemService("connectivity");
+                    NetworkInfo.State wifi = manager.getNetworkInfo(1).getState();
+                    if (wifi == NetworkInfo.State.CONNECTED) {
+                        new Thread(MainActivity.this.net_thread).start();
+                        return;
+                    } else {
+                        MainActivity.this.unlink_parse(SharedPreferencesHelper.load_info());
+                        return;
+                    }
+                default:
+                    return;
+            }
+        }
+    }
+
+    static /* synthetic */ String access$16(MainActivity mainActivity, String str, String str2) {
+        return mainActivity.Get_Config_Json(str, str2);
+    }
+
+    private String Get_Config_Json(String url, String username) {
+        if (url == null || url.equals("") || username == null || username.equals("")) {
+            Log.e(TAG, "Get_Config_Json 入参有问题。。。");
+            return null;
+        }
+        try {
+            HttpResponse httpResponse = Get_http_addheader(url, username);
+            Log.e(TAG, "解析返回的内容...");
+            if (httpResponse == null) {
+                return null;
+            }
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                StringBuilder builder = new StringBuilder();
+                BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8"));
+                for (String s = bufferedReader2.readLine(); s != null; s = bufferedReader2.readLine()) {
+                    builder.append(s);
+                }
+                String resultString = builder.toString();
+                System.out.println(resultString);
+                Log.e(TAG, "学校和用户个人信息获取完成。。。");
+                return resultString;
+            }
+            Log.e(TAG, "与服务端连接失败。。。");
+            Log.e(TAG, "连接状态码Status=" + httpResponse.getStatusLine().getStatusCode());
+            Log.e(TAG, "ddddd=" + httpResponse.getEntity());
+            return null;
+        } catch (ClientProtocolException e) {
             e.printStackTrace();
+            return null;
         } catch (IOException e2) {
             e2.printStackTrace();
+            return null;
         }
-        SharedPreferencesHelper.save_info(stringBuffer.toString());
     }
 
-    public void toast(final String str) {
-        runOnUiThread(new Runnable() { // from class: com.edutech.appmanage.MainActivity.19
-            @Override // java.lang.Runnable
-            public void run() {
-                Toast.makeText(MainActivity.this.getApplicationContext(), str, 0).show();
-            }
-        });
+    private HttpResponse Get_http_addheader(String url, String user_Name) throws IOException, ClientProtocolException {
+        HttpGet request = new HttpGet(url);
+        request.addHeader("X-Edutech-Entity", user_Name);
+        long imestamp = System.currentTimeMillis();
+        String sign = My_md5.Md5(String.valueOf(imestamp) + user_Name);
+        Log.e(TAG, "timestamp=" + imestamp + "   sign=" + sign);
+        request.addHeader("X-Edutech-Sign", String.valueOf(imestamp) + "+" + sign);
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpResponse httpResponse = httpClient.execute(request);
+        return httpResponse;
     }
 
-    public void unlink_parse(String str) {
-        PackageInfo packageInfo;
+    static /* synthetic */ boolean access$17(MainActivity mainActivity, String str) {
+        return mainActivity.jsonToConfig(str);
+    }
+
+    private boolean jsonToConfig(String json_str) {
+        if (json_str == null || json_str.equals("")) {
+            return false;
+        }
         try {
-            JSONArray jSONArray = ((JSONObject) new JSONTokener(str).nextValue()).getJSONObject("data").getJSONArray("app");
-            market_applist = new LinkedList<>();
-            market_applist_local = new LinkedList<>();
-            int i = 0;
-            while (true) {
-                if (i >= jSONArray.length()) {
-                    break;
+            JSONObject info = new JSONObject(json_str);
+            Log.i(TAG, "info :" + info);
+            String status = info.getString("status");
+            String errorNum = info.getString("errorNum");
+            String errorInfo = info.getString("errorInfo");
+            if (errorNum.equals("0")) {
+                JSONObject data = info.getJSONObject("data");
+                Log.i(TAG, "status :" + status);
+                Log.i(TAG, "errorNum :" + errorNum);
+                Log.i(TAG, "errorInfo :" + errorInfo);
+                Log.i(TAG, "data :" + data);
+                String privatekey = data.getString("privatekey");
+                JSONObject userArray = data.getJSONObject(UserID.ELEMENT_NAME);
+                try {
+                    this.usercode = userArray.getString("usercode");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                AppInfo appInfo = new AppInfo();
-                JSONObject jSONObject = (JSONObject) jSONArray.get(i);
-                appInfo.apptype = Integer.parseInt(jSONObject.getString("apptype"));
-                appInfo.apkname = jSONObject.getString("apkname");
-                appInfo.appname = jSONObject.getString("appname");
-                appInfo.packagename = jSONObject.getString("packagename");
-                if (!"".equals(appInfo.packagename)) {
+                Log.i(TAG, "privatekey :" + privatekey);
+                Log.i(TAG, "encrypt :" + ((String) null));
+                Log.i(TAG, "apihost :" + ((String) null));
+                try {
+                    JSONObject tigase = data.getJSONObject("tigase");
+                    String domain = null;
+                    String port = null;
                     try {
-                        packageInfo = getPackageManager().getPackageInfo(appInfo.packagename, 0);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        packageInfo = null;
-                        e.printStackTrace();
+                        domain = tigase.getString(ClientCookie.DOMAIN_ATTR);
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
                     }
-                    if (packageInfo != null) {
-                        appInfo.islocal = true;
-                        appInfo.appsize = jSONObject.getString("appsize");
-                        appInfo.versionCode = Integer.parseInt(jSONObject.getString("versioncode"));
-                        if (jSONObject.getString("versionname").length() > 10) {
-                            appInfo.versionName = String.valueOf(jSONObject.getString("versionname").substring(0, 10)) + "...";
-                        } else {
-                            appInfo.versionName = jSONObject.getString("versionname");
-                        }
-                        appInfo.webpath = jSONObject.getString(KeyEnvironment.KEYWEBPATH);
-                        appInfo.iconurl = jSONObject.getString("iconurl");
-                        market_applist.add(appInfo);
-                        market_applist_local.add(appInfo);
+                    try {
+                        port = tigase.getString(ClientCookie.PORT_ATTR);
+                    } catch (Exception e3) {
+                        e3.printStackTrace();
                     }
+                    Log.i(TAG, "domain :" + domain);
+                    Log.i(TAG, "port :" + port);
+                } catch (Exception e4) {
+                    e4.printStackTrace();
                 }
-                i++;
+                try {
+                    JSONObject mongo = data.getJSONObject("mongo");
+                    String mongo_domain = null;
+                    String mongo_port = null;
+                    String mongo_user = null;
+                    String mongo_pwd = null;
+                    try {
+                        mongo_domain = mongo.getString(ClientCookie.DOMAIN_ATTR);
+                    } catch (Exception e5) {
+                        e5.printStackTrace();
+                    }
+                    try {
+                        mongo_port = mongo.getString(ClientCookie.PORT_ATTR);
+                    } catch (Exception e6) {
+                        e6.printStackTrace();
+                    }
+                    try {
+                        mongo_user = mongo.getString(UserID.ELEMENT_NAME);
+                    } catch (Exception e7) {
+                        e7.printStackTrace();
+                    }
+                    try {
+                        mongo_pwd = mongo.getString("pwd");
+                    } catch (Exception e8) {
+                        e8.printStackTrace();
+                    }
+                    Log.i(TAG, "mongo_domain :" + mongo_domain);
+                    Log.i(TAG, "mongo_port :" + mongo_port);
+                    Log.i(TAG, "mongo_user :" + mongo_user);
+                    Log.i(TAG, "mongo_pwd :" + mongo_pwd);
+                } catch (Exception e9) {
+                    e9.printStackTrace();
+                }
+                return true;
             }
-        } catch (JSONException e2) {
-            e2.printStackTrace();
+            Log.i(TAG, "配置信息 json数据  返回错误数据。。。");
+            return false;
+        } catch (JSONException e10) {
+            e10.printStackTrace();
+            return false;
         }
-        Collections.sort(market_applist, new Comparator<AppInfo>() { // from class: com.edutech.appmanage.MainActivity.12
-            public int compare(AppInfo appInfo2, AppInfo appInfo3) {
-                char c = 0;
-                char c2 = 0;
-                if (appInfo2.islocal) {
-                    c = 1;
-                }
-                if (appInfo3.islocal) {
-                    c2 = 1;
-                }
-                return c > c2 ? -1 : c == c2 ? 0 : 1;
-            }
-        });
-        this.data_load = true;
-        this.pic_load = true;
-        if (!this.toast_unlink) {
-            if (market_applist.size() != 0) {
-                this.unlink_handler.sendEmptyMessage(2);
-            }
-            this.toast_unlink = true;
-        }
-        this.unlink_handler.sendEmptyMessage(1);
-        this.progress_handler.sendEmptyMessage(2);
-        this.handler.post(this.runnableUi);
     }
 }

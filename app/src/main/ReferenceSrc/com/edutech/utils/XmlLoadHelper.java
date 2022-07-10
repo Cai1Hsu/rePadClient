@@ -15,81 +15,76 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
-
-/* loaded from: classes.jar:com/edutech/utils/XmlLoadHelper.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class XmlLoadHelper {
-    private static HashMap<String, String> getItemData(XmlPullParser xmlPullParser) {
-        HashMap<String, String> hashMap = new HashMap<>();
-        for (int attributeCount = xmlPullParser.getAttributeCount() - 1; attributeCount >= 0; attributeCount--) {
-            hashMap.put(xmlPullParser.getAttributeName(attributeCount), xmlPullParser.getAttributeValue(attributeCount));
-        }
-        return hashMap;
-    }
-
-    public static HashMap<String, String> loadIpXml() {
-        File file = FileInOutHelper.setupOrOpenFile(AppEnvironment.URLFILEPATH);
-        FileInputStream fileInputStream = null;
-        HashMap<String, String> hashMap = new HashMap<>();
-        try {
-            fileInputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            XmlPullParser newPullParser = XmlPullParserFactory.newInstance().newPullParser();
-            newPullParser.setInput(fileInputStream, "UTF-8");
-            for (int eventType = newPullParser.getEventType(); eventType != 1; eventType = newPullParser.next()) {
-                String name = newPullParser.getName();
-                switch (eventType) {
-                    case 2:
-                        if ("ip".equals(name)) {
-                            hashMap.put("ip", newPullParser.nextText());
-                        }
-                        if ("username".equals(name)) {
-                            try {
-                                hashMap.put("username", BZip2Utils.Base64DecodeToString(newPullParser.nextText()));
-                            } catch (Exception e2) {
-                                e2.printStackTrace();
-                            }
-                        }
-                        if (AppEnvironment.PASSWORD.equals(name)) {
-                            try {
-                                hashMap.put(AppEnvironment.PASSWORD, BZip2Utils.Base64DecodeToString(newPullParser.nextText()));
-                                break;
-                            } catch (Exception e3) {
-                                e3.printStackTrace();
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                }
-            }
-        } catch (IOException e4) {
-            e4.printStackTrace();
-        } catch (XmlPullParserException e5) {
-            e5.printStackTrace();
-        }
-        return hashMap;
-    }
-
-    public static ArrayList<HashMap<String, String>> loadXml(ArrayList<HashMap<String, String>> arrayList) {
-        if (new File(AppEnvironment.SETTING_PWD_SAVE_FILEPATH).exists()) {
+    public static void writeXml(String path, ArrayList<HashMap<String, String>> settinginfo) {
+        if (settinginfo.size() != 0) {
+            File xmlFile = FileInOutHelper.setupOrOpenFile(path);
+            FileOutputStream fileos = null;
             try {
-                FileInputStream fileInputStream = new FileInputStream(FileInOutHelper.setupOrOpenFile(AppEnvironment.SETTING_PWD_SAVE_FILEPATH));
+                FileOutputStream fileos2 = new FileOutputStream(xmlFile);
+                fileos = fileos2;
+            } catch (FileNotFoundException e) {
+            }
+            XmlSerializer serializer = Xml.newSerializer();
+            try {
+                serializer.setOutput(fileos, "UTF-8");
+                serializer.startDocument("", true);
+                serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+                serializer.startTag("", "setting");
+                Iterator<HashMap<String, String>> it = settinginfo.iterator();
+                while (it.hasNext()) {
+                    HashMap<String, String> tempsetting = it.next();
+                    serializer.startTag("", "pwdinfo");
+                    String type = tempsetting.get("type");
+                    serializer.attribute("", "type", type);
+                    String password = tempsetting.get(AppEnvironment.PASSWORD);
+                    if (password == null) {
+                        password = "";
+                    }
+                    serializer.attribute("", AppEnvironment.PASSWORD, password);
+                    String createtime = tempsetting.get(AppEnvironment.CreatTime);
+                    if (createtime == null) {
+                        createtime = "";
+                    }
+                    serializer.attribute("", AppEnvironment.CreatTime, createtime);
+                    String isnew = tempsetting.get(AppEnvironment.ISNEW);
+                    if (isnew == null) {
+                        isnew = "0";
+                    }
+                    serializer.attribute("", AppEnvironment.ISNEW, isnew);
+                    serializer.endTag("", "pwdinfo");
+                }
+                serializer.endTag("", "setting");
+                serializer.endDocument();
+                serializer.flush();
+                fileos.close();
+            } catch (Exception e2) {
+            }
+        }
+    }
+
+    public static ArrayList<HashMap<String, String>> loadXml(ArrayList<HashMap<String, String>> settinginfo) {
+        File file = new File(AppEnvironment.SETTING_PWD_SAVE_FILEPATH);
+        if (file.exists()) {
+            File xmlFile = FileInOutHelper.setupOrOpenFile(AppEnvironment.SETTING_PWD_SAVE_FILEPATH);
+            try {
+                FileInputStream filein = new FileInputStream(xmlFile);
                 try {
-                    XmlPullParser newPullParser = XmlPullParserFactory.newInstance().newPullParser();
-                    newPullParser.setInput(fileInputStream, "UTF-8");
-                    for (int eventType = newPullParser.getEventType(); eventType != 1; eventType = newPullParser.next()) {
-                        String name = newPullParser.getName();
+                    XmlPullParserFactory pullParserFactory = XmlPullParserFactory.newInstance();
+                    XmlPullParser xmlPullParser = pullParserFactory.newPullParser();
+                    xmlPullParser.setInput(filein, "UTF-8");
+                    for (int eventType = xmlPullParser.getEventType(); eventType != 1; eventType = xmlPullParser.next()) {
+                        String nodeName = xmlPullParser.getName();
                         switch (eventType) {
                             case 2:
-                                if ("pwdinfo".equals(name)) {
+                                if ("pwdinfo".equals(nodeName)) {
                                     new HashMap();
-                                    arrayList.add(getItemData(newPullParser));
-                                    break;
+                                    HashMap<String, String> hashMap = getItemData(xmlPullParser);
+                                    settinginfo.add(hashMap);
+                                    continue;
                                 } else {
-                                    break;
+                                    continue;
                                 }
                         }
                     }
@@ -98,59 +93,67 @@ public class XmlLoadHelper {
                 } catch (XmlPullParserException e2) {
                     e2.printStackTrace();
                 }
-            } catch (FileNotFoundException e3) {
-                e3.printStackTrace();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
             }
         }
-        return arrayList;
+        return settinginfo;
     }
 
-    public static void writeXml(String str, ArrayList<HashMap<String, String>> arrayList) {
-        if (arrayList.size() == 0) {
-            return;
+    private static HashMap<String, String> getItemData(XmlPullParser xmlPullParser) {
+        HashMap<String, String> hashMap = new HashMap<>();
+        for (int i = xmlPullParser.getAttributeCount() - 1; i >= 0; i--) {
+            hashMap.put(xmlPullParser.getAttributeName(i), xmlPullParser.getAttributeValue(i));
         }
-        File file = FileInOutHelper.setupOrOpenFile(str);
-        FileOutputStream fileOutputStream = null;
+        return hashMap;
+    }
+
+    public static HashMap<String, String> loadIpXml() {
+        File xmlFile = FileInOutHelper.setupOrOpenFile(AppEnvironment.URLFILEPATH);
+        FileInputStream filein = null;
+        HashMap<String, String> hashmap = new HashMap<>();
         try {
-            fileOutputStream = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
+            FileInputStream filein2 = new FileInputStream(xmlFile);
+            filein = filein2;
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
         }
-        XmlSerializer newSerializer = Xml.newSerializer();
         try {
-            newSerializer.setOutput(fileOutputStream, "UTF-8");
-            newSerializer.startDocument("", true);
-            newSerializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-            newSerializer.startTag("", "setting");
-            Iterator<HashMap<String, String>> it = arrayList.iterator();
-            while (it.hasNext()) {
-                HashMap<String, String> next = it.next();
-                newSerializer.startTag("", "pwdinfo");
-                newSerializer.attribute("", "type", next.get("type"));
-                String str2 = next.get(AppEnvironment.PASSWORD);
-                String str3 = str2;
-                if (str2 == null) {
-                    str3 = "";
+            XmlPullParserFactory pullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser xmlPullParser = pullParserFactory.newPullParser();
+            xmlPullParser.setInput(filein, "UTF-8");
+            for (int eventType = xmlPullParser.getEventType(); eventType != 1; eventType = xmlPullParser.next()) {
+                String nodeName = xmlPullParser.getName();
+                switch (eventType) {
+                    case 2:
+                        if ("ip".equals(nodeName)) {
+                            hashmap.put("ip", xmlPullParser.nextText());
+                        }
+                        if ("username".equals(nodeName)) {
+                            try {
+                                hashmap.put("username", BZip2Utils.Base64DecodeToString(xmlPullParser.nextText()));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (AppEnvironment.PASSWORD.equals(nodeName)) {
+                            try {
+                                hashmap.put(AppEnvironment.PASSWORD, BZip2Utils.Base64DecodeToString(xmlPullParser.nextText()));
+                                continue;
+                            } catch (Exception e2) {
+                                e2.printStackTrace();
+                                continue;
+                            }
+                        } else {
+                            continue;
+                        }
                 }
-                newSerializer.attribute("", AppEnvironment.PASSWORD, str3);
-                String str4 = next.get(AppEnvironment.CreatTime);
-                String str5 = str4;
-                if (str4 == null) {
-                    str5 = "";
-                }
-                newSerializer.attribute("", AppEnvironment.CreatTime, str5);
-                String str6 = next.get(AppEnvironment.ISNEW);
-                String str7 = str6;
-                if (str6 == null) {
-                    str7 = "0";
-                }
-                newSerializer.attribute("", AppEnvironment.ISNEW, str7);
-                newSerializer.endTag("", "pwdinfo");
             }
-            newSerializer.endTag("", "setting");
-            newSerializer.endDocument();
-            newSerializer.flush();
-            fileOutputStream.close();
-        } catch (Exception e2) {
+        } catch (IOException e3) {
+            e3.printStackTrace();
+        } catch (XmlPullParserException e4) {
+            e4.printStackTrace();
         }
+        return hashmap;
     }
 }

@@ -1,27 +1,23 @@
 package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/BookmarkDoCoMoResultParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class BookmarkDoCoMoResultParser extends AbstractDoCoMoResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public URIParsedResult parse(Result result) {
-        URIParsedResult uRIParsedResult;
-        String text = result.getText();
-        if (!text.startsWith("MEBKM:")) {
-            uRIParsedResult = null;
-        } else {
-            String matchSingleDoCoMoPrefixedField = matchSingleDoCoMoPrefixedField("TITLE:", text, true);
-            String[] matchDoCoMoPrefixedField = matchDoCoMoPrefixedField("URL:", text, true);
-            uRIParsedResult = null;
-            if (matchDoCoMoPrefixedField != null) {
-                String str = matchDoCoMoPrefixedField[0];
-                uRIParsedResult = null;
-                if (URIResultParser.isBasicallyValidURI(str)) {
-                    uRIParsedResult = new URIParsedResult(str, matchSingleDoCoMoPrefixedField);
-                }
-            }
+        String rawText = result.getText();
+        if (!rawText.startsWith("MEBKM:")) {
+            return null;
         }
-        return uRIParsedResult;
+        String title = matchSingleDoCoMoPrefixedField("TITLE:", rawText, true);
+        String[] rawUri = matchDoCoMoPrefixedField("URL:", rawText, true);
+        if (rawUri == null) {
+            return null;
+        }
+        String uri = rawUri[0];
+        if (!URIResultParser.isBasicallyValidURI(uri)) {
+            return null;
+        }
+        return new URIParsedResult(uri, title);
     }
 }

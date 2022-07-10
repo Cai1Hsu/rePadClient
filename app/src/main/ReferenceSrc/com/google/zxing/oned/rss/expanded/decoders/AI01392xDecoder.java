@@ -2,14 +2,13 @@ package com.google.zxing.oned.rss.expanded.decoders;
 
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI01392xDecoder.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class AI01392xDecoder extends AI01decoder {
     private static final int HEADER_SIZE = 8;
     private static final int LAST_DIGIT_SIZE = 2;
 
-    AI01392xDecoder(BitArray bitArray) {
-        super(bitArray);
+    public AI01392xDecoder(BitArray information) {
+        super(information);
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
@@ -17,13 +16,14 @@ final class AI01392xDecoder extends AI01decoder {
         if (getInformation().getSize() < 48) {
             throw NotFoundException.getNotFoundInstance();
         }
-        StringBuilder sb = new StringBuilder();
-        encodeCompressedGtin(sb, 8);
-        int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray(48, 2);
-        sb.append("(392");
-        sb.append(extractNumericValueFromBitArray);
-        sb.append(')');
-        sb.append(getGeneralDecoder().decodeGeneralPurposeField(50, null).getNewString());
-        return sb.toString();
+        StringBuilder buf = new StringBuilder();
+        encodeCompressedGtin(buf, 8);
+        int lastAIdigit = getGeneralDecoder().extractNumericValueFromBitArray(48, 2);
+        buf.append("(392");
+        buf.append(lastAIdigit);
+        buf.append(')');
+        DecodedInformation decodedInformation = getGeneralDecoder().decodeGeneralPurposeField(50, null);
+        buf.append(decodedInformation.getNewString());
+        return buf.toString();
     }
 }

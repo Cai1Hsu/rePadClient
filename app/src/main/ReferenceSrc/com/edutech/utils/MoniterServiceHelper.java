@@ -4,63 +4,28 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import java.util.Iterator;
 import org.apache.tools.ant.taskdefs.Execute;
-
-/* loaded from: classes.jar:com/edutech/utils/MoniterServiceHelper.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class MoniterServiceHelper {
     private boolean isrun = true;
     private Context mContext;
     private String serviceName;
 
-    /* loaded from: classes.jar:com/edutech/utils/MoniterServiceHelper$ListenerRun.class */
-    private class ListenerRun implements Runnable {
-        private ListenerRun() {
-            MoniterServiceHelper.this = r4;
-        }
-
-        /* synthetic */ ListenerRun(MoniterServiceHelper moniterServiceHelper, ListenerRun listenerRun) {
-            this();
-        }
-
-        @Override // java.lang.Runnable
-        public void run() {
-            while (MoniterServiceHelper.this.isrun) {
-                try {
-                    Thread.sleep(1000L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (MoniterServiceHelper.this.isServiceRunning(MoniterServiceHelper.this.serviceName, MoniterServiceHelper.this.mContext)) {
-                    Log.i("Autorun", "����������");
-                } else {
-                    MoniterServiceHelper.this.mContext.sendBroadcast(new Intent("android.intent.action.START_SERVICE"));
-                    Log.i("Autorun", "����ֹͣ");
-                }
-            }
-        }
+    static /* synthetic */ String access$1(MoniterServiceHelper moniterServiceHelper) {
+        return moniterServiceHelper.serviceName;
     }
 
-    public MoniterServiceHelper(String str, Context context) {
-        this.serviceName = str;
+    static /* synthetic */ Context access$2(MoniterServiceHelper moniterServiceHelper) {
+        return moniterServiceHelper.mContext;
+    }
+
+    static /* synthetic */ boolean access$0(MoniterServiceHelper moniterServiceHelper) {
+        return moniterServiceHelper.isrun;
+    }
+
+    public MoniterServiceHelper(String serviceName, Context context) {
+        this.serviceName = serviceName;
         this.mContext = context;
-    }
-
-    public boolean isServiceRunning(String str, Context context) {
-        boolean z;
-        Iterator<ActivityManager.RunningServiceInfo> it = ((ActivityManager) this.mContext.getSystemService("activity")).getRunningServices(Execute.INVALID).iterator();
-        while (true) {
-            if (it.hasNext()) {
-                if (str.equals(it.next().service.getClassName())) {
-                    z = true;
-                    break;
-                }
-            } else {
-                z = false;
-                break;
-            }
-        }
-        return z;
     }
 
     public void startMoniter() {
@@ -70,5 +35,44 @@ public class MoniterServiceHelper {
 
     public void stopMoniter() {
         this.isrun = false;
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    private class ListenerRun implements Runnable {
+        private ListenerRun() {
+            MoniterServiceHelper.this = r1;
+        }
+
+        /* synthetic */ ListenerRun(MoniterServiceHelper moniterServiceHelper, ListenerRun listenerRun) {
+            this();
+        }
+
+        @Override // java.lang.Runnable
+        public void run() {
+            while (MoniterServiceHelper.access$0(MoniterServiceHelper.this)) {
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (MoniterServiceHelper.this.isServiceRunning(MoniterServiceHelper.access$1(MoniterServiceHelper.this), MoniterServiceHelper.access$2(MoniterServiceHelper.this))) {
+                    Log.i("Autorun", "����������");
+                } else {
+                    Intent intent = new Intent("android.intent.action.START_SERVICE");
+                    MoniterServiceHelper.access$2(MoniterServiceHelper.this).sendBroadcast(intent);
+                    Log.i("Autorun", "����ֹͣ");
+                }
+            }
+        }
+    }
+
+    public boolean isServiceRunning(String serviceName, Context context) {
+        ActivityManager manager = (ActivityManager) this.mContext.getSystemService("activity");
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Execute.INVALID)) {
+            if (serviceName.equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

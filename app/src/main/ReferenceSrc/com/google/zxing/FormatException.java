@@ -1,6 +1,5 @@
 package com.google.zxing;
-
-/* loaded from: classes.jar:com/google/zxing/FormatException.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class FormatException extends ReaderException {
     private static final FormatException instance = new FormatException();
 

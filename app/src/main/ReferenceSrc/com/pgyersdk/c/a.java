@@ -2,8 +2,7 @@ package com.pgyersdk.c;
 
 import android.os.AsyncTask;
 import android.os.Build;
-
-/* loaded from: classes.jar:com/pgyersdk/c/a.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class a {
     public static void a(AsyncTask asyncTask) {
         if (Build.VERSION.SDK_INT <= 12) {

@@ -4,12 +4,8 @@ import android.os.AsyncTask;
 import com.edutech.publicedu.log.LogHelp;
 import java.util.ArrayList;
 import org.apache.http.message.BasicNameValuePair;
-
-/* loaded from: classes.jar:com/pgyersdk/crash/f.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class f extends AsyncTask {
-    f() {
-    }
-
     @Override // android.os.AsyncTask
     protected final /* synthetic */ Object doInBackground(Object... objArr) {
         ArrayList arrayList = new ArrayList();

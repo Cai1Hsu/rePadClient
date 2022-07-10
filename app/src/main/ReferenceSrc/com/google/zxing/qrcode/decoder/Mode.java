@@ -1,6 +1,5 @@
 package com.google.zxing.qrcode.decoder;
-
-/* loaded from: classes.jar:com/google/zxing/qrcode/decoder/Mode.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public enum Mode {
     TERMINATOR(new int[]{0, 0, 0}, 0),
     NUMERIC(new int[]{10, 12, 14}, 1),
@@ -16,32 +15,25 @@ public enum Mode {
     private final int bits;
     private final int[] characterCountBitsForVersions;
 
-    Mode(int[] iArr, int i) {
-        this.characterCountBitsForVersions = iArr;
-        this.bits = i;
+    Mode(int[] characterCountBitsForVersions, int bits) {
+        this.characterCountBitsForVersions = characterCountBitsForVersions;
+        this.bits = bits;
     }
 
-    public static Mode forBits(int i) {
-        Mode mode;
-        switch (i) {
+    public static Mode forBits(int bits) {
+        switch (bits) {
             case 0:
-                mode = TERMINATOR;
-                break;
+                return TERMINATOR;
             case 1:
-                mode = NUMERIC;
-                break;
+                return NUMERIC;
             case 2:
-                mode = ALPHANUMERIC;
-                break;
+                return ALPHANUMERIC;
             case 3:
-                mode = STRUCTURED_APPEND;
-                break;
+                return STRUCTURED_APPEND;
             case 4:
-                mode = BYTE;
-                break;
+                return BYTE;
             case 5:
-                mode = FNC1_FIRST_POSITION;
-                break;
+                return FNC1_FIRST_POSITION;
             case 6:
             case 10:
             case 11:
@@ -49,27 +41,30 @@ public enum Mode {
             default:
                 throw new IllegalArgumentException();
             case 7:
-                mode = ECI;
-                break;
+                return ECI;
             case 8:
-                mode = KANJI;
-                break;
+                return KANJI;
             case 9:
-                mode = FNC1_SECOND_POSITION;
-                break;
+                return FNC1_SECOND_POSITION;
             case 13:
-                mode = HANZI;
-                break;
+                return HANZI;
         }
-        return mode;
+    }
+
+    public int getCharacterCountBits(Version version) {
+        int offset;
+        int number = version.getVersionNumber();
+        if (number <= 9) {
+            offset = 0;
+        } else if (number <= 26) {
+            offset = 1;
+        } else {
+            offset = 2;
+        }
+        return this.characterCountBitsForVersions[offset];
     }
 
     public int getBits() {
         return this.bits;
-    }
-
-    public int getCharacterCountBits(Version version) {
-        int versionNumber = version.getVersionNumber();
-        return this.characterCountBitsForVersions[(versionNumber <= 9 ? null : versionNumber <= 26 ? 1 : 2) == 1 ? 1 : 0];
     }
 }

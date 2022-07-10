@@ -2,13 +2,12 @@ package com.pgyersdk.feedback;
 
 import android.content.Context;
 import android.content.DialogInterface;
-
-/* loaded from: classes.jar:com/pgyersdk/feedback/e.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class e implements DialogInterface.OnClickListener {
     final /* synthetic */ c a;
     private final /* synthetic */ Context b;
 
-    e(c cVar, Context context) {
+    public e(c cVar, Context context) {
         this.a = cVar;
         this.b = context;
     }

@@ -9,100 +9,97 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/download/AysncHelper.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class AysncHelper {
-    public static void compareAppInfo(ArrayList<HashMap<String, String>> arrayList, ArrayList<HashMap<String, String>> arrayList2, ArrayList<HashMap<String, String>> arrayList3, ArrayList<HashMap<String, String>> arrayList4) {
-        Iterator<HashMap<String, String>> it = arrayList2.iterator();
+    public static ArrayList<HashMap<String, String>> getSystemInfo(ArrayList<HashMap<String, String>> appInfoList, Context mContext) {
+        List<PackageInfo> packages = mContext.getPackageManager().getInstalledPackages(0);
+        for (int i = 0; i < packages.size(); i++) {
+            PackageInfo packageInfo = packages.get(i);
+            HashMap<String, String> tmpInfo = new HashMap<>();
+            tmpInfo.put("appname", packageInfo.applicationInfo.loadLabel(mContext.getPackageManager()).toString());
+            tmpInfo.put("packagename", packageInfo.packageName);
+            tmpInfo.put("versioncode", Integer.toString(packageInfo.versionCode));
+            tmpInfo.put("versionname", packageInfo.versionName);
+            appInfoList.add(tmpInfo);
+        }
+        return appInfoList;
+    }
+
+    public static void compareAppInfo(ArrayList<HashMap<String, String>> downAppinfo, ArrayList<HashMap<String, String>> jsonAppinfo, ArrayList<HashMap<String, String>> localjsonAppinfo, ArrayList<HashMap<String, String>> localAppinfo) {
+        Iterator<HashMap<String, String>> it = jsonAppinfo.iterator();
         while (it.hasNext()) {
-            HashMap<String, String> next = it.next();
-            if (next.get("packagename") != null && next.get("versionname") != null && next.get("versioncode") != null && next.get("appname") != null && next.get("appwebpath") != null) {
-                boolean z = false;
-                Iterator<HashMap<String, String>> it2 = arrayList4.iterator();
+            HashMap<String, String> jsonTempApp = it.next();
+            if (jsonTempApp.get("packagename") != null && jsonTempApp.get("versionname") != null && jsonTempApp.get("versioncode") != null && jsonTempApp.get("appname") != null && jsonTempApp.get("appwebpath") != null) {
+                boolean isInstall = false;
+                Iterator<HashMap<String, String>> it2 = localAppinfo.iterator();
                 while (it2.hasNext()) {
-                    HashMap<String, String> next2 = it2.next();
-                    if (next2.get("packagename") != null && next.get("packagename").equals(next2.get("packagename"))) {
-                        z = true;
-                        if ((next2.get("versioncode") == null || next2.get("versionname") == null || next.get("versioncode").equals(next2.get("versioncode"))) && next.get("versionname").equals(next2.get("versionname"))) {
+                    HashMap<String, String> localTempApp = it2.next();
+                    if (localTempApp.get("packagename") != null && jsonTempApp.get("packagename").equals(localTempApp.get("packagename"))) {
+                        isInstall = true;
+                        if ((localTempApp.get("versioncode") == null || localTempApp.get("versionname") == null || jsonTempApp.get("versioncode").equals(localTempApp.get("versioncode"))) && jsonTempApp.get("versionname").equals(localTempApp.get("versionname"))) {
                             break;
                         }
-                        z = true;
-                        if (!isInDownloadList(arrayList, next.get("packagename"))) {
-                            arrayList.add(next);
-                            z = true;
+                        boolean isExistDownload = isInDownloadList(downAppinfo, jsonTempApp.get("packagename"));
+                        if (!isExistDownload) {
+                            downAppinfo.add(jsonTempApp);
                         }
                     }
                 }
-                if (!z && !isInDownloadList(arrayList, next.get("packagename"))) {
-                    arrayList.add(next);
+                if (!isInstall) {
+                    boolean isExistDownload2 = isInDownloadList(downAppinfo, jsonTempApp.get("packagename"));
+                    if (!isExistDownload2) {
+                        downAppinfo.add(jsonTempApp);
+                    }
                 }
             }
         }
     }
 
-    public static ArrayList<HashMap<String, String>> getSystemInfo(ArrayList<HashMap<String, String>> arrayList, Context context) {
-        List<PackageInfo> installedPackages = context.getPackageManager().getInstalledPackages(0);
-        for (int i = 0; i < installedPackages.size(); i++) {
-            PackageInfo packageInfo = installedPackages.get(i);
-            HashMap<String, String> hashMap = new HashMap<>();
-            hashMap.put("appname", packageInfo.applicationInfo.loadLabel(context.getPackageManager()).toString());
-            hashMap.put("packagename", packageInfo.packageName);
-            hashMap.put("versioncode", Integer.toString(packageInfo.versionCode));
-            hashMap.put("versionname", packageInfo.versionName);
-            arrayList.add(hashMap);
+    public static boolean isInDownloadList(ArrayList<HashMap<String, String>> downAppinfo, String jsonpackagename) {
+        Iterator<HashMap<String, String>> it = downAppinfo.iterator();
+        while (it.hasNext()) {
+            HashMap<String, String> tempDownAppInfo = it.next();
+            String packageName = tempDownAppInfo.get("packagename");
+            if (packageName != null && jsonpackagename != null && packageName.equals(jsonpackagename)) {
+                return true;
+            }
         }
-        return arrayList;
+        return false;
     }
 
-    public static boolean isInDownloadList(ArrayList<HashMap<String, String>> arrayList, String str) {
-        boolean z;
-        Iterator<HashMap<String, String>> it = arrayList.iterator();
-        while (true) {
-            if (it.hasNext()) {
-                String str2 = it.next().get("packagename");
-                if (str2 != null && str != null && str2.equals(str)) {
-                    z = true;
-                    break;
+    public static void startDownLoadList(ArrayList<HashMap<String, String>> downloadlist, ArrayList<Map<String, Async>> listTask) {
+        Log.d("wpdemo", "downloadlist = " + downloadlist.size());
+        Log.d("wpdemo", "downloadlist = " + downloadlist.toString());
+        for (int i = 0; i < downloadlist.size(); i++) {
+            if (listTask == null || listTask.size() < 10) {
+                boolean isHas = false;
+                String apkname = downloadlist.get(i).get("appname");
+                String webpath = downloadlist.get(i).get("appwebpath");
+                Log.d("wpdemo", "add 下载连接的个数 listTask.size:" + webpath);
+                int j = 0;
+                while (true) {
+                    if (j >= listTask.size()) {
+                        break;
+                    }
+                    Async startTask = listTask.get(j).get(webpath);
+                    if (startTask == null) {
+                        j++;
+                    } else {
+                        isHas = true;
+                        break;
+                    }
                 }
+                if (!isHas) {
+                    Async asyncTask = new Async();
+                    Map<String, Async> map = new Hashtable<>();
+                    map.put(webpath, asyncTask);
+                    listTask.add(map);
+                    asyncTask.execute(apkname, webpath);
+                }
+                Log.d("wpdemo", "add 下载连接的个数 listTask.size:" + listTask.size());
             } else {
-                z = false;
-                break;
-            }
-        }
-        return z;
-    }
-
-    public static void startDownLoadList(ArrayList<HashMap<String, String>> arrayList, ArrayList<Map<String, Async>> arrayList2) {
-        boolean z;
-        Log.d("wpdemo", "downloadlist = " + arrayList.size());
-        Log.d("wpdemo", "downloadlist = " + arrayList.toString());
-        for (int i = 0; i < arrayList.size(); i++) {
-            if (arrayList2 != null && arrayList2.size() >= 10) {
                 return;
             }
-            String str = arrayList.get(i).get("appname");
-            String str2 = arrayList.get(i).get("appwebpath");
-            Log.d("wpdemo", "add 下载连接的个数 listTask.size:" + str2);
-            int i2 = 0;
-            while (true) {
-                if (i2 >= arrayList2.size()) {
-                    z = false;
-                    break;
-                } else if (arrayList2.get(i2).get(str2) != null) {
-                    z = true;
-                    break;
-                } else {
-                    i2++;
-                }
-            }
-            if (!z) {
-                Async async = new Async();
-                Hashtable hashtable = new Hashtable();
-                hashtable.put(str2, async);
-                arrayList2.add(hashtable);
-                async.execute(str, str2);
-            }
-            Log.d("wpdemo", "add 下载连接的个数 listTask.size:" + arrayList2.size());
         }
     }
 }

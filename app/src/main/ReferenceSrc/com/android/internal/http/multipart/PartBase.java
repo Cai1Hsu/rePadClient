@@ -1,18 +1,7 @@
 package com.android.internal.http.multipart;
-
-/* loaded from: classes.jar:com/android/internal/http/multipart/PartBase.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public abstract class PartBase extends Part {
-    public PartBase(String str, String str2, String str3, String str4) {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // com.android.internal.http.multipart.Part
-    public String getCharSet() {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override // com.android.internal.http.multipart.Part
-    public String getContentType() {
+    public PartBase(String name, String contentType, String charSet, String transferEncoding) {
         throw new RuntimeException("Stub!");
     }
 
@@ -22,23 +11,33 @@ public abstract class PartBase extends Part {
     }
 
     @Override // com.android.internal.http.multipart.Part
+    public String getContentType() {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // com.android.internal.http.multipart.Part
+    public String getCharSet() {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override // com.android.internal.http.multipart.Part
     public String getTransferEncoding() {
         throw new RuntimeException("Stub!");
     }
 
-    public void setCharSet(String str) {
+    public void setCharSet(String charSet) {
         throw new RuntimeException("Stub!");
     }
 
-    public void setContentType(String str) {
+    public void setContentType(String contentType) {
         throw new RuntimeException("Stub!");
     }
 
-    public void setName(String str) {
+    public void setName(String name) {
         throw new RuntimeException("Stub!");
     }
 
-    public void setTransferEncoding(String str) {
+    public void setTransferEncoding(String transferEncoding) {
         throw new RuntimeException("Stub!");
     }
 }

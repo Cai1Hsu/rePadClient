@@ -2,24 +2,27 @@ package com.anfengde.epub.core.value;
 
 import com.anfengde.epub.EPubMetadata;
 import java.util.ArrayList;
-
-/* loaded from: classes.jar:com/anfengde/epub/core/value/BookInfo.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class BookInfo {
     private String cssPath;
     private String path;
     public EPubMetadata metadata = new EPubMetadata();
     private ArrayList<String> spineList = new ArrayList<>();
 
-    public void addSpine(String str) {
-        this.spineList.add(str);
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getCssPath() {
         return this.cssPath;
     }
 
-    public String getPath() {
-        return this.path;
+    public void setCssPath(String cssPath) {
+        this.cssPath = cssPath;
     }
 
     public String getSpineItem(int i) {
@@ -30,12 +33,8 @@ public class BookInfo {
         return this.spineList;
     }
 
-    public void setCssPath(String str) {
-        this.cssPath = str;
-    }
-
-    public void setPath(String str) {
-        this.path = str;
+    public void addSpine(String spine) {
+        this.spineList.add(spine);
     }
 
     public String toString() {

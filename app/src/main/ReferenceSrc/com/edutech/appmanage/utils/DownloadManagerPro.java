@@ -5,8 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import java.lang.reflect.Method;
-
-/* loaded from: classes.jar:com/edutech/appmanage/utils/DownloadManagerPro.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class DownloadManagerPro {
     public static final String COLUMN_LOCAL_FILENAME = "local_filename";
     public static final String COLUMN_LOCAL_URI = "local_uri";
@@ -19,7 +18,113 @@ public class DownloadManagerPro {
     private static Method pauseDownload = null;
     private static Method resumeDownload = null;
 
-    /* loaded from: classes.jar:com/edutech/appmanage/utils/DownloadManagerPro$RequestPro.class */
+    public DownloadManagerPro(DownloadManager downloadManager) {
+        this.downloadManager = downloadManager;
+    }
+
+    public int getStatusById(long downloadId) {
+        return getInt(downloadId, "status");
+    }
+
+    public int[] getDownloadBytes(long downloadId) {
+        int[] bytesAndStatus = getBytesAndStatus(downloadId);
+        return new int[]{bytesAndStatus[0], bytesAndStatus[1]};
+    }
+
+    public int[] getBytesAndStatus(long downloadId) {
+        int[] bytesAndStatus = {-1, -1};
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(downloadId);
+        Cursor c = null;
+        try {
+            c = this.downloadManager.query(query);
+            if (c != null && c.moveToFirst()) {
+                bytesAndStatus[0] = c.getInt(c.getColumnIndexOrThrow("bytes_so_far"));
+                bytesAndStatus[1] = c.getInt(c.getColumnIndexOrThrow("total_size"));
+                bytesAndStatus[2] = c.getInt(c.getColumnIndex("status"));
+            }
+            return bytesAndStatus;
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
+    public int pauseDownload(long... ids) {
+        initPauseMethod();
+        if (pauseDownload == null) {
+            return -1;
+        }
+        try {
+            return ((Integer) pauseDownload.invoke(this.downloadManager, ids)).intValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public int resumeDownload(long... ids) {
+        initResumeMethod();
+        if (resumeDownload == null) {
+            return -1;
+        }
+        try {
+            return ((Integer) resumeDownload.invoke(this.downloadManager, ids)).intValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static boolean isExistPauseAndResumeMethod() {
+        initPauseMethod();
+        initResumeMethod();
+        return (pauseDownload == null || resumeDownload == null) ? false : true;
+    }
+
+    private static void initPauseMethod() {
+        if (!isInitPauseDownload) {
+            isInitPauseDownload = true;
+            try {
+                pauseDownload = DownloadManager.class.getMethod(METHOD_NAME_PAUSE_DOWNLOAD, long[].class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void initResumeMethod() {
+        if (!isInitResumeDownload) {
+            isInitResumeDownload = true;
+            try {
+                resumeDownload = DownloadManager.class.getMethod(METHOD_NAME_RESUME_DOWNLOAD, long[].class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String getFileName(long downloadId) {
+        return getString(downloadId, Build.VERSION.SDK_INT < 11 ? COLUMN_LOCAL_URI : COLUMN_LOCAL_FILENAME);
+    }
+
+    public String getUri(long downloadId) {
+        return getString(downloadId, "uri");
+    }
+
+    public int getReason(long downloadId) {
+        return getInt(downloadId, "reason");
+    }
+
+    public int getPausedReason(long downloadId) {
+        return getInt(downloadId, "reason");
+    }
+
+    public int getErrorCode(long downloadId) {
+        return getInt(downloadId, "reason");
+    }
+
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static class RequestPro extends DownloadManager.Request {
         public static final String METHOD_NAME_SET_NOTI_CLASS = "setNotiClass";
         public static final String METHOD_NAME_SET_NOTI_EXTRAS = "setNotiExtras";
@@ -32,7 +137,7 @@ public class DownloadManagerPro {
             super(uri);
         }
 
-        public void setNotiClass(String str) {
+        public void setNotiClass(String className) {
             synchronized (this) {
                 if (!isInitNotiClass) {
                     isInitNotiClass = true;
@@ -45,14 +150,14 @@ public class DownloadManagerPro {
             }
             if (setNotiClass != null) {
                 try {
-                    setNotiClass.invoke(this, str);
+                    setNotiClass.invoke(this, className);
                 } catch (Exception e2) {
                     e2.printStackTrace();
                 }
             }
         }
 
-        public void setNotiExtras(String str) {
+        public void setNotiExtras(String extras) {
             synchronized (this) {
                 if (!isInitNotiExtras) {
                     isInitNotiExtras = true;
@@ -65,7 +170,7 @@ public class DownloadManagerPro {
             }
             if (setNotiExtras != null) {
                 try {
-                    setNotiExtras.invoke(this, str);
+                    setNotiExtras.invoke(this, extras);
                 } catch (Exception e2) {
                     e2.printStackTrace();
                 }
@@ -73,169 +178,37 @@ public class DownloadManagerPro {
         }
     }
 
-    public DownloadManagerPro(DownloadManager downloadManager) {
-        this.downloadManager = downloadManager;
-    }
-
-    private int getInt(long j, String str) {
-        Cursor cursor = null;
+    private String getString(long downloadId, String columnName) {
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(downloadId);
+        String result = null;
+        Cursor c = null;
         try {
-            Cursor query = this.downloadManager.query(new DownloadManager.Query().setFilterById(j));
-            int i = -1;
-            if (query != null) {
-                i = -1;
-                if (query.moveToFirst()) {
-                    cursor = query;
-                    i = query.getInt(query.getColumnIndex(str));
-                }
+            c = this.downloadManager.query(query);
+            if (c != null && c.moveToFirst()) {
+                result = c.getString(c.getColumnIndex(columnName));
             }
-            if (query != null) {
-                query.close();
+            return result;
+        } finally {
+            if (c != null) {
+                c.close();
             }
-            return i;
-        } catch (Throwable th) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            throw th;
         }
     }
 
-    private String getString(long j, String str) {
-        Cursor cursor = null;
+    private int getInt(long downloadId, String columnName) {
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(downloadId);
+        int result = -1;
+        Cursor c = null;
         try {
-            Cursor query = this.downloadManager.query(new DownloadManager.Query().setFilterById(j));
-            String str2 = null;
-            if (query != null) {
-                str2 = null;
-                if (query.moveToFirst()) {
-                    cursor = query;
-                    str2 = query.getString(query.getColumnIndex(str));
-                }
+            c = this.downloadManager.query(query);
+            if (c != null && c.moveToFirst()) {
+                result = c.getInt(c.getColumnIndex(columnName));
             }
-            if (query != null) {
-                query.close();
-            }
-            return str2;
-        } catch (Throwable th) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            throw th;
-        }
-    }
-
-    private static void initPauseMethod() {
-        if (isInitPauseDownload) {
-            return;
-        }
-        isInitPauseDownload = true;
-        try {
-            pauseDownload = DownloadManager.class.getMethod(METHOD_NAME_PAUSE_DOWNLOAD, long[].class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void initResumeMethod() {
-        if (isInitResumeDownload) {
-            return;
-        }
-        isInitResumeDownload = true;
-        try {
-            resumeDownload = DownloadManager.class.getMethod(METHOD_NAME_RESUME_DOWNLOAD, long[].class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static boolean isExistPauseAndResumeMethod() {
-        initPauseMethod();
-        initResumeMethod();
-        return (pauseDownload == null || resumeDownload == null) ? false : true;
-    }
-
-    public int[] getBytesAndStatus(long j) {
-        int[] iArr = {-1, -1};
-        Cursor cursor = null;
-        try {
-            Cursor query = this.downloadManager.query(new DownloadManager.Query().setFilterById(j));
-            if (query != null && query.moveToFirst()) {
-                iArr[0] = query.getInt(query.getColumnIndexOrThrow("bytes_so_far"));
-                iArr[1] = query.getInt(query.getColumnIndexOrThrow("total_size"));
-                cursor = query;
-                iArr[2] = query.getInt(query.getColumnIndex("status"));
-            }
-            if (query != null) {
-                query.close();
-            }
-            return iArr;
-        } catch (Throwable th) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            throw th;
-        }
-    }
-
-    public int[] getDownloadBytes(long j) {
-        int[] bytesAndStatus = getBytesAndStatus(j);
-        return new int[]{bytesAndStatus[0], bytesAndStatus[1]};
-    }
-
-    public int getErrorCode(long j) {
-        return getInt(j, "reason");
-    }
-
-    public String getFileName(long j) {
-        return getString(j, Build.VERSION.SDK_INT < 11 ? COLUMN_LOCAL_URI : COLUMN_LOCAL_FILENAME);
-    }
-
-    public int getPausedReason(long j) {
-        return getInt(j, "reason");
-    }
-
-    public int getReason(long j) {
-        return getInt(j, "reason");
-    }
-
-    public int getStatusById(long j) {
-        return getInt(j, "status");
-    }
-
-    public String getUri(long j) {
-        return getString(j, "uri");
-    }
-
-    public int pauseDownload(long... jArr) {
-        int i;
-        initPauseMethod();
-        if (pauseDownload == null) {
-            i = -1;
-        } else {
-            try {
-                i = ((Integer) pauseDownload.invoke(this.downloadManager, jArr)).intValue();
-            } catch (Exception e) {
-                e.printStackTrace();
-                i = -1;
+            return result;
+        } finally {
+            if (c != null) {
+                c.close();
             }
         }
-        return i;
-    }
-
-    public int resumeDownload(long... jArr) {
-        int i;
-        initResumeMethod();
-        if (resumeDownload == null) {
-            i = -1;
-        } else {
-            try {
-                i = ((Integer) resumeDownload.invoke(this.downloadManager, jArr)).intValue();
-            } catch (Exception e) {
-                e.printStackTrace();
-                i = -1;
-            }
-        }
-        return i;
     }
 }

@@ -1,6 +1,5 @@
 package com.google.gson;
-
-/* loaded from: classes.jar:com/google/gson/JsonNull.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class JsonNull extends JsonElement {
     public static final JsonNull INSTANCE = new JsonNull();
 
@@ -9,11 +8,11 @@ public final class JsonNull extends JsonElement {
         return INSTANCE;
     }
 
-    public boolean equals(Object obj) {
-        return this == obj || (obj instanceof JsonNull);
-    }
-
     public int hashCode() {
         return JsonNull.class.hashCode();
+    }
+
+    public boolean equals(Object other) {
+        return this == other || (other instanceof JsonNull);
     }
 }

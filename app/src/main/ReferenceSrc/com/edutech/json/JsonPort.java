@@ -6,173 +6,201 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-/* loaded from: classes.jar:com/edutech/json/JsonPort.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class JsonPort {
-    public boolean ObjectToJosn(String str, String str2) {
-        return JsonCreate.saveJsonToLocal(str, str2);
+    public Tree<HashMap<String, Object>> parseJson(Tree<HashMap<String, Object>> tree, String json, String parkey, String leafKey) {
+        return JsonParse.parsejson(tree, json, parkey, leafKey);
     }
 
-    public void addBookToBooksJson(HashMap<String, Object> hashMap, String str) {
-        BookJsonHelper.addBookToBooksJson(BookJsonHelper.getStringDefault(hashMap.get("id").toString()), BookJsonHelper.getStringDefault(hashMap.get("name").toString()), BookJsonHelper.getLongDefault(hashMap.get(KeyEnvironment.KEYDOWNLOADSIZE)), BookJsonHelper.getLongDefault(hashMap.get("size")), str);
+    public boolean createJson(Tree<HashMap<String, Object>> tree, String jsonpath) {
+        String json = JsonCreate.createjson(tree);
+        return JsonCreate.saveJsonToLocal(json, jsonpath);
     }
 
-    public ArrayList<HashMap<String, String>> addExamToDownlist(HashMap<String, Object> hashMap, HashMap<String, Object> hashMap2, String str, String str2) {
-        ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
-        TreeData treeData = new TreeData();
-        HashMap<String, Object> examAddNewKeys = treeData.examAddNewKeys(hashMap, str);
-        if (str.equals(AppEnvironment.GeRenChengZhang)) {
-            treeData.UpdateGeRenOldJsonMap(examAddNewKeys, hashMap2, str, arrayList);
+    public ArrayList<Object> getValueList(ArrayList<Object> objectList, Object object) {
+        TreeData getObjectlistData = new TreeData();
+        return getObjectlistData.getValueList(objectList, object);
+    }
+
+    public Object mapToObject(HashMap<String, Object> map) {
+        return JsonCreate.MaptoJSONObject(map);
+    }
+
+    public boolean ObjectToJosn(String json, String jsonpath) {
+        return JsonCreate.saveJsonToLocal(json, jsonpath);
+    }
+
+    public HashMap<String, Object> objectToMap(Object object) {
+        return JsonParse.geteObjectToMap(object);
+    }
+
+    public Object toJSONArrayObject(ArrayList<Object> objectList) {
+        return JsonCreate.toJSONArrayObject(objectList);
+    }
+
+    public boolean objectToBoolean(HashMap<String, Object> dataMap, String key) {
+        return JsonParse.isBooleanTrue(dataMap, key);
+    }
+
+    public ArrayList<String> sourceidToList(String sourceId) {
+        TreeData sourceTreedata = new TreeData();
+        return sourceTreedata.sourceidToList(sourceId);
+    }
+
+    public String listToSourceId(ArrayList<String> idList) {
+        TreeData sourceTreedata = new TreeData();
+        return sourceTreedata.appendid(idList);
+    }
+
+    public String removeSourceId(String sourceId) {
+        TreeData sourceTreedata = new TreeData();
+        return sourceTreedata.removeSourceId(sourceId);
+    }
+
+    public boolean isJsonArray(Object inputObject) {
+        CommonJSONParser common = new CommonJSONParser();
+        return common.isJsonArray(inputObject);
+    }
+
+    public HashMap<String, Object> getStringToMap(String json) {
+        CommonJSONParser common = new CommonJSONParser();
+        HashMap<String, Object> tempMap = common.parse(json);
+        return tempMap;
+    }
+
+    public void deleteDir(String FileDir) {
+        FileHelper.deleteDir(FileDir);
+    }
+
+    public void copyFile(String srcPath, String desPath) {
+        FileHelper.copyAllDirectoryFile(srcPath, desPath);
+    }
+
+    public void changeTreeData(Tree<HashMap<String, Object>> tree, HashMap<String, Object> oldHead, Object object, String key) {
+        TreeData changeTreeData = new TreeData();
+        changeTreeData.changeTreeData(tree, oldHead, object, key);
+    }
+
+    public void addBookToBooksJson(HashMap<String, Object> head, String booksJsonPath) {
+        String book_id = BookJsonHelper.getStringDefault(head.get("id").toString());
+        String book_name = BookJsonHelper.getStringDefault(head.get("name").toString());
+        long book_downloadsize = BookJsonHelper.getLongDefault(head.get(KeyEnvironment.KEYDOWNLOADSIZE));
+        long book_size = BookJsonHelper.getLongDefault(head.get("size"));
+        BookJsonHelper.addBookToBooksJson(book_id, book_name, book_downloadsize, book_size, booksJsonPath);
+    }
+
+    public void updateBooksJson(Books book, String booksJsonPath) {
+        BookJsonHelper.getBooks(book, booksJsonPath);
+    }
+
+    public ArrayList<HashMap<String, String>> updateTree(Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> localtree, String downloadJson, String key, String appName, String jsonpath) {
+        ArrayList<HashMap<String, String>> needDownloadList = new ArrayList<>();
+        TreeData updataTreeData = new TreeData();
+        if (localtree != null) {
+            updataTreeData.updateJsonTree(tree, localtree, key, appName, null);
+        }
+        updataTreeData.getNeedDownloadList(tree, downloadJson, key, appName, needDownloadList);
+        createJson(tree, jsonpath);
+        return needDownloadList;
+    }
+
+    public ArrayList<HashMap<String, String>> getAllBooksNeedDownloadList(ArrayList<HashMap<String, String>> downloadlist, String booksJsonPath, String offlineDownloadDir, String studentId, String appName) {
+        TreeData downlistTreeData = new TreeData();
+        return downlistTreeData.getAllBookNeedDownList(downloadlist, booksJsonPath, offlineDownloadDir, studentId, appName);
+    }
+
+    public void deleteBooksJsonInfo(String bookId, String booksJsonPath) {
+        BookJsonHelper.deleteBooksJsonInfo(bookId, booksJsonPath);
+    }
+
+    public ArrayList<String> deleteSourceFile(String deletejson, String offlineDownloadDir, String studentId, ArrayList<String> sourceIdList, String key, String appName) {
+        TreeData deleteSourceData = new TreeData();
+        deleteSourceData.deleteSourceFile(deletejson, offlineDownloadDir, studentId, sourceIdList, key, appName);
+        return sourceIdList;
+    }
+
+    public HashMap<String, Object> getUpdateJsonObject(Tree<HashMap<String, Object>> tree, ArrayList<String> idList) {
+        TreeData treedata = new TreeData();
+        return treedata.getUpdateJsonObject(tree, idList);
+    }
+
+    public String updateProgressAndSize(Tree<HashMap<String, Object>> tree, String sourceId, HashMap<String, Object> tempMap, String webpath, String oldProgress, long downloadsize, String appName) {
+        TreeData treedata = new TreeData();
+        if (appName.equals("DaoXueBenNew")) {
+            return treedata.updateDxProgressAndSize(tree, sourceId, tempMap, webpath, oldProgress, downloadsize, appName, KeyEnvironment.KEYWEBPATH, "path", KeyEnvironment.KEYDOWNLOADSIZE, "progress");
+        }
+        return treedata.updateProgressAndSize(tree, sourceId, tempMap, webpath, oldProgress, downloadsize, appName, KeyEnvironment.KEYWEBPATH, "path", KeyEnvironment.KEYDOWNLOADSIZE, "progress");
+    }
+
+    public void updateHMProgressAndSize(Tree<HashMap<String, Object>> tree, String sourceId, HashMap<String, Object> tempMap, String webpath, String oldProgress, long downloadsize, String appName) {
+        TreeData treedata = new TreeData();
+        if (appName.equals(AppEnvironment.GeRenChengZhang)) {
+            treedata.updateGeRenProgressAndSize(tree, sourceId, tempMap, webpath, oldProgress, downloadsize, appName);
         } else {
-            treeData.UpdateOldJsonMap(examAddNewKeys, hashMap2, str, arrayList);
+            treedata.updateHMProgressAndSize(tree, sourceId, tempMap, webpath, oldProgress, downloadsize, appName);
         }
-        return arrayList;
     }
 
-    public void changeTreeData(Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, Object obj, String str) {
-        new TreeData().changeTreeData(tree, hashMap, obj, str);
-    }
-
-    public void checkResourceUpdate(String str, String str2, String str3, String str4, String str5) {
-        String jsonUpdateHttpPost;
-        HashMap<String, Object> stringToMap;
-        String bookCheckUpdateJson = CheckUpdataHelper.getBookCheckUpdateJson(str, str2);
-        if (bookCheckUpdateJson == null || "".equals(bookCheckUpdateJson) || (jsonUpdateHttpPost = CheckUpdataHelper.jsonUpdateHttpPost(str3, str4, bookCheckUpdateJson)) == null || "".equals(jsonUpdateHttpPost) || (stringToMap = getStringToMap(jsonUpdateHttpPost)) == null || stringToMap.get("status") == null || stringToMap.get("errorNum") == null) {
-            return;
-        }
-        ArrayList arrayList = new ArrayList();
-        CheckUpdataHelper.getNeedCheckLeafBookIdList(arrayList, stringToMap);
-        if (arrayList.size() <= 0) {
-            return;
-        }
-        Iterator it = arrayList.iterator();
-        while (it.hasNext()) {
-            String str6 = (String) it.next();
-            Tree<HashMap<String, Object>> localTree = CheckUpdataHelper.getLocalTree(str5, str6, str2);
-            if (localTree != null && CheckUpdataHelper.aBookCheckUpdata(localTree, str3, str4, str6, str2)) {
-                BookJsonHelper.updateIsNewToBooksJson(str6, str);
-                JsonCreate.saveJsonToLocal(JsonCreate.createjson(localTree), String.valueOf(str5) + str6 + "/json.json");
+    public void checkResourceUpdate(String booksJsonPath, String appName, String ip, String studentid, String offline_download) {
+        String returnJson;
+        HashMap<String, Object> tempMap;
+        String bookcheckupdatejson = CheckUpdataHelper.getBookCheckUpdateJson(booksJsonPath, appName);
+        if (bookcheckupdatejson != null && !"".equals(bookcheckupdatejson) && (returnJson = CheckUpdataHelper.jsonUpdateHttpPost(ip, studentid, bookcheckupdatejson)) != null && !"".equals(returnJson) && (tempMap = getStringToMap(returnJson)) != null && tempMap.get("status") != null && tempMap.get("errorNum") != null) {
+            ArrayList<String> bookidList = new ArrayList<>();
+            CheckUpdataHelper.getNeedCheckLeafBookIdList(bookidList, tempMap);
+            if (bookidList.size() > 0) {
+                Iterator<String> it = bookidList.iterator();
+                while (it.hasNext()) {
+                    String bookid = it.next();
+                    Tree<HashMap<String, Object>> localTree = CheckUpdataHelper.getLocalTree(offline_download, bookid, appName);
+                    if (localTree != null) {
+                        boolean isNew = CheckUpdataHelper.aBookCheckUpdata(localTree, ip, studentid, bookid, appName);
+                        if (isNew) {
+                            BookJsonHelper.updateIsNewToBooksJson(bookid, booksJsonPath);
+                            String newjson = JsonCreate.createjson(localTree);
+                            String JsonPath = String.valueOf(offline_download) + bookid + "/json.json";
+                            JsonCreate.saveJsonToLocal(newjson, JsonPath);
+                        }
+                    }
+                }
             }
         }
     }
 
-    public void copyFile(String str, String str2) {
-        FileHelper.copyAllDirectoryFile(str, str2);
-    }
-
-    public boolean createJson(Tree<HashMap<String, Object>> tree, String str) {
-        return JsonCreate.saveJsonToLocal(JsonCreate.createjson(tree), str);
-    }
-
-    public void deleteBooksJsonInfo(String str, String str2) {
-        BookJsonHelper.deleteBooksJsonInfo(str, str2);
-    }
-
-    public void deleteDir(String str) {
-        FileHelper.deleteDir(str);
-    }
-
-    public ArrayList<String> deleteSourceFile(String str, String str2, String str3, ArrayList<String> arrayList, String str4, String str5) {
-        new TreeData().deleteSourceFile(str, str2, str3, arrayList, str4, str5);
-        return arrayList;
-    }
-
-    public ArrayList<HashMap<String, String>> getAllBooksNeedDownloadList(ArrayList<HashMap<String, String>> arrayList, String str, String str2, String str3, String str4) {
-        return new TreeData().getAllBookNeedDownList(arrayList, str, str2, str3, str4);
-    }
-
-    public void getFileDownloadList(String str, ArrayList<HashMap<String, String>> arrayList, String str2) {
-        if (new File(str).exists()) {
-            new TreeData().getFileDownloadList(getStringToMap(JsonHelper.getFileString(str)), arrayList, str2);
-        }
-    }
-
-    public HashMap<String, Object> getStringToMap(String str) {
-        return new CommonJSONParser().parse(str);
-    }
-
-    public HashMap<String, Object> getUpdateJsonObject(Tree<HashMap<String, Object>> tree, ArrayList<String> arrayList) {
-        return new TreeData().getUpdateJsonObject(tree, arrayList);
-    }
-
-    public ArrayList<Object> getValueList(ArrayList<Object> arrayList, Object obj) {
-        return new TreeData().getValueList(arrayList, obj);
-    }
-
-    public boolean isJsonArray(Object obj) {
-        return new CommonJSONParser().isJsonArray(obj);
-    }
-
-    public String listToSourceId(ArrayList<String> arrayList) {
-        return new TreeData().appendid(arrayList);
-    }
-
-    public Object mapToObject(HashMap<String, Object> hashMap) {
-        return JsonCreate.MaptoJSONObject(hashMap);
-    }
-
-    public boolean objectToBoolean(HashMap<String, Object> hashMap, String str) {
-        return JsonParse.isBooleanTrue(hashMap, str);
-    }
-
-    public HashMap<String, Object> objectToMap(Object obj) {
-        return JsonParse.geteObjectToMap(obj);
-    }
-
-    public Tree<HashMap<String, Object>> parseJson(Tree<HashMap<String, Object>> tree, String str, String str2, String str3) {
-        return JsonParse.parsejson(tree, str, str2, str3);
-    }
-
-    public String removeSourceId(String str) {
-        return new TreeData().removeSourceId(str);
-    }
-
-    public ArrayList<String> sourceidToList(String str) {
-        return new TreeData().sourceidToList(str);
-    }
-
-    public Object toJSONArrayObject(ArrayList<Object> arrayList) {
-        return JsonCreate.toJSONArrayObject(arrayList);
-    }
-
-    public void updateBooksJson(Books books, String str) {
-        BookJsonHelper.getBooks(books, str);
-    }
-
-    public void updateErrorStatus(String str, String str2, String str3, int i, String str4, Tree<HashMap<String, Object>> tree) {
-        new TreeData().updateErrorStatus(str, str2, str3, i, str4, tree);
-    }
-
-    public void updateFormJson(String str, String str2, int i) {
-        new TreeData().updateFormJson(str, str2, i);
-    }
-
-    public void updateHMProgressAndSize(Tree<HashMap<String, Object>> tree, String str, HashMap<String, Object> hashMap, String str2, String str3, long j, String str4) {
-        TreeData treeData = new TreeData();
-        if (str4.equals(AppEnvironment.GeRenChengZhang)) {
-            treeData.updateGeRenProgressAndSize(tree, str, hashMap, str2, str3, j, str4);
+    public ArrayList<HashMap<String, String>> addExamToDownlist(HashMap<String, Object> jsonMap, HashMap<String, Object> localJsonMap, String appName, String jsonpath) {
+        ArrayList<HashMap<String, String>> needDownloadList = new ArrayList<>();
+        TreeData updataExamData = new TreeData();
+        HashMap<String, Object> jsonMap2 = updataExamData.examAddNewKeys(jsonMap, appName);
+        if (appName.equals(AppEnvironment.GeRenChengZhang)) {
+            updataExamData.UpdateGeRenOldJsonMap(jsonMap2, localJsonMap, appName, needDownloadList);
         } else {
-            treeData.updateHMProgressAndSize(tree, str, hashMap, str2, str3, j, str4);
+            updataExamData.UpdateOldJsonMap(jsonMap2, localJsonMap, appName, needDownloadList);
+        }
+        return needDownloadList;
+    }
+
+    public void updateFormJson(String questionid, String bookJsonPath, int status) {
+        TreeData removeQuestionTreeData = new TreeData();
+        removeQuestionTreeData.updateFormJson(questionid, bookJsonPath, status);
+    }
+
+    public void getFileDownloadList(String jsonpath, ArrayList<HashMap<String, String>> needDownloadList, String appName) {
+        File newFileJson = new File(jsonpath);
+        if (newFileJson.exists()) {
+            String localjson = JsonHelper.getFileString(jsonpath);
+            HashMap<String, Object> localjsonMap = getStringToMap(localjson);
+            TreeData getFileTreeData = new TreeData();
+            getFileTreeData.getFileDownloadList(localjsonMap, needDownloadList, appName);
         }
     }
 
-    public String updateHomeworkProgressAndSize(Tree<HashMap<String, Object>> tree, String str, HashMap<String, Object> hashMap, String str2, String str3, long j, String str4) {
-        return new TreeData().updateXINHomeworkProgressAndSize(tree, str, hashMap, str2, str3, j, str4, KeyEnvironment.KEYWEBPATH, "path", KeyEnvironment.KEYDOWNLOADSIZE, "progress");
+    public void updateErrorStatus(String booksJsonPath, String appName, String offline_download, int inerror, String bookid, Tree<HashMap<String, Object>> tree) {
+        TreeData updateErrorStatusTreeData = new TreeData();
+        updateErrorStatusTreeData.updateErrorStatus(booksJsonPath, appName, offline_download, inerror, bookid, tree);
     }
 
-    public String updateProgressAndSize(Tree<HashMap<String, Object>> tree, String str, HashMap<String, Object> hashMap, String str2, String str3, long j, String str4) {
-        TreeData treeData = new TreeData();
-        return str4.equals("DaoXueBenNew") ? treeData.updateDxProgressAndSize(tree, str, hashMap, str2, str3, j, str4, KeyEnvironment.KEYWEBPATH, "path", KeyEnvironment.KEYDOWNLOADSIZE, "progress") : treeData.updateProgressAndSize(tree, str, hashMap, str2, str3, j, str4, KeyEnvironment.KEYWEBPATH, "path", KeyEnvironment.KEYDOWNLOADSIZE, "progress");
-    }
-
-    public ArrayList<HashMap<String, String>> updateTree(Tree<HashMap<String, Object>> tree, Tree<HashMap<String, Object>> tree2, String str, String str2, String str3, String str4) {
-        ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
-        TreeData treeData = new TreeData();
-        if (tree2 != null) {
-            treeData.updateJsonTree(tree, tree2, str2, str3, null);
-        }
-        treeData.getNeedDownloadList(tree, str, str2, str3, arrayList);
-        createJson(tree, str4);
-        return arrayList;
+    public String updateHomeworkProgressAndSize(Tree<HashMap<String, Object>> tree, String sourceId, HashMap<String, Object> tempMap, String webpath, String oldProgress, long downloadsize, String appName) {
+        TreeData treedata = new TreeData();
+        return treedata.updateXINHomeworkProgressAndSize(tree, sourceId, tempMap, webpath, oldProgress, downloadsize, appName, KeyEnvironment.KEYWEBPATH, "path", KeyEnvironment.KEYDOWNLOADSIZE, "progress");
     }
 }

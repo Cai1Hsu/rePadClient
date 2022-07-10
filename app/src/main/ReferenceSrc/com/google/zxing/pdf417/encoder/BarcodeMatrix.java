@@ -1,24 +1,37 @@
 package com.google.zxing.pdf417.encoder;
 
-/* loaded from: classes.jar:com/google/zxing/pdf417/encoder/BarcodeMatrix.class */
+import java.lang.reflect.Array;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class BarcodeMatrix {
     private int currentRow;
     private final int height;
     private final BarcodeRow[] matrix;
     private final int width;
 
-    BarcodeMatrix(int i, int i2) {
-        this.matrix = new BarcodeRow[i + 2];
-        int length = this.matrix.length;
-        for (int i3 = 0; i3 < length; i3++) {
-            this.matrix[i3] = new BarcodeRow(((i2 + 4) * 17) + 1);
+    public BarcodeMatrix(int height, int width) {
+        this.matrix = new BarcodeRow[height + 2];
+        int matrixLength = this.matrix.length;
+        for (int i = 0; i < matrixLength; i++) {
+            this.matrix[i] = new BarcodeRow(((width + 4) * 17) + 1);
         }
-        this.width = i2 * 17;
-        this.height = i + 2;
+        this.width = width * 17;
+        this.height = height + 2;
         this.currentRow = 0;
     }
 
-    BarcodeRow getCurrentRow() {
+    void set(int x, int y, byte value) {
+        this.matrix[y].set(x, value);
+    }
+
+    void setMatrix(int x, int y, boolean black) {
+        set(x, y, (byte) (black ? 1 : 0));
+    }
+
+    public void startRow() {
+        this.currentRow++;
+    }
+
+    public BarcodeRow getCurrentRow() {
         return this.matrix[this.currentRow];
     }
 
@@ -26,28 +39,16 @@ final class BarcodeMatrix {
         return getScaledMatrix(1, 1);
     }
 
-    byte[][] getScaledMatrix(int i) {
-        return getScaledMatrix(i, i);
+    byte[][] getScaledMatrix(int Scale) {
+        return getScaledMatrix(Scale, Scale);
     }
 
-    byte[][] getScaledMatrix(int i, int i2) {
-        byte[][] bArr = new byte[this.height * i2][this.width * i];
-        int i3 = this.height * i2;
-        for (int i4 = 0; i4 < i3; i4++) {
-            bArr[(i3 - i4) - 1] = this.matrix[i4 / i2].getScaledRow(i);
+    public byte[][] getScaledMatrix(int xScale, int yScale) {
+        byte[][] matrixOut = (byte[][]) Array.newInstance(Byte.TYPE, this.height * yScale, this.width * xScale);
+        int yMax = this.height * yScale;
+        for (int ii = 0; ii < yMax; ii++) {
+            matrixOut[(yMax - ii) - 1] = this.matrix[ii / yScale].getScaledRow(xScale);
         }
-        return bArr;
-    }
-
-    void set(int i, int i2, byte b) {
-        this.matrix[i2].set(i, b);
-    }
-
-    void setMatrix(int i, int i2, boolean z) {
-        set(i, i2, (byte) (z ? 1 : 0));
-    }
-
-    void startRow() {
-        this.currentRow++;
+        return matrixOut;
     }
 }

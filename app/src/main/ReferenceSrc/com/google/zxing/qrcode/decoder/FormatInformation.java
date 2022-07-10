@@ -1,6 +1,7 @@
 package com.google.zxing.qrcode.decoder;
 
-/* loaded from: classes.jar:com/google/zxing/qrcode/decoder/FormatInformation.class */
+import org.apache.tools.ant.taskdefs.Execute;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class FormatInformation {
     private final byte dataMask;
     private final ErrorCorrectionLevel errorCorrectionLevel;
@@ -8,88 +9,64 @@ final class FormatInformation {
     private static final int[][] FORMAT_INFO_DECODE_LOOKUP = {new int[]{FORMAT_INFO_MASK_QR, 0}, new int[]{20773, 1}, new int[]{24188, 2}, new int[]{23371, 3}, new int[]{17913, 4}, new int[]{16590, 5}, new int[]{20375, 6}, new int[]{19104, 7}, new int[]{30660, 8}, new int[]{29427, 9}, new int[]{32170, 10}, new int[]{30877, 11}, new int[]{26159, 12}, new int[]{25368, 13}, new int[]{27713, 14}, new int[]{26998, 15}, new int[]{5769, 16}, new int[]{5054, 17}, new int[]{7399, 18}, new int[]{6608, 19}, new int[]{1890, 20}, new int[]{597, 21}, new int[]{3340, 22}, new int[]{2107, 23}, new int[]{13663, 24}, new int[]{12392, 25}, new int[]{16177, 26}, new int[]{14854, 27}, new int[]{9396, 28}, new int[]{8579, 29}, new int[]{11994, 30}, new int[]{11245, 31}};
     private static final int[] BITS_SET_IN_HALF_BYTE = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
 
-    private FormatInformation(int i) {
-        this.errorCorrectionLevel = ErrorCorrectionLevel.forBits((i >> 3) & 3);
-        this.dataMask = (byte) (i & 7);
+    private FormatInformation(int formatInfo) {
+        this.errorCorrectionLevel = ErrorCorrectionLevel.forBits((formatInfo >> 3) & 3);
+        this.dataMask = (byte) (formatInfo & 7);
     }
 
-    static FormatInformation decodeFormatInformation(int i, int i2) {
-        FormatInformation doDecodeFormatInformation = doDecodeFormatInformation(i, i2);
-        if (doDecodeFormatInformation == null) {
-            doDecodeFormatInformation = doDecodeFormatInformation(i ^ FORMAT_INFO_MASK_QR, i2 ^ FORMAT_INFO_MASK_QR);
-        }
-        return doDecodeFormatInformation;
+    public static int numBitsDiffering(int a, int b) {
+        int a2 = a ^ b;
+        return BITS_SET_IN_HALF_BYTE[a2 & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 4) & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 8) & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 12) & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 16) & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 20) & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 24) & 15] + BITS_SET_IN_HALF_BYTE[(a2 >>> 28) & 15];
     }
 
-    private static FormatInformation doDecodeFormatInformation(int i, int i2) {
-        FormatInformation formatInformation;
-        int i3 = Integer.MAX_VALUE;
-        int i4 = 0;
-        int[][] iArr = FORMAT_INFO_DECODE_LOOKUP;
-        int length = iArr.length;
-        int i5 = 0;
-        while (i5 < length) {
-            int[] iArr2 = iArr[i5];
-            int i6 = iArr2[0];
-            if (i6 == i || i6 == i2) {
-                formatInformation = new FormatInformation(iArr2[1]);
-                break;
+    public static FormatInformation decodeFormatInformation(int maskedFormatInfo1, int maskedFormatInfo2) {
+        FormatInformation formatInfo = doDecodeFormatInformation(maskedFormatInfo1, maskedFormatInfo2);
+        return formatInfo != null ? formatInfo : doDecodeFormatInformation(maskedFormatInfo1 ^ FORMAT_INFO_MASK_QR, maskedFormatInfo2 ^ FORMAT_INFO_MASK_QR);
+    }
+
+    private static FormatInformation doDecodeFormatInformation(int maskedFormatInfo1, int maskedFormatInfo2) {
+        int bitsDifference;
+        int bestDifference = Execute.INVALID;
+        int bestFormatInfo = 0;
+        int[][] arr$ = FORMAT_INFO_DECODE_LOOKUP;
+        for (int[] decodeInfo : arr$) {
+            int targetInfo = decodeInfo[0];
+            if (targetInfo == maskedFormatInfo1 || targetInfo == maskedFormatInfo2) {
+                return new FormatInformation(decodeInfo[1]);
             }
-            int numBitsDiffering = numBitsDiffering(i, i6);
-            int i7 = i3;
-            if (numBitsDiffering < i3) {
-                i4 = iArr2[1];
-                i7 = numBitsDiffering;
+            int bitsDifference2 = numBitsDiffering(maskedFormatInfo1, targetInfo);
+            if (bitsDifference2 < bestDifference) {
+                bestFormatInfo = decodeInfo[1];
+                bestDifference = bitsDifference2;
             }
-            i3 = i7;
-            int i8 = i4;
-            if (i != i2) {
-                int numBitsDiffering2 = numBitsDiffering(i2, i6);
-                i3 = i7;
-                i8 = i4;
-                if (numBitsDiffering2 < i7) {
-                    i8 = iArr2[1];
-                    i3 = numBitsDiffering2;
-                }
-            }
-            i5++;
-            i4 = i8;
-        }
-        formatInformation = i3 <= 3 ? new FormatInformation(i4) : null;
-        return formatInformation;
-    }
-
-    static int numBitsDiffering(int i, int i2) {
-        int i3 = i ^ i2;
-        return BITS_SET_IN_HALF_BYTE[i3 & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 4) & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 8) & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 12) & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 16) & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 20) & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 24) & 15] + BITS_SET_IN_HALF_BYTE[(i3 >>> 28) & 15];
-    }
-
-    public boolean equals(Object obj) {
-        boolean z;
-        if (!(obj instanceof FormatInformation)) {
-            z = false;
-        } else {
-            FormatInformation formatInformation = (FormatInformation) obj;
-            z = false;
-            if (this.errorCorrectionLevel == formatInformation.errorCorrectionLevel) {
-                z = false;
-                if (this.dataMask == formatInformation.dataMask) {
-                    z = true;
-                }
+            if (maskedFormatInfo1 != maskedFormatInfo2 && (bitsDifference = numBitsDiffering(maskedFormatInfo2, targetInfo)) < bestDifference) {
+                bestFormatInfo = decodeInfo[1];
+                bestDifference = bitsDifference;
             }
         }
-        return z;
+        if (bestDifference <= 3) {
+            return new FormatInformation(bestFormatInfo);
+        }
+        return null;
     }
 
-    byte getDataMask() {
-        return this.dataMask;
-    }
-
-    ErrorCorrectionLevel getErrorCorrectionLevel() {
+    public ErrorCorrectionLevel getErrorCorrectionLevel() {
         return this.errorCorrectionLevel;
+    }
+
+    public byte getDataMask() {
+        return this.dataMask;
     }
 
     public int hashCode() {
         return (this.errorCorrectionLevel.ordinal() << 3) | this.dataMask;
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof FormatInformation)) {
+            return false;
+        }
+        FormatInformation other = (FormatInformation) o;
+        return this.errorCorrectionLevel == other.errorCorrectionLevel && this.dataMask == other.dataMask;
     }
 }

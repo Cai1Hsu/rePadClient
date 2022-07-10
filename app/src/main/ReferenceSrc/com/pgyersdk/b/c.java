@@ -1,12 +1,11 @@
 package com.pgyersdk.b;
 
 import android.content.DialogInterface;
-
-/* loaded from: classes.jar:com/pgyersdk/b/c.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class c implements DialogInterface.OnClickListener {
     final /* synthetic */ b a;
 
-    c(b bVar) {
+    public c(b bVar) {
         this.a = bVar;
     }
 

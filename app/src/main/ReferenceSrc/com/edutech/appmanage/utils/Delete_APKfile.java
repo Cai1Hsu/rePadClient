@@ -5,8 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import java.io.File;
 import java.util.ArrayList;
-
-/* loaded from: classes.jar:com/edutech/appmanage/utils/Delete_APKfile.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class Delete_APKfile extends Service {
     @Override // android.app.Service
     public IBinder onBind(Intent intent) {
@@ -14,55 +13,51 @@ public class Delete_APKfile extends Service {
     }
 
     @Override // android.app.Service
-    public int onStartCommand(Intent intent, int i, int i2) {
-        ArrayList<String> stringArrayListExtra = intent.getStringArrayListExtra("deletefile");
-        for (int i3 = 0; i3 < stringArrayListExtra.size(); i3++) {
-            File file = new File(stringArrayListExtra.get(i3));
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        ArrayList<String> delete_apkfile = intent.getStringArrayListExtra("deletefile");
+        for (int i = 0; i < delete_apkfile.size(); i++) {
+            File file = new File(delete_apkfile.get(i));
             if (file.isFile() && file.exists()) {
                 file.delete();
             }
         }
-        File[] listFiles = new File(intent.getStringExtra("deleteicon")).listFiles();
-        if (listFiles != null) {
-            for (int i4 = 0; i4 < listFiles.length; i4++) {
-                if (listFiles[i4].isFile() && listFiles[i4].exists()) {
-                    listFiles[i4].delete();
+        String iconpath = intent.getStringExtra("deleteicon");
+        File fileicon = new File(iconpath);
+        File[] icons = fileicon.listFiles();
+        if (icons != null) {
+            for (int i2 = 0; i2 < icons.length; i2++) {
+                if (icons[i2].isFile() && icons[i2].exists()) {
+                    icons[i2].delete();
                 }
             }
         }
-        ArrayList<String> stringArrayListExtra2 = intent.getStringArrayListExtra("install");
-        File[] listFiles2 = new File(intent.getStringExtra("deleteapks")).listFiles();
-        boolean z = false;
-        if (listFiles2 != null && listFiles2.length > 0) {
-            int i5 = 0;
-            while (i5 < listFiles2.length) {
-                boolean z2 = z;
-                if (listFiles2[i5].isFile()) {
-                    z2 = z;
-                    if (listFiles2[i5].exists()) {
-                        int i6 = 0;
-                        while (true) {
-                            if (i6 >= stringArrayListExtra2.size()) {
-                                break;
-                            }
-                            if (listFiles2[i5].getName().equals(new File(stringArrayListExtra2.get(i6)).getName())) {
-                                z = true;
-                                break;
-                            }
-                            i6++;
+        ArrayList<String> install_num = intent.getStringArrayListExtra("install");
+        String apkpath = intent.getStringExtra("deleteapks");
+        File apk = new File(apkpath);
+        File[] apks = apk.listFiles();
+        boolean exist = false;
+        if (apks != null && apks.length > 0) {
+            for (int i3 = 0; i3 < apks.length; i3++) {
+                if (apks[i3].isFile() && apks[i3].exists()) {
+                    int j = 0;
+                    while (true) {
+                        if (j >= install_num.size()) {
+                            break;
                         }
-                        z2 = z;
-                        if (!z) {
-                            listFiles2[i5].delete();
-                            z2 = z;
+                        if (!apks[i3].getName().equals(new File(install_num.get(j)).getName())) {
+                            j++;
+                        } else {
+                            exist = true;
+                            break;
                         }
                     }
+                    if (!exist) {
+                        apks[i3].delete();
+                    }
                 }
-                i5++;
-                z = z2;
             }
         }
         stopSelf();
-        return super.onStartCommand(intent, i, i2);
+        return super.onStartCommand(intent, flags, startId);
     }
 }

@@ -5,8 +5,7 @@ import android.media.MediaPlayer;
 import android.view.View;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import java.util.HashMap;
-
-/* loaded from: classes.jar:com/handmark/pulltorefresh/library/extras/SoundPullEventListener.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class SoundPullEventListener<V extends View> implements PullToRefreshBase.OnPullEventListener<V> {
     private final Context mContext;
     private MediaPlayer mCurrentMediaPlayer;
@@ -16,19 +15,16 @@ public class SoundPullEventListener<V extends View> implements PullToRefreshBase
         this.mContext = context;
     }
 
-    private void playSound(int i) {
-        if (this.mCurrentMediaPlayer != null) {
-            this.mCurrentMediaPlayer.stop();
-            this.mCurrentMediaPlayer.release();
-        }
-        this.mCurrentMediaPlayer = MediaPlayer.create(this.mContext, i);
-        if (this.mCurrentMediaPlayer != null) {
-            this.mCurrentMediaPlayer.start();
+    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnPullEventListener
+    public final void onPullEvent(PullToRefreshBase<V> refreshView, PullToRefreshBase.State event, PullToRefreshBase.Mode direction) {
+        Integer soundResIdObj = this.mSoundMap.get(event);
+        if (soundResIdObj != null) {
+            playSound(soundResIdObj.intValue());
         }
     }
 
-    public void addSoundEvent(PullToRefreshBase.State state, int i) {
-        this.mSoundMap.put(state, Integer.valueOf(i));
+    public void addSoundEvent(PullToRefreshBase.State event, int resId) {
+        this.mSoundMap.put(event, Integer.valueOf(resId));
     }
 
     public void clearSounds() {
@@ -39,11 +35,14 @@ public class SoundPullEventListener<V extends View> implements PullToRefreshBase
         return this.mCurrentMediaPlayer;
     }
 
-    @Override // com.handmark.pulltorefresh.library.PullToRefreshBase.OnPullEventListener
-    public final void onPullEvent(PullToRefreshBase<V> pullToRefreshBase, PullToRefreshBase.State state, PullToRefreshBase.Mode mode) {
-        Integer num = this.mSoundMap.get(state);
-        if (num != null) {
-            playSound(num.intValue());
+    private void playSound(int resId) {
+        if (this.mCurrentMediaPlayer != null) {
+            this.mCurrentMediaPlayer.stop();
+            this.mCurrentMediaPlayer.release();
+        }
+        this.mCurrentMediaPlayer = MediaPlayer.create(this.mContext, resId);
+        if (this.mCurrentMediaPlayer != null) {
+            this.mCurrentMediaPlayer.start();
         }
     }
 }

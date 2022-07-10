@@ -1,9 +1,8 @@
 package com.handmark.pulltorefresh.library;
-
-/* loaded from: classes.jar:com/handmark/pulltorefresh/library/R.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class R {
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$anim.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class anim {
         public static final int slide_in_from_bottom = 0x7f040019;
         public static final int slide_in_from_top = 0x7f04001a;
@@ -11,7 +10,7 @@ public final class R {
         public static final int slide_out_to_top = 0x7f04001d;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$attr.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class attr {
         public static final int ptrAdapterViewBackground = 0x7f010010;
         public static final int ptrAnimationStyle = 0x7f01000c;
@@ -34,7 +33,7 @@ public final class R {
         public static final int ptrSubHeaderTextAppearance = 0x7f01000b;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$dimen.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class dimen {
         public static final int header_footer_left_right_padding = 0x7f070005;
         public static final int header_footer_top_bottom_padding = 0x7f070006;
@@ -43,7 +42,7 @@ public final class R {
         public static final int indicator_right_padding = 0x7f070002;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$drawable.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class drawable {
         public static final int default_ptr_flip = 0x7f020137;
         public static final int default_ptr_rotate = 0x7f020138;
@@ -52,7 +51,7 @@ public final class R {
         public static final int indicator_bg_top = 0x7f02018b;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$id.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class id {
         public static final int both = 0x7f0a0011;
         public static final int disabled = 0x7f0a0012;
@@ -73,13 +72,13 @@ public final class R {
         public static final int webview = 0x7f0a0001;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$layout.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class layout {
         public static final int pull_to_refresh_header_horizontal = 0x7f03007c;
         public static final int pull_to_refresh_header_vertical = 0x7f03007d;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$string.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class string {
         public static final int pull_to_refresh_from_bottom_pull_label = 0x7f080007;
         public static final int pull_to_refresh_from_bottom_refreshing_label = 0x7f080009;
@@ -90,7 +89,7 @@ public final class R {
         public static final int pull_to_refresh_release_label = 0x7f080005;
     }
 
-    /* loaded from: classes.jar:com/handmark/pulltorefresh/library/R$styleable.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     public static final class styleable {
         public static final int[] PullToRefresh = {2130771968, 2130771969, 2130771970, 2130771971, 2130771972, 2130771973, 2130771974, 2130771975, 2130771976, 2130771977, 2130771978, 2130771979, 2130771980, 2130771981, 2130771982, 2130771983, 2130771984, 2130771985, 2130771986};
         public static final int PullToRefresh_ptrAdapterViewBackground = 0x00000010;

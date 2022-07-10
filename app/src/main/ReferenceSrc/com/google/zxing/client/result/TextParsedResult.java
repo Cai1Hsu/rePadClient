@@ -1,18 +1,16 @@
 package com.google.zxing.client.result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/TextParsedResult.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class TextParsedResult extends ParsedResult {
     private final String language;
     private final String text;
 
-    public TextParsedResult(String str, String str2) {
+    public TextParsedResult(String text, String language) {
         super(ParsedResultType.TEXT);
-        this.text = str;
-        this.language = str2;
+        this.text = text;
+        this.language = language;
     }
 
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
+    public String getText() {
         return this.text;
     }
 
@@ -20,7 +18,8 @@ public final class TextParsedResult extends ParsedResult {
         return this.language;
     }
 
-    public String getText() {
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
         return this.text;
     }
 }

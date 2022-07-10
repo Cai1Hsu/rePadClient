@@ -1,6 +1,5 @@
 package com.edutech.daoxueben.until;
-
-/* loaded from: classes.jar:com/edutech/daoxueben/until/BookUpdateInfo.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class BookUpdateInfo {
     private int book_isnew;
     private String id;
@@ -20,44 +19,40 @@ public class BookUpdateInfo {
         this.total = 0;
     }
 
-    public BookUpdateInfo(BookUpdateInfo bookUpdateInfo) {
-        this.id = bookUpdateInfo.id;
-        this.type = bookUpdateInfo.type;
-        this.updated = bookUpdateInfo.updated;
-        this.source = bookUpdateInfo.source;
-        this.updatetime = bookUpdateInfo.updatetime;
-        this.book_isnew = bookUpdateInfo.book_isnew;
-        this.total = bookUpdateInfo.total;
+    public BookUpdateInfo(String id, String type, boolean updated, String source, String updatetime, int book_isnew, int total) {
+        this.id = id;
+        this.type = type;
+        this.updated = updated;
+        this.source = source;
+        this.updatetime = updatetime;
+        this.book_isnew = book_isnew;
+        this.total = total;
     }
 
-    public BookUpdateInfo(String str, String str2, boolean z, String str3, String str4, int i, int i2) {
-        this.id = str;
-        this.type = str2;
-        this.updated = z;
-        this.source = str3;
-        this.updatetime = str4;
-        this.book_isnew = i;
-        this.total = i2;
+    public BookUpdateInfo(BookUpdateInfo bookupdateinfo) {
+        this.id = bookupdateinfo.id;
+        this.type = bookupdateinfo.type;
+        this.updated = bookupdateinfo.updated;
+        this.source = bookupdateinfo.source;
+        this.updatetime = bookupdateinfo.updatetime;
+        this.book_isnew = bookupdateinfo.book_isnew;
+        this.total = bookupdateinfo.total;
     }
 
     public BookUpdateInfo getBookUpdateInfo() {
         return this;
     }
 
-    public int getBook_isnew() {
-        return this.book_isnew;
+    public void setid(String id) {
+        this.id = id;
     }
 
     public String getid() {
         return this.id;
     }
 
-    public String getsource() {
-        return this.source;
-    }
-
-    public int gettotal() {
-        return this.total;
+    public void settype(String type) {
+        this.type = type;
     }
 
     public String gettype() {
@@ -68,36 +63,40 @@ public class BookUpdateInfo {
         return this.updated;
     }
 
+    public void setupdated(boolean updated) {
+        this.updated = updated;
+    }
+
+    public void setsource(String source) {
+        this.source = source;
+    }
+
+    public String getsource() {
+        return this.source;
+    }
+
     public String getupdatetime() {
         return this.updatetime;
     }
 
-    public void setBook_isnew(int i) {
-        this.book_isnew = i;
+    public void setupdatetime(String updatetime) {
+        this.updatetime = updatetime;
     }
 
-    public void setid(String str) {
-        this.id = str;
+    public int getBook_isnew() {
+        return this.book_isnew;
     }
 
-    public void setsource(String str) {
-        this.source = str;
+    public void setBook_isnew(int book_isnew) {
+        this.book_isnew = book_isnew;
     }
 
-    public void settotal(int i) {
-        this.total = i;
+    public int gettotal() {
+        return this.total;
     }
 
-    public void settype(String str) {
-        this.type = str;
-    }
-
-    public void setupdated(boolean z) {
-        this.updated = z;
-    }
-
-    public void setupdatetime(String str) {
-        this.updatetime = str;
+    public void settotal(int total) {
+        this.total = total;
     }
 
     public String toString() {

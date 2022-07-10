@@ -5,39 +5,40 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/oned/ITFWriter.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class ITFWriter extends UPCEANWriter {
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter, com.google.zxing.Writer
-    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
-        if (barcodeFormat != BarcodeFormat.ITF) {
-            throw new IllegalArgumentException("Can only encode ITF, but got " + barcodeFormat);
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
+        if (format != BarcodeFormat.ITF) {
+            throw new IllegalArgumentException("Can only encode ITF, but got " + format);
         }
-        return super.encode(str, barcodeFormat, i, i2, map);
+        return super.encode(contents, format, width, height, hints);
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public byte[] encode(String str) {
-        int length = str.length();
+    public byte[] encode(String contents) {
+        int length = contents.length();
         if (length % 2 != 0) {
             throw new IllegalArgumentException("The lenght of the input should be even");
         }
         if (length > 80) {
             throw new IllegalArgumentException("Requested contents should be less than 80 digits long, but got " + length);
         }
-        byte[] bArr = new byte[(length * 9) + 9];
-        int appendPattern = appendPattern(bArr, 0, new int[]{1, 1, 1, 1}, 1);
+        byte[] result = new byte[(length * 9) + 9];
+        int[] start = {1, 1, 1, 1};
+        int pos = appendPattern(result, 0, start, 1);
         for (int i = 0; i < length; i += 2) {
-            int digit = Character.digit(str.charAt(i), 10);
-            int digit2 = Character.digit(str.charAt(i + 1), 10);
-            int[] iArr = new int[18];
-            for (int i2 = 0; i2 < 5; i2++) {
-                iArr[i2 << 1] = ITFReader.PATTERNS[digit][i2];
-                iArr[(i2 << 1) + 1] = ITFReader.PATTERNS[digit2][i2];
+            int one = Character.digit(contents.charAt(i), 10);
+            int two = Character.digit(contents.charAt(i + 1), 10);
+            int[] encoding = new int[18];
+            for (int j = 0; j < 5; j++) {
+                encoding[j << 1] = ITFReader.PATTERNS[one][j];
+                encoding[(j << 1) + 1] = ITFReader.PATTERNS[two][j];
             }
-            appendPattern += appendPattern(bArr, appendPattern, iArr, 1);
+            pos += appendPattern(result, pos, encoding, 1);
         }
-        appendPattern(bArr, appendPattern, new int[]{3, 1, 1}, 1);
-        return bArr;
+        int[] end = {3, 1, 1};
+        int appendPattern = pos + appendPattern(result, pos, end, 1);
+        return result;
     }
 }

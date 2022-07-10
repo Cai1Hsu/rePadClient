@@ -5,40 +5,40 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.LocaleList;
+import android.util.DisplayMetrics;
 import java.util.Locale;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/LanguageUtils.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class LanguageUtils {
-    public static void SetLanguage(Context context, String str) {
-        Resources resources = context.getResources();
-        Configuration configuration = resources.getConfiguration();
-        Locale localeByLanguage = getLocaleByLanguage(str);
-        if (Build.VERSION.SDK_INT >= 17) {
-            configuration.setLocale(localeByLanguage);
-        } else {
-            configuration.locale = localeByLanguage;
-        }
-        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
-    }
-
-    public static Context attachBaseContext(Context context, String str) {
-        Context context2 = context;
+    public static Context attachBaseContext(Context context, String language) {
         if (Build.VERSION.SDK_INT >= 24) {
-            context2 = updateResources(context, str);
+            return updateResources(context, language);
         }
-        return context2;
+        return context;
     }
 
-    private static Locale getLocaleByLanguage(String str) {
-        return "en".equals(str) ? Locale.ENGLISH : Locale.SIMPLIFIED_CHINESE;
-    }
-
-    private static Context updateResources(Context context, String str) {
+    public static void SetLanguage(Context context, String newLanguage) {
         Resources resources = context.getResources();
-        Locale localeByLanguage = getLocaleByLanguage(str);
         Configuration configuration = resources.getConfiguration();
-        configuration.setLocale(localeByLanguage);
-        configuration.setLocales(new LocaleList(localeByLanguage));
+        Locale locale = getLocaleByLanguage(newLanguage);
+        if (Build.VERSION.SDK_INT >= 17) {
+            configuration.setLocale(locale);
+        } else {
+            configuration.locale = locale;
+        }
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        resources.updateConfiguration(configuration, dm);
+    }
+
+    private static Context updateResources(Context context, String language) {
+        Resources resources = context.getResources();
+        Locale locale = getLocaleByLanguage(language);
+        Configuration configuration = resources.getConfiguration();
+        configuration.setLocale(locale);
+        configuration.setLocales(new LocaleList(locale));
         return context.createConfigurationContext(configuration);
+    }
+
+    private static Locale getLocaleByLanguage(String language) {
+        return "en".equals(language) ? Locale.ENGLISH : Locale.SIMPLIFIED_CHINESE;
     }
 }

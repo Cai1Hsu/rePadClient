@@ -1,15 +1,14 @@
 package com.android.internal.http.multipart;
 
 import java.io.InputStream;
-
-/* loaded from: classes.jar:com/android/internal/http/multipart/ByteArrayPartSource.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class ByteArrayPartSource implements PartSource {
-    public ByteArrayPartSource(String str, byte[] bArr) {
+    public ByteArrayPartSource(String fileName, byte[] bytes) {
         throw new RuntimeException("Stub!");
     }
 
     @Override // com.android.internal.http.multipart.PartSource
-    public InputStream createInputStream() {
+    public long getLength() {
         throw new RuntimeException("Stub!");
     }
 
@@ -19,7 +18,7 @@ public class ByteArrayPartSource implements PartSource {
     }
 
     @Override // com.android.internal.http.multipart.PartSource
-    public long getLength() {
+    public InputStream createInputStream() {
         throw new RuntimeException("Stub!");
     }
 }

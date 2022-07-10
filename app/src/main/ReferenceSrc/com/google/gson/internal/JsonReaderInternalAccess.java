@@ -2,8 +2,7 @@ package com.google.gson.internal;
 
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
-
-/* loaded from: classes.jar:com/google/gson/internal/JsonReaderInternalAccess.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public abstract class JsonReaderInternalAccess {
     public static JsonReaderInternalAccess INSTANCE;
 

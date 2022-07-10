@@ -1,24 +1,23 @@
 package com.google.zxing.oned.rss;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/Pair.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class Pair extends DataCharacter {
     private int count;
     private final FinderPattern finderPattern;
 
-    Pair(int i, int i2, FinderPattern finderPattern) {
-        super(i, i2);
+    public Pair(int value, int checksumPortion, FinderPattern finderPattern) {
+        super(value, checksumPortion);
         this.finderPattern = finderPattern;
     }
 
-    int getCount() {
-        return this.count;
-    }
-
-    FinderPattern getFinderPattern() {
+    public FinderPattern getFinderPattern() {
         return this.finderPattern;
     }
 
-    void incrementCount() {
+    public int getCount() {
+        return this.count;
+    }
+
+    public void incrementCount() {
         this.count++;
     }
 }

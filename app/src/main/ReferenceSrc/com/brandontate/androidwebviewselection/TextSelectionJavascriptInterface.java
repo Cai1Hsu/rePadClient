@@ -1,21 +1,36 @@
 package com.brandontate.androidwebviewselection;
 
 import android.content.Context;
-
-/* loaded from: classes.jar:com/brandontate/androidwebviewselection/TextSelectionJavascriptInterface.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class TextSelectionJavascriptInterface {
     private static final String TAG = "TextSelectionJavascriptInterface";
     private final String interfaceName = "TextSelection";
     private TextSelectionJavascriptInterfaceListener listener;
     Context mContext;
 
-    public TextSelectionJavascriptInterface(Context context) {
-        this.mContext = context;
+    public TextSelectionJavascriptInterface(Context c) {
+        this.mContext = c;
     }
 
-    public TextSelectionJavascriptInterface(Context context, TextSelectionJavascriptInterfaceListener textSelectionJavascriptInterfaceListener) {
-        this.mContext = context;
-        this.listener = textSelectionJavascriptInterfaceListener;
+    public TextSelectionJavascriptInterface(Context c, TextSelectionJavascriptInterfaceListener listener) {
+        this.mContext = c;
+        this.listener = listener;
+    }
+
+    public void jsError(String error) {
+        if (this.listener != null) {
+            this.listener.tsjiJSError(error);
+        }
+    }
+
+    public String getInterfaceName() {
+        return "TextSelection";
+    }
+
+    public void startSelectionMode() {
+        if (this.listener != null) {
+            this.listener.tsjiStartSelectionMode();
+        }
     }
 
     public void endSelectionMode() {
@@ -24,31 +39,15 @@ public class TextSelectionJavascriptInterface {
         }
     }
 
-    public String getInterfaceName() {
-        return "TextSelection";
-    }
-
-    public void jsError(String str) {
+    public void selectionChanged(String range, String text, String handleBounds, String menuBounds) {
         if (this.listener != null) {
-            this.listener.tsjiJSError(str);
+            this.listener.tsjiSelectionChanged(range, text, handleBounds, menuBounds);
         }
     }
 
-    public void selectionChanged(String str, String str2, String str3, String str4) {
+    public void setContentWidth(float contentWidth) {
         if (this.listener != null) {
-            this.listener.tsjiSelectionChanged(str, str2, str3, str4);
-        }
-    }
-
-    public void setContentWidth(float f) {
-        if (this.listener != null) {
-            this.listener.tsjiSetContentWidth(f);
-        }
-    }
-
-    public void startSelectionMode() {
-        if (this.listener != null) {
-            this.listener.tsjiStartSelectionMode();
+            this.listener.tsjiSetContentWidth(contentWidth);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.google.gson.internal;
-
-/* loaded from: classes.jar:com/google/gson/internal/ObjectConstructor.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface ObjectConstructor<T> {
     T construct();
 }

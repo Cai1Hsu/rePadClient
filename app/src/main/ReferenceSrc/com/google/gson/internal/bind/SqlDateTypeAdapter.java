@@ -13,38 +13,44 @@ import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-/* loaded from: classes.jar:com/google/gson/internal/bind/SqlDateTypeAdapter.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class SqlDateTypeAdapter extends TypeAdapter<Date> {
-    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() { // from class: com.google.gson.internal.bind.SqlDateTypeAdapter.1
-        @Override // com.google.gson.TypeAdapterFactory
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Date.class ? new SqlDateTypeAdapter() : null;
-        }
-    };
+    public static final TypeAdapterFactory FACTORY = new AnonymousClass1();
     private final DateFormat format = new SimpleDateFormat("MMM d, yyyy");
 
+    /* renamed from: com.google.gson.internal.bind.SqlDateTypeAdapter$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    static class AnonymousClass1 implements TypeAdapterFactory {
+        AnonymousClass1() {
+        }
+
+        @Override // com.google.gson.TypeAdapterFactory
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+            if (typeToken.getRawType() == Date.class) {
+                return new SqlDateTypeAdapter();
+            }
+            return null;
+        }
+    }
+
     @Override // com.google.gson.TypeAdapter
-    public Date read(JsonReader jsonReader) throws IOException {
+    public synchronized Date read(JsonReader in) throws IOException {
         Date date;
-        synchronized (this) {
-            if (jsonReader.peek() == JsonToken.NULL) {
-                jsonReader.nextNull();
-                date = null;
-            } else {
-                try {
-                    date = new Date(this.format.parse(jsonReader.nextString()).getTime());
-                } catch (ParseException e) {
-                    throw new JsonSyntaxException(e);
-                }
+        if (in.peek() == JsonToken.NULL) {
+            in.nextNull();
+            date = null;
+        } else {
+            try {
+                long utilDate = this.format.parse(in.nextString()).getTime();
+                date = new Date(utilDate);
+            } catch (ParseException e) {
+                throw new JsonSyntaxException(e);
             }
         }
         return date;
     }
 
-    public void write(JsonWriter jsonWriter, Date date) throws IOException {
-        synchronized (this) {
-            jsonWriter.value(date == null ? null : this.format.format((java.util.Date) date));
-        }
+    public synchronized void write(JsonWriter out, Date value) throws IOException {
+        out.value(value == null ? null : this.format.format((java.util.Date) value));
     }
 }

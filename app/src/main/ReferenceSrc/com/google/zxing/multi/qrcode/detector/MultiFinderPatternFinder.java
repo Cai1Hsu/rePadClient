@@ -14,8 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/multi/qrcode/detector/MultiFinderPatternFinder.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class MultiFinderPatternFinder extends FinderPatternFinder {
     private static final float DIFF_MODSIZE_CUTOFF = 0.5f;
     private static final float DIFF_MODSIZE_CUTOFF_PERCENT = 0.05f;
@@ -23,63 +22,72 @@ final class MultiFinderPatternFinder extends FinderPatternFinder {
     private static final float MAX_MODULE_COUNT_PER_EDGE = 180.0f;
     private static final float MIN_MODULE_COUNT_PER_EDGE = 9.0f;
 
-    /* loaded from: classes.jar:com/google/zxing/multi/qrcode/detector/MultiFinderPatternFinder$ModuleSizeComparator.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     private static class ModuleSizeComparator implements Comparator<FinderPattern>, Serializable {
         private ModuleSizeComparator() {
         }
 
-        public int compare(FinderPattern finderPattern, FinderPattern finderPattern2) {
-            float estimatedModuleSize = finderPattern2.getEstimatedModuleSize() - finderPattern.getEstimatedModuleSize();
-            return ((double) estimatedModuleSize) < 0.0d ? -1 : ((double) estimatedModuleSize) > 0.0d ? 1 : 0;
+        /* synthetic */ ModuleSizeComparator(AnonymousClass1 x0) {
+            this();
+        }
+
+        public int compare(FinderPattern center1, FinderPattern center2) {
+            float value = center2.getEstimatedModuleSize() - center1.getEstimatedModuleSize();
+            if (value < 0.0d) {
+                return -1;
+            }
+            return ((double) value) > 0.0d ? 1 : 0;
         }
     }
 
-    MultiFinderPatternFinder(BitMatrix bitMatrix) {
-        super(bitMatrix);
+    MultiFinderPatternFinder(BitMatrix image) {
+        super(image);
     }
 
-    MultiFinderPatternFinder(BitMatrix bitMatrix, ResultPointCallback resultPointCallback) {
-        super(bitMatrix, resultPointCallback);
+    public MultiFinderPatternFinder(BitMatrix image, ResultPointCallback resultPointCallback) {
+        super(image, resultPointCallback);
     }
 
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r0v99, types: [com.google.zxing.qrcode.detector.FinderPattern[]] */
     private FinderPattern[][] selectMutipleBestPatterns() throws NotFoundException {
-        FinderPattern[][] finderPatternArr;
         List<FinderPattern> possibleCenters = getPossibleCenters();
         int size = possibleCenters.size();
         if (size < 3) {
             throw NotFoundException.getNotFoundInstance();
         }
         if (size == 3) {
-            finderPatternArr = new FinderPattern[]{new FinderPattern[]{possibleCenters.get(0), possibleCenters.get(1), possibleCenters.get(2)}};
-        } else {
-            Collections.sort(possibleCenters, new ModuleSizeComparator());
-            ArrayList arrayList = new ArrayList();
-            for (int i = 0; i < size - 2; i++) {
-                FinderPattern finderPattern = possibleCenters.get(i);
-                if (finderPattern != null) {
-                    for (int i2 = i + 1; i2 < size - 1; i2++) {
-                        FinderPattern finderPattern2 = possibleCenters.get(i2);
-                        if (finderPattern2 != null) {
-                            float estimatedModuleSize = (finderPattern.getEstimatedModuleSize() - finderPattern2.getEstimatedModuleSize()) / Math.min(finderPattern.getEstimatedModuleSize(), finderPattern2.getEstimatedModuleSize());
-                            if (Math.abs(finderPattern.getEstimatedModuleSize() - finderPattern2.getEstimatedModuleSize()) <= DIFF_MODSIZE_CUTOFF || estimatedModuleSize < DIFF_MODSIZE_CUTOFF_PERCENT) {
-                                for (int i3 = i2 + 1; i3 < size; i3++) {
-                                    FinderPattern finderPattern3 = possibleCenters.get(i3);
-                                    if (finderPattern3 != null) {
-                                        float estimatedModuleSize2 = (finderPattern2.getEstimatedModuleSize() - finderPattern3.getEstimatedModuleSize()) / Math.min(finderPattern2.getEstimatedModuleSize(), finderPattern3.getEstimatedModuleSize());
-                                        if (Math.abs(finderPattern2.getEstimatedModuleSize() - finderPattern3.getEstimatedModuleSize()) <= DIFF_MODSIZE_CUTOFF || estimatedModuleSize2 < DIFF_MODSIZE_CUTOFF_PERCENT) {
-                                            FinderPattern[] finderPatternArr2 = {finderPattern, finderPattern2, finderPattern3};
-                                            ResultPoint.orderBestPatterns(finderPatternArr2);
-                                            FinderPatternInfo finderPatternInfo = new FinderPatternInfo(finderPatternArr2);
-                                            float distance = ResultPoint.distance(finderPatternInfo.getTopLeft(), finderPatternInfo.getBottomLeft());
-                                            float distance2 = ResultPoint.distance(finderPatternInfo.getTopRight(), finderPatternInfo.getBottomLeft());
-                                            float distance3 = ResultPoint.distance(finderPatternInfo.getTopLeft(), finderPatternInfo.getTopRight());
-                                            float estimatedModuleSize3 = (distance + distance3) / (finderPattern.getEstimatedModuleSize() * 2.0f);
-                                            if (estimatedModuleSize3 <= MAX_MODULE_COUNT_PER_EDGE && estimatedModuleSize3 >= MIN_MODULE_COUNT_PER_EDGE && Math.abs((distance - distance3) / Math.min(distance, distance3)) < 0.1f) {
-                                                float sqrt = (float) Math.sqrt((distance * distance) + (distance3 * distance3));
-                                                if (Math.abs((distance2 - sqrt) / Math.min(distance2, sqrt)) < 0.1f) {
-                                                    arrayList.add(finderPatternArr2);
+            return new FinderPattern[][]{new FinderPattern[]{possibleCenters.get(0), possibleCenters.get(1), possibleCenters.get(2)}};
+        }
+        Collections.sort(possibleCenters, new ModuleSizeComparator(null));
+        List<FinderPattern[]> results = new ArrayList<>();
+        for (int i1 = 0; i1 < size - 2; i1++) {
+            FinderPattern p1 = possibleCenters.get(i1);
+            if (p1 != null) {
+                for (int i2 = i1 + 1; i2 < size - 1; i2++) {
+                    FinderPattern p2 = possibleCenters.get(i2);
+                    if (p2 != null) {
+                        float vModSize12 = (p1.getEstimatedModuleSize() - p2.getEstimatedModuleSize()) / Math.min(p1.getEstimatedModuleSize(), p2.getEstimatedModuleSize());
+                        float vModSize12A = Math.abs(p1.getEstimatedModuleSize() - p2.getEstimatedModuleSize());
+                        if (vModSize12A <= DIFF_MODSIZE_CUTOFF || vModSize12 < DIFF_MODSIZE_CUTOFF_PERCENT) {
+                            for (int i3 = i2 + 1; i3 < size; i3++) {
+                                FinderPattern p3 = possibleCenters.get(i3);
+                                if (p3 != null) {
+                                    float vModSize23 = (p2.getEstimatedModuleSize() - p3.getEstimatedModuleSize()) / Math.min(p2.getEstimatedModuleSize(), p3.getEstimatedModuleSize());
+                                    float vModSize23A = Math.abs(p2.getEstimatedModuleSize() - p3.getEstimatedModuleSize());
+                                    if (vModSize23A <= DIFF_MODSIZE_CUTOFF || vModSize23 < DIFF_MODSIZE_CUTOFF_PERCENT) {
+                                        FinderPattern[] test = {p1, p2, p3};
+                                        ResultPoint.orderBestPatterns(test);
+                                        FinderPatternInfo info = new FinderPatternInfo(test);
+                                        float dA = ResultPoint.distance(info.getTopLeft(), info.getBottomLeft());
+                                        float dC = ResultPoint.distance(info.getTopRight(), info.getBottomLeft());
+                                        float dB = ResultPoint.distance(info.getTopLeft(), info.getTopRight());
+                                        float estimatedModuleCount = (dA + dB) / (p1.getEstimatedModuleSize() * 2.0f);
+                                        if (estimatedModuleCount <= MAX_MODULE_COUNT_PER_EDGE && estimatedModuleCount >= MIN_MODULE_COUNT_PER_EDGE) {
+                                            float vABBC = Math.abs((dA - dB) / Math.min(dA, dB));
+                                            if (vABBC < 0.1f) {
+                                                float dCpy = (float) Math.sqrt((dA * dA) + (dB * dB));
+                                                float vPyC = Math.abs((dC - dCpy) / Math.min(dC, dCpy));
+                                                if (vPyC < 0.1f) {
+                                                    results.add(test);
                                                 }
                                             }
                                         }
@@ -90,93 +98,83 @@ final class MultiFinderPatternFinder extends FinderPatternFinder {
                     }
                 }
             }
-            if (arrayList.isEmpty()) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            finderPatternArr = (FinderPattern[][]) arrayList.toArray(new FinderPattern[arrayList.size()]);
         }
-        return finderPatternArr;
+        if (!results.isEmpty()) {
+            return (FinderPattern[][]) results.toArray(new FinderPattern[results.size()]);
+        }
+        throw NotFoundException.getNotFoundInstance();
     }
 
-    public FinderPatternInfo[] findMulti(Map<DecodeHintType, ?> map) throws NotFoundException {
-        int i;
-        int i2;
-        boolean z = map != null && map.containsKey(DecodeHintType.TRY_HARDER);
+    public FinderPatternInfo[] findMulti(Map<DecodeHintType, ?> hints) throws NotFoundException {
+        boolean tryHarder = hints != null && hints.containsKey(DecodeHintType.TRY_HARDER);
         BitMatrix image = getImage();
-        int height = image.getHeight();
-        int width = image.getWidth();
-        int i3 = (int) ((height / 228.0f) * 3.0f);
-        if (i3 < 3 || z) {
-            i3 = 3;
+        int maxI = image.getHeight();
+        int maxJ = image.getWidth();
+        int iSkip = (int) ((maxI / 228.0f) * 3.0f);
+        if (iSkip < 3 || tryHarder) {
+            iSkip = 3;
         }
-        int[] iArr = new int[5];
-        int i4 = i3 - 1;
-        while (true) {
-            int i5 = i4;
-            if (i5 >= height) {
-                break;
-            }
-            iArr[0] = 0;
-            iArr[1] = 0;
-            iArr[2] = 0;
-            iArr[3] = 0;
-            iArr[4] = 0;
-            int i6 = 0;
-            int i7 = 0;
-            while (i7 < width) {
-                if (image.get(i7, i5)) {
-                    i = i6;
-                    if ((i6 & 1) == 1) {
-                        i = i6 + 1;
+        int[] stateCount = new int[5];
+        for (int i = iSkip - 1; i < maxI; i += iSkip) {
+            stateCount[0] = 0;
+            stateCount[1] = 0;
+            stateCount[2] = 0;
+            stateCount[3] = 0;
+            stateCount[4] = 0;
+            int currentState = 0;
+            int j = 0;
+            while (j < maxJ) {
+                if (image.get(j, i)) {
+                    if ((currentState & 1) == 1) {
+                        currentState++;
                     }
-                    iArr[i] = iArr[i] + 1;
-                } else if ((i6 & 1) != 0) {
-                    iArr[i6] = iArr[i6] + 1;
-                    i = i6;
-                } else if (i6 != 4) {
-                    i = i6 + 1;
-                    iArr[i] = iArr[i] + 1;
-                } else if (foundPatternCross(iArr)) {
-                    int i8 = i7;
-                    if (!handlePossibleCenter(iArr, i5, i7)) {
-                        do {
-                            i2 = i7 + 1;
-                            if (i2 >= width) {
-                                break;
+                    stateCount[currentState] = stateCount[currentState] + 1;
+                } else if ((currentState & 1) == 0) {
+                    if (currentState == 4) {
+                        if (foundPatternCross(stateCount)) {
+                            boolean confirmed = handlePossibleCenter(stateCount, i, j);
+                            if (!confirmed) {
+                                do {
+                                    j++;
+                                    if (j >= maxJ) {
+                                        break;
+                                    }
+                                } while (!image.get(j, i));
+                                j--;
                             }
-                            i7 = i2;
-                        } while (!image.get(i2, i5));
-                        i8 = i2 - 1;
+                            currentState = 0;
+                            stateCount[0] = 0;
+                            stateCount[1] = 0;
+                            stateCount[2] = 0;
+                            stateCount[3] = 0;
+                            stateCount[4] = 0;
+                        } else {
+                            stateCount[0] = stateCount[2];
+                            stateCount[1] = stateCount[3];
+                            stateCount[2] = stateCount[4];
+                            stateCount[3] = 1;
+                            stateCount[4] = 0;
+                            currentState = 3;
+                        }
+                    } else {
+                        currentState++;
+                        stateCount[currentState] = stateCount[currentState] + 1;
                     }
-                    i = 0;
-                    iArr[0] = 0;
-                    iArr[1] = 0;
-                    iArr[2] = 0;
-                    iArr[3] = 0;
-                    iArr[4] = 0;
-                    i7 = i8;
                 } else {
-                    iArr[0] = iArr[2];
-                    iArr[1] = iArr[3];
-                    iArr[2] = iArr[4];
-                    iArr[3] = 1;
-                    iArr[4] = 0;
-                    i = 3;
+                    stateCount[currentState] = stateCount[currentState] + 1;
                 }
-                i7++;
-                i6 = i;
+                j++;
             }
-            if (foundPatternCross(iArr)) {
-                handlePossibleCenter(iArr, i5, width);
+            if (foundPatternCross(stateCount)) {
+                handlePossibleCenter(stateCount, i, maxJ);
             }
-            i4 = i5 + i3;
         }
-        FinderPattern[][] selectMutipleBestPatterns = selectMutipleBestPatterns();
-        ArrayList arrayList = new ArrayList();
-        for (FinderPattern[] finderPatternArr : selectMutipleBestPatterns) {
-            ResultPoint.orderBestPatterns(finderPatternArr);
-            arrayList.add(new FinderPatternInfo(finderPatternArr));
+        FinderPattern[][] patternInfo = selectMutipleBestPatterns();
+        List<FinderPatternInfo> result = new ArrayList<>();
+        for (FinderPattern[] pattern : patternInfo) {
+            ResultPoint.orderBestPatterns(pattern);
+            result.add(new FinderPatternInfo(pattern));
         }
-        return arrayList.isEmpty() ? EMPTY_RESULT_ARRAY : (FinderPatternInfo[]) arrayList.toArray(new FinderPatternInfo[arrayList.size()]);
+        return result.isEmpty() ? EMPTY_RESULT_ARRAY : (FinderPatternInfo[]) result.toArray(new FinderPatternInfo[result.size()]);
     }
 }

@@ -10,8 +10,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
-
-/* loaded from: classes.jar:com/mining/app/zxing/decoding/DecodeThread.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class DecodeThread extends Thread {
     public static final String BARCODE_BITMAP = "barcode_bitmap";
     private final MipcaActivityCapture activity;
@@ -19,27 +18,22 @@ final class DecodeThread extends Thread {
     private final CountDownLatch handlerInitLatch = new CountDownLatch(1);
     private final Hashtable<DecodeHintType, Object> hints = new Hashtable<>(3);
 
-    /* JADX WARN: Code restructure failed: missing block: B:5:0x002d, code lost:
-        if (r7.isEmpty() != false) goto L6;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-    */
-    DecodeThread(MipcaActivityCapture mipcaActivityCapture, Collection<BarcodeFormat> collection, String str, ResultPointCallback resultPointCallback) {
-        this.activity = mipcaActivityCapture;
-        Vector vector = collection != null ? collection : vector;
-        vector = new Vector();
-        vector.addAll(DecodeFormatManager.ONE_D_FORMATS);
-        vector.addAll(DecodeFormatManager.QR_CODE_FORMATS);
-        vector.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);
-        this.hints.put(DecodeHintType.POSSIBLE_FORMATS, vector);
-        if (str != null) {
-            this.hints.put(DecodeHintType.CHARACTER_SET, str);
+    public DecodeThread(MipcaActivityCapture activity, Collection<BarcodeFormat> decodeFormats, String characterSet, ResultPointCallback resultPointCallback) {
+        this.activity = activity;
+        if (decodeFormats == null || decodeFormats.isEmpty()) {
+            decodeFormats = new Vector<>();
+            decodeFormats.addAll(DecodeFormatManager.ONE_D_FORMATS);
+            decodeFormats.addAll(DecodeFormatManager.QR_CODE_FORMATS);
+            decodeFormats.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);
+        }
+        this.hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
+        if (characterSet != null) {
+            this.hints.put(DecodeHintType.CHARACTER_SET, characterSet);
         }
         this.hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
     }
 
-    Handler getHandler() {
+    public Handler getHandler() {
         try {
             this.handlerInitLatch.await();
         } catch (InterruptedException e) {

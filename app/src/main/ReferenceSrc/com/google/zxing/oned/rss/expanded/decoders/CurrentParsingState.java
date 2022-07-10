@@ -1,53 +1,49 @@
 package com.google.zxing.oned.rss.expanded.decoders;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/CurrentParsingState.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class CurrentParsingState {
     private int position = 0;
     private State encoding = State.NUMERIC;
 
-    /* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/CurrentParsingState$State.class */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
     private enum State {
         NUMERIC,
         ALPHA,
         ISO_IEC_646
     }
 
-    CurrentParsingState() {
-    }
-
-    int getPosition() {
+    public int getPosition() {
         return this.position;
     }
 
-    void incrementPosition(int i) {
-        this.position += i;
+    public void setPosition(int position) {
+        this.position = position;
     }
 
-    boolean isAlpha() {
+    public void incrementPosition(int delta) {
+        this.position += delta;
+    }
+
+    public boolean isAlpha() {
         return this.encoding == State.ALPHA;
-    }
-
-    boolean isIsoIec646() {
-        return this.encoding == State.ISO_IEC_646;
     }
 
     boolean isNumeric() {
         return this.encoding == State.NUMERIC;
     }
 
-    void setAlpha() {
-        this.encoding = State.ALPHA;
+    public boolean isIsoIec646() {
+        return this.encoding == State.ISO_IEC_646;
     }
 
-    void setIsoIec646() {
-        this.encoding = State.ISO_IEC_646;
-    }
-
-    void setNumeric() {
+    public void setNumeric() {
         this.encoding = State.NUMERIC;
     }
 
-    void setPosition(int i) {
-        this.position = i;
+    public void setAlpha() {
+        this.encoding = State.ALPHA;
+    }
+
+    public void setIsoIec646() {
+        this.encoding = State.ISO_IEC_646;
     }
 }

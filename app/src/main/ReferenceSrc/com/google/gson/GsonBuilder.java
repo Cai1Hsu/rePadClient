@@ -12,8 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/gson/GsonBuilder.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class GsonBuilder {
     private boolean complexMapKeySerialization;
     private String datePattern;
@@ -31,61 +30,13 @@ public final class GsonBuilder {
     private int timeStyle = 2;
     private boolean escapeHtmlChars = true;
 
-    private void addTypeAdaptersForDate(String str, int i, int i2, List<TypeAdapterFactory> list) {
-        DefaultDateTypeAdapter defaultDateTypeAdapter;
-        if (str != null && !"".equals(str.trim())) {
-            defaultDateTypeAdapter = new DefaultDateTypeAdapter(str);
-        } else if (i == 2 || i2 == 2) {
-            return;
-        } else {
-            defaultDateTypeAdapter = new DefaultDateTypeAdapter(i, i2);
-        }
-        list.add(TreeTypeAdapter.newFactory(TypeToken.get(Date.class), defaultDateTypeAdapter));
-        list.add(TreeTypeAdapter.newFactory(TypeToken.get(Timestamp.class), defaultDateTypeAdapter));
-        list.add(TreeTypeAdapter.newFactory(TypeToken.get(java.sql.Date.class), defaultDateTypeAdapter));
-    }
-
-    public GsonBuilder addDeserializationExclusionStrategy(ExclusionStrategy exclusionStrategy) {
-        this.excluder = this.excluder.withExclusionStrategy(exclusionStrategy, false, true);
+    public GsonBuilder setVersion(double ignoreVersionsAfter) {
+        this.excluder = this.excluder.withVersion(ignoreVersionsAfter);
         return this;
     }
 
-    public GsonBuilder addSerializationExclusionStrategy(ExclusionStrategy exclusionStrategy) {
-        this.excluder = this.excluder.withExclusionStrategy(exclusionStrategy, true, false);
-        return this;
-    }
-
-    public Gson create() {
-        ArrayList arrayList = new ArrayList();
-        arrayList.addAll(this.factories);
-        Collections.reverse(arrayList);
-        arrayList.addAll(this.hierarchyFactories);
-        addTypeAdaptersForDate(this.datePattern, this.dateStyle, this.timeStyle, arrayList);
-        return new Gson(this.excluder, this.fieldNamingPolicy, this.instanceCreators, this.serializeNulls, this.complexMapKeySerialization, this.generateNonExecutableJson, this.escapeHtmlChars, this.prettyPrinting, this.serializeSpecialFloatingPointValues, this.longSerializationPolicy, arrayList);
-    }
-
-    public GsonBuilder disableHtmlEscaping() {
-        this.escapeHtmlChars = false;
-        return this;
-    }
-
-    public GsonBuilder disableInnerClassSerialization() {
-        this.excluder = this.excluder.disableInnerClassSerialization();
-        return this;
-    }
-
-    public GsonBuilder enableComplexMapKeySerialization() {
-        this.complexMapKeySerialization = true;
-        return this;
-    }
-
-    public GsonBuilder excludeFieldsWithModifiers(int... iArr) {
-        this.excluder = this.excluder.withModifiers(iArr);
-        return this;
-    }
-
-    public GsonBuilder excludeFieldsWithoutExposeAnnotation() {
-        this.excluder = this.excluder.excludeFieldsWithoutExposeAnnotation();
+    public GsonBuilder excludeFieldsWithModifiers(int... modifiers) {
+        this.excluder = this.excluder.withModifiers(modifiers);
         return this;
     }
 
@@ -94,33 +45,8 @@ public final class GsonBuilder {
         return this;
     }
 
-    public GsonBuilder registerTypeAdapter(Type type, Object obj) {
-        C$Gson$Preconditions.checkArgument((obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer) || (obj instanceof InstanceCreator) || (obj instanceof TypeAdapter));
-        if (obj instanceof InstanceCreator) {
-            this.instanceCreators.put(type, (InstanceCreator) obj);
-        }
-        if ((obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer)) {
-            this.factories.add(TreeTypeAdapter.newFactoryWithMatchRawType(TypeToken.get(type), obj));
-        }
-        if (obj instanceof TypeAdapter) {
-            this.factories.add(TypeAdapters.newFactory(TypeToken.get(type), (TypeAdapter) obj));
-        }
-        return this;
-    }
-
-    public GsonBuilder registerTypeAdapterFactory(TypeAdapterFactory typeAdapterFactory) {
-        this.factories.add(typeAdapterFactory);
-        return this;
-    }
-
-    public GsonBuilder registerTypeHierarchyAdapter(Class<?> cls, Object obj) {
-        C$Gson$Preconditions.checkArgument((obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer) || (obj instanceof TypeAdapter));
-        if ((obj instanceof JsonDeserializer) || (obj instanceof JsonSerializer)) {
-            this.hierarchyFactories.add(0, TreeTypeAdapter.newTypeHierarchyFactory(cls, obj));
-        }
-        if (obj instanceof TypeAdapter) {
-            this.factories.add(TypeAdapters.newTypeHierarchyFactory(cls, (TypeAdapter) obj));
-        }
+    public GsonBuilder excludeFieldsWithoutExposeAnnotation() {
+        this.excluder = this.excluder.excludeFieldsWithoutExposeAnnotation();
         return this;
     }
 
@@ -129,38 +55,23 @@ public final class GsonBuilder {
         return this;
     }
 
-    public GsonBuilder serializeSpecialFloatingPointValues() {
-        this.serializeSpecialFloatingPointValues = true;
+    public GsonBuilder enableComplexMapKeySerialization() {
+        this.complexMapKeySerialization = true;
         return this;
     }
 
-    public GsonBuilder setDateFormat(int i) {
-        this.dateStyle = i;
-        this.datePattern = null;
+    public GsonBuilder disableInnerClassSerialization() {
+        this.excluder = this.excluder.disableInnerClassSerialization();
         return this;
     }
 
-    public GsonBuilder setDateFormat(int i, int i2) {
-        this.dateStyle = i;
-        this.timeStyle = i2;
-        this.datePattern = null;
+    public GsonBuilder setLongSerializationPolicy(LongSerializationPolicy serializationPolicy) {
+        this.longSerializationPolicy = serializationPolicy;
         return this;
     }
 
-    public GsonBuilder setDateFormat(String str) {
-        this.datePattern = str;
-        return this;
-    }
-
-    public GsonBuilder setExclusionStrategies(ExclusionStrategy... exclusionStrategyArr) {
-        for (ExclusionStrategy exclusionStrategy : exclusionStrategyArr) {
-            this.excluder = this.excluder.withExclusionStrategy(exclusionStrategy, true, true);
-        }
-        return this;
-    }
-
-    public GsonBuilder setFieldNamingPolicy(FieldNamingPolicy fieldNamingPolicy) {
-        this.fieldNamingPolicy = fieldNamingPolicy;
+    public GsonBuilder setFieldNamingPolicy(FieldNamingPolicy namingConvention) {
+        this.fieldNamingPolicy = namingConvention;
         return this;
     }
 
@@ -169,8 +80,20 @@ public final class GsonBuilder {
         return this;
     }
 
-    public GsonBuilder setLongSerializationPolicy(LongSerializationPolicy longSerializationPolicy) {
-        this.longSerializationPolicy = longSerializationPolicy;
+    public GsonBuilder setExclusionStrategies(ExclusionStrategy... strategies) {
+        for (ExclusionStrategy strategy : strategies) {
+            this.excluder = this.excluder.withExclusionStrategy(strategy, true, true);
+        }
+        return this;
+    }
+
+    public GsonBuilder addSerializationExclusionStrategy(ExclusionStrategy strategy) {
+        this.excluder = this.excluder.withExclusionStrategy(strategy, true, false);
+        return this;
+    }
+
+    public GsonBuilder addDeserializationExclusionStrategy(ExclusionStrategy strategy) {
+        this.excluder = this.excluder.withExclusionStrategy(strategy, false, true);
         return this;
     }
 
@@ -179,8 +102,85 @@ public final class GsonBuilder {
         return this;
     }
 
-    public GsonBuilder setVersion(double d) {
-        this.excluder = this.excluder.withVersion(d);
+    public GsonBuilder disableHtmlEscaping() {
+        this.escapeHtmlChars = false;
         return this;
+    }
+
+    public GsonBuilder setDateFormat(String pattern) {
+        this.datePattern = pattern;
+        return this;
+    }
+
+    public GsonBuilder setDateFormat(int style) {
+        this.dateStyle = style;
+        this.datePattern = null;
+        return this;
+    }
+
+    public GsonBuilder setDateFormat(int dateStyle, int timeStyle) {
+        this.dateStyle = dateStyle;
+        this.timeStyle = timeStyle;
+        this.datePattern = null;
+        return this;
+    }
+
+    public GsonBuilder registerTypeAdapter(Type type, Object typeAdapter) {
+        C$Gson$Preconditions.checkArgument((typeAdapter instanceof JsonSerializer) || (typeAdapter instanceof JsonDeserializer) || (typeAdapter instanceof InstanceCreator) || (typeAdapter instanceof TypeAdapter));
+        if (typeAdapter instanceof InstanceCreator) {
+            this.instanceCreators.put(type, (InstanceCreator) typeAdapter);
+        }
+        if ((typeAdapter instanceof JsonSerializer) || (typeAdapter instanceof JsonDeserializer)) {
+            TypeToken<?> typeToken = TypeToken.get(type);
+            this.factories.add(TreeTypeAdapter.newFactoryWithMatchRawType(typeToken, typeAdapter));
+        }
+        if (typeAdapter instanceof TypeAdapter) {
+            this.factories.add(TypeAdapters.newFactory(TypeToken.get(type), (TypeAdapter) typeAdapter));
+        }
+        return this;
+    }
+
+    public GsonBuilder registerTypeAdapterFactory(TypeAdapterFactory factory) {
+        this.factories.add(factory);
+        return this;
+    }
+
+    public GsonBuilder registerTypeHierarchyAdapter(Class<?> baseType, Object typeAdapter) {
+        C$Gson$Preconditions.checkArgument((typeAdapter instanceof JsonSerializer) || (typeAdapter instanceof JsonDeserializer) || (typeAdapter instanceof TypeAdapter));
+        if ((typeAdapter instanceof JsonDeserializer) || (typeAdapter instanceof JsonSerializer)) {
+            this.hierarchyFactories.add(0, TreeTypeAdapter.newTypeHierarchyFactory(baseType, typeAdapter));
+        }
+        if (typeAdapter instanceof TypeAdapter) {
+            this.factories.add(TypeAdapters.newTypeHierarchyFactory(baseType, (TypeAdapter) typeAdapter));
+        }
+        return this;
+    }
+
+    public GsonBuilder serializeSpecialFloatingPointValues() {
+        this.serializeSpecialFloatingPointValues = true;
+        return this;
+    }
+
+    public Gson create() {
+        List<TypeAdapterFactory> factories = new ArrayList<>();
+        factories.addAll(this.factories);
+        Collections.reverse(factories);
+        factories.addAll(this.hierarchyFactories);
+        addTypeAdaptersForDate(this.datePattern, this.dateStyle, this.timeStyle, factories);
+        return new Gson(this.excluder, this.fieldNamingPolicy, this.instanceCreators, this.serializeNulls, this.complexMapKeySerialization, this.generateNonExecutableJson, this.escapeHtmlChars, this.prettyPrinting, this.serializeSpecialFloatingPointValues, this.longSerializationPolicy, factories);
+    }
+
+    private void addTypeAdaptersForDate(String datePattern, int dateStyle, int timeStyle, List<TypeAdapterFactory> factories) {
+        DefaultDateTypeAdapter dateTypeAdapter;
+        if (datePattern != null && !"".equals(datePattern.trim())) {
+            dateTypeAdapter = new DefaultDateTypeAdapter(datePattern);
+        } else if (dateStyle != 2 && timeStyle != 2) {
+            dateTypeAdapter = new DefaultDateTypeAdapter(dateStyle, timeStyle);
+        } else {
+            return;
+        }
+        factories.add(TreeTypeAdapter.newFactory(TypeToken.get(Date.class), dateTypeAdapter));
+        factories.add(TreeTypeAdapter.newFactory(TypeToken.get(Timestamp.class), dateTypeAdapter));
+        factories.add(TreeTypeAdapter.newFactory(TypeToken.get(java.sql.Date.class), dateTypeAdapter));
     }
 }

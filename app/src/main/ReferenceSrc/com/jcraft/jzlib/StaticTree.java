@@ -1,6 +1,5 @@
 package com.jcraft.jzlib;
-
-/* loaded from: classes.jar:com/jcraft/jzlib/StaticTree.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class StaticTree {
     private static final int BL_CODES = 19;
     private static final int D_CODES = 30;
@@ -20,11 +19,11 @@ final class StaticTree {
     static StaticTree static_d_desc = new StaticTree(static_dtree, Tree.extra_dbits, 0, 30, 15);
     static StaticTree static_bl_desc = new StaticTree(null, Tree.extra_blbits, 0, 19, 7);
 
-    StaticTree(short[] sArr, int[] iArr, int i, int i2, int i3) {
-        this.static_tree = sArr;
-        this.extra_bits = iArr;
-        this.extra_base = i;
-        this.elems = i2;
-        this.max_length = i3;
+    StaticTree(short[] static_tree, int[] extra_bits, int extra_base, int elems, int max_length) {
+        this.static_tree = static_tree;
+        this.extra_bits = extra_bits;
+        this.extra_base = extra_base;
+        this.elems = elems;
+        this.max_length = max_length;
     }
 }

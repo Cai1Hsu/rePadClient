@@ -3,8 +3,9 @@ package com.google.zxing.common;
 import com.google.zxing.Binarizer;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.NotFoundException;
-
-/* loaded from: classes.jar:com/google/zxing/common/HybridBinarizer.class */
+import java.lang.reflect.Array;
+import org.bson.BSON;
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class HybridBinarizer extends GlobalHistogramBinarizer {
     private static final int BLOCK_SIZE = 8;
     private static final int BLOCK_SIZE_MASK = 7;
@@ -12,163 +13,133 @@ public final class HybridBinarizer extends GlobalHistogramBinarizer {
     private static final int MINIMUM_DIMENSION = 40;
     private BitMatrix matrix;
 
-    public HybridBinarizer(LuminanceSource luminanceSource) {
-        super(luminanceSource);
-    }
-
-    private static int[][] calculateBlackPoints(byte[] bArr, int i, int i2, int i3, int i4) {
-        int[][] iArr = new int[i2][i];
-        for (int i5 = 0; i5 < i2; i5++) {
-            int i6 = i5 << 3;
-            int i7 = i6;
-            if (i6 + 8 >= i4) {
-                i7 = i4 - 8;
-            }
-            for (int i8 = 0; i8 < i; i8++) {
-                int i9 = i8 << 3;
-                int i10 = i9;
-                if (i9 + 8 >= i3) {
-                    i10 = i3 - 8;
-                }
-                int i11 = 0;
-                int i12 = 255;
-                int i13 = 0;
-                int i14 = (i7 * i3) + i10;
-                int i15 = 0;
-                while (i15 < 8) {
-                    int i16 = 0;
-                    int i17 = i12;
-                    int i18 = i13;
-                    while (i16 < 8) {
-                        int i19 = bArr[i14 + i16] & 255;
-                        i11 += i19;
-                        int i20 = i17;
-                        if (i19 < i17) {
-                            i20 = i19;
-                        }
-                        int i21 = i18;
-                        if (i19 > i18) {
-                            i21 = i19;
-                        }
-                        i16++;
-                        i18 = i21;
-                        i17 = i20;
-                    }
-                    i15++;
-                    i14 += i3;
-                    i13 = i18;
-                    i12 = i17;
-                }
-                int i22 = i11 >> 6;
-                if (i13 - i12 <= 24) {
-                    int i23 = i12 >> 1;
-                    i22 = i23;
-                    if (i5 > 0) {
-                        i22 = i23;
-                        if (i8 > 0) {
-                            int i24 = ((iArr[i5 - 1][i8] + (iArr[i5][i8 - 1] * 2)) + iArr[i5 - 1][i8 - 1]) >> 2;
-                            i22 = i23;
-                            if (i12 < i24) {
-                                i22 = i24;
-                            }
-                        }
-                    }
-                }
-                iArr[i5][i8] = i22;
-            }
-        }
-        return iArr;
-    }
-
-    private static void calculateThresholdForBlock(byte[] bArr, int i, int i2, int i3, int i4, int[][] iArr, BitMatrix bitMatrix) {
-        int i5 = 0;
-        while (i5 < i2) {
-            int i6 = i5 << 3;
-            int i7 = i6;
-            if (i6 + 8 >= i4) {
-                i7 = i4 - 8;
-            }
-            int i8 = 0;
-            while (i8 < i) {
-                int i9 = i8 << 3;
-                int i10 = i9;
-                if (i9 + 8 >= i3) {
-                    i10 = i3 - 8;
-                }
-                int i11 = i8 > 1 ? i8 : 2;
-                int i12 = i11 < i - 2 ? i11 : i - 3;
-                int i13 = i5 > 1 ? i5 : 2;
-                if (i13 >= i2 - 2) {
-                    i13 = i2 - 3;
-                }
-                int i14 = 0;
-                for (int i15 = -2; i15 <= 2; i15++) {
-                    int[] iArr2 = iArr[i13 + i15];
-                    i14 += iArr2[i12 - 2] + iArr2[i12 - 1] + iArr2[i12] + iArr2[i12 + 1] + iArr2[i12 + 2];
-                }
-                threshold8x8Block(bArr, i10, i7, i14 / 25, i3, bitMatrix);
-                i8++;
-            }
-            i5++;
-        }
-    }
-
-    private static void threshold8x8Block(byte[] bArr, int i, int i2, int i3, int i4, BitMatrix bitMatrix) {
-        int i5 = 0;
-        int i6 = i2 * i4;
-        int i7 = i;
-        while (true) {
-            int i8 = i6 + i7;
-            if (i5 < 8) {
-                for (int i9 = 0; i9 < 8; i9++) {
-                    if ((bArr[i8 + i9] & 255) <= i3) {
-                        bitMatrix.set(i + i9, i2 + i5);
-                    }
-                }
-                i5++;
-                i6 = i8;
-                i7 = i4;
-            } else {
-                return;
-            }
-        }
-    }
-
-    @Override // com.google.zxing.common.GlobalHistogramBinarizer, com.google.zxing.Binarizer
-    public Binarizer createBinarizer(LuminanceSource luminanceSource) {
-        return new HybridBinarizer(luminanceSource);
+    public HybridBinarizer(LuminanceSource source) {
+        super(source);
     }
 
     @Override // com.google.zxing.common.GlobalHistogramBinarizer, com.google.zxing.Binarizer
     public BitMatrix getBlackMatrix() throws NotFoundException {
-        BitMatrix bitMatrix;
         if (this.matrix != null) {
-            bitMatrix = this.matrix;
-        } else {
-            LuminanceSource luminanceSource = getLuminanceSource();
-            if (luminanceSource.getWidth() < 40 || luminanceSource.getHeight() < 40) {
-                this.matrix = super.getBlackMatrix();
-            } else {
-                byte[] matrix = luminanceSource.getMatrix();
-                int width = luminanceSource.getWidth();
-                int height = luminanceSource.getHeight();
-                int i = width >> 3;
-                int i2 = i;
-                if ((width & 7) != 0) {
-                    i2 = i + 1;
-                }
-                int i3 = height >> 3;
-                int i4 = i3;
-                if ((height & 7) != 0) {
-                    i4 = i3 + 1;
-                }
-                int[][] calculateBlackPoints = calculateBlackPoints(matrix, i2, i4, width, height);
-                BitMatrix bitMatrix2 = new BitMatrix(width, height);
-                calculateThresholdForBlock(matrix, i2, i4, width, height, calculateBlackPoints, bitMatrix2);
-                this.matrix = bitMatrix2;
-            }
-            bitMatrix = this.matrix;
+            return this.matrix;
         }
-        return bitMatrix;
+        LuminanceSource source = getLuminanceSource();
+        if (source.getWidth() >= 40 && source.getHeight() >= 40) {
+            byte[] luminances = source.getMatrix();
+            int width = source.getWidth();
+            int height = source.getHeight();
+            int subWidth = width >> 3;
+            if ((width & 7) != 0) {
+                subWidth++;
+            }
+            int subHeight = height >> 3;
+            if ((height & 7) != 0) {
+                subHeight++;
+            }
+            int[][] blackPoints = calculateBlackPoints(luminances, subWidth, subHeight, width, height);
+            BitMatrix newMatrix = new BitMatrix(width, height);
+            calculateThresholdForBlock(luminances, subWidth, subHeight, width, height, blackPoints, newMatrix);
+            this.matrix = newMatrix;
+        } else {
+            this.matrix = super.getBlackMatrix();
+        }
+        return this.matrix;
+    }
+
+    @Override // com.google.zxing.common.GlobalHistogramBinarizer, com.google.zxing.Binarizer
+    public Binarizer createBinarizer(LuminanceSource source) {
+        return new HybridBinarizer(source);
+    }
+
+    private static void calculateThresholdForBlock(byte[] luminances, int subWidth, int subHeight, int width, int height, int[][] blackPoints, BitMatrix matrix) {
+        int y = 0;
+        while (y < subHeight) {
+            int yoffset = y << 3;
+            if (yoffset + 8 >= height) {
+                yoffset = height - 8;
+            }
+            int x = 0;
+            while (x < subWidth) {
+                int xoffset = x << 3;
+                if (xoffset + 8 >= width) {
+                    xoffset = width - 8;
+                }
+                int left = x > 1 ? x : 2;
+                if (left >= subWidth - 2) {
+                    left = subWidth - 3;
+                }
+                int top = y > 1 ? y : 2;
+                if (top >= subHeight - 2) {
+                    top = subHeight - 3;
+                }
+                int sum = 0;
+                for (int z = -2; z <= 2; z++) {
+                    int[] blackRow = blackPoints[top + z];
+                    sum += blackRow[left - 2] + blackRow[left - 1] + blackRow[left] + blackRow[left + 1] + blackRow[left + 2];
+                }
+                int average = sum / 25;
+                threshold8x8Block(luminances, xoffset, yoffset, average, width, matrix);
+                x++;
+            }
+            y++;
+        }
+    }
+
+    private static void threshold8x8Block(byte[] luminances, int xoffset, int yoffset, int threshold, int stride, BitMatrix matrix) {
+        int y = 0;
+        int offset = (yoffset * stride) + xoffset;
+        while (y < 8) {
+            for (int x = 0; x < 8; x++) {
+                if ((luminances[offset + x] & 255) <= threshold) {
+                    matrix.set(xoffset + x, yoffset + y);
+                }
+            }
+            y++;
+            offset += stride;
+        }
+    }
+
+    private static int[][] calculateBlackPoints(byte[] luminances, int subWidth, int subHeight, int width, int height) {
+        int averageNeighborBlackPoint;
+        int[][] blackPoints = (int[][]) Array.newInstance(Integer.TYPE, subHeight, subWidth);
+        for (int y = 0; y < subHeight; y++) {
+            int yoffset = y << 3;
+            if (yoffset + 8 >= height) {
+                yoffset = height - 8;
+            }
+            for (int x = 0; x < subWidth; x++) {
+                int xoffset = x << 3;
+                if (xoffset + 8 >= width) {
+                    xoffset = width - 8;
+                }
+                int sum = 0;
+                int min = 255;
+                int max = 0;
+                int yy = 0;
+                int offset = (yoffset * width) + xoffset;
+                while (yy < 8) {
+                    for (int xx = 0; xx < 8; xx++) {
+                        int pixel = luminances[offset + xx] & BSON.MINKEY;
+                        sum += pixel;
+                        if (pixel < min) {
+                            min = pixel;
+                        }
+                        if (pixel > max) {
+                            max = pixel;
+                        }
+                    }
+                    yy++;
+                    offset += width;
+                }
+                int average = sum >> 6;
+                if (max - min <= 24) {
+                    average = min >> 1;
+                    if (y > 0 && x > 0 && min < (averageNeighborBlackPoint = ((blackPoints[y - 1][x] + (blackPoints[y][x - 1] * 2)) + blackPoints[y - 1][x - 1]) >> 2)) {
+                        average = averageNeighborBlackPoint;
+                    }
+                }
+                blackPoints[y][x] = average;
+            }
+        }
+        return blackPoints;
     }
 }

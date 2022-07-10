@@ -15,8 +15,7 @@ import com.mongodb.util.TimeConstants;
 import java.util.List;
 import java.util.TimerTask;
 import org.apache.tools.ant.taskdefs.optional.clearcase.ClearCase;
-
-/* loaded from: classes.jar:com/edutech/mobilestudyclient/activity/service/sysProtectTimer.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class sysProtectTimer extends TimerTask {
     public static final String TAG = "LockTask";
     public static boolean flag = true;
@@ -124,9 +123,6 @@ public class sysProtectTimer extends TimerTask {
     @Override // java.util.TimerTask, java.lang.Runnable
     @SuppressLint({"NewApi"})
     public void run() {
-        boolean z;
-        String str;
-        int i;
         PackageInfo packageInfo;
         PackageInfo packageInfo2;
         if (this.mContext == null && this.extraContext != null) {
@@ -135,298 +131,291 @@ public class sysProtectTimer extends TimerTask {
         if (this.mActivityManager == null) {
             this.mActivityManager = (ActivityManager) this.mContext.getSystemService("activity");
         }
-        List<ActivityManager.RunningTaskInfo> runningTasks = this.mActivityManager.getRunningTasks(5);
-        if (runningTasks == null || runningTasks.size() < 1) {
-            return;
-        }
-        ComponentName componentName = runningTasks.get(0).topActivity;
-        String packageName = componentName.getPackageName();
-        String className = componentName.getClassName();
-        flagNeedPasswd = true;
-        if (isLiveShow && !this.takeShotAc.equals(className) && !this.permissionAc.equals(className) && !this.livePkg.equals(packageName) && !this.liveAc.equals(className)) {
-            int size = runningTasks.size();
-            int i2 = 0;
-            while (true) {
-                if (i2 >= size) {
-                    break;
-                }
-                if (this.livePkg.equals(runningTasks.get(i2).topActivity.getPackageName())) {
-                    Log.e("Lock", "Go to liveshow!!," + packageName + "," + className);
-                    Log.e("Lock", "i is" + i2);
-                    this.mActivityManager.moveTaskToFront(runningTasks.get(i2).id, 2);
-                    flagNeedPasswd = false;
-                    break;
-                }
-                i2++;
-            }
-        } else if (isInteraction && !this.interPackageName.equals(packageName) && !this.cameraPackageName.equals(packageName) && !this.takeShotAc.equals(className) && !this.permissionAc.equals(className) && !this.livePkg.equals(packageName) && !this.liveAc.equals(className)) {
-            int size2 = runningTasks.size();
-            for (int i3 = 0; i3 < size2; i3++) {
-                ComponentName componentName2 = runningTasks.get(i3).topActivity;
-                if (this.interPackageName.equals(componentName2.getPackageName()) || this.cameraPackageName.equals(componentName2.getPackageName())) {
-                    Log.e("Lock", "Go to Interaction!!," + packageName + "," + className);
-                    Log.e("Lock", "i is" + i3);
-                    this.mActivityManager.moveTaskToFront(runningTasks.get(i3).id, 2);
-                    flagNeedPasswd = false;
-                    break;
-                }
-            }
-        }
-        SharedPreferences sharedPreferences = this.mContext.getSharedPreferences("lockscreen", 4);
-        boolean z2 = sharedPreferences.getBoolean("locked", false);
-        int i4 = sharedPreferences.getInt("tmplocked", 0);
-        boolean z3 = this.mContext.getSharedPreferences("allowcall", 4).getBoolean("cancall", false);
-        boolean z4 = this.mContext.getSharedPreferences("sdcard", 4).getBoolean("sdcard", false);
-        if (AppEnvironment.isPDSSZ && flag && ((this.testPackageName.equals(packageName) || this.ggpy.equals(packageName) || this.browserPackageName.equals(packageName)) && !this.mContext.getSharedPreferences("privatekey", 0).getString("apihost", "").contains("www.ischool365.com"))) {
-            if (!z2 && i4 != 1) {
-                SharedPreferences sharedPreferences2 = this.mContext.getSharedPreferences("lockscreen", 4);
-                sharedPreferences2.edit().putInt("tmplocked", 1).commit();
-                sharedPreferences2.edit().putLong("tmplockedtime", System.currentTimeMillis()).commit();
-                Intent intent = new Intent(AppEnvironment.Intent_LOCKWINDOW);
-                intent.putExtra("state", LogHelp.TYPE_GUIDANCE);
-                this.mContext.sendBroadcast(intent);
-            }
-            try {
-                Intent intent2 = new Intent("android.intent.action.MAIN");
-                intent2.setFlags(268468224);
-                intent2.addCategory("android.intent.category.LAUNCHER");
-                intent2.setComponent(new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity"));
-                this.mContext.startActivity(intent2);
-                return;
-            } catch (Exception e) {
-                return;
-            }
-        }
-        if (z2 && !z4) {
-            if (System.currentTimeMillis() - sharedPreferences.getLong("lockstartTime", 0L) > sharedPreferences.getLong("lockTime", 0L)) {
-                sharedPreferences.edit().putLong("lockstartTime", 0L).commit();
-                sharedPreferences.edit().putLong("lockTime", 0L).commit();
-                sharedPreferences.edit().putBoolean("locked", false).commit();
-                sharedPreferences.edit().putInt("tmplocked", 0).commit();
-                sharedPreferences.edit().putLong("showstarttime", 0L).commit();
-                sharedPreferences.edit().putInt("shownumber", 1).commit();
-                AppEnvironment.showDialogNumber = 0;
-                AppEnvironment.startTime = 0L;
-                this.mContext.sendBroadcast(new Intent(AppEnvironment.Intent_UNLOCKWINDOW));
-            } else if (!"com.launcher.activity".equals(packageName) && !this.wifiWarningClassName.equals(className) && !"com.android.vpndialogs".equals(packageName) && !"com.edutech.firewall".equals(packageName) && !"com.edutech.wificonn".equals(packageName)) {
-                Intent intent3 = new Intent("android.intent.action.MAIN");
-                intent3.setFlags(268468224);
-                intent3.addCategory("android.intent.category.LAUNCHER");
-                intent3.setComponent(new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity"));
-                this.mContext.startActivity(intent3);
-                return;
-            }
-        } else if (i4 == 1 && !z4) {
-            if (System.currentTimeMillis() - sharedPreferences.getLong("tmplockedtime", 0L) > 300000) {
-                sharedPreferences.edit().putInt("tmplocked", 2).commit();
-                sharedPreferences.edit().putLong("tmplockedtime", 0L).commit();
-                this.mContext.sendBroadcast(new Intent(AppEnvironment.Intent_UNLOCKWINDOW));
-            } else if (!className.equals("com.edutech.mobilestudyclient.activity.PasswdDialogActivity") && !"com.launcher.activity".equals(packageName) && !this.wifiWarningClassName.equals(className) && !"com.android.vpndialogs".equals(packageName) && !"com.edutech.firewall".equals(packageName) && !"com.edutech.wificonn".equals(packageName)) {
-                return;
-            }
-        }
-        if (className.equals("com.edutech.mobilestudyclient.activity.PasswdDialogActivity") || className.equals("com.android.settings.DeviceAdminAdd")) {
-            return;
-        }
-        this.mContext.getSharedPreferences("usbotg", 4);
-        if (packageName.contains("com.edutech") || packageName.equals("com.launcher.activity")) {
-            flag = true;
-        }
-        if (z4 && flag) {
-            AppEnvironment.showDialogNumber++;
-            Intent intent4 = new Intent("android.intent.action.MAIN");
-            intent4.setFlags(268435456);
-            intent4.setComponent(new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.PasswdDialogActivity"));
-            intent4.setFlags(268468224);
-            intent4.putExtra("number", AppEnvironment.showDialogNumber);
-            intent4.putExtra("lockwarning", 0);
-            intent4.putExtra("packagename", packageName);
-            try {
-                packageInfo2 = this.mContext.getPackageManager().getPackageInfo("com.launcher.activity", 0);
-            } catch (PackageManager.NameNotFoundException e2) {
-                packageInfo2 = null;
-                e2.printStackTrace();
-            }
-            if (packageInfo2 == null) {
-                return;
-            }
-            try {
-                this.mContext.startActivity(intent4);
-            } catch (Exception e3) {
-            }
-        } else if (!this.testPackageName.equals(packageName) || !AppEnvironment.isSDYB || !this.wifiAc.equals(className)) {
-            if (this.testPackageName.equals(packageName) && this.batteryDialogAc.equals(className)) {
-                return;
-            }
-            if (((!this.testPackageName.equals(packageName) || this.wifiPermission.equals(className) || this.wifiWarningClassName.equals(className)) && !this.lenovoWebview.equals(packageName) && !this.lenovoQuickSearch.equals(packageName) && !this.lananBrowser.equals(packageName) && !this.sspy.equals(packageName) && !this.lenovoBrowser.equals(packageName) && !this.pdfnote.equals(packageName) && !this.ssnotes.equals(packageName) && ((!this.ggpy.equals(packageName) || className.equals(this.permissionQC80A2)) && !this.XTPYSZ.equals(className) && !this.emailSM.equals(packageName) && !this.uninstallSMPackageActivity.equals(className) && !this.testPackageName2.equals(packageName) && !this.huafenPName.equals(packageName) && !this.sinaHD.equals(packageName) && !this.sinaPhone.equals(packageName) && !this.tencentWb.equals(packageName) && !this.emailPackageNameP550.equals(packageName) && !this.sconnectPackageNameP550.equals(packageName) && !this.pinboardPackageNameP550.equals(packageName) && !this.inputBaidu.equals(packageName) && !this.psharePName.equals(packageName) && ((z3 || (!this.mms.equals(packageName) && !this.call.equals(packageName))) && !this.hwidPName.equals(packageName) && !this.hwdiskPName.equals(packageName) && !this.wps1.equals(className) && !this.mobileprintPackageName.equals(packageName) && !this.wpsPushActivity.equals(className) && !this.officesuiteClass.equals(className) && !this.emailPName.equals(packageName) && !this.wechatPName.equals(packageName) && !this.playPName.equals(packageName) && !this.qqPName.equals(packageName) && !this.walletPName.equals(packageName) && !this.baiduMapPName.equals(packageName) && !this.storePName.equals(packageName) && !this.searchpackageName.equals(packageName) && !this.gesturePackageName.equals(packageName) && !this.secLauncherPackageName.equals(packageName) && ((!this.installerPackageName.equals(packageName) || className.equals(this.permissionQC80A) || className.equals(this.installAcName)) && !this.gallery3dClassName.equals(className) && !this.inputPackageName.equals(packageName) && !this.browserPackageName.equals(packageName) && !this.tencentBrowserPackageName.equals(packageName) && !this.fileBrowserPackageName.equals(packageName) && !this.baiduNetdiskPackageName.equals(packageName) && !this.activeExplorerPackageName.equals(packageName) && !this.kuaiyaPackageName.equals(packageName) && !this.samsungAppsPackageName.equals(packageName) && !this.autonaviPackageName.equals(packageName) && !this.dirPic.equals(packageName) && !packageName.contains(this.snote) && !this.snotePackageName.equals(packageName))))) || !flag || !flagNeedPasswd || (packageName.equals(this.testPackageName) && className.equals(this.detailsActivity))) {
-                if (this.testPackageName.equals(packageName) || this.passwdClassName.equals(className) || this.testPackageName2.equals(packageName) || this.gesturePackageName.equals(packageName) || this.secLauncherPackageName.equals(packageName) || this.installerPackageName.equals(packageName) || this.gallery3dClassName.equals(className) || !this.inputPackageName.equals(packageName)) {
-                }
-                return;
-            }
-            Log.e(ClearCase.COMMAND_LOCK, String.valueOf(className) + "," + packageName);
-            String string = this.mContext.getSharedPreferences("privatekey", 0).getString("apihost", "");
-            if ((this.testPackageName.equals(packageName) || this.XTPYSZ.equals(className) || (this.ggpy.equals(packageName) && !className.equals(this.permissionQC80A2))) && !string.contains("www.ischool365.com")) {
-                SharedPreferences sharedPreferences3 = this.mContext.getSharedPreferences("lockscreen", 4);
-                sharedPreferences3.edit().putInt("tmplocked", 1).commit();
-                sharedPreferences3.edit().putLong("tmplockedtime", System.currentTimeMillis()).commit();
-                Intent intent5 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
-                intent5.putExtra("state", LogHelp.TYPE_GUIDANCE);
-                this.mContext.sendBroadcast(intent5);
-                Intent intent6 = new Intent("android.intent.action.MAIN");
-                intent6.setFlags(268468224);
-                intent6.addCategory("android.intent.category.LAUNCHER");
-                intent6.setComponent(new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity"));
-                this.mContext.startActivity(intent6);
-                return;
-            }
-            SharedPreferences sharedPreferences4 = this.mContext.getSharedPreferences("lockscreen", 4);
-            boolean z5 = sharedPreferences4.getBoolean("locked", false);
-            long currentTimeMillis = System.currentTimeMillis();
-            int i5 = 0;
-            int i6 = sharedPreferences4.getInt("tmplocked", 0);
-            int i7 = sharedPreferences4.getInt("shownumber", 1);
-            long j = sharedPreferences4.getLong("showstarttime", 0L);
-            if (i7 == 6 || i7 == 7 || i7 == 13 || i7 == 14) {
-                i5 = 2;
-            }
-            if (j <= 0) {
-                sharedPreferences4.edit().putLong("showstarttime", currentTimeMillis).commit();
-            }
-            long j2 = j;
-            if (j <= 0) {
-                j2 = currentTimeMillis;
-            }
-            long abs = Math.abs((currentTimeMillis - j2) / 1000);
-            if (abs < TimeConstants.S_HOUR) {
-                if (i6 == 0) {
-                    z = z5;
-                    str = "0";
-                    if (i7 >= 7) {
-                        z = true;
-                        sharedPreferences4.edit().putInt("tmplocked", 1).commit();
-                        sharedPreferences4.edit().putLong("tmplockedtime", currentTimeMillis).commit();
-                        str = LogHelp.TYPE_GUIDANCE;
+        List<ActivityManager.RunningTaskInfo> taskList = this.mActivityManager.getRunningTasks(5);
+        if (taskList != null && taskList.size() >= 1) {
+            ComponentName topActivity = taskList.get(0).topActivity;
+            String packageNameTop = topActivity.getPackageName();
+            String classNameTop = topActivity.getClassName();
+            flagNeedPasswd = true;
+            if (isLiveShow && !this.takeShotAc.equals(classNameTop) && !this.permissionAc.equals(classNameTop) && !this.livePkg.equals(packageNameTop) && !this.liveAc.equals(classNameTop)) {
+                int sizeStack = taskList.size();
+                int i = 0;
+                while (true) {
+                    if (i >= sizeStack) {
+                        break;
                     }
-                    i = i7 + 1;
-                    sharedPreferences4.edit().putInt("shownumber", i).commit();
-                } else if (i6 == 1) {
-                    z = true;
-                    str = LogHelp.TYPE_GUIDANCE;
-                    i = i7;
-                } else {
-                    z = z5;
-                    str = "0";
-                    i = i7;
-                    if (i6 == 2) {
-                        if (i7 >= 14) {
-                            z = true;
-                            str = LogHelp.TYPE_MYWORK;
-                            sharedPreferences4.edit().putInt("tmplocked", 0).commit();
-                            sharedPreferences4.edit().putLong("showstarttime", 0L).commit();
-                            sharedPreferences4.edit().putInt("shownumber", 1).commit();
-                            sharedPreferences4.edit().putLong("lockstartTime", currentTimeMillis).commit();
-                            if (AppEnvironment.isSNZT) {
-                                sharedPreferences4.edit().putLong("lockTime", 864000000L).commit();
-                            } else {
-                                sharedPreferences4.edit().putLong("lockTime", 86400000L).commit();
-                            }
-                            sharedPreferences4.edit().putBoolean("locked", true).commit();
-                            sharedPreferences4.edit().putBoolean("uploadlockstate", false).commit();
-                            i = i7;
-                        } else {
-                            i = i7 + 1;
-                            sharedPreferences4.edit().putInt("shownumber", i).commit();
-                            z = z5;
-                            str = "0";
-                        }
-                    }
-                }
-            } else if (abs <= TimeConstants.S_HOUR || abs > 7200) {
-                z = false;
-                sharedPreferences4.edit().putInt("tmplocked", 0).commit();
-                sharedPreferences4.edit().putLong("showstarttime", currentTimeMillis).commit();
-                sharedPreferences4.edit().putInt("shownumber", 1).commit();
-                str = "0";
-                i = i7;
-            } else if (i6 == 0) {
-                z = false;
-                sharedPreferences4.edit().putInt("tmplocked", 0).commit();
-                sharedPreferences4.edit().putLong("showstarttime", currentTimeMillis).commit();
-                sharedPreferences4.edit().putInt("shownumber", 1).commit();
-                str = "0";
-                i = i7;
-            } else if (i6 == 1) {
-                z = true;
-                str = LogHelp.TYPE_GUIDANCE;
-                i = i7 + 1;
-                sharedPreferences4.edit().putInt("shownumber", i).commit();
-            } else {
-                z = z5;
-                str = "0";
-                i = i7;
-                if (i6 == 2) {
-                    if (i7 >= 14) {
-                        z = true;
-                        str = LogHelp.TYPE_MYWORK;
-                        sharedPreferences4.edit().putInt("tmplocked", 0).commit();
-                        sharedPreferences4.edit().putLong("showstarttime", 0L).commit();
-                        sharedPreferences4.edit().putInt("shownumber", 1).commit();
-                        sharedPreferences4.edit().putLong("lockstartTime", currentTimeMillis).commit();
-                        if (AppEnvironment.isSNZT) {
-                            sharedPreferences4.edit().putLong("lockTime", 864000000L).commit();
-                        } else {
-                            sharedPreferences4.edit().putLong("lockTime", 86400000L).commit();
-                        }
-                        sharedPreferences4.edit().putBoolean("locked", true).commit();
-                        sharedPreferences4.edit().putBoolean("uploadlockstate", false).commit();
-                        i = i7;
+                    if (!this.livePkg.equals(taskList.get(i).topActivity.getPackageName())) {
+                        i++;
                     } else {
-                        i = i7 + 1;
-                        sharedPreferences4.edit().putInt("shownumber", i).commit();
-                        z = z5;
-                        str = "0";
+                        Log.e("Lock", "Go to liveshow!!," + packageNameTop + "," + classNameTop);
+                        Log.e("Lock", "i is" + i);
+                        this.mActivityManager.moveTaskToFront(taskList.get(i).id, 2);
+                        flagNeedPasswd = false;
+                        break;
+                    }
+                }
+            } else if (isInteraction && !this.interPackageName.equals(packageNameTop) && !this.cameraPackageName.equals(packageNameTop) && !this.takeShotAc.equals(classNameTop) && !this.permissionAc.equals(classNameTop) && !this.livePkg.equals(packageNameTop) && !this.liveAc.equals(classNameTop)) {
+                int sizeStack2 = taskList.size();
+                for (int i2 = 0; i2 < sizeStack2; i2++) {
+                    ComponentName tmpcn = taskList.get(i2).topActivity;
+                    if (this.interPackageName.equals(tmpcn.getPackageName()) || this.cameraPackageName.equals(tmpcn.getPackageName())) {
+                        Log.e("Lock", "Go to Interaction!!," + packageNameTop + "," + classNameTop);
+                        Log.e("Lock", "i is" + i2);
+                        this.mActivityManager.moveTaskToFront(taskList.get(i2).id, 2);
+                        flagNeedPasswd = false;
+                        break;
                     }
                 }
             }
-            if (z) {
-                try {
-                    Intent intent7 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
-                    intent7.putExtra("state", str);
-                    this.mContext.sendBroadcast(intent7);
-                    Intent intent8 = new Intent("android.intent.action.MAIN");
-                    intent8.addCategory("android.intent.category.LAUNCHER");
-                    intent8.setComponent(new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity"));
-                    this.mContext.startActivity(intent8);
+            SharedPreferences spf = this.mContext.getSharedPreferences("lockscreen", 4);
+            boolean locked = spf.getBoolean("locked", false);
+            int tempLock = spf.getInt("tmplocked", 0);
+            SharedPreferences callSp = this.mContext.getSharedPreferences("allowcall", 4);
+            boolean cancall = callSp.getBoolean("cancall", false);
+            boolean issdcard = this.mContext.getSharedPreferences("sdcard", 4).getBoolean("sdcard", false);
+            if (AppEnvironment.isPDSSZ && flag && (this.testPackageName.equals(packageNameTop) || this.ggpy.equals(packageNameTop) || this.browserPackageName.equals(packageNameTop))) {
+                SharedPreferences sharePre = this.mContext.getSharedPreferences("privatekey", 0);
+                String ip = sharePre.getString("apihost", "");
+                if (!ip.contains("www.ischool365.com")) {
+                    if (!locked && tempLock != 1) {
+                        SharedPreferences sp = this.mContext.getSharedPreferences("lockscreen", 4);
+                        sp.edit().putInt("tmplocked", 1).commit();
+                        sp.edit().putLong("tmplockedtime", System.currentTimeMillis()).commit();
+                        Intent intent2 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
+                        intent2.putExtra("state", LogHelp.TYPE_GUIDANCE);
+                        this.mContext.sendBroadcast(intent2);
+                    }
+                    try {
+                        Intent intent = new Intent("android.intent.action.MAIN");
+                        intent.setFlags(268468224);
+                        intent.addCategory("android.intent.category.LAUNCHER");
+                        ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                        intent.setComponent(cn);
+                        this.mContext.startActivity(intent);
+                        return;
+                    } catch (Exception e) {
+                        return;
+                    }
+                }
+            }
+            if (locked && !issdcard) {
+                long startTime = spf.getLong("lockstartTime", 0L);
+                long delayTime = spf.getLong("lockTime", 0L);
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - startTime > delayTime) {
+                    spf.edit().putLong("lockstartTime", 0L).commit();
+                    spf.edit().putLong("lockTime", 0L).commit();
+                    spf.edit().putBoolean("locked", false).commit();
+                    spf.edit().putInt("tmplocked", 0).commit();
+                    spf.edit().putLong("showstarttime", 0L).commit();
+                    spf.edit().putInt("shownumber", 1).commit();
+                    AppEnvironment.showDialogNumber = 0;
+                    AppEnvironment.startTime = 0L;
+                    this.mContext.sendBroadcast(new Intent(AppEnvironment.Intent_UNLOCKWINDOW));
+                } else if (!"com.launcher.activity".equals(packageNameTop) && !this.wifiWarningClassName.equals(classNameTop) && !"com.android.vpndialogs".equals(packageNameTop) && !"com.edutech.firewall".equals(packageNameTop) && !"com.edutech.wificonn".equals(packageNameTop)) {
+                    Intent intent3 = new Intent("android.intent.action.MAIN");
+                    intent3.setFlags(268468224);
+                    intent3.addCategory("android.intent.category.LAUNCHER");
+                    ComponentName cn2 = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                    intent3.setComponent(cn2);
+                    this.mContext.startActivity(intent3);
                     return;
-                } catch (NullPointerException e4) {
-                    return;
-                } catch (Exception e5) {
+                }
+            } else if (tempLock == 1 && !issdcard) {
+                long tempStartTime = spf.getLong("tmplockedtime", 0L);
+                long currentTime2 = System.currentTimeMillis();
+                if (currentTime2 - tempStartTime > 300000) {
+                    spf.edit().putInt("tmplocked", 2).commit();
+                    spf.edit().putLong("tmplockedtime", 0L).commit();
+                    this.mContext.sendBroadcast(new Intent(AppEnvironment.Intent_UNLOCKWINDOW));
+                } else if (!classNameTop.equals("com.edutech.mobilestudyclient.activity.PasswdDialogActivity") && !"com.launcher.activity".equals(packageNameTop) && !this.wifiWarningClassName.equals(classNameTop) && !"com.android.vpndialogs".equals(packageNameTop) && !"com.edutech.firewall".equals(packageNameTop) && !"com.edutech.wificonn".equals(packageNameTop)) {
                     return;
                 }
             }
-            Intent intent9 = new Intent("android.intent.action.MAIN");
-            intent9.setFlags(268435456);
-            int i8 = i;
-            if (i > 7) {
-                i8 = i - 7;
-            }
-            intent9.setComponent(new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.PasswdDialogActivity"));
-            intent9.setFlags(268468224);
-            intent9.putExtra("number", i8);
-            intent9.putExtra("lockwarning", i5);
-            intent9.putExtra("packagename", packageName);
-            try {
-                packageInfo = this.mContext.getPackageManager().getPackageInfo("com.launcher.activity", 0);
-            } catch (PackageManager.NameNotFoundException e6) {
-                packageInfo = null;
-                e6.printStackTrace();
-            }
-            if (packageInfo == null) {
-                return;
-            }
-            try {
-                this.mContext.startActivity(intent9);
-            } catch (Exception e7) {
+            if (!classNameTop.equals("com.edutech.mobilestudyclient.activity.PasswdDialogActivity") && !classNameTop.equals("com.android.settings.DeviceAdminAdd")) {
+                this.mContext.getSharedPreferences("usbotg", 4);
+                if (packageNameTop.contains("com.edutech") || packageNameTop.equals("com.launcher.activity")) {
+                    flag = true;
+                }
+                if (issdcard && flag) {
+                    AppEnvironment.showDialogNumber++;
+                    Intent intent4 = new Intent("android.intent.action.MAIN");
+                    intent4.setFlags(268435456);
+                    ComponentName cn3 = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.PasswdDialogActivity");
+                    intent4.setComponent(cn3);
+                    intent4.setFlags(268468224);
+                    intent4.putExtra("number", AppEnvironment.showDialogNumber);
+                    intent4.putExtra("lockwarning", 0);
+                    intent4.putExtra("packagename", packageNameTop);
+                    try {
+                        packageInfo2 = this.mContext.getPackageManager().getPackageInfo("com.launcher.activity", 0);
+                    } catch (PackageManager.NameNotFoundException e2) {
+                        packageInfo2 = null;
+                        e2.printStackTrace();
+                    }
+                    if (packageInfo2 != null) {
+                        try {
+                            this.mContext.startActivity(intent4);
+                        } catch (Exception e3) {
+                        }
+                    }
+                } else if (!this.testPackageName.equals(packageNameTop) || !AppEnvironment.isSDYB || !this.wifiAc.equals(classNameTop)) {
+                    if (!this.testPackageName.equals(packageNameTop) || !this.batteryDialogAc.equals(classNameTop)) {
+                        if (((this.testPackageName.equals(packageNameTop) && !this.wifiPermission.equals(classNameTop) && !this.wifiWarningClassName.equals(classNameTop)) || this.lenovoWebview.equals(packageNameTop) || this.lenovoQuickSearch.equals(packageNameTop) || this.lananBrowser.equals(packageNameTop) || this.sspy.equals(packageNameTop) || this.lenovoBrowser.equals(packageNameTop) || this.pdfnote.equals(packageNameTop) || this.ssnotes.equals(packageNameTop) || ((this.ggpy.equals(packageNameTop) && !classNameTop.equals(this.permissionQC80A2)) || this.XTPYSZ.equals(classNameTop) || this.emailSM.equals(packageNameTop) || this.uninstallSMPackageActivity.equals(classNameTop) || this.testPackageName2.equals(packageNameTop) || this.huafenPName.equals(packageNameTop) || this.sinaHD.equals(packageNameTop) || this.sinaPhone.equals(packageNameTop) || this.tencentWb.equals(packageNameTop) || this.emailPackageNameP550.equals(packageNameTop) || this.sconnectPackageNameP550.equals(packageNameTop) || this.pinboardPackageNameP550.equals(packageNameTop) || this.inputBaidu.equals(packageNameTop) || this.psharePName.equals(packageNameTop) || ((!cancall && (this.mms.equals(packageNameTop) || this.call.equals(packageNameTop))) || this.hwidPName.equals(packageNameTop) || this.hwdiskPName.equals(packageNameTop) || this.wps1.equals(classNameTop) || this.mobileprintPackageName.equals(packageNameTop) || this.wpsPushActivity.equals(classNameTop) || this.officesuiteClass.equals(classNameTop) || this.emailPName.equals(packageNameTop) || this.wechatPName.equals(packageNameTop) || this.playPName.equals(packageNameTop) || this.qqPName.equals(packageNameTop) || this.walletPName.equals(packageNameTop) || this.baiduMapPName.equals(packageNameTop) || this.storePName.equals(packageNameTop) || this.searchpackageName.equals(packageNameTop) || this.gesturePackageName.equals(packageNameTop) || this.secLauncherPackageName.equals(packageNameTop) || ((this.installerPackageName.equals(packageNameTop) && !classNameTop.equals(this.permissionQC80A) && !classNameTop.equals(this.installAcName)) || this.gallery3dClassName.equals(classNameTop) || this.inputPackageName.equals(packageNameTop) || this.browserPackageName.equals(packageNameTop) || this.tencentBrowserPackageName.equals(packageNameTop) || this.fileBrowserPackageName.equals(packageNameTop) || this.baiduNetdiskPackageName.equals(packageNameTop) || this.activeExplorerPackageName.equals(packageNameTop) || this.kuaiyaPackageName.equals(packageNameTop) || this.samsungAppsPackageName.equals(packageNameTop) || this.autonaviPackageName.equals(packageNameTop) || this.dirPic.equals(packageNameTop) || packageNameTop.contains(this.snote) || this.snotePackageName.equals(packageNameTop))))) && flag && flagNeedPasswd && (!packageNameTop.equals(this.testPackageName) || !classNameTop.equals(this.detailsActivity))) {
+                            Log.e(ClearCase.COMMAND_LOCK, String.valueOf(classNameTop) + "," + packageNameTop);
+                            SharedPreferences sharePre2 = this.mContext.getSharedPreferences("privatekey", 0);
+                            String ip2 = sharePre2.getString("apihost", "");
+                            if ((this.testPackageName.equals(packageNameTop) || this.XTPYSZ.equals(classNameTop) || (this.ggpy.equals(packageNameTop) && !classNameTop.equals(this.permissionQC80A2))) && !ip2.contains("www.ischool365.com")) {
+                                SharedPreferences sp2 = this.mContext.getSharedPreferences("lockscreen", 4);
+                                sp2.edit().putInt("tmplocked", 1).commit();
+                                sp2.edit().putLong("tmplockedtime", System.currentTimeMillis()).commit();
+                                Intent intent22 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
+                                intent22.putExtra("state", LogHelp.TYPE_GUIDANCE);
+                                this.mContext.sendBroadcast(intent22);
+                                Intent intent5 = new Intent("android.intent.action.MAIN");
+                                intent5.setFlags(268468224);
+                                intent5.addCategory("android.intent.category.LAUNCHER");
+                                ComponentName cn4 = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                                intent5.setComponent(cn4);
+                                this.mContext.startActivity(intent5);
+                                return;
+                            }
+                            SharedPreferences sp3 = this.mContext.getSharedPreferences("lockscreen", 4);
+                            boolean islocked = sp3.getBoolean("locked", false);
+                            long nowTime = System.currentTimeMillis();
+                            int showWarning = 0;
+                            int istmplocked = sp3.getInt("tmplocked", 0);
+                            int tmpNum = sp3.getInt("shownumber", 1);
+                            long tmpStartTime = sp3.getLong("showstarttime", 0L);
+                            if (tmpNum == 6 || tmpNum == 7 || tmpNum == 13 || tmpNum == 14) {
+                                showWarning = 2;
+                            }
+                            if (tmpStartTime <= 0) {
+                                sp3.edit().putLong("showstarttime", nowTime).commit();
+                            }
+                            if (tmpStartTime <= 0) {
+                                tmpStartTime = nowTime;
+                            }
+                            long second = Math.abs((nowTime - tmpStartTime) / 1000);
+                            String state = "0";
+                            if (second < TimeConstants.S_HOUR) {
+                                if (istmplocked == 0) {
+                                    if (tmpNum >= 7) {
+                                        islocked = true;
+                                        sp3.edit().putInt("tmplocked", 1).commit();
+                                        sp3.edit().putLong("tmplockedtime", nowTime).commit();
+                                        state = LogHelp.TYPE_GUIDANCE;
+                                    }
+                                    tmpNum++;
+                                    sp3.edit().putInt("shownumber", tmpNum).commit();
+                                } else if (istmplocked == 1) {
+                                    islocked = true;
+                                    state = LogHelp.TYPE_GUIDANCE;
+                                } else if (istmplocked == 2) {
+                                    if (tmpNum >= 14) {
+                                        islocked = true;
+                                        state = LogHelp.TYPE_MYWORK;
+                                        sp3.edit().putInt("tmplocked", 0).commit();
+                                        sp3.edit().putLong("showstarttime", 0L).commit();
+                                        sp3.edit().putInt("shownumber", 1).commit();
+                                        sp3.edit().putLong("lockstartTime", nowTime).commit();
+                                        if (AppEnvironment.isSNZT) {
+                                            sp3.edit().putLong("lockTime", 864000000L).commit();
+                                        } else {
+                                            sp3.edit().putLong("lockTime", 86400000L).commit();
+                                        }
+                                        sp3.edit().putBoolean("locked", true).commit();
+                                        sp3.edit().putBoolean("uploadlockstate", false).commit();
+                                    } else {
+                                        tmpNum++;
+                                        sp3.edit().putInt("shownumber", tmpNum).commit();
+                                    }
+                                }
+                            } else if (second > TimeConstants.S_HOUR && second <= 7200) {
+                                if (istmplocked == 0) {
+                                    islocked = false;
+                                    sp3.edit().putInt("tmplocked", 0).commit();
+                                    sp3.edit().putLong("showstarttime", nowTime).commit();
+                                    sp3.edit().putInt("shownumber", 1).commit();
+                                } else if (istmplocked == 1) {
+                                    islocked = true;
+                                    state = LogHelp.TYPE_GUIDANCE;
+                                    tmpNum++;
+                                    sp3.edit().putInt("shownumber", tmpNum).commit();
+                                } else if (istmplocked == 2) {
+                                    if (tmpNum >= 14) {
+                                        islocked = true;
+                                        state = LogHelp.TYPE_MYWORK;
+                                        sp3.edit().putInt("tmplocked", 0).commit();
+                                        sp3.edit().putLong("showstarttime", 0L).commit();
+                                        sp3.edit().putInt("shownumber", 1).commit();
+                                        sp3.edit().putLong("lockstartTime", nowTime).commit();
+                                        if (AppEnvironment.isSNZT) {
+                                            sp3.edit().putLong("lockTime", 864000000L).commit();
+                                        } else {
+                                            sp3.edit().putLong("lockTime", 86400000L).commit();
+                                        }
+                                        sp3.edit().putBoolean("locked", true).commit();
+                                        sp3.edit().putBoolean("uploadlockstate", false).commit();
+                                    } else {
+                                        tmpNum++;
+                                        sp3.edit().putInt("shownumber", tmpNum).commit();
+                                    }
+                                }
+                            } else {
+                                islocked = false;
+                                sp3.edit().putInt("tmplocked", 0).commit();
+                                sp3.edit().putLong("showstarttime", nowTime).commit();
+                                sp3.edit().putInt("shownumber", 1).commit();
+                            }
+                            if (islocked) {
+                                try {
+                                    Intent intent6 = new Intent(AppEnvironment.Intent_LOCKWINDOW);
+                                    intent6.putExtra("state", state);
+                                    this.mContext.sendBroadcast(intent6);
+                                    Intent newintent = new Intent("android.intent.action.MAIN");
+                                    newintent.addCategory("android.intent.category.LAUNCHER");
+                                    ComponentName cn5 = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                                    newintent.setComponent(cn5);
+                                    this.mContext.startActivity(newintent);
+                                    return;
+                                } catch (NullPointerException e4) {
+                                    return;
+                                } catch (Exception e5) {
+                                    return;
+                                }
+                            }
+                            Intent intent7 = new Intent("android.intent.action.MAIN");
+                            intent7.setFlags(268435456);
+                            if (tmpNum > 7) {
+                                tmpNum -= 7;
+                            }
+                            ComponentName cn6 = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.PasswdDialogActivity");
+                            intent7.setComponent(cn6);
+                            intent7.setFlags(268468224);
+                            intent7.putExtra("number", tmpNum);
+                            intent7.putExtra("lockwarning", showWarning);
+                            intent7.putExtra("packagename", packageNameTop);
+                            try {
+                                packageInfo = this.mContext.getPackageManager().getPackageInfo("com.launcher.activity", 0);
+                            } catch (PackageManager.NameNotFoundException e6) {
+                                packageInfo = null;
+                                e6.printStackTrace();
+                            }
+                            if (packageInfo != null) {
+                                try {
+                                    this.mContext.startActivity(intent7);
+                                    return;
+                                } catch (Exception e7) {
+                                    return;
+                                }
+                            }
+                            return;
+                        }
+                        if (this.testPackageName.equals(packageNameTop) || this.passwdClassName.equals(classNameTop) || this.testPackageName2.equals(packageNameTop) || this.gesturePackageName.equals(packageNameTop) || this.secLauncherPackageName.equals(packageNameTop) || this.installerPackageName.equals(packageNameTop) || this.gallery3dClassName.equals(classNameTop) || !this.inputPackageName.equals(packageNameTop)) {
+                        }
+                    }
+                }
             }
         }
     }

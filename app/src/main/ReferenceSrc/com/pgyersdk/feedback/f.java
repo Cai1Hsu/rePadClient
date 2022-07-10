@@ -1,12 +1,11 @@
 package com.pgyersdk.feedback;
 
 import android.content.DialogInterface;
-
-/* loaded from: classes.jar:com/pgyersdk/feedback/f.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class f implements DialogInterface.OnCancelListener {
     final /* synthetic */ c a;
 
-    f(c cVar) {
+    public f(c cVar) {
         this.a = cVar;
     }
 

@@ -3,8 +3,7 @@ package com.google.zxing.common;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.compress.utils.CharsetNames;
-
-/* loaded from: classes.jar:com/google/zxing/common/CharacterSetECI.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public enum CharacterSetECI {
     Cp437(new int[]{0, 2}, new String[0]),
     ISO8859_1(new int[]{1, 3}, "ISO-8859-1"),
@@ -40,44 +39,46 @@ public enum CharacterSetECI {
     private static final Map<String, CharacterSetECI> NAME_TO_ECI = new HashMap();
 
     static {
-        CharacterSetECI[] values;
-        for (CharacterSetECI characterSetECI : values()) {
-            for (int i : characterSetECI.values) {
-                VALUE_TO_ECI.put(Integer.valueOf(i), characterSetECI);
+        CharacterSetECI[] arr$ = values();
+        for (CharacterSetECI eci : arr$) {
+            int[] arr$2 = eci.values;
+            for (int value : arr$2) {
+                VALUE_TO_ECI.put(Integer.valueOf(value), eci);
             }
-            NAME_TO_ECI.put(characterSetECI.name(), characterSetECI);
-            for (String str : characterSetECI.otherEncodingNames) {
-                NAME_TO_ECI.put(str, characterSetECI);
+            NAME_TO_ECI.put(eci.name(), eci);
+            String[] arr$3 = eci.otherEncodingNames;
+            for (String name : arr$3) {
+                NAME_TO_ECI.put(name, eci);
             }
         }
     }
 
-    CharacterSetECI(int i) {
-        this(new int[]{i}, new String[0]);
+    CharacterSetECI(int value) {
+        this(new int[]{value}, new String[0]);
     }
 
-    CharacterSetECI(int i, String... strArr) {
-        this.values = new int[]{i};
-        this.otherEncodingNames = strArr;
+    CharacterSetECI(int value, String... otherEncodingNames) {
+        this.values = new int[]{value};
+        this.otherEncodingNames = otherEncodingNames;
     }
 
-    CharacterSetECI(int[] iArr, String... strArr) {
-        this.values = iArr;
-        this.otherEncodingNames = strArr;
-    }
-
-    public static CharacterSetECI getCharacterSetECIByName(String str) {
-        return NAME_TO_ECI.get(str);
-    }
-
-    public static CharacterSetECI getCharacterSetECIByValue(int i) {
-        if (i < 0 || i >= 900) {
-            throw new IllegalArgumentException("Bad ECI value: " + i);
-        }
-        return VALUE_TO_ECI.get(Integer.valueOf(i));
+    CharacterSetECI(int[] values, String... otherEncodingNames) {
+        this.values = values;
+        this.otherEncodingNames = otherEncodingNames;
     }
 
     public int getValue() {
         return this.values[0];
+    }
+
+    public static CharacterSetECI getCharacterSetECIByValue(int value) {
+        if (value < 0 || value >= 900) {
+            throw new IllegalArgumentException("Bad ECI value: " + value);
+        }
+        return VALUE_TO_ECI.get(Integer.valueOf(value));
+    }
+
+    public static CharacterSetECI getCharacterSetECIByName(String name) {
+        return NAME_TO_ECI.get(name);
     }
 }

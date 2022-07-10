@@ -11,116 +11,99 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/multi/GenericMultipleBarcodeReader.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class GenericMultipleBarcodeReader implements MultipleBarcodeReader {
     private static final int MIN_DIMENSION_TO_RECUR = 100;
     private final Reader delegate;
 
-    public GenericMultipleBarcodeReader(Reader reader) {
-        this.delegate = reader;
+    public GenericMultipleBarcodeReader(Reader delegate) {
+        this.delegate = delegate;
     }
 
-    private void doDecodeMultiple(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map, List<Result> list, int i, int i2) {
-        boolean z;
+    @Override // com.google.zxing.multi.MultipleBarcodeReader
+    public Result[] decodeMultiple(BinaryBitmap image) throws NotFoundException {
+        return decodeMultiple(image, null);
+    }
+
+    @Override // com.google.zxing.multi.MultipleBarcodeReader
+    public Result[] decodeMultiple(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException {
+        List<Result> results = new ArrayList<>();
+        doDecodeMultiple(image, hints, results, 0, 0);
+        if (results.isEmpty()) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+        return (Result[]) results.toArray(new Result[results.size()]);
+    }
+
+    private void doDecodeMultiple(BinaryBitmap image, Map<DecodeHintType, ?> hints, List<Result> results, int xOffset, int yOffset) {
         try {
-            Result decode = this.delegate.decode(binaryBitmap, map);
-            Iterator<Result> it = list.iterator();
+            Result result = this.delegate.decode(image, hints);
+            boolean alreadyFound = false;
+            Iterator i$ = results.iterator();
             while (true) {
-                z = false;
-                if (it.hasNext()) {
-                    if (it.next().getText().equals(decode.getText())) {
-                        z = true;
-                        break;
-                    }
-                } else {
+                if (!i$.hasNext()) {
+                    break;
+                }
+                Result existingResult = i$.next();
+                if (existingResult.getText().equals(result.getText())) {
+                    alreadyFound = true;
                     break;
                 }
             }
-            if (z) {
-                return;
-            }
-            list.add(translateResultPoints(decode, i, i2));
-            ResultPoint[] resultPoints = decode.getResultPoints();
-            if (resultPoints == null || resultPoints.length == 0) {
-                return;
-            }
-            int width = binaryBitmap.getWidth();
-            int height = binaryBitmap.getHeight();
-            float f = width;
-            float f2 = height;
-            float f3 = 0.0f;
-            float f4 = 0.0f;
-            int length = resultPoints.length;
-            int i3 = 0;
-            while (i3 < length) {
-                ResultPoint resultPoint = resultPoints[i3];
-                float x = resultPoint.getX();
-                float y = resultPoint.getY();
-                float f5 = f;
-                if (x < f) {
-                    f5 = x;
+            if (!alreadyFound) {
+                results.add(translateResultPoints(result, xOffset, yOffset));
+                ResultPoint[] resultPoints = result.getResultPoints();
+                if (resultPoints != null && resultPoints.length != 0) {
+                    int width = image.getWidth();
+                    int height = image.getHeight();
+                    float minX = width;
+                    float minY = height;
+                    float maxX = 0.0f;
+                    float maxY = 0.0f;
+                    for (ResultPoint point : resultPoints) {
+                        float x = point.getX();
+                        float y = point.getY();
+                        if (x < minX) {
+                            minX = x;
+                        }
+                        if (y < minY) {
+                            minY = y;
+                        }
+                        if (x > maxX) {
+                            maxX = x;
+                        }
+                        if (y > maxY) {
+                            maxY = y;
+                        }
+                    }
+                    if (minX > 100.0f) {
+                        doDecodeMultiple(image.crop(0, 0, (int) minX, height), hints, results, xOffset, yOffset);
+                    }
+                    if (minY > 100.0f) {
+                        doDecodeMultiple(image.crop(0, 0, width, (int) minY), hints, results, xOffset, yOffset);
+                    }
+                    if (maxX < width - 100) {
+                        doDecodeMultiple(image.crop((int) maxX, 0, width - ((int) maxX), height), hints, results, xOffset + ((int) maxX), yOffset);
+                    }
+                    if (maxY < height - 100) {
+                        doDecodeMultiple(image.crop(0, (int) maxY, width, height - ((int) maxY)), hints, results, xOffset, yOffset + ((int) maxY));
+                    }
                 }
-                float f6 = f2;
-                if (y < f2) {
-                    f6 = y;
-                }
-                float f7 = f3;
-                if (x > f3) {
-                    f7 = x;
-                }
-                float f8 = f4;
-                if (y > f4) {
-                    f8 = y;
-                }
-                i3++;
-                f3 = f7;
-                f4 = f8;
-                f = f5;
-                f2 = f6;
             }
-            if (f > 100.0f) {
-                doDecodeMultiple(binaryBitmap.crop(0, 0, (int) f, height), map, list, i, i2);
-            }
-            if (f2 > 100.0f) {
-                doDecodeMultiple(binaryBitmap.crop(0, 0, width, (int) f2), map, list, i, i2);
-            }
-            if (f3 < width - 100) {
-                doDecodeMultiple(binaryBitmap.crop((int) f3, 0, width - ((int) f3), height), map, list, i + ((int) f3), i2);
-            }
-            if (f4 >= height - 100) {
-                return;
-            }
-            doDecodeMultiple(binaryBitmap.crop(0, (int) f4, width, height - ((int) f4)), map, list, i, i2 + ((int) f4));
         } catch (ReaderException e) {
         }
     }
 
-    private static Result translateResultPoints(Result result, int i, int i2) {
-        ResultPoint[] resultPoints = result.getResultPoints();
-        if (resultPoints != null) {
-            ResultPoint[] resultPointArr = new ResultPoint[resultPoints.length];
-            for (int i3 = 0; i3 < resultPoints.length; i3++) {
-                ResultPoint resultPoint = resultPoints[i3];
-                resultPointArr[i3] = new ResultPoint(resultPoint.getX() + i, resultPoint.getY() + i2);
+    private static Result translateResultPoints(Result result, int xOffset, int yOffset) {
+        ResultPoint[] oldResultPoints = result.getResultPoints();
+        if (oldResultPoints != null) {
+            ResultPoint[] newResultPoints = new ResultPoint[oldResultPoints.length];
+            for (int i = 0; i < oldResultPoints.length; i++) {
+                ResultPoint oldPoint = oldResultPoints[i];
+                newResultPoints[i] = new ResultPoint(oldPoint.getX() + xOffset, oldPoint.getY() + yOffset);
             }
-            result = new Result(result.getText(), result.getRawBytes(), resultPointArr, result.getBarcodeFormat());
+            return new Result(result.getText(), result.getRawBytes(), newResultPoints, result.getBarcodeFormat());
         }
         return result;
-    }
-
-    @Override // com.google.zxing.multi.MultipleBarcodeReader
-    public Result[] decodeMultiple(BinaryBitmap binaryBitmap) throws NotFoundException {
-        return decodeMultiple(binaryBitmap, null);
-    }
-
-    @Override // com.google.zxing.multi.MultipleBarcodeReader
-    public Result[] decodeMultiple(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException {
-        ArrayList arrayList = new ArrayList();
-        doDecodeMultiple(binaryBitmap, map, arrayList, 0, 0);
-        if (arrayList.isEmpty()) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        return (Result[]) arrayList.toArray(new Result[arrayList.size()]);
     }
 }

@@ -8,12 +8,8 @@ import java.util.ArrayList;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-/* loaded from: classes.jar:com/pgyersdk/crash/e.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 final class e extends AsyncTask {
-    e() {
-    }
-
     @Override // android.os.AsyncTask
     protected final /* synthetic */ Object doInBackground(Object... objArr) {
         ArrayList arrayList = new ArrayList();

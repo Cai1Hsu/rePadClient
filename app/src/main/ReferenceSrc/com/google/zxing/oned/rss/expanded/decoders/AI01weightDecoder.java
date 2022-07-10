@@ -1,28 +1,27 @@
 package com.google.zxing.oned.rss.expanded.decoders;
 
 import com.google.zxing.common.BitArray;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI01weightDecoder.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 abstract class AI01weightDecoder extends AI01decoder {
-    AI01weightDecoder(BitArray bitArray) {
-        super(bitArray);
-    }
-
     protected abstract void addWeightCode(StringBuilder sb, int i);
 
     protected abstract int checkWeight(int i);
 
-    protected void encodeCompressedWeight(StringBuilder sb, int i, int i2) {
-        int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray(i, i2);
-        addWeightCode(sb, extractNumericValueFromBitArray);
-        int checkWeight = checkWeight(extractNumericValueFromBitArray);
-        int i3 = 100000;
-        for (int i4 = 0; i4 < 5; i4++) {
-            if (checkWeight / i3 == 0) {
-                sb.append('0');
+    public AI01weightDecoder(BitArray information) {
+        super(information);
+    }
+
+    public void encodeCompressedWeight(StringBuilder buf, int currentPos, int weightSize) {
+        int originalWeightNumeric = getGeneralDecoder().extractNumericValueFromBitArray(currentPos, weightSize);
+        addWeightCode(buf, originalWeightNumeric);
+        int weightNumeric = checkWeight(originalWeightNumeric);
+        int currentDivisor = 100000;
+        for (int i = 0; i < 5; i++) {
+            if (weightNumeric / currentDivisor == 0) {
+                buf.append('0');
             }
-            i3 /= 10;
+            currentDivisor /= 10;
         }
-        sb.append(checkWeight);
+        buf.append(weightNumeric);
     }
 }

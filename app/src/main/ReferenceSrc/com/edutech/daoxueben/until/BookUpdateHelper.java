@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -24,219 +26,66 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-/* loaded from: classes.jar:com/edutech/daoxueben/until/BookUpdateHelper.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class BookUpdateHelper {
-    public ArrayList<BookUpdateInfo> BookUpdateBook(ArrayList<BookUpdateInfo> arrayList) {
-        Iterator<OldBooks> it = JsonHelper.booksparserJson(new ArrayList()).iterator();
-        while (it.hasNext()) {
-            OldBooks next = it.next();
-            String str = next.getbook_id();
-            String book_updatetime = next.getBook_updatetime();
-            int book_total = next.getBook_total();
-            BookUpdateInfo bookUpdateInfo = new BookUpdateInfo();
-            bookUpdateInfo.setid(str);
-            bookUpdateInfo.settype(LogHelp.TYPE_GUIDANCE);
-            bookUpdateInfo.setsource(LogHelp.TYPE_GUIDANCE);
-            bookUpdateInfo.setupdatetime(book_updatetime);
-            bookUpdateInfo.settotal(book_total);
-            arrayList.add(bookUpdateInfo);
+    public ArrayList<BookUpdateInfo> JsonUpdateHttpPost(String ip, String studentid, String json, ArrayList<BookUpdateInfo> updateinfo) {
+        String url = AppEnvironment.UPDATEJSON_HTTPPOST_URL(ip, studentid);
+        if (json == null || "".equals(json)) {
+            return updateinfo;
         }
-        return arrayList;
-    }
-
-    public ArrayList<BookUpdateInfo> BookUpdateChapter(ArrayList<BookUpdateInfo> arrayList, ArrayList<BookInfo> arrayList2) {
-        return arrayList;
-    }
-
-    public ArrayList<BookInfo> BookUpdateGetPeerBook(String str, ArrayList<BookInfo> arrayList) {
-        String str2 = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + str + "//json.json";
-        ArrayList<BookInfo> arrayList2 = arrayList;
-        if (new File(str2).exists()) {
-            arrayList2 = JsonHelper.peerbookparserJson(arrayList, JsonHelper.getFileString(str2));
-        }
-        return arrayList2;
-    }
-
-    public void BookUpdateLocalBookJson(ArrayList<BookUpdateInfo> arrayList) {
-        ArrayList<OldBooks> booksparserJson = JsonHelper.booksparserJson(new ArrayList());
-        Iterator<BookUpdateInfo> it = arrayList.iterator();
-        while (it.hasNext()) {
-            BookUpdateInfo next = it.next();
-            String idVar = next.getid();
-            Iterator<OldBooks> it2 = booksparserJson.iterator();
-            if (it2.hasNext()) {
-                OldBooks next2 = it2.next();
-                if (idVar.equals(next2.getbook_id())) {
-                    next2.setBook_isnew(next.getBook_isnew());
-                    next2.setBook_updatetime(next.getupdatetime());
-                }
+        HttpPost httpRequest = new HttpPost(url);
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("data", json));
+        try {
+            httpRequest.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                String strResult = EntityUtils.toString(httpResponse.getEntity());
+                return parseHttpPostReturnJson(strResult, updateinfo);
             }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        } catch (Exception e3) {
+            e3.printStackTrace();
         }
-        JsonHelper.CreateFile(JsonHelper.bookscreateJson(booksparserJson), AppEnvironment.JSON_BOOKS_File);
+        return updateinfo;
     }
 
-    public ArrayList<BookInfo> BookUpdateLocalJson(ArrayList<BookInfo> arrayList, String str) {
-        int i = 0;
-        while (true) {
-            if (i >= arrayList.size()) {
-                break;
-            }
-            BookInfo bookInfo = arrayList.get(i);
-            if (bookInfo.isIsdown() && bookInfo.getSection_id().equals(str)) {
-                arrayList.get(i).setIsnew(true);
-                break;
-            }
-            i++;
-        }
-        return arrayList;
-    }
-
-    public void BookUpdateLocalJsonJson(ArrayList<BookInfo> arrayList, String str) {
-        String str2 = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + str;
-        String peerbookcreateJson = JsonHelper.peerbookcreateJson(arrayList);
-        Log.d("CreateJson", "BookUpdateLocalJsonJson" + peerbookcreateJson);
-        JsonHelper.CreateFile(peerbookcreateJson, String.valueOf(str2) + "//json.json");
-    }
-
-    public ArrayList<BookUpdateInfo> BookUpdateQuestion(ArrayList<BookUpdateInfo> arrayList, ArrayList<BookInfo> arrayList2) {
-        for (int i = 0; i < arrayList2.size(); i++) {
-            BookInfo bookInfo = arrayList2.get(i);
-            if (bookInfo.isIsdown()) {
-                bookInfo.getSection_id();
-                bookInfo.getsection_updatetime();
-                bookInfo.getSection_webpath().size();
-                bookInfo.getExams().size();
-            }
-        }
-        return arrayList;
-    }
-
-    public ArrayList<BookUpdateInfo> BookUpdateSection(ArrayList<BookUpdateInfo> arrayList, ArrayList<BookInfo> arrayList2) {
-        for (int i = 0; i < arrayList2.size(); i++) {
-            BookInfo bookInfo = arrayList2.get(i);
-            if (bookInfo.isIsdown()) {
-                String section_id = bookInfo.getSection_id();
-                String str = bookInfo.getsection_updatetime();
-                int size = bookInfo.getSection_webpath().size();
-                int size2 = bookInfo.getExams().size();
-                BookUpdateInfo bookUpdateInfo = new BookUpdateInfo();
-                bookUpdateInfo.setid(section_id);
-                bookUpdateInfo.settype(LogHelp.TYPE_HWHELP);
-                bookUpdateInfo.setsource(LogHelp.TYPE_GUIDANCE);
-                bookUpdateInfo.setupdatetime(str);
-                bookUpdateInfo.settotal(size + size2);
-                arrayList.add(bookUpdateInfo);
-            }
-        }
-        return arrayList;
-    }
-
-    public ArrayList<BookUpdateInfo> JsonUpdateHttpPost(String str, String str2, String str3, ArrayList<BookUpdateInfo> arrayList) {
-        ArrayList<BookUpdateInfo> arrayList2;
-        String UPDATEJSON_HTTPPOST_URL = AppEnvironment.UPDATEJSON_HTTPPOST_URL(str, str2);
-        if (str3 == null || "".equals(str3)) {
-            arrayList2 = arrayList;
-        } else {
-            HttpPost httpPost = new HttpPost(UPDATEJSON_HTTPPOST_URL);
-            ArrayList arrayList3 = new ArrayList();
-            arrayList3.add(new BasicNameValuePair("data", str3));
+    public ArrayList<BookUpdateInfo> parseHttpPostReturnJson(String json, ArrayList<BookUpdateInfo> updateinfo) {
+        if (!"".equals(json)) {
             try {
-                httpPost.setEntity(new UrlEncodedFormEntity(arrayList3, "UTF-8"));
-                HttpResponse execute = new DefaultHttpClient().execute(httpPost);
-                if (execute.getStatusLine().getStatusCode() == 200) {
-                    arrayList2 = parseHttpPostReturnJson(EntityUtils.toString(execute.getEntity()), arrayList);
-                }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            } catch (Exception e3) {
-                e3.printStackTrace();
-            }
-            arrayList2 = arrayList;
-        }
-        return arrayList2;
-    }
-
-    public int getIsDownTrue(String str, Tree<HashMap<String, Object>> tree, HashMap<String, Object> hashMap, JsonPort jsonPort, String str2, HashMap<String, Integer> hashMap2) {
-        Collection<HashMap<String, Object>> successors = tree.getSuccessors(hashMap);
-        ArrayList arrayList = new ArrayList();
-        for (HashMap<String, Object> hashMap3 : successors) {
-            if (hashMap3 != null && hashMap3.get(str2) != null) {
-                String obj = hashMap3.get(str2).toString();
-                int i = 0;
-                if (hashMap3.get(KeyEnvironment.KEYWEBPATH) != null) {
-                    ArrayList<Object> valueList = jsonPort.getValueList(new ArrayList<>(), hashMap3.get(KeyEnvironment.KEYWEBPATH));
-                    i = 0;
-                    if (valueList != null) {
-                        i = 0;
-                        if (valueList.size() > 0) {
-                            i = 0 + valueList.size();
-                        }
-                    }
-                }
-                int i2 = i;
-                if (hashMap3.get("exams") != null) {
-                    ArrayList<Object> valueList2 = jsonPort.getValueList(new ArrayList<>(), hashMap3.get("exams"));
-                    i2 = i;
-                    if (valueList2 != null) {
-                        i2 = i;
-                        if (valueList2.size() > 0) {
-                            i2 = i + valueList2.size();
-                        }
-                    }
-                }
-                hashMap2.put(obj, Integer.valueOf(i2));
-                if (hashMap3.get("isdown") != null && jsonPort.objectToBoolean(hashMap3, "isdown")) {
-                    arrayList.add(obj);
-                }
-            }
-        }
-        return 0;
-    }
-
-    public Tree<HashMap<String, Object>> getLocalJsonTree(String str, Tree<HashMap<String, Object>> tree, JsonPort jsonPort) {
-        String str2 = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + str + "/json.json";
-        Tree<HashMap<String, Object>> tree2 = tree;
-        if (new File(str2).exists()) {
-            tree2 = jsonPort.parseJson(tree, JsonHelper.getFileString(str2), "data", "children");
-        }
-        return tree2;
-    }
-
-    public ArrayList<BookUpdateInfo> parseHttpPostReturnJson(String str, ArrayList<BookUpdateInfo> arrayList) {
-        if (!"".equals(str)) {
-            try {
-                JSONObject jSONObject = (JSONObject) new JSONTokener(str).nextValue();
-                boolean booleanPropertyName = JsonHelper.getBooleanPropertyName(jSONObject, "status");
-                int intPropertyName = JsonHelper.getIntPropertyName(jSONObject, "errorNum");
-                String propertyName = JsonHelper.getPropertyName(jSONObject, "errorInfo");
-                JSONArray jSONArray = jSONObject.getJSONArray("data");
-                for (int i = 0; i < jSONArray.length(); i++) {
-                    JSONObject jSONObject2 = jSONArray.getJSONObject(i);
-                    String propertyName2 = JsonHelper.getPropertyName(jSONObject2, "id");
-                    String propertyName3 = JsonHelper.getPropertyName(jSONObject2, "type");
-                    String propertyName4 = JsonHelper.getPropertyName(jSONObject2, "source");
-                    boolean booleanPropertyName2 = JsonHelper.getBooleanPropertyName(jSONObject2, MSVSSConstants.TIME_UPDATED);
-                    String propertyName5 = JsonHelper.getPropertyName(jSONObject2, "updatetime");
-                    if (booleanPropertyName2) {
-                        Iterator<BookUpdateInfo> it = arrayList.iterator();
+                JSONTokener jsonTokener = new JSONTokener(json);
+                JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+                boolean status = JsonHelper.getBooleanPropertyName(jsonObject, "status");
+                int errorNum = JsonHelper.getIntPropertyName(jsonObject, "errorNum");
+                String errorInfo = JsonHelper.getPropertyName(jsonObject, "errorInfo");
+                JSONArray array = jsonObject.getJSONArray("data");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject object = array.getJSONObject(i);
+                    String id = JsonHelper.getPropertyName(object, "id");
+                    String type = JsonHelper.getPropertyName(object, "type");
+                    String source = JsonHelper.getPropertyName(object, "source");
+                    boolean updated = JsonHelper.getBooleanPropertyName(object, MSVSSConstants.TIME_UPDATED);
+                    String updatetime = JsonHelper.getPropertyName(object, "updatetime");
+                    if (updated) {
+                        Iterator<BookUpdateInfo> it = updateinfo.iterator();
                         while (true) {
                             if (!it.hasNext()) {
                                 break;
                             }
-                            BookUpdateInfo next = it.next();
-                            if (propertyName2.equals(next.getid()) && propertyName3.equals(next.gettype()) && propertyName4.equals(next.getsource())) {
-                                next.setupdated(true);
-                                next.setupdatetime(propertyName5);
+                            BookUpdateInfo tempupdateinfo = it.next();
+                            if (id.equals(tempupdateinfo.getid()) && type.equals(tempupdateinfo.gettype()) && source.equals(tempupdateinfo.getsource())) {
+                                tempupdateinfo.setupdated(true);
+                                tempupdateinfo.setupdatetime(updatetime);
                                 break;
                             }
                         }
                     }
                 }
-                if (booleanPropertyName && intPropertyName == 0) {
-                    if ("".equals(propertyName)) {
+                if (status && errorNum == 0) {
+                    if ("".equals(errorInfo)) {
                     }
                 }
             } catch (JSONException e) {
@@ -245,13 +94,162 @@ public class BookUpdateHelper {
                 e2.printStackTrace();
             }
         }
-        return arrayList;
+        return updateinfo;
     }
 
-    public Tree<HashMap<String, Object>> updateIsNew(Tree<HashMap<String, Object>> tree, JsonPort jsonPort) {
-        if (tree != null && tree.getHead() != null && tree.getHead().get("id") != null) {
-            tree.getHead().get("id").toString();
+    public ArrayList<BookUpdateInfo> BookUpdateBook(ArrayList<BookUpdateInfo> updateinfo) {
+        ArrayList<OldBooks> books = new ArrayList<>();
+        Iterator<OldBooks> it = JsonHelper.booksparserJson(books).iterator();
+        while (it.hasNext()) {
+            OldBooks entry = it.next();
+            String book_id = entry.getbook_id();
+            String book_updatetime = entry.getBook_updatetime();
+            int book_total = entry.getBook_total();
+            BookUpdateInfo bookupdateinfo = new BookUpdateInfo();
+            bookupdateinfo.setid(book_id);
+            bookupdateinfo.settype(LogHelp.TYPE_GUIDANCE);
+            bookupdateinfo.setsource(LogHelp.TYPE_GUIDANCE);
+            bookupdateinfo.setupdatetime(book_updatetime);
+            bookupdateinfo.settotal(book_total);
+            updateinfo.add(bookupdateinfo);
         }
-        return tree;
+        return updateinfo;
+    }
+
+    public ArrayList<BookInfo> BookUpdateGetPeerBook(String tempbook_id, ArrayList<BookInfo> localpeerbook) {
+        String bookJsonPath = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + tempbook_id + "//json.json";
+        File bookJsonFile = new File(bookJsonPath);
+        if (bookJsonFile.exists()) {
+            String localjson = JsonHelper.getFileString(bookJsonPath);
+            return JsonHelper.peerbookparserJson(localpeerbook, localjson);
+        }
+        return localpeerbook;
+    }
+
+    public ArrayList<BookUpdateInfo> BookUpdateChapter(ArrayList<BookUpdateInfo> updateinfo, ArrayList<BookInfo> books) {
+        return updateinfo;
+    }
+
+    public ArrayList<BookUpdateInfo> BookUpdateSection(ArrayList<BookUpdateInfo> updateinfo, ArrayList<BookInfo> localpeerbook) {
+        for (int j = 0; j < localpeerbook.size(); j++) {
+            BookInfo bookinfo = localpeerbook.get(j);
+            boolean isdwon = bookinfo.isIsdown();
+            if (isdwon) {
+                String section_id = bookinfo.getSection_id();
+                String section_updatetime = bookinfo.getsection_updatetime();
+                int total = bookinfo.getSection_webpath().size() + bookinfo.getExams().size();
+                BookUpdateInfo bookupdateinfo = new BookUpdateInfo();
+                bookupdateinfo.setid(section_id);
+                bookupdateinfo.settype(LogHelp.TYPE_HWHELP);
+                bookupdateinfo.setsource(LogHelp.TYPE_GUIDANCE);
+                bookupdateinfo.setupdatetime(section_updatetime);
+                bookupdateinfo.settotal(total);
+                updateinfo.add(bookupdateinfo);
+            }
+        }
+        return updateinfo;
+    }
+
+    public ArrayList<BookUpdateInfo> BookUpdateQuestion(ArrayList<BookUpdateInfo> updateinfo, ArrayList<BookInfo> localpeerbook) {
+        for (int j = 0; j < localpeerbook.size(); j++) {
+            BookInfo bookinfo = localpeerbook.get(j);
+            boolean isdwon = bookinfo.isIsdown();
+            if (isdwon) {
+                bookinfo.getSection_id();
+                bookinfo.getsection_updatetime();
+                int size = bookinfo.getSection_webpath().size() + bookinfo.getExams().size();
+            }
+        }
+        return updateinfo;
+    }
+
+    public ArrayList<BookInfo> BookUpdateLocalJson(ArrayList<BookInfo> localpeerbook, String sectionid) {
+        int j = 0;
+        while (true) {
+            if (j >= localpeerbook.size()) {
+                break;
+            }
+            BookInfo bookinfo = localpeerbook.get(j);
+            boolean isdwon = bookinfo.isIsdown();
+            if (isdwon) {
+                String section_id = bookinfo.getSection_id();
+                if (section_id.equals(sectionid)) {
+                    localpeerbook.get(j).setIsnew(true);
+                    break;
+                }
+            }
+            j++;
+        }
+        return localpeerbook;
+    }
+
+    public void BookUpdateLocalJsonJson(ArrayList<BookInfo> localpeerbook, String book_id) {
+        String NewBookPath = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + book_id;
+        String Newjson = JsonHelper.peerbookcreateJson(localpeerbook);
+        Log.d("CreateJson", "BookUpdateLocalJsonJson" + Newjson);
+        JsonHelper.CreateFile(Newjson, String.valueOf(NewBookPath) + "//json.json");
+    }
+
+    public void BookUpdateLocalBookJson(ArrayList<BookUpdateInfo> updateinfo) {
+        ArrayList<OldBooks> books = JsonHelper.booksparserJson(new ArrayList<>());
+        Iterator<BookUpdateInfo> it = updateinfo.iterator();
+        while (it.hasNext()) {
+            BookUpdateInfo tempupdateinfo = it.next();
+            String tempbookid = tempupdateinfo.getid();
+            Iterator<OldBooks> it2 = books.iterator();
+            if (it2.hasNext()) {
+                OldBooks entry = it2.next();
+                if (tempbookid.equals(entry.getbook_id())) {
+                    entry.setBook_isnew(tempupdateinfo.getBook_isnew());
+                    entry.setBook_updatetime(tempupdateinfo.getupdatetime());
+                }
+            }
+        }
+        String Newjson = JsonHelper.bookscreateJson(books);
+        JsonHelper.CreateFile(Newjson, AppEnvironment.JSON_BOOKS_File);
+    }
+
+    public Tree<HashMap<String, Object>> getLocalJsonTree(String book_id, Tree<HashMap<String, Object>> localtree, JsonPort jsonPort) {
+        String bookJsonPath = String.valueOf(AppEnvironment.OFFLINE_DOWNLOAD) + book_id + "/json.json";
+        File bookJsonFile = new File(bookJsonPath);
+        if (bookJsonFile.exists()) {
+            String localjson = JsonHelper.getFileString(bookJsonPath);
+            return jsonPort.parseJson(localtree, localjson, "data", "children");
+        }
+        return localtree;
+    }
+
+    public Tree<HashMap<String, Object>> updateIsNew(Tree<HashMap<String, Object>> localtree, JsonPort jsonPort) {
+        if (localtree != null && localtree.getHead() != null && localtree.getHead().get("id") != null) {
+            localtree.getHead().get("id").toString();
+        }
+        return localtree;
+    }
+
+    public int getIsDownTrue(String parId, Tree<HashMap<String, Object>> localtree, HashMap<String, Object> head, JsonPort jsonPort, String key, HashMap<String, Integer> idSourceCount) {
+        ArrayList<Object> examsobjectList;
+        ArrayList<Object> webpathList;
+        Collection<HashMap<String, Object>> Successors = localtree.getSuccessors(head);
+        ArrayList<String> idList = new ArrayList<>();
+        for (HashMap<String, Object> tempSuccessors : Successors) {
+            if (tempSuccessors != null && tempSuccessors.get(key) != null) {
+                String sourceId = tempSuccessors.get(key).toString();
+                int total = 0;
+                if (tempSuccessors.get(KeyEnvironment.KEYWEBPATH) != null && (webpathList = jsonPort.getValueList(new ArrayList<>(), tempSuccessors.get(KeyEnvironment.KEYWEBPATH))) != null && webpathList.size() > 0) {
+                    total = 0 + webpathList.size();
+                }
+                if (tempSuccessors.get("exams") != null && (examsobjectList = jsonPort.getValueList(new ArrayList<>(), tempSuccessors.get("exams"))) != null && examsobjectList.size() > 0) {
+                    total += examsobjectList.size();
+                }
+                idSourceCount.put(sourceId, Integer.valueOf(total));
+                if (tempSuccessors.get("isdown") != null) {
+                    boolean isdown = jsonPort.objectToBoolean(tempSuccessors, "isdown");
+                    if (isdown) {
+                        idList.add(sourceId);
+                    }
+                }
+            }
+        }
+        return 0;
     }
 }

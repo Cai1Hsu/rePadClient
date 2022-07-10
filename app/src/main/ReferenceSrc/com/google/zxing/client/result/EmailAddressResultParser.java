@@ -2,39 +2,34 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/EmailAddressResultParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class EmailAddressResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public EmailAddressParsedResult parse(Result result) {
-        EmailAddressParsedResult emailAddressParsedResult;
-        String text = result.getText();
-        if (text.startsWith("mailto:") || text.startsWith("MAILTO:")) {
-            String substring = text.substring(7);
-            int indexOf = substring.indexOf(63);
-            String str = substring;
-            if (indexOf >= 0) {
-                str = substring.substring(0, indexOf);
+        String rawText = result.getText();
+        if (rawText.startsWith("mailto:") || rawText.startsWith("MAILTO:")) {
+            String emailAddress = rawText.substring(7);
+            int queryStart = emailAddress.indexOf(63);
+            if (queryStart >= 0) {
+                emailAddress = emailAddress.substring(0, queryStart);
             }
-            Map<String, String> parseNameValuePairs = parseNameValuePairs(text);
-            String str2 = null;
-            String str3 = null;
-            String str4 = str;
-            if (parseNameValuePairs != null) {
-                str4 = str;
-                if (str.length() == 0) {
-                    str4 = parseNameValuePairs.get("to");
+            Map<String, String> nameValues = parseNameValuePairs(rawText);
+            String subject = null;
+            String body = null;
+            if (nameValues != null) {
+                if (emailAddress.length() == 0) {
+                    emailAddress = nameValues.get("to");
                 }
-                str2 = parseNameValuePairs.get("subject");
-                str3 = parseNameValuePairs.get("body");
+                String subject2 = nameValues.get("subject");
+                subject = subject2;
+                String body2 = nameValues.get("body");
+                body = body2;
             }
-            emailAddressParsedResult = new EmailAddressParsedResult(str4, str2, str3, text);
+            return new EmailAddressParsedResult(emailAddress, subject, body, rawText);
+        } else if (!EmailDoCoMoResultParser.isBasicallyValidEmailAddress(rawText)) {
+            return null;
         } else {
-            emailAddressParsedResult = null;
-            if (EmailDoCoMoResultParser.isBasicallyValidEmailAddress(text)) {
-                emailAddressParsedResult = new EmailAddressParsedResult(text, null, null, "mailto:" + text);
-            }
+            return new EmailAddressParsedResult(rawText, null, null, "mailto:" + rawText);
         }
-        return emailAddressParsedResult;
     }
 }

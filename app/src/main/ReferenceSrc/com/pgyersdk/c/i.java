@@ -7,51 +7,43 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-/* loaded from: classes.jar:com/pgyersdk/c/i.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class i {
     public static Bitmap a(String str) {
-        Bitmap bitmap;
         try {
-            bitmap = BitmapFactory.decodeStream(new FileInputStream(str));
+            return BitmapFactory.decodeStream(new FileInputStream(str));
         } catch (FileNotFoundException e) {
-            bitmap = null;
+            return null;
         }
-        return bitmap;
     }
 
     public static Boolean a(Bitmap bitmap, String str) {
-        Exception e;
         FileOutputStream fileOutputStream;
-        Boolean bool;
+        Exception e;
         if (bitmap == null) {
-            bool = false;
-        } else {
-            try {
-                FileOutputStream fileOutputStream2 = new FileOutputStream(str);
-                try {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream2);
-                    fileOutputStream2.close();
-                    bool = true;
-                } catch (Exception e2) {
-                    e = e2;
-                    fileOutputStream = fileOutputStream2;
-                    Log.e("PgyerSDK", "Could not save screenshot.", e);
-                    if (fileOutputStream != null) {
-                        try {
-                            fileOutputStream.close();
-                        } catch (IOException e3) {
-                            e3.printStackTrace();
-                        }
-                    }
-                    bool = false;
-                    return bool;
-                }
-            } catch (Exception e4) {
-                e = e4;
-                fileOutputStream = null;
-            }
+            return false;
         }
-        return bool;
+        try {
+            fileOutputStream = new FileOutputStream(str);
+        } catch (Exception e2) {
+            e = e2;
+            fileOutputStream = null;
+        }
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            fileOutputStream.close();
+            return true;
+        } catch (Exception e3) {
+            e = e3;
+            Log.e("PgyerSDK", "Could not save screenshot.", e);
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e4) {
+                    e4.printStackTrace();
+                }
+            }
+            return false;
+        }
     }
 }

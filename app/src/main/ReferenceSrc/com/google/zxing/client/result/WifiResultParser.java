@@ -1,31 +1,20 @@
 package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/WifiResultParser.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class WifiResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public WifiParsedResult parse(Result result) {
-        WifiParsedResult wifiParsedResult;
-        String text = result.getText();
-        if (!text.startsWith("WIFI:")) {
-            wifiParsedResult = null;
-        } else {
-            String matchSinglePrefixedField = matchSinglePrefixedField("S:", text, ';', false);
-            wifiParsedResult = null;
-            if (matchSinglePrefixedField != null) {
-                wifiParsedResult = null;
-                if (matchSinglePrefixedField.length() != 0) {
-                    String matchSinglePrefixedField2 = matchSinglePrefixedField("P:", text, ';', false);
-                    String matchSinglePrefixedField3 = matchSinglePrefixedField("T:", text, ';', false);
-                    String str = matchSinglePrefixedField3;
-                    if (matchSinglePrefixedField3 == null) {
-                        str = "nopass";
-                    }
-                    wifiParsedResult = new WifiParsedResult(str, matchSinglePrefixedField, matchSinglePrefixedField2);
-                }
-            }
+        String ssid;
+        String rawText = result.getText();
+        if (!rawText.startsWith("WIFI:") || (ssid = matchSinglePrefixedField("S:", rawText, ';', false)) == null || ssid.length() == 0) {
+            return null;
         }
-        return wifiParsedResult;
+        String pass = matchSinglePrefixedField("P:", rawText, ';', false);
+        String type = matchSinglePrefixedField("T:", rawText, ';', false);
+        if (type == null) {
+            type = "nopass";
+        }
+        return new WifiParsedResult(type, ssid, pass);
     }
 }

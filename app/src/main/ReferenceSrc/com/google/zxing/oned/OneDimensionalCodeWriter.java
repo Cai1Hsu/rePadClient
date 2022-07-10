@@ -6,67 +6,67 @@ import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/google/zxing/oned/OneDimensionalCodeWriter.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public abstract class OneDimensionalCodeWriter implements Writer {
     private final int sidesMargin;
 
-    protected OneDimensionalCodeWriter(int i) {
-        this.sidesMargin = i;
-    }
+    public abstract byte[] encode(String str);
 
-    protected static int appendPattern(byte[] bArr, int i, int[] iArr, int i2) {
-        if (i2 == 0 || i2 == 1) {
-            byte b = (byte) i2;
-            int i3 = 0;
-            int i4 = i;
-            for (int i5 : iArr) {
-                for (int i6 = 0; i6 < i5; i6++) {
-                    bArr[i4] = b;
-                    i4++;
-                    i3++;
-                }
-                b = (byte) (b ^ 1);
-            }
-            return i3;
-        }
-        throw new IllegalArgumentException("startColor must be either 0 or 1, but got: " + i2);
-    }
-
-    private BitMatrix renderResult(byte[] bArr, int i, int i2) {
-        int length = bArr.length;
-        int i3 = length + this.sidesMargin;
-        int max = Math.max(i, i3);
-        int max2 = Math.max(1, i2);
-        int i4 = max / i3;
-        int i5 = (max - (length * i4)) / 2;
-        BitMatrix bitMatrix = new BitMatrix(max, max2);
-        int i6 = 0;
-        while (i6 < length) {
-            if (bArr[i6] == 1) {
-                bitMatrix.setRegion(i5, 0, i4, max2);
-            }
-            i6++;
-            i5 += i4;
-        }
-        return bitMatrix;
+    public OneDimensionalCodeWriter(int sidesMargin) {
+        this.sidesMargin = sidesMargin;
     }
 
     @Override // com.google.zxing.Writer
-    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2) throws WriterException {
-        return encode(str, barcodeFormat, i, i2, null);
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height) throws WriterException {
+        return encode(contents, format, width, height, null);
     }
 
     @Override // com.google.zxing.Writer
-    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
-        if (str.length() == 0) {
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
+        if (contents.length() == 0) {
             throw new IllegalArgumentException("Found empty contents");
         }
-        if (i >= 0 && i2 >= 0) {
-            return renderResult(encode(str), i, i2);
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException("Negative size is not allowed. Input: " + width + 'x' + height);
         }
-        throw new IllegalArgumentException("Negative size is not allowed. Input: " + i + 'x' + i2);
+        byte[] code = encode(contents);
+        return renderResult(code, width, height);
     }
 
-    public abstract byte[] encode(String str);
+    private BitMatrix renderResult(byte[] code, int width, int height) {
+        int inputWidth = code.length;
+        int fullWidth = inputWidth + this.sidesMargin;
+        int outputWidth = Math.max(width, fullWidth);
+        int outputHeight = Math.max(1, height);
+        int multiple = outputWidth / fullWidth;
+        int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
+        BitMatrix output = new BitMatrix(outputWidth, outputHeight);
+        int inputX = 0;
+        int outputX = leftPadding;
+        while (inputX < inputWidth) {
+            if (code[inputX] == 1) {
+                output.setRegion(outputX, 0, multiple, outputHeight);
+            }
+            inputX++;
+            outputX += multiple;
+        }
+        return output;
+    }
+
+    public static int appendPattern(byte[] target, int pos, int[] pattern, int startColor) {
+        if (startColor != 0 && startColor != 1) {
+            throw new IllegalArgumentException("startColor must be either 0 or 1, but got: " + startColor);
+        }
+        byte color = (byte) startColor;
+        int numAdded = 0;
+        for (int len : pattern) {
+            for (int j = 0; j < len; j++) {
+                target[pos] = color;
+                pos++;
+                numAdded++;
+            }
+            color = (byte) (color ^ 1);
+        }
+        return numAdded;
+    }
 }

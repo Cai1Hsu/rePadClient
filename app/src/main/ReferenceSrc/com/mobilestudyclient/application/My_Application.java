@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-/* loaded from: classes.jar:com/mobilestudyclient/application/My_Application.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class My_Application extends Application {
     private static final String AUTH_ON = "on";
     public static int Class_Type = 0;
-    public static String LoginName;
+    public static String LoginName = null;
     private static final String POLICY_ALWAYS_NEW_CLIENT = "always new client";
     private static final String POLICY_SINGLE_SESSION_PER_ACCOUNT = "single session per account";
     private static Context mContext;

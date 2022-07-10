@@ -2,8 +2,7 @@ package com.handmark.pulltorefresh.library;
 
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-
-/* loaded from: classes.jar:com/handmark/pulltorefresh/library/ILoadingLayout.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface ILoadingLayout {
     void setLastUpdatedLabel(CharSequence charSequence);
 

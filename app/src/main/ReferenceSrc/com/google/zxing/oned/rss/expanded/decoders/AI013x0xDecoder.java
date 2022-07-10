@@ -2,14 +2,13 @@ package com.google.zxing.oned.rss.expanded.decoders;
 
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
-
-/* loaded from: classes.jar:com/google/zxing/oned/rss/expanded/decoders/AI013x0xDecoder.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 abstract class AI013x0xDecoder extends AI01weightDecoder {
     private static final int HEADER_SIZE = 5;
     private static final int WEIGHT_SIZE = 15;
 
-    AI013x0xDecoder(BitArray bitArray) {
-        super(bitArray);
+    public AI013x0xDecoder(BitArray information) {
+        super(information);
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
@@ -17,9 +16,9 @@ abstract class AI013x0xDecoder extends AI01weightDecoder {
         if (getInformation().getSize() != 60) {
             throw NotFoundException.getNotFoundInstance();
         }
-        StringBuilder sb = new StringBuilder();
-        encodeCompressedGtin(sb, 5);
-        encodeCompressedWeight(sb, 45, 15);
-        return sb.toString();
+        StringBuilder buf = new StringBuilder();
+        encodeCompressedGtin(buf, 5);
+        encodeCompressedWeight(buf, 45, 15);
+        return buf.toString();
     }
 }

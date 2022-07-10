@@ -2,8 +2,7 @@ package com.google.zxing;
 
 import com.google.zxing.common.BitArray;
 import com.google.zxing.common.BitMatrix;
-
-/* loaded from: classes.jar:com/google/zxing/BinaryBitmap.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class BinaryBitmap {
     private final Binarizer binarizer;
     private BitMatrix matrix;
@@ -15,8 +14,16 @@ public final class BinaryBitmap {
         this.binarizer = binarizer;
     }
 
-    public BinaryBitmap crop(int i, int i2, int i3, int i4) {
-        return new BinaryBitmap(this.binarizer.createBinarizer(this.binarizer.getLuminanceSource().crop(i, i2, i3, i4)));
+    public int getWidth() {
+        return this.binarizer.getWidth();
+    }
+
+    public int getHeight() {
+        return this.binarizer.getHeight();
+    }
+
+    public BitArray getBlackRow(int y, BitArray row) throws NotFoundException {
+        return this.binarizer.getBlackRow(y, row);
     }
 
     public BitMatrix getBlackMatrix() throws NotFoundException {
@@ -26,20 +33,13 @@ public final class BinaryBitmap {
         return this.matrix;
     }
 
-    public BitArray getBlackRow(int i, BitArray bitArray) throws NotFoundException {
-        return this.binarizer.getBlackRow(i, bitArray);
-    }
-
-    public int getHeight() {
-        return this.binarizer.getHeight();
-    }
-
-    public int getWidth() {
-        return this.binarizer.getWidth();
-    }
-
     public boolean isCropSupported() {
         return this.binarizer.getLuminanceSource().isCropSupported();
+    }
+
+    public BinaryBitmap crop(int left, int top, int width, int height) {
+        LuminanceSource newSource = this.binarizer.getLuminanceSource().crop(left, top, width, height);
+        return new BinaryBitmap(this.binarizer.createBinarizer(newSource));
     }
 
     public boolean isRotateSupported() {
@@ -47,6 +47,7 @@ public final class BinaryBitmap {
     }
 
     public BinaryBitmap rotateCounterClockwise() {
-        return new BinaryBitmap(this.binarizer.createBinarizer(this.binarizer.getLuminanceSource().rotateCounterClockwise()));
+        LuminanceSource newSource = this.binarizer.getLuminanceSource().rotateCounterClockwise();
+        return new BinaryBitmap(this.binarizer.createBinarizer(newSource));
     }
 }

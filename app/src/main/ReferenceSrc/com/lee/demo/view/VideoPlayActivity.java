@@ -1,6 +1,7 @@
 package com.lee.demo.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -17,8 +18,7 @@ import com.edutech.daoxueben.sysconfig.AppEnvironment;
 import com.launcher.activity.R;
 import java.util.Timer;
 import java.util.TimerTask;
-
-/* loaded from: classes.jar:com/lee/demo/view/VideoPlayActivity.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public class VideoPlayActivity extends Activity implements SurfaceHolder.Callback {
     private DisplayMetrics dm;
     private int duration;
@@ -32,132 +32,40 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
     private TextView tv_time;
     private String url = "";
 
-    private void initViews() {
-        this.surface_view = (SurfaceView) findViewById(R.id.surface_view);
-        this.surface_holder = this.surface_view.getHolder();
-        this.surface_holder.addCallback(this);
-        this.play = (ImageView) findViewById(R.id.play);
-        this.play.setOnClickListener(new View.OnClickListener() { // from class: com.lee.demo.view.VideoPlayActivity.6
-            @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
-                if (AppEnvironment.getMedia() != null) {
-                    if (AppEnvironment.getMedia().isPlaying()) {
-                        VideoPlayActivity.this.pauseVideo();
-                    } else {
-                        VideoPlayActivity.this.playVideo();
-                    }
-                }
-            }
-        });
-        this.tv_time = (TextView) findViewById(R.id.tv_time);
-        this.seekBar = (SeekBar) findViewById(R.id.seekBar);
-        this.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { // from class: com.lee.demo.view.VideoPlayActivity.7
-            @Override // android.widget.SeekBar.OnSeekBarChangeListener
-            public void onProgressChanged(SeekBar seekBar, int i, boolean z) {
-                if (z && AppEnvironment.getMedia() != null) {
-                    AppEnvironment.getMedia().seekTo((int) (VideoPlayActivity.this.duration * (i / 7200000.0f)));
-                }
-                VideoPlayActivity.this.duration = AppEnvironment.getMedia().getDuration();
-                VideoPlayActivity.this.tv_time.setText(String.valueOf(VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getCurrentPosition())) + "/" + VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getDuration()));
-            }
-
-            @Override // android.widget.SeekBar.OnSeekBarChangeListener
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override // android.widget.SeekBar.OnSeekBarChangeListener
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
+    static /* synthetic */ SurfaceView access$5(VideoPlayActivity videoPlayActivity) {
+        return videoPlayActivity.surface_view;
     }
 
-    private void mpInitialize() {
-        AppEnvironment.getMedia().setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() { // from class: com.lee.demo.view.VideoPlayActivity.1
-            @Override // android.media.MediaPlayer.OnBufferingUpdateListener
-            public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
-                VideoPlayActivity.this.seekBar.setSecondaryProgress(i * 10);
-            }
-        });
-        AppEnvironment.getMedia().setOnCompletionListener(new MediaPlayer.OnCompletionListener() { // from class: com.lee.demo.view.VideoPlayActivity.2
-            @Override // android.media.MediaPlayer.OnCompletionListener
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                VideoPlayActivity.this.pauseVideo();
-            }
-        });
-        AppEnvironment.getMedia().setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() { // from class: com.lee.demo.view.VideoPlayActivity.3
-            @Override // android.media.MediaPlayer.OnSeekCompleteListener
-            public void onSeekComplete(MediaPlayer mediaPlayer) {
-            }
-        });
-        AppEnvironment.getMedia().setOnPreparedListener(new MediaPlayer.OnPreparedListener() { // from class: com.lee.demo.view.VideoPlayActivity.4
-            @Override // android.media.MediaPlayer.OnPreparedListener
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                VideoPlayActivity.this.duration = AppEnvironment.getMedia().getDuration();
-                VideoPlayActivity.this.tv_time.setText(String.valueOf(VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getCurrentPosition())) + "/" + VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getDuration()));
-                VideoPlayActivity.this.playVideo();
-            }
-        });
-        AppEnvironment.getMedia().setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() { // from class: com.lee.demo.view.VideoPlayActivity.5
-            @Override // android.media.MediaPlayer.OnVideoSizeChangedListener
-            public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i2) {
-                ViewGroup.LayoutParams layoutParams = VideoPlayActivity.this.surface_view.getLayoutParams();
-                float max = Math.max(AppEnvironment.getMedia().getVideoWidth() / VideoPlayActivity.this.dm.widthPixels, AppEnvironment.getMedia().getVideoHeight() / VideoPlayActivity.this.dm.heightPixels);
-                layoutParams.width = (int) (AppEnvironment.getMedia().getVideoWidth() / max);
-                layoutParams.height = (int) (AppEnvironment.getMedia().getVideoHeight() / max);
-                VideoPlayActivity.this.surface_view.setLayoutParams(layoutParams);
-            }
-        });
+    static /* synthetic */ TextView access$3(VideoPlayActivity videoPlayActivity) {
+        return videoPlayActivity.tv_time;
     }
 
-    public void pauseVideo() {
-        if (AppEnvironment.getMedia() == null) {
-            return;
-        }
-        if (AppEnvironment.getMedia().isPlaying()) {
-            AppEnvironment.getMedia().pause();
-            this.play.setImageResource(R.drawable.video_play);
-        }
-        if (this.timerTask == null || this.timer == null) {
-            return;
-        }
-        this.timerTask.cancel();
-        this.timerTask = null;
-        this.timer.cancel();
-        this.timer = null;
+    static /* synthetic */ SeekBar access$0(VideoPlayActivity videoPlayActivity) {
+        return videoPlayActivity.seekBar;
     }
 
-    public void playVideo() {
-        if (AppEnvironment.getMedia() != null && !AppEnvironment.getMedia().isPlaying()) {
-            AppEnvironment.getMedia().start();
-            this.play.setImageResource(R.drawable.video_stop);
-            this.timer = new Timer();
-            this.timerTask = new TimerTask() { // from class: com.lee.demo.view.VideoPlayActivity.8
-                @Override // java.util.TimerTask, java.lang.Runnable
-                public void run() {
-                    if (AppEnvironment.getMedia() == null || !AppEnvironment.getMedia().isPlaying()) {
-                        return;
-                    }
-                    VideoPlayActivity.this.seekBar.setProgress((int) ((AppEnvironment.getMedia().getCurrentPosition() / VideoPlayActivity.this.duration) * 7200000.0f));
-                }
-            };
-            this.timer.schedule(this.timerTask, 0L, 500L);
-        }
+    static /* synthetic */ void access$2(VideoPlayActivity videoPlayActivity, int i) {
+        videoPlayActivity.duration = i;
     }
 
-    public String getTime(int i) {
-        int rint = (int) Math.rint(i / 1000.0f);
-        return String.valueOf(rint / 60 > 9 ? "" : "0") + (rint / 60) + ":" + (rint % 60 > 9 ? "" : "0") + (rint % 60);
+    static /* synthetic */ int access$7(VideoPlayActivity videoPlayActivity) {
+        return videoPlayActivity.duration;
+    }
+
+    static /* synthetic */ DisplayMetrics access$6(VideoPlayActivity videoPlayActivity) {
+        return videoPlayActivity.dm;
     }
 
     @Override // android.app.Activity
-    protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         this.dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(this.dm);
         setContentView(R.layout.fragment_video);
         initViews();
         Log.e("qwe", "dataSource:" + this.url);
-        this.url = getIntent().getStringExtra("mediaurl");
+        Intent intent = getIntent();
+        this.url = intent.getStringExtra("mediaurl");
         mpInitialize();
         try {
             AppEnvironment.getMedia().setDataSource(this.url);
@@ -168,33 +76,206 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
         }
     }
 
-    @Override // android.app.Activity
-    public void onDestroy() {
-        super.onDestroy();
-        this.isPlaying = false;
-        this.timer = null;
-        Log.e("qwe", "ondestory");
+    private void mpInitialize() {
+        AppEnvironment.getMedia().setOnBufferingUpdateListener(new AnonymousClass1());
+        AppEnvironment.getMedia().setOnCompletionListener(new AnonymousClass2());
+        AppEnvironment.getMedia().setOnSeekCompleteListener(new AnonymousClass3());
+        AppEnvironment.getMedia().setOnPreparedListener(new AnonymousClass4());
+        AppEnvironment.getMedia().setOnVideoSizeChangedListener(new AnonymousClass5());
     }
 
-    @Override // android.app.Activity, android.view.KeyEvent.Callback
-    public boolean onKeyDown(int i, KeyEvent keyEvent) {
-        switch (i) {
-            case 4:
-                setResult(1024);
-                finish();
-                break;
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$1 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass1 implements MediaPlayer.OnBufferingUpdateListener {
+        AnonymousClass1() {
+            VideoPlayActivity.this = r1;
         }
-        return super.onKeyDown(i, keyEvent);
+
+        @Override // android.media.MediaPlayer.OnBufferingUpdateListener
+        public void onBufferingUpdate(MediaPlayer arg0, int percent) {
+            VideoPlayActivity.access$0(VideoPlayActivity.this).setSecondaryProgress(percent * 10);
+        }
     }
 
-    @Override // android.app.Activity
-    public void onPause() {
-        super.onPause();
-        Log.e("qwe", "onpause");
-        if (AppEnvironment.getMedia() == null || !AppEnvironment.getMedia().isPlaying()) {
-            return;
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$2 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass2 implements MediaPlayer.OnCompletionListener {
+        AnonymousClass2() {
+            VideoPlayActivity.this = r1;
         }
-        pauseVideo();
+
+        @Override // android.media.MediaPlayer.OnCompletionListener
+        public void onCompletion(MediaPlayer arg0) {
+            VideoPlayActivity.access$1(VideoPlayActivity.this);
+        }
+    }
+
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$3 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass3 implements MediaPlayer.OnSeekCompleteListener {
+        AnonymousClass3() {
+            VideoPlayActivity.this = r1;
+        }
+
+        @Override // android.media.MediaPlayer.OnSeekCompleteListener
+        public void onSeekComplete(MediaPlayer mp) {
+        }
+    }
+
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$4 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass4 implements MediaPlayer.OnPreparedListener {
+        AnonymousClass4() {
+            VideoPlayActivity.this = r1;
+        }
+
+        @Override // android.media.MediaPlayer.OnPreparedListener
+        public void onPrepared(MediaPlayer arg0) {
+            VideoPlayActivity.access$2(VideoPlayActivity.this, AppEnvironment.getMedia().getDuration());
+            VideoPlayActivity.access$3(VideoPlayActivity.this).setText(String.valueOf(VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getCurrentPosition())) + "/" + VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getDuration()));
+            VideoPlayActivity.access$4(VideoPlayActivity.this);
+        }
+    }
+
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$5 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass5 implements MediaPlayer.OnVideoSizeChangedListener {
+        AnonymousClass5() {
+            VideoPlayActivity.this = r1;
+        }
+
+        @Override // android.media.MediaPlayer.OnVideoSizeChangedListener
+        public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+            ViewGroup.LayoutParams layoutParams = VideoPlayActivity.access$5(VideoPlayActivity.this).getLayoutParams();
+            float w = AppEnvironment.getMedia().getVideoWidth() / VideoPlayActivity.access$6(VideoPlayActivity.this).widthPixels;
+            float h = AppEnvironment.getMedia().getVideoHeight() / VideoPlayActivity.access$6(VideoPlayActivity.this).heightPixels;
+            float m = Math.max(w, h);
+            layoutParams.width = (int) (AppEnvironment.getMedia().getVideoWidth() / m);
+            layoutParams.height = (int) (AppEnvironment.getMedia().getVideoHeight() / m);
+            VideoPlayActivity.access$5(VideoPlayActivity.this).setLayoutParams(layoutParams);
+        }
+    }
+
+    public String getTime(int t) {
+        int cRint = (int) Math.rint(t / 1000.0f);
+        return String.valueOf(cRint / 60 > 9 ? "" : "0") + (cRint / 60) + ":" + (cRint % 60 > 9 ? "" : "0") + (cRint % 60);
+    }
+
+    private void initViews() {
+        this.surface_view = (SurfaceView) findViewById(R.id.surface_view);
+        this.surface_holder = this.surface_view.getHolder();
+        this.surface_holder.addCallback(this);
+        this.play = (ImageView) findViewById(R.id.play);
+        this.play.setOnClickListener(new AnonymousClass6());
+        this.tv_time = (TextView) findViewById(R.id.tv_time);
+        this.seekBar = (SeekBar) findViewById(R.id.seekBar);
+        this.seekBar.setOnSeekBarChangeListener(new AnonymousClass7());
+    }
+
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$6 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass6 implements View.OnClickListener {
+        AnonymousClass6() {
+            VideoPlayActivity.this = r1;
+        }
+
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            if (AppEnvironment.getMedia() != null) {
+                if (AppEnvironment.getMedia().isPlaying()) {
+                    VideoPlayActivity.access$1(VideoPlayActivity.this);
+                } else {
+                    VideoPlayActivity.access$4(VideoPlayActivity.this);
+                }
+            }
+        }
+    }
+
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$7 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass7 implements SeekBar.OnSeekBarChangeListener {
+        AnonymousClass7() {
+            VideoPlayActivity.this = r1;
+        }
+
+        @Override // android.widget.SeekBar.OnSeekBarChangeListener
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override // android.widget.SeekBar.OnSeekBarChangeListener
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override // android.widget.SeekBar.OnSeekBarChangeListener
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (fromUser && AppEnvironment.getMedia() != null) {
+                AppEnvironment.getMedia().seekTo((int) (VideoPlayActivity.access$7(VideoPlayActivity.this) * (progress / 7200000.0f)));
+            }
+            VideoPlayActivity.access$2(VideoPlayActivity.this, AppEnvironment.getMedia().getDuration());
+            VideoPlayActivity.access$3(VideoPlayActivity.this).setText(String.valueOf(VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getCurrentPosition())) + "/" + VideoPlayActivity.this.getTime(AppEnvironment.getMedia().getDuration()));
+        }
+    }
+
+    static /* synthetic */ void access$4(VideoPlayActivity videoPlayActivity) {
+        videoPlayActivity.playVideo();
+    }
+
+    private void playVideo() {
+        if (AppEnvironment.getMedia() != null && !AppEnvironment.getMedia().isPlaying()) {
+            AppEnvironment.getMedia().start();
+            this.play.setImageResource(R.drawable.video_stop);
+            this.timer = new Timer();
+            this.timerTask = new AnonymousClass8();
+            this.timer.schedule(this.timerTask, 0L, 500L);
+        }
+    }
+
+    /* renamed from: com.lee.demo.view.VideoPlayActivity$8 */
+    /* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
+    class AnonymousClass8 extends TimerTask {
+        AnonymousClass8() {
+            VideoPlayActivity.this = r1;
+        }
+
+        @Override // java.util.TimerTask, java.lang.Runnable
+        public void run() {
+            if (AppEnvironment.getMedia() != null && AppEnvironment.getMedia().isPlaying()) {
+                VideoPlayActivity.access$0(VideoPlayActivity.this).setProgress((int) ((AppEnvironment.getMedia().getCurrentPosition() / VideoPlayActivity.access$7(VideoPlayActivity.this)) * 7200000.0f));
+            }
+        }
+    }
+
+    static /* synthetic */ void access$1(VideoPlayActivity videoPlayActivity) {
+        videoPlayActivity.pauseVideo();
+    }
+
+    private void pauseVideo() {
+        if (AppEnvironment.getMedia() != null) {
+            if (AppEnvironment.getMedia().isPlaying()) {
+                AppEnvironment.getMedia().pause();
+                this.play.setImageResource(R.drawable.video_play);
+            }
+            if (this.timerTask != null && this.timer != null) {
+                this.timerTask.cancel();
+                this.timerTask = null;
+                this.timer.cancel();
+                this.timer = null;
+            }
+        }
+    }
+
+    @Override // android.view.SurfaceHolder.Callback
+    public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
+    }
+
+    @Override // android.view.SurfaceHolder.Callback
+    public void surfaceCreated(SurfaceHolder arg0) {
+        AppEnvironment.getMedia().setDisplay(arg0);
+    }
+
+    @Override // android.view.SurfaceHolder.Callback
+    public void surfaceDestroyed(SurfaceHolder arg0) {
+        AppEnvironment.getMedia().setDisplay(null);
     }
 
     @Override // android.app.Activity
@@ -210,26 +291,39 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
     protected void onStop() {
         Log.e("qwe", "activity stop");
         super.onStop();
-        if (this.timerTask == null || this.timer == null) {
-            return;
+        if (this.timerTask != null && this.timer != null) {
+            this.timerTask.cancel();
+            this.timerTask = null;
+            this.timer.cancel();
+            this.timer = null;
         }
-        this.timerTask.cancel();
-        this.timerTask = null;
-        this.timer.cancel();
+    }
+
+    @Override // android.app.Activity, android.view.KeyEvent.Callback
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case 4:
+                setResult(1024);
+                finish();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override // android.app.Activity
+    public void onPause() {
+        super.onPause();
+        Log.e("qwe", "onpause");
+        if (AppEnvironment.getMedia() != null && AppEnvironment.getMedia().isPlaying()) {
+            pauseVideo();
+        }
+    }
+
+    @Override // android.app.Activity
+    public void onDestroy() {
+        super.onDestroy();
+        this.isPlaying = false;
         this.timer = null;
-    }
-
-    @Override // android.view.SurfaceHolder.Callback
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-    }
-
-    @Override // android.view.SurfaceHolder.Callback
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        AppEnvironment.getMedia().setDisplay(surfaceHolder);
-    }
-
-    @Override // android.view.SurfaceHolder.Callback
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        AppEnvironment.getMedia().setDisplay(null);
+        Log.e("qwe", "ondestory");
     }
 }

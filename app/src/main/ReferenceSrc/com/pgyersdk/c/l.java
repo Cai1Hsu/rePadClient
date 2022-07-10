@@ -9,8 +9,7 @@ import java.util.Random;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicHeader;
-
-/* loaded from: classes.jar:com/pgyersdk/c/l.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class l implements HttpEntity {
     private static final char[] a = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     private String e;
@@ -132,7 +131,7 @@ public final class l implements HttpEntity {
     }
 
     @Override // org.apache.http.HttpEntity
-    public final void writeTo(OutputStream outputStream) {
-        outputStream.write(this.d.toByteArray());
+    public final void writeTo(OutputStream outstream) {
+        outstream.write(this.d.toByteArray());
     }
 }

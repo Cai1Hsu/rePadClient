@@ -1,6 +1,5 @@
 package com.brandontate.androidwebviewselection;
-
-/* loaded from: classes.jar:com/brandontate/androidwebviewselection/TextSelectionJavascriptInterfaceListener.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public interface TextSelectionJavascriptInterfaceListener {
     void tsjiEndSelectionMode();
 

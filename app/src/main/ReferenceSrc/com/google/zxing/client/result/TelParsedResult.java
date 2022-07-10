@@ -1,24 +1,15 @@
 package com.google.zxing.client.result;
-
-/* loaded from: classes.jar:com/google/zxing/client/result/TelParsedResult.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class TelParsedResult extends ParsedResult {
     private final String number;
     private final String telURI;
     private final String title;
 
-    public TelParsedResult(String str, String str2, String str3) {
+    public TelParsedResult(String number, String telURI, String title) {
         super(ParsedResultType.TEL);
-        this.number = str;
-        this.telURI = str2;
-        this.title = str3;
-    }
-
-    @Override // com.google.zxing.client.result.ParsedResult
-    public String getDisplayResult() {
-        StringBuilder sb = new StringBuilder(20);
-        maybeAppend(this.number, sb);
-        maybeAppend(this.title, sb);
-        return sb.toString();
+        this.number = number;
+        this.telURI = telURI;
+        this.title = title;
     }
 
     public String getNumber() {
@@ -31,5 +22,13 @@ public final class TelParsedResult extends ParsedResult {
 
     public String getTitle() {
         return this.title;
+    }
+
+    @Override // com.google.zxing.client.result.ParsedResult
+    public String getDisplayResult() {
+        StringBuilder result = new StringBuilder(20);
+        maybeAppend(this.number, result);
+        maybeAppend(this.title, result);
+        return result.toString();
     }
 }

@@ -11,8 +11,7 @@ import com.pgyersdk.update.UpdateManagerListener;
 import org.apache.commons.net.bsd.RCommandClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-/* loaded from: classes.jar:com/pgyersdk/b/b.class */
+/* loaded from: /home/caiyi/jadx/jadx-1.4.2/bin/classes.dex */
 public final class b extends a {
     protected boolean d;
     private Activity f;
@@ -29,6 +28,18 @@ public final class b extends a {
         this.d = true;
     }
 
+    public static /* synthetic */ String a(b bVar) {
+        return bVar.i;
+    }
+
+    public static /* synthetic */ String b(b bVar) {
+        return bVar.h;
+    }
+
+    public static /* synthetic */ Activity c(b bVar) {
+        return bVar.f;
+    }
+
     @Override // com.pgyersdk.b.a
     public final void a() {
         super.a();
@@ -40,15 +51,13 @@ public final class b extends a {
     }
 
     @Override // com.pgyersdk.b.a
-    protected final void a(String str) {
-        String str2;
+    public final void a(String str) {
         if (m.a(str) || !this.d) {
             return;
         }
         String a = com.pgyersdk.a.b.a(this.c, RCommandClient.DEFAULT_PORT);
         try {
             JSONObject jSONObject = new JSONObject(str);
-            str2 = a;
             if ("0".equals(jSONObject.getString("code"))) {
                 JSONObject jSONObject2 = jSONObject.getJSONObject("data");
                 if (jSONObject2.has("lastBuild")) {
@@ -66,16 +75,13 @@ public final class b extends a {
                     this.c.onNoUpdateAvailable();
                     return;
                 }
-                String string = jSONObject2.getString("releaseNote");
-                str2 = string;
+                a = jSONObject2.getString("releaseNote");
                 if (jSONObject2.has("appUrl")) {
                     this.h = jSONObject2.getString("appUrl");
-                    str2 = string;
                 }
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            str2 = a;
         }
         if (this.f == null || this.f.isFinishing()) {
             return;
@@ -88,7 +94,7 @@ public final class b extends a {
         textView.setTextColor(Color.parseColor("#56bc94"));
         textView.setPadding(30, 20, 0, 20);
         textView.setBackgroundColor(Color.parseColor("#56bc94"));
-        builder.setMessage(str2);
+        builder.setMessage(a);
         builder.setNegativeButton(com.pgyersdk.a.b.a(this.c, 515), new c(this));
         builder.setPositiveButton(com.pgyersdk.a.b.a(this.c, 516), new d(this));
         this.g = builder.create();
@@ -100,7 +106,7 @@ public final class b extends a {
     }
 
     @Override // com.pgyersdk.b.a
-    protected final void b() {
+    public final void b() {
         super.b();
         this.f = null;
         this.g = null;
