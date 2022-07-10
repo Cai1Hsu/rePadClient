@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">移动学习客户端</string>
+    <string name="app_name">OpenStudyClient</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="add_app">扩展</string>
@@ -38,7 +38,7 @@
     <string name="exit_myapp">退出</string>
     <string name="app_name_home_school">家校互动</string>
     <string name="myapp_title">我的应用</string>
-    <string name="app_name_studystore">打开密码框</string>
+    <string name="app_name_studystore">学习空间</string>
     <string name="app_name_owncolund">我的空间</string>
     <string name="app_name_mycamera">我的相机</string>
     <string name="app_name_myDiscussion">互动讨论</string>
