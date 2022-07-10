@@ -20,7 +20,7 @@
             android:layout_marginTop="4.0dip"
             android:text="@string/setting_back"
             android:textColor="@color/whilte"
-            android:textStyle="bold"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -29,7 +29,7 @@
             android:gravity="center"
             android:text="@string/setting_setting"
             android:textColor="@android:color/white"
-            android:textSize="26.0sp"
+            android:textSize="26.0sp" />
 
         <Button
             android:id="@id/btnServiceControl"
@@ -42,7 +42,7 @@
             android:paddingRight="6.0dip"
             android:text="@string/feedback"
             android:textColor="@color/whilte"
-            android:textStyle="bold"
+            android:textStyle="bold" />
 
         <Button
             android:id="@id/btnAppControl"
@@ -55,7 +55,7 @@
             android:paddingRight="6.0dip"
             android:text="@string/appscontrol"
             android:textColor="@color/whilte"
-            android:textStyle="bold"
+            android:textStyle="bold" />
 
         <Button
             android:id="@id/btnReset"
