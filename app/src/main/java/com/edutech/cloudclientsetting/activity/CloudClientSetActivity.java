@@ -1920,7 +1920,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     private void showServiceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("关于OpenStudyClient");
-        builder.setMessage("OpenStudyClient\n版本14.7.0(build on GitHub CI)\n访问源代码：https://github.com/cai1hsu/rePadClient\n本程序在GPLv3协议下开源");
+        builder.setMessage("OpenStudyClient\n版本14.7.0(build on Circle CI)\n访问源代码：https://github.com/cai1hsu/rePadClient\n持续集成：https://app.circleci.com/pipelines/github/Cai1Hsu/rePadClient\n本程序在GPLv3协议下开源");
         builder.setPositiveButton(getResources().getString(R.string.confirm), new AnonymousClass18());
         builder.setCancelable(true);
         AlertDialog dialog = builder.create();
