@@ -1,5 +1,4 @@
 .gradle
 .gradle/*
 **/build/*
-./app/.cxx
-./app/.cxx/*
+**/.cxx/*

@@ -1287,6 +1287,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
         this.btnReset.setOnClickListener(this);
         this.btnServiceControl = (Button) findViewById(R.id.btnServiceControl);
         this.btnServiceControl.setOnClickListener(this);
+        this.btnServiceControl.setText("关于");
         this.mBluetooth = BluetoothAdapter.getDefaultAdapter();
         this.btnbluetoothControl = (Button) findViewById(R.id.btnbluetoothControl);
         if (this.mBluetooth != null && this.mBluetooth.isEnabled()) {
@@ -1918,8 +1919,8 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
 
     private void showServiceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.notifymessage));
-        builder.setMessage(getResources().getString(R.string.feedbackmsg));
+        builder.setTitle("关于OpenStudyClient");
+        builder.setMessage("OpenStudyClient\n版本14.7.0(build on GitHub CI)\n访问源代码：https://github.com/cai1hsu/rePadClient\n本程序在GPLv3协议下开源");
         builder.setPositiveButton(getResources().getString(R.string.confirm), new AnonymousClass18());
         builder.setCancelable(true);
         AlertDialog dialog = builder.create();

@@ -245,6 +245,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
     private WifiReceiver wifiReceiver;
     private TextView wifi_btn;
     private String wpsPackage;
+    private int PasswdDialogClickTime = 0;
     public static boolean isDown = false;
     public static ArrayList<HashMap<String, String>> apkdownloadlist = new ArrayList<>();
     public static ArrayList<HashMap<String, String>> apkdownloadlistTemp = new ArrayList<>();
@@ -252,7 +253,6 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
     public static ArrayList<String> apkfinList = null;
     public static int installApkFlag = -1;
     public static final String TEMP = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + File.separatorChar + "MobileStudyClient" + File.separatorChar + ".System" + File.separatorChar + "DaoXueBen" + File.separatorChar + "temp" + File.separatorChar;
-
     public CloudClientActivity(Context pContext) {
         this.imageViews = new ImageView[12];
         this.textViews = new TextView[12];
@@ -3602,9 +3602,15 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                 break;
             case R.id.eleven_img /* 2131362167 */:
             case R.id.ll_eleven /* 2131362182 */:
-                Intent intent8 = new Intent( CloudClientActivity.this, PasswdDialogActivity.class);
-                intent8.addFlags(335544320);
-                startActivity(intent8);
+                if(PasswdDialogClickTime < 5){
+                    PasswdDialogClickTime++;
+                    Toast.makeText(this, "该功能暂不开放！", 0).show();
+                }else{
+                    Toast.makeText(this, "你居然呢发现了", 0).show();
+                    Intent intent8 = new Intent( CloudClientActivity.this, PasswdDialogActivity.class);
+                    intent8.addFlags(335544320);
+                    startActivity(intent8);
+                }
                 break;
             case R.id.twelve_img /* 2131362169 */:
             case R.id.ll_twelve /* 2131362179 */:
