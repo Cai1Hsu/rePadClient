@@ -3,16 +3,14 @@
     style="@style/layout_full"
     android:background="@color/newbgcolor"
     android:gravity="center"
-    android:orientation="vertical"
-    android:theme="@android:style/TextAppearance.Material">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="40.0dip"
         android:layout_alignParentTop="true"
         android:background="@android:color/black"
-        android:paddingTop="0.0px"
-        android:theme="@android:style/TextAppearance.Material">
+        android:paddingTop="0.0px">
 
         <Button
             android:id="@id/btnTitleBack"
@@ -71,7 +69,6 @@
             android:text="@string/appreset"
             android:textColor="@color/whilte"
             android:textStyle="bold"
-            android:theme="@android:style/TextAppearance.Material"
             android:visibility="visible" />
 
         <Button
@@ -86,7 +83,6 @@
             android:text="开启蓝牙"
             android:textColor="@color/whilte"
             android:textStyle="bold"
-            android:theme="@android:style/TextAppearance.Material"
             android:visibility="visible" />
 
     </RelativeLayout>
@@ -102,14 +98,12 @@
         android:layout_marginTop="4.0sp"
         android:text="@string/setting_back"
         android:textColor="@android:color/white"
-        android:theme="@android:style/TextAppearance.Material"
         android:visibility="gone" />
 
     <LinearLayout
         style="@style/layout_full"
         android:layout_marginTop="40.0sp"
-        android:orientation="vertical"
-        android:theme="@android:style/TextAppearance.Material">
+        android:orientation="vertical">
 
         <WebView
             android:id="@id/mwebview"
@@ -118,26 +112,22 @@
             android:layout_height="fill_parent"
             android:layout_marginTop="5.0sp"
             android:scrollbars="none"
-            android:theme="@android:style/TextAppearance.Material"
             android:visibility="gone" />
 
         <LinearLayout
             style="@style/layout_wrap"
-            android:paddingTop="10.0dip"
-            android:theme="@android:style/TextAppearance.Material">
+            android:paddingTop="10.0dip">
 
             <TextView
                 style="@style/layout_setting_wrap"
                 android:text="@string/setting_url"
                 android:textColor="@android:color/black"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="invisible" />
 
             <EditText
@@ -149,7 +139,6 @@
                 android:hint="@string/hinturl"
                 android:singleLine="true"
                 android:text="192.168.0.88"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <TextView
@@ -158,7 +147,6 @@
                 android:text="版  本  号："
                 android:textColor="@android:color/black"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <TextView
@@ -166,8 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="70.0dip"
                 android:textColor="@android:color/black"
-                android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
+                android:textSize="18.0sp""
                 android:visibility="gone" />
 
             <Button
@@ -176,7 +163,6 @@
                 android:layout_height="wrap_content"
                 android:text="更新"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
         </LinearLayout>
 
@@ -186,23 +172,20 @@
             android:layout_marginLeft="50.0dip"
             android:layout_marginTop="0.0dip"
             android:layout_marginRight="50.0dip"
-            android:gravity="center_vertical"
-            android:theme="@android:style/TextAppearance.Material">
+            android:gravity="center_vertical">
 
             <TextView
                 style="@style/layout_setting_wrap"
                 android:layout_marginLeft="15.0dip"
                 android:text="@string/setting_url"
                 android:textColor="@android:color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <EditText
                 android:id="@id/ip_edit"
@@ -213,8 +196,7 @@
                 android:hint="@string/hinturl"
                 android:singleLine="true"
                 android:text="192.168.0.88"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -224,23 +206,20 @@
             android:layout_marginTop="15.0dip"
             android:layout_marginRight="50.0dip"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:theme="@android:style/TextAppearance.Material">
+            android:orientation="horizontal">
 
             <TextView
                 style="@style/layout_setting_wrap"
                 android:layout_marginLeft="15.0dip"
                 android:text="@string/setting_username"
                 android:textColor="@android:color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <EditText
                 android:id="@id/username_edit"
@@ -251,8 +230,7 @@
                 android:hint="@string/hintusername"
                 android:singleLine="true"
                 android:text="02"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
         </LinearLayout>
 
         <TextView
@@ -264,7 +242,6 @@
             android:layout_marginRight="50.0dip"
             android:text="账号注销请联系学校管理员"
             android:textColor="#ffa20000"
-            android:theme="@android:style/TextAppearance.Material"
             android:visibility="gone" />
 
         <LinearLayout
@@ -273,23 +250,20 @@
             android:layout_marginLeft="50.0dip"
             android:layout_marginTop="15.0dip"
             android:layout_marginRight="50.0dip"
-            android:gravity="center_vertical"
-            android:theme="@android:style/TextAppearance.Material">
+            android:gravity="center_vertical" >
 
             <TextView
                 style="@style/layout_setting_wrap"
                 android:layout_marginLeft="15.0dip"
                 android:text="@string/setting_pw"
                 android:textColor="@android:color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <EditText
                 android:id="@id/password_edit"
@@ -301,8 +275,7 @@
                 android:password="true"
                 android:singleLine="true"
                 android:text="1"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -312,7 +285,6 @@
             android:layout_marginTop="15.0dip"
             android:layout_marginRight="50.0dip"
             android:gravity="center_vertical"
-            android:theme="@android:style/TextAppearance.Material"
             android:visibility="gone">
 
             <Button
@@ -322,7 +294,6 @@
                 android:layout_marginLeft="10.0sp"
                 android:text="修改"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <Button
@@ -332,7 +303,6 @@
                 android:layout_marginLeft="10.0sp"
                 android:text="重置"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <TextView
@@ -340,15 +310,13 @@
                 android:layout_marginLeft="15.0dip"
                 android:text="@string/str_grant_code0"
                 android:textColor="@android:color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <EditText
                 android:id="@id/idauth_edit"
@@ -362,8 +330,7 @@
                 android:gravity="center"
                 android:singleLine="false"
                 android:text="@string/str_not_registered"
-                android:textSize="10.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="10.0sp" />
 
             <Button
                 android:id="@id/idauth_btn"
@@ -374,8 +341,7 @@
                 android:layout_marginTop="5.0dip"
                 android:layout_marginRight="15.0dip"
                 android:layout_marginBottom="5.0dip"
-                android:text="@string/str_registered"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:text="@string/str_registered" />
         </LinearLayout>
 
         <LinearLayout
@@ -385,23 +351,20 @@
             android:layout_marginLeft="50.0dip"
             android:layout_marginTop="15.0dip"
             android:layout_marginRight="50.0dip"
-            android:gravity="center_vertical"
-            android:theme="@android:style/TextAppearance.Material">
+            android:gravity="center_vertical">
 
             <TextView
                 style="@style/layout_setting_wrap"
                 android:layout_marginLeft="15.0dip"
                 android:text="@string/language_t"
                 android:textColor="@android:color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:id="@id/language_txt"
@@ -411,8 +374,7 @@
                 android:layout_marginRight="20.0dip"
                 android:gravity="center|right"
                 android:text="@string/setchinese"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -420,8 +382,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="50.0dip"
             android:layout_marginTop="15.0dip"
-            android:layout_marginRight="50.0dip"
-            android:theme="@android:style/TextAppearance.Material">
+            android:layout_marginRight="50.0dip">
 
             <Button
                 android:id="@id/ok_btn"
@@ -432,8 +393,7 @@
                 android:layout_marginTop="20.0dip"
                 android:text="@string/setting_save"
                 android:textColor="@color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:id="@id/tvUpdatePass"
@@ -443,8 +403,7 @@
                 android:layout_marginRight="30.0dip"
                 android:text="@string/updatepass"
                 android:textColor="@color/blue"
-                android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="18.0sp" />
 
             <TextView
                 android:id="@id/tvForgetPass"
@@ -454,7 +413,6 @@
                 android:text="@string/forgetpass"
                 android:textColor="@color/blue"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
         </RelativeLayout>
 
@@ -463,16 +421,14 @@
             android:layout_height="1.0dip"
             android:layout_marginLeft="50.0dip"
             android:layout_marginTop="00.0dip"
-            android:layout_marginRight="50.0dip"
-            android:theme="@android:style/TextAppearance.Material" />
+            android:layout_marginRight="50.0dip" />
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:layout_marginLeft="50.0dip"
             android:layout_marginRight="50.0dip"
-            android:gravity="center_vertical"
-            android:theme="@android:style/TextAppearance.Material">
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@id/tvCurrVersion"
@@ -482,8 +438,7 @@
                 android:layout_marginLeft="15.0dip"
                 android:text="当前版本：V1.0.0"
                 android:textColor="@android:color/black"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
 
             <TextView
                 android:id="@id/tvUpdateNow"
@@ -493,22 +448,19 @@
                 android:layout_marginRight="15.0dip"
                 android:text="@string/updatenow"
                 android:textColor="@color/blue"
-                android:textSize="22.0sp"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textSize="22.0sp" />
         </RelativeLayout>
 
         <LinearLayout
             style="@style/layout_wrap"
             android:layout_marginTop="15.0sp"
-            android:theme="@android:style/TextAppearance.Material"
             android:visibility="gone">
 
             <TextView
                 style="@style/layout_wrap"
                 android:layout_gravity="center_vertical"
                 android:text="以演示模式运行:"
-                android:textColor="@android:color/black"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:textColor="@android:color/black" />
 
             <ImageButton
                 android:id="@id/setting_demo_onoff"
@@ -516,22 +468,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="48.0sp"
                 android:background="#00000000"
-                android:src="@drawable/radio_off"
-                android:theme="@android:style/TextAppearance.Material" />
+                android:src="@drawable/radio_off" />
         </LinearLayout>
 
         <LinearLayout
             style="@style/layout_wrap"
             android:layout_marginTop="15.0sp"
-            android:orientation="horizontal"
-            android:theme="@android:style/TextAppearance.Material">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@id/wifi_btn"
                 android:layout_width="100.0sp"
                 android:layout_height="wrap_content"
                 android:text="Wi-Fi设置"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <Button
@@ -540,7 +489,6 @@
                 android:layout_marginLeft="47.0sp"
                 android:text="保存"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
 
             <Button
@@ -550,14 +498,12 @@
                 android:layout_marginLeft="47.0sp"
                 android:text="返回"
                 android:textSize="18.0sp"
-                android:theme="@android:style/TextAppearance.Material"
                 android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
             style="@style/layout_wrap"
             android:orientation="horizontal"
-            android:paddingBottom="150.0px"
-            android:theme="@android:style/TextAppearance.Material" />
+            android:paddingBottom="150.0px" />
     </LinearLayout>
 </RelativeLayout>
