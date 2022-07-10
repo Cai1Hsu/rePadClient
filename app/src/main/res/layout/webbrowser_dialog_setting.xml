@@ -58,29 +58,29 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@id/btnReset"
-            android:layout_width="wrap_content"
-            android:layout_height="30.0dip"
-            android:layout_marginTop="4.0dip"
-            android:layout_marginRight="15.0dip"
-            android:layout_toLeftOf="@id/btnAppControl"
-            android:paddingLeft="6.0dip"
-            android:paddingRight="6.0dip"
-            android:text="@string/appreset"
-            android:textColor="@color/whilte"
-            android:textStyle="bold"
-            android:visibility="visible" />
-
-        <Button
             android:id="@id/btnbluetoothControl"
             android:layout_width="wrap_content"
             android:layout_height="30.0dip"
             android:layout_marginTop="4.0dip"
             android:layout_marginRight="15.0dp"
-            android:layout_toLeftOf="@id/btnReset"
+            android:layout_toLeftOf="@id/btnAppControl"
             android:paddingLeft="6.0dip"
             android:paddingRight="6.0dip"
             android:text="开启蓝牙"
+            android:textColor="@color/whilte"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@id/btnReset"
+            android:layout_width="wrap_content"
+            android:layout_height="30.0dip"
+            android:layout_marginTop="4.0dip"
+            android:layout_marginRight="15.0dip"
+            android:layout_toLeftOf="@id/btnbluetoothControl"
+            android:paddingLeft="6.0dip"
+            android:paddingRight="6.0dip"
+            android:text="@string/appreset"
             android:textColor="@color/whilte"
             android:textStyle="bold"
             android:visibility="visible" />
@@ -116,7 +116,7 @@
 
         <LinearLayout
             style="@style/layout_wrap"
-            android:paddingTop="10.0dip">
+            android:paddingTop="0.0dip">
 
             <TextView
                 style="@style/layout_setting_wrap"
@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="70.0dip"
                 android:textColor="@android:color/black"
-                android:textSize="18.0sp""
+                android:textSize="18.0sp"
                 android:visibility="gone" />
 
             <Button
@@ -250,7 +250,7 @@
             android:layout_marginLeft="50.0dip"
             android:layout_marginTop="15.0dip"
             android:layout_marginRight="50.0dip"
-            android:gravity="center_vertical" >
+            android:gravity="center_vertical">
 
             <TextView
                 style="@style/layout_setting_wrap"
