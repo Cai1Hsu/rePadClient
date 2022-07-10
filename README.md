@@ -2,7 +2,9 @@
 reversed source code for MobileStudyClient( PadClient )
 
 ## Download binary file
-[GitHub CI](https://github.com/Cai1Hsu/rePadClient/actions)
+- [Circle CI](https://app.circleci.com/pipelines/github/Cai1Hsu/rePadClient/4/workflows/lateset/jobs/4/artifacts)
+- [GitHub CI](https://github.com/Cai1Hsu/rePadClient/actions)
+
 ## Build on Your PC
 ### Before Compile
 - Edit local.properties
