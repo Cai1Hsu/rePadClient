@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:gravity="center" android:orientation="vertical" android:background="@color/newbgcolor" style="@style/layout_full"
+<ScrollView android:gravity="center" android:orientation="vertical" android:background="@color/newbgcolor" style="@style/layout_full"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <RelativeLayout android:background="@android:color/black" android:paddingTop="0.0px" android:layout_width="fill_parent" android:layout_height="40.0dip" android:layout_alignParentTop="true">
         <Button android:textStyle="bold" android:textColor="@color/whilte" android:id="@id/btnTitleBack" android:background="@drawable/button_bg" android:layout_width="60.0dip" android:layout_height="30.0dip" android:layout_marginLeft="15.0dip" android:layout_marginTop="4.0dip" android:text="@string/setting_back" />
@@ -70,4 +70,4 @@
         </LinearLayout>
         <LinearLayout android:orientation="horizontal" android:paddingBottom="150.0px" style="@style/layout_wrap" />
     </LinearLayout>
-</RelativeLayout>
+</ScrollView>
