@@ -1296,7 +1296,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
             this.btnbluetoothControl.setText("开启蓝牙");
         }
         this.btnbluetoothControl.setOnClickListener(new AnonymousClass13());
-        this.btnbluetoothControl.setVisibility(0);
+        //this.btnbluetoothControl.setVisibility(0);
 	this.tvUpdatePass = (TextView) findViewById(R.id.tvUpdatePass);
         this.tvUpdateNow = (TextView) findViewById(R.id.tvUpdateNow);
         this.tvUpdatePass.setOnClickListener(this);

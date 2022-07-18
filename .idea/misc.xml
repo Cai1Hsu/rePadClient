@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/main.xml" value="0.152" />
+        <entry key="app/src/main/res/layout/passworddialog.xml" value="0.15651041666666668" />
+        <entry key="app/src/main/res/layout/passwordshow.xml" value="0.15651041666666668" />
         <entry key="app/src/main/res/layout/webbrowser_dialog_setting.xml" value="0.264" />
       </map>
     </option>
