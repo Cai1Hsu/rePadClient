@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: ./app/javaScaffoding/classes.all.dex.jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/javaScaffoding/classes.all.dex.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
