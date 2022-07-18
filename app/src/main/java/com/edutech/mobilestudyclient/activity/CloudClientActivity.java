@@ -1217,13 +1217,12 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
             if (Build.DISPLAY.contains("M1016Pro") || Build.DISPLAY.contains("P990S.V") || Build.DISPLAY.contains("S1016") || Build.DISPLAY.contains("M856.V")) {
                 this.tv_line.setVisibility(0);
                 this.tv_main_eryproc.setVisibility(0);
-            } /*else {
+            } else {
                 this.tv_line.setVisibility(4);
                 this.tv_main_eryproc.setVisibility(4);
                 this.tv_main_eryproc.setWidth(1);
                 this.tv_main_eryproc.setHeight(1);
             }
-            */
         } catch (Exception e) {
         }
     }
