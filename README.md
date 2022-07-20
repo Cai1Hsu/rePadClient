@@ -1,5 +1,4 @@
-# rePadClient [![Android CI](https://github.com/Cai1Hsu/rePadClient/actions/workflows/android.yml/badge.svg?branch=master)](https://github.com/Cai1Hsu/rePadClient/actions/workflows/android.yml)
-[![Repo size](https://img.shields.io/github/repo-size/Cai1Hsu/rePadClient)](https://github.com/Cai1Hsu/rePadClient)
+# rePadClient [![Android CI](https://github.com/Cai1Hsu/rePadClient/actions/workflows/android.yml/badge.svg?branch=master)](https://github.com/Cai1Hsu/rePadClient/actions/workflows/android.yml)[![Repo size](https://img.shields.io/github/repo-size/Cai1Hsu/rePadClient)](https://github.com/Cai1Hsu/rePadClient)
 reversed source code for MobileStudyClient( PadClient )
 
 ## Download binary file
@@ -9,7 +8,7 @@ reversed source code for MobileStudyClient( PadClient )
 ## Build on Your PC
 ### For developers from China
 - You can clone from azure for faster speed
-`https://Cai1Hsu@dev.azure.com/Cai1Hsu/OpenStudyClient/_git/OpenStudyClient`
+`git clone https://Cai1Hsu@dev.azure.com/Cai1Hsu/OpenStudyClient/_git/OpenStudyClient`
 ### Before Compile
 - Edit local.properties
 - Edit gradle.properties
