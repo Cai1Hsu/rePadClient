@@ -2,6 +2,7 @@
 reversed source code for MobileStudyClient( PadClient )
 
 ## Download binary file
+- [GitHub Release](https://github.com/Cai1Hsu/rePadClient/releases/latest)
 - [Circle CI](https://app.circleci.com/pipelines/github/Cai1Hsu/rePadClient?branch=master)
 - [GitHub CI](https://github.com/Cai1Hsu/rePadClient/actions)
 
