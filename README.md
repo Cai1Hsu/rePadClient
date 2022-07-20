@@ -8,7 +8,10 @@ reversed source code for MobileStudyClient( PadClient )
 ## Build on Your PC
 ### For developers from China
 - You can clone from azure for faster speed
-`git clone https://Cai1Hsu@dev.azure.com/Cai1Hsu/OpenStudyClient/_git/OpenStudyClient`
+``` Bash
+git clone https://Cai1Hsu@dev.azure.com/Cai1Hsu/OpenStudyClient/_git/OpenStudyClient
+```
+
 ### Before Compile
 - Edit local.properties
 - Edit gradle.properties
