@@ -10,7 +10,7 @@ reversed source code for MobileStudyClient( PadClient )
 ### For developers from China
 - You can clone from azure for faster speed
 ``` Bash
-git clone https://Cai1Hsu@dev.azure.com/Cai1Hsu/OpenStudyClient/_git/OpenStudyClient
+git clone https://gitee.com/x1052/OpenStudyClient.git
 ```
 
 ### Before Compile
