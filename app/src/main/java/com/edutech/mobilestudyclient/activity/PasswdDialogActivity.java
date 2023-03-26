@@ -226,7 +226,7 @@ public class PasswdDialogActivity extends Activity {
                 r2.setVisibility(0);
             }
         }
-        r2.setText("Cai1Hsu hacked in.\nThe password is:\'" + PasswdDialogActivity.this.PWD + "\'");
+        r2.setText("The password is:\'" + PasswdDialogActivity.this.PWD + "\'");
         builder.setTitle(getResources().getString(R.string.hintpassword)).setIcon(17301659).setView(view).setPositiveButton(getResources().getString(R.string.appmanager_ok), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.1
             @Override // android.content.DialogInterface.OnClickListener
             public void onClick(DialogInterface arg0, int arg1) {
