@@ -7,11 +7,6 @@ reversed source code for MobileStudyClient( PadClient )
 - [GitHub CI](https://github.com/Cai1Hsu/rePadClient/actions)
 
 ## Build on Your PC
-### For developers from China
-- You can clone from azure for faster speed
-``` Bash
-git clone https://gitee.com/x1052/OpenStudyClient.git
-```
 
 ### Before Compile
 - Edit local.properties
