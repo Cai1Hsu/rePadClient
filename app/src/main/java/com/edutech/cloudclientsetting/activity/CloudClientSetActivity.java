@@ -1948,10 +1948,10 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
 
                                 intent.setComponent(cn);
                                 startActivity(intent);
-                            }catch (Exception e){
+							}
+                        }catch (Exception e){
                                 
-                            }
-                        }
+                       }
                     }
                 })
                 .setNegativeButton("取消", null)
