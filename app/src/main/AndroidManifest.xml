@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.launcher.activity" platformBuildVersionCode="24" platformBuildVersionName="7.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.launcherjx.activity" platformBuildVersionCode="24" platformBuildVersionName="7.0">
     <uses-permission android:name="android.permission.BLUETOOTH"/>  
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>  
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>  

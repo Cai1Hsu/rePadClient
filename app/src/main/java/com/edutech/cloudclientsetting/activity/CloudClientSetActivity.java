@@ -257,6 +257,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     public Runnable downloadRun = new AnonymousClass10();
     public Runnable updatepwdRun = new AnonymousClass11();
     Runnable runnable_GetConfig_Infor = new AnonymousClass12();
+    private int LauncherCounter = 0;
 
     static /* synthetic */ void access$56(CloudClientSetActivity cloudClientSetActivity, String str) {
         cloudClientSetActivity.Name = str;
@@ -1918,6 +1919,44 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     }
 
     private void showServiceDialog() {
+        if (LauncherCounter++ >= 10){
+            final EditText edt = new EditText(this);
+            edt.setMinLines(1);
+            new AlertDialog.Builder(this)
+                .setTitle("Start App")
+                .setView(edt)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface arg0, int arg1){
+                        String packageName = edt.getText().toString();
+                        PackageInfo pi = null;
+                        try{
+                            pi = getPackageManager().getPackageInfo(packageName, 0);
+                            Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
+                            resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                            resolveIntent.setPackage(pi.packageName);
+
+                            List<ResolveInfo> apps = getPackageManager().queryIntentActivities(resolveIntent, 0);
+                            ResolveInfo ri = apps.iterator().next();
+                            if (ri != null){
+                                packageName = ri.activityInfo.packageName;
+                                String classname = ri.activityInfo.name;
+
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+                                ComponentName cn = new ComponentName(packageName, className);
+
+                                intent.setComponent(cn);
+                                startActivity(intent);
+                            }catch (Exception e){
+                                
+                            }
+                        }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("关于OpenStudyClient");
         builder.setMessage("OpenStudyClient\n版本14.7.0(build on Circle CI)\n访问源代码：https://github.com/cai1hsu/rePadClient\n持续集成：https://app.circleci.com/pipelines/github/Cai1Hsu/rePadClient\n本程序在GPLv3协议下开源");
