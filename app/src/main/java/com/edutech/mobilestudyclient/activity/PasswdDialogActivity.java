@@ -230,6 +230,7 @@ public class PasswdDialogActivity extends Activity {
         builder.setTitle(getResources().getString(R.string.hintpassword)).setIcon(17301659).setView(view).setPositiveButton(getResources().getString(R.string.appmanager_ok), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.1
             @Override // android.content.DialogInterface.OnClickListener
             public void onClick(DialogInterface arg0, int arg1) {
+                return;
                 String passwd = PasswdDialogActivity.this.PWD;
                 if (passwd.length() == 0) {
                     passwd = "ayjedutechyx@123456z";
