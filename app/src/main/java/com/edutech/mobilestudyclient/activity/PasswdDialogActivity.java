@@ -275,7 +275,7 @@ public class PasswdDialogActivity extends Activity {
             public void onClick(DialogInterface arg0, int arg1) {
                 PasswdDialogActivity.this.errorNum = 0;
                 Intent intent = new Intent("android.intent.action.MAIN");
-                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(268468224);
                 intent.addCategory("android.intent.category.HOME");
                 PasswdDialogActivity.this.startActivity(intent);
                 // TODO: Fix 
@@ -290,7 +290,7 @@ public class PasswdDialogActivity extends Activity {
                 PasswdDialogActivity.this.errorNum = 0;
                 PasswdDialogActivity.this.errorNum = 0;
                 Intent intent = new Intent("android.intent.action.MAIN");
-                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(268468224);
                 intent.addCategory("android.intent.category.HOME");
                 PasswdDialogActivity.this.startActivity(intent);
                 // Intent intent = new Intent("android.intent.action.MAIN");
