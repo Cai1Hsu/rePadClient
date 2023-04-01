@@ -14,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -1921,7 +1922,8 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     private void showServiceDialog() {
         if (LauncherCounter++ >= 10){
             final EditText edt = new EditText(this);
-            edt.setMinLines(1);
+            edt.setSingleLine(true);
+            edt.setText("com.android.apkinstaller");
             new AlertDialog.Builder(this)
                 .setTitle("Start App")
                 .setView(edt)
@@ -1939,7 +1941,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                             ResolveInfo ri = apps.iterator().next();
                             if (ri != null){
                                 packageName = ri.activityInfo.packageName;
-                                String classname = ri.activityInfo.name;
+                                String className = ri.activityInfo.name;
 
                                 Intent intent = new Intent(Intent.ACTION_MAIN);
                                 intent.addCategory(Intent.CATEGORY_LAUNCHER);
