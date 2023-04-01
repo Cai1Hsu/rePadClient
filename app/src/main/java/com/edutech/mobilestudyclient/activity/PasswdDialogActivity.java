@@ -274,12 +274,14 @@ public class PasswdDialogActivity extends Activity {
             public void onClick(DialogInterface arg0, int arg1) {
                 PasswdDialogActivity.this.errorNum = 0;
                 Intent intent = new Intent("android.intent.action.MAIN");
-                intent.setFlags(268468224);
-                intent.addCategory("android.intent.category.LAUNCHER");
-                ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
-                intent.setComponent(cn);
-                PasswdDialogActivity.this.startActivity(intent);
-                PasswdDialogActivity.this.finish();
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                intent.addCategory("android.intent.category.HOME");
+                startActivity(intent);
+                // TODO: Fix 
+                // ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                // intent.setComponent(cn);
+                // PasswdDialogActivity.this.startActivity(intent);
+                // PasswdDialogActivity.this.finish();
             }
         }).setOnCancelListener(new DialogInterface.OnCancelListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.3
             @Override // android.content.DialogInterface.OnCancelListener
