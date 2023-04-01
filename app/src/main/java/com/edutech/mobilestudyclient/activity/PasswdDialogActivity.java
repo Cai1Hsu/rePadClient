@@ -276,22 +276,27 @@ public class PasswdDialogActivity extends Activity {
                 Intent intent = new Intent("android.intent.action.MAIN");
                 intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
                 intent.addCategory("android.intent.category.HOME");
-                startActivity(intent);
+                PasswdDialogActivity.this.startActivity(intent);
                 // TODO: Fix 
                 // ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
                 // intent.setComponent(cn);
                 // PasswdDialogActivity.this.startActivity(intent);
-                // PasswdDialogActivity.this.finish();
+                PasswdDialogActivity.this.finish();
             }
         }).setOnCancelListener(new DialogInterface.OnCancelListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.3
             @Override // android.content.DialogInterface.OnCancelListener
             public void onCancel(DialogInterface dialog) {
                 PasswdDialogActivity.this.errorNum = 0;
+                PasswdDialogActivity.this.errorNum = 0;
                 Intent intent = new Intent("android.intent.action.MAIN");
-                intent.setFlags(268468224);
-                intent.addCategory("android.intent.category.LAUNCHER");
-                ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
-                intent.setComponent(cn);
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                intent.addCategory("android.intent.category.HOME");
+                PasswdDialogActivity.this.startActivity(intent);
+                // Intent intent = new Intent("android.intent.action.MAIN");
+                // intent.setFlags(268468224);
+                // intent.addCategory("android.intent.category.LAUNCHER");
+                // ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                // intent.setComponent(cn);
                 PasswdDialogActivity.this.startActivity(intent);
                 PasswdDialogActivity.this.finish();
             }
