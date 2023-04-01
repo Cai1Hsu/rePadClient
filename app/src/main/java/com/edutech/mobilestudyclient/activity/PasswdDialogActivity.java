@@ -231,6 +231,7 @@ public class PasswdDialogActivity extends Activity {
             @Override // android.content.DialogInterface.OnClickListener
             public void onClick(DialogInterface arg0, int arg1) {
                 return;
+                /*
                 String passwd = PasswdDialogActivity.this.PWD;
                 if (passwd.length() == 0) {
                     passwd = "ayjedutechyx@123456z";
@@ -269,6 +270,7 @@ public class PasswdDialogActivity extends Activity {
                     e.printStackTrace();
                 }
                 PasswdDialogActivity.this.showDialog();
+                */
             }
         }).setNegativeButton(getResources().getString(R.string.appmanager_cancel), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.2
             @Override // android.content.DialogInterface.OnClickListener
