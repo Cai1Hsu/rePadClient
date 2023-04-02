@@ -3166,7 +3166,10 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     e3.printStackTrace();
                 }
                 if (!My_md5.Md5(this.Pwd).equals(pubkey)) {
-                    return 0;
+                    // 真的牛逼，在本地验证密码
+                    showToast("密码错误！但 OpenStudyClient 可以强制登录")
+                    // TODO
+                    //return 0;
                 }
                 SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
                 SharedPreferences.Editor editor = sharePre.edit();
