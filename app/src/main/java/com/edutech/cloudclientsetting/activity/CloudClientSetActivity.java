@@ -3167,7 +3167,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                 }
                 if (!My_md5.Md5(this.Pwd).equals(pubkey)) {
                     // 真的牛逼，在本地验证密码
-                    showToast("密码错误！但 OpenStudyClient 可以强制登录")
+                    showToast("密码错误！但 OpenStudyClient 可以强制登录");
                     // TODO
                     //return 0;
                 }
