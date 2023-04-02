@@ -14,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -257,6 +258,7 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     public Runnable downloadRun = new AnonymousClass10();
     public Runnable updatepwdRun = new AnonymousClass11();
     Runnable runnable_GetConfig_Infor = new AnonymousClass12();
+    private int LauncherCounter = 0;
 
     static /* synthetic */ void access$56(CloudClientSetActivity cloudClientSetActivity, String str) {
         cloudClientSetActivity.Name = str;
@@ -1918,6 +1920,45 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
     }
 
     private void showServiceDialog() {
+        if (LauncherCounter++ >= 10){
+            final EditText edt = new EditText(this);
+            edt.setSingleLine(true);
+            edt.setText("com.android.apkinstaller");
+            new AlertDialog.Builder(this)
+                .setTitle("Start App")
+                .setView(edt)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface arg0, int arg1){
+                        String packageName = edt.getText().toString();
+                        PackageInfo pi = null;
+                        try{
+                            pi = getPackageManager().getPackageInfo(packageName, 0);
+                            Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
+                            resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                            resolveIntent.setPackage(pi.packageName);
+
+                            List<ResolveInfo> apps = getPackageManager().queryIntentActivities(resolveIntent, 0);
+                            ResolveInfo ri = apps.iterator().next();
+                            if (ri != null){
+                                packageName = ri.activityInfo.packageName;
+                                String className = ri.activityInfo.name;
+
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+                                ComponentName cn = new ComponentName(packageName, className);
+
+                                intent.setComponent(cn);
+                                startActivity(intent);
+							}
+                        }catch (Exception e){
+                                
+                       }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("关于OpenStudyClient");
         builder.setMessage("OpenStudyClient\n版本14.7.0(build on Circle CI)\n本程序在GPLv3协议下开源");
@@ -3125,7 +3166,10 @@ public class CloudClientSetActivity extends Activity implements View.OnClickList
                     e3.printStackTrace();
                 }
                 if (!My_md5.Md5(this.Pwd).equals(pubkey)) {
-                    return 0;
+                    // 真的牛逼，在本地验证密码
+                    showToast("密码错误！但 OpenStudyClient 可以强制登录")
+                    // TODO
+                    //return 0;
                 }
                 SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
                 SharedPreferences.Editor editor = sharePre.edit();

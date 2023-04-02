@@ -230,6 +230,8 @@ public class PasswdDialogActivity extends Activity {
         builder.setTitle(getResources().getString(R.string.hintpassword)).setIcon(17301659).setView(view).setPositiveButton(getResources().getString(R.string.appmanager_ok), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.1
             @Override // android.content.DialogInterface.OnClickListener
             public void onClick(DialogInterface arg0, int arg1) {
+                return;
+                /*
                 String passwd = PasswdDialogActivity.this.PWD;
                 if (passwd.length() == 0) {
                     passwd = "ayjedutechyx@123456z";
@@ -268,6 +270,7 @@ public class PasswdDialogActivity extends Activity {
                     e.printStackTrace();
                 }
                 PasswdDialogActivity.this.showDialog();
+                */
             }
         }).setNegativeButton(getResources().getString(R.string.appmanager_cancel), new DialogInterface.OnClickListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.2
             @Override // android.content.DialogInterface.OnClickListener
@@ -275,21 +278,28 @@ public class PasswdDialogActivity extends Activity {
                 PasswdDialogActivity.this.errorNum = 0;
                 Intent intent = new Intent("android.intent.action.MAIN");
                 intent.setFlags(268468224);
-                intent.addCategory("android.intent.category.LAUNCHER");
-                ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
-                intent.setComponent(cn);
+                intent.addCategory("android.intent.category.HOME");
                 PasswdDialogActivity.this.startActivity(intent);
+                // TODO: Fix 
+                // ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                // intent.setComponent(cn);
+                // PasswdDialogActivity.this.startActivity(intent);
                 PasswdDialogActivity.this.finish();
             }
         }).setOnCancelListener(new DialogInterface.OnCancelListener() { // from class: com.edutech.mobilestudyclient.activity.PasswdDialogActivity.3
             @Override // android.content.DialogInterface.OnCancelListener
             public void onCancel(DialogInterface dialog) {
                 PasswdDialogActivity.this.errorNum = 0;
+                PasswdDialogActivity.this.errorNum = 0;
                 Intent intent = new Intent("android.intent.action.MAIN");
                 intent.setFlags(268468224);
-                intent.addCategory("android.intent.category.LAUNCHER");
-                ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
-                intent.setComponent(cn);
+                intent.addCategory("android.intent.category.HOME");
+                PasswdDialogActivity.this.startActivity(intent);
+                // Intent intent = new Intent("android.intent.action.MAIN");
+                // intent.setFlags(268468224);
+                // intent.addCategory("android.intent.category.LAUNCHER");
+                // ComponentName cn = new ComponentName("com.launcher.activity", "com.edutech.mobilestudyclient.activity.CloudClientActivity");
+                // intent.setComponent(cn);
                 PasswdDialogActivity.this.startActivity(intent);
                 PasswdDialogActivity.this.finish();
             }

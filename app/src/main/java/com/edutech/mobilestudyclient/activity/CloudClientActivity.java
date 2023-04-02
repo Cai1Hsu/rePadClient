@@ -1072,7 +1072,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.agreement_sp = getSharedPreferences("myAgreement", 0);
-        boolean hasLicensed = this.agreement_sp.getBoolean("agreement_key", true);
+        boolean hasLicensed = true; //this.agreement_sp.getBoolean("agreement_key", true);
         // if (!hasLicensed) {
         // }
         try {
@@ -2039,7 +2039,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         } catch (Exception e4) {
         }
         try {
-            uploadLogs();
+            // uploadLogs();
         } catch (Exception e5) {
         }
         try {
@@ -2053,12 +2053,12 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
         } catch (Exception e7) {
         }
         try {
-            autoUpdateApks();
+            // autoUpdateApks();
             autoUpdateDesigns();
         } catch (Exception e8) {
         }
         try {
-            DensityUtil.isMyLauncherDefault(this);
+            // DensityUtil.isMyLauncherDefault(this);
         } catch (Exception e9) {
         }
     }
@@ -2072,21 +2072,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
     }
 
     private void autoUpdateApks() {
-        long time = System.currentTimeMillis();
-        SharedPreferences sp = getSharedPreferences("resumeconfig", 0);
-        long pretime = sp.getLong("updateapks", 0L);
-        if (time - pretime > 86400000 || pretime == 0) {
-            this.hasUpdated = false;
-            apkUpdate();
-        } else if (time - pretime > 3600000) {
-            SharedPreferences sharePre = getSharedPreferences("privatekey", 0);
-            String ip = sharePre.getString("apihost", "");
-            List<String> failedApks = Utils.getFailedEbagUpdated(this, ip);
-            if (failedApks != null && failedApks.size() > 0) {
-                this.hasUpdated = false;
-                apkUpdate();
-            }
-        }
+        // removed
     }
 
     private void autoUpdateDesigns() {
@@ -3605,6 +3591,7 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                     PasswdDialogClickTime++;
                     Toast.makeText(this, "该功能暂不开放！", 0).show();
                 }else{
+                    // Hacked
                     Toast.makeText(this, "你居然呢发现了", 0).show();
                     Intent intent8 = new Intent( CloudClientActivity.this, PasswdDialogActivity.class);
                     intent8.addFlags(335544320);
@@ -3974,7 +3961,8 @@ public class CloudClientActivity extends ActivityBase implements View.OnClickLis
                         CloudClientActivity.this.tv_wifi.setText(String.valueOf(CloudClientActivity.this.getString(R.string.wifi_name)) + wifiInfo.getSSID());
                     }
                     CloudClientActivity.this.getDesignView();
-                    CloudClientActivity.this.apkUpdate();
+                    // HACKED
+                    // CloudClientActivity.this.apkUpdate();
                 }
             } else if (action.equals(sysProtectService.SERVICE_START)) {
                 CloudClientActivity.this.lockPad();
